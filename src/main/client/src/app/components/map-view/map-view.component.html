@@ -1,0 +1,24 @@
+
+<div>
+     <h4>{{ 'tenants' | translate}}</h4>
+<mat-form-field>
+  <mat-label>{{ 'tenant' | translate}}</mat-label>
+  <mat-select [(ngModel)]="tenant" (selectionChange)="changeTenant()">
+    @for (t of tenants; track t) {
+      <mat-option [value]="t">{{ t.val | translate}}</mat-option>
+    }
+  </mat-select>
+</mat-form-field>
+</div>
+
+<div style="height: 550px;"
+     leaflet 
+     [leafletOptions]="options"
+     (leafletMapReady)="onMapReady($event)">
+</div>
+
+<div echarts style="height: 100px; width: 100%"
+    [options]="chartOptionsRok" 
+     (chartInit)="onChartRokInit($event)" (chartBrushEnd)="onRokSelected($event)" 
+     (chartBrushSelected)="onClearSelection($event)">
+</div>

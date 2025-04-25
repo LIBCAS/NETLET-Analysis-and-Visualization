@@ -1,0 +1,26 @@
+.mat-toolbar {
+    //height: $app-navbar-height;
+  
+    .app-logo {
+      height: 34px;
+    }
+  
+    .app-logo-desc {
+      color: rgba(var(--app-color-lightnes-rgb), .6);
+      font-weight: 100;
+      border-left: 1px solid rgba(var(--app-color-lightnes-rgb), .3);
+      margin-left: 8px;
+      padding: 0 0 0 8px;
+      align-self: self-end;
+    }
+  
+    .mdc-button {
+      padding-left: 16px;
+      padding-right: 16px;
+  
+      &:hover, &.active {
+        color: inherit;
+        //background-color: $app-navbar-active-item-color;
+      }
+    }
+  }

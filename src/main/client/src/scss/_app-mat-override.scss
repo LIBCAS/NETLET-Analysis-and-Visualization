@@ -1,0 +1,260 @@
+// --- MATERIAL OVERRIDE ---
+
+@use "app-mixins";
+@use '@angular/material' as mat;
+
+// card
+.mat-mdc-card {
+  &.app-alert {
+    @include app-mixins.setAlertCard();
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--app-color-gray-3);
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    justify-content: center;
+
+    .mat-icon {
+      @include app-mixins.setIcon(18);
+      flex: 1 1 26px;
+      box-sizing: border-box;
+      max-width: 26px;
+      min-width: 26px;
+    }
+
+    .app-text {
+      word-break: break-all;
+    }
+  }
+
+  .mat-mdc-card-actions {
+    padding: 0 16px 16px 16px;
+  }
+}
+
+// table
+.mat-mdc-table {
+  .mat-mdc-row {
+    &.app-selected {
+      background-color: var(--app-color-item-selected) !important;
+    }
+
+    &.app-invalid {
+      background-color: rgba(var(--app-color-item-invalid-no-rgb), .1) !important;
+
+      .mat-icon {
+        color: var(--app-color-item-invalid);
+      }
+    }
+
+    &.app-repre {
+      font-weight: 700;
+    }
+  }
+
+  &.app-striped {
+    .mat-mdc-row {
+      &:nth-child(odd) {
+        &:not(.app-selected) {
+          background-color: var(--app-color-gray-1);
+        }
+      }
+    }
+  }
+
+  &.app-hover {
+    .mat-mdc-row {
+      &:hover {
+        &:not(.app-selected, .app-row-detail) {
+          background-color: var(--app-color-gray-2);
+        }
+      }
+    }
+  }
+
+  &.app-resize {
+    table-layout: fixed;
+    //min-width: auto;
+    width: fit-content;
+
+    &.app-resizing {
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+
+    .mat-mdc-header-cell {
+      position: relative;
+
+      .app-resize-holder {
+        cursor: col-resize;
+        width: 10px;
+        height: 100%;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 1;
+
+        &:after {
+          content: '';
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          right: 0;
+          border-right: 1px solid var(--app-default-border-color);
+        }
+      }
+    }
+
+    .mat-mdc-header-cell,
+    .mat-mdc-cell {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .mat-mdc-header-cell {
+    &.mat-column-isLocked {
+      padding: 0 8px;
+    }
+  }
+
+  .mat-mdc-icon-button {
+    &.mat-mdc-button-base {
+      border-radius: 0;
+      --mdc-icon-button-state-layer-size: 34px;
+      width: var(--mdc-icon-button-state-layer-size);
+      height: var(--mdc-icon-button-state-layer-size);
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .mat-mdc-button-persistent-ripple {
+      border-radius: 0;
+    }
+  }
+
+  .mat-icon {
+    @include app-mixins.setIcon(20, $position: sub);
+  }
+
+  a {
+    .mat-icon {
+      @include app-mixins.setIcon(16);
+    }
+  }
+}
+
+// paginator
+.mat-mdc-paginator {
+  .app-toolbar & {
+    background-color: transparent;
+  }
+
+  .app-oa-y & {
+    position: sticky;
+    bottom: 0;
+  }
+}
+
+// menu
+.mat-mdc-menu-item {
+  min-height: var(--app-menu-item-height) !important;
+}
+
+// select
+.mat-mdc-option {
+  min-height: var(--app-menu-item-height) !important;
+  line-height: var(--app-menu-item-height) !important;
+
+  .mdc-list-item__primary-text {
+    white-space: nowrap !important;
+    display: inline-block;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+
+// radio button
+.mat-mdc-radio-group {
+  .mat-mdc-radio-button {
+    &.mat-accent {
+      --mdc-radio-selected-icon-color: var(--app-color-primary);
+      --mdc-radio-selected-hover-icon-color:  var(--app-color-primary);
+      --mdc-radio-selected-focus-icon-color:  var(--app-color-primary);
+      --mat-radio-checked-ripple-color:  var(--app-color-primary);
+    }
+  }
+
+  .app-toolbar & {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+    .mat-mdc-radio-button {
+      --mdc-radio-state-layer-size: calc(var(--app-toolbar-radio-button-size) * 2);
+      margin-right: 8px;
+
+      .mdc-radio__background::before {
+        top: calc(-1 * (var(--mdc-radio-state-layer-size, 40px) - var(--app-toolbar-radio-button-size)) / 2) !important;
+        left: calc(-1 * (var(--mdc-radio-state-layer-size, 40px) - var(--app-toolbar-radio-button-size)) / 2) !important;
+      }
+    
+      .mdc-radio {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    
+        .mat-mdc-radio-touch-target {
+          height: var(--app-toolbar-height);
+          width: var(--app-toolbar-height);
+        }
+    
+        .mdc-radio__background {
+          height: var(--app-toolbar-radio-button-size);
+          width: var(--app-toolbar-radio-button-size);
+    
+          .mdc-radio__inner-circle {
+            border-width: calc(var(--app-toolbar-radio-button-size) / 2);
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// form field
+.mat-mdc-form-field {
+  .mat-mdc-form-field-icon-suffix {
+    padding-right: 4px;
+    @include mat.icon-button-density(-6);
+
+    .mat-mdc-icon-button {
+      .mat-icon {
+        @include app-mixins.setIcon(20);
+      }
+    }
+  }
+
+  .mat-mdc-form-field-bottom-align {
+    --mat-form-field-subscript-text-line-height: 0;
+    height: 8px;
+
+    &::before {
+      height: 0;
+    }
+  }
+}
+
+
+:root {
+  @include mat.form-field-density(-6);
+}

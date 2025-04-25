@@ -1,0 +1,176 @@
+// --- VARIABLES ---
+
+:root {
+  // config
+  --app-color-info: #856404;
+  --app-color-success: #2E7D32;
+  --app-color-disabled: var(--app-color-gray-4);
+  --app-color-item-bg: var(--app-color-gray-1);
+  --app-color-item-selected: var(--palette-primary-50);
+  --app-color-item-active: var(--app-color-gray-8);
+  --app-color-item-invalid: var(--app-color-warn);
+  --app-color-item-invalid-no-rgb: var(--palette-warn-500-no-rgb);
+  --app-color-item-hover: var(--palette-primary-50);
+  --app-color-item-dragover-allowed: $app-color-success;
+  --app-color-item-dragover-noallowed: var(--app-color-warn);
+
+  // basic colors
+  --app-color-primary: var(--palette-primary-500);
+  --app-color-accent: var(--palette-accent-500) ;
+  --app-color-warn: var(--palette-warn-500);
+
+  --app-color-lightnes: #ffffff;
+  --app-color-lightnes-rgb: 255, 255, 255;
+  --app-color-darknes: #000000;
+  --app-color-darknes-rgb: 0, 0, 0;
+
+  // gray pallete
+  --app-color-gray-0: #FAFAFA;
+  --app-color-gray-1: #F5F5F5;
+  --app-color-gray-2: #EEEEEE;
+  --app-color-gray-3: #E0E0E0;
+  --app-color-gray-4: #BDBDBD;
+  --app-color-gray-5: #9E9E9E;
+  --app-color-gray-6: #757575;
+  --app-color-gray-7: #616161;
+  --app-color-gray-8: #424242;
+  --app-color-gray-9: #212121;
+
+  // custom
+  --app-default-border-color: var(--app-color-gray-3);
+  --app-default-bg: var(--app-color-gray-1); 
+  --app-default-wrapper: 8px;
+
+  // components
+  --app-navbar-active-item-color: #{rgba(var(--app-color-lightnes-rgb), .15)};
+  --app-navbar-session-color: #{rgba(var(--app-color-lightnes-rgb), .3)};
+
+  --app-toolbar-height: 34px;
+  --app-toolbar-color: var(--app-color-gray-7);
+  --app-toolbar-border-color: var(--app-default-border-color);
+  --app-toolbar-bg-color: var(--app-default-bg);
+  --app-toolbar-button-bg-active: var(--app-toolbar-border-color);
+  --app-toolbar-button-height: var(--app-toolbar-height);
+  --app-toolbar-radio-button-size: 14px;
+  
+  --app-breadcrumbsbar-height: 40px;
+
+  --app-menu-item-height: 28px;
+
+   // form
+   --app-form-bg-color: var(--app-color-gray-2);
+   --app-form-border-color-top-level: var(--app-color-gray-5);
+   --app-form-border-color: #d3d2d2;
+   --app-form-gap: 8px;
+   --app-form-header-height: 40px;
+   --app-form-title-weight: 600;
+   --app-form-header-button-color: var(--app-color-gray-7);
+   --app-form-field-border-color: var(--app-color-gray-3);
+
+  // footer
+  --app-footer-bg-color: var(--app-color-darknes);
+  --app-footer-color: var(--app-color-gray-5);
+
+  // mat override
+  --mat-toolbar-standard-height: 56px;
+  --mat-text-button-horizontal-padding: 16px;
+  --mdc-outlined-card-container-shape: 0;
+
+  --mat-table-header-container-height: 28px;
+  --mat-table-row-item-container-height: 28px;
+
+  --mat-paginator-container-size: 0;
+
+  --mdc-icon-button-disabled-icon-color: var(--app-color-gray-4);
+}
+
+
+// gaps
+$gaps: (
+  "0": 0,
+  "1": 4,
+  "2": 8,
+  "3": 12,
+  "4": 16,
+  "5": 20,
+  "6": 24,
+  "7": 28,
+  "8": 32,
+);
+
+// icon size
+$iconSize: (
+  "14": 14,
+  "15": 15,
+  "16": 16,
+  "17": 17,
+  "18": 18,
+  "19": 19,
+  "20": 20,
+  "21": 21,
+  "22": 22,
+  "23": 23,
+);
+
+// alerts
+$alerts: (
+  warn: (
+    color: var(--palette-warn-500),
+    bg: var(--palette-warn-50),
+    border: var(--palette-warn-100)
+  )/* ,
+  info: (
+    color: $app-color-info,
+    bg: #fff3cd,
+    border: rgba($app-color-info, .15)
+  ),
+  success: (
+    color: $app-color-success,
+    bg: rgba($app-color-success, .1),
+    border: rgba($app-color-success, .2)
+  ),
+  message: (
+    color: $app-gray-7,
+    bg: rgba($app-gray-7, .1),
+    border: rgba($app-gray-7, .2)
+  ) */
+);
+
+// states
+/* $states: (
+  sentiment_satisfied: $app-color-info,
+  mood_bad: $app-color-warn,
+  mood: $app-color-success,
+
+  LOADING: mat-color($mat-blue-gray, 600),
+  LOADED:  $app-color-success,
+  LOADING_FAILED: $app-color-warn,
+  INGESTING: mat-color($mat-blue-gray, 600),
+  INGESTED: $app-color-success,
+  INGESTING_FAILED: $app-color-warn,
+  EXPORT_PLANNED: $app-color-info,
+  EXPORTING: mat-color($mat-blue-gray, 600),
+  EXPORT_DONE: $app-color-success,
+  EXPORT_FAILED: $app-color-warn,
+  EXPORT_VALID_WARNING: $app-color-warn,
+  REINDEXING: mat-color($mat-blue-gray, 600),
+  REINDEX_DONE: $app-color-success,
+  REINDEX_FAILED: $app-color-warn,
+  UPLOADING: mat-color($mat-blue-gray, 600),
+  UPLOAD_DONE: $app-color-success,
+  UPLOAD_FAILED: $app-color-warn,
+  STOPPED: mat-color($mat-blue-gray, 600),
+  WAITING: mat-color($mat-teal, 500),
+  INTERNAL_DONE: $app-color-success,
+  INTERNAL_RUNNING: mat-color($mat-blue-gray, 600),
+  INTERNAL_PLANNED: $app-color-info,
+  INTERNAL_FAILED: $app-color-warn,
+  IMPORT_PLANNED: $app-color-info,
+  EXTERNAL_RUNNING: mat-color($mat-blue-gray, 600),
+  EXTERNAL_PLANNED: $app-color-info,
+  EXTERNAL_FAILED: $app-color-warn,
+  EXTERNAL_DONE: $app-color-success,
+  model: $app-badge-model-bg,
+  default: $app-gray-6
+); */
+
