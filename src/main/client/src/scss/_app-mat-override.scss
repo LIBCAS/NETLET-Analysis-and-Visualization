@@ -3,6 +3,13 @@
 @use "app-mixins";
 @use '@angular/material' as mat;
 
+// :root {
+//   @include mat.toolbar-overrides((
+//     container-background-color: var(--palette-primary-500),
+//     container-text-color: red,
+//   ));
+// }
+
 // card
 .mat-mdc-card {
   &.app-alert {

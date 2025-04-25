@@ -45,13 +45,13 @@ export class MapViewComponent implements OnInit {
     count: number,
     date_year_max: number,
     date_year_min: number
-    }[] = [];
+  }[] = [];
   tenant: {
     val: string,
     count: number,
     date_year_max: number,
     date_year_min: number
-    };
+  };
 
   map: Map;
   options = {
@@ -95,7 +95,7 @@ export class MapViewComponent implements OnInit {
   }
 
   changeTenant() {
-    this.limits = [this.tenant.date_year_min,this.tenant.date_year_max];
+    this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
     this.getData();
   }
 
@@ -115,7 +115,7 @@ export class MapViewComponent implements OnInit {
     // if (this.limits) {
     //   p.date_range = this.limits.toString();
     // } else {
-      p.date_range = this.tenant.date_year_min+','+this.tenant.date_year_max;
+    p.date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
     //}
     this.solrResponse = null;
     this.service.getPlaces(p as HttpParams).subscribe((resp: any) => {
@@ -134,7 +134,7 @@ export class MapViewComponent implements OnInit {
     if (!this.solrResponse) {
       return;
     }
-    
+
     this.nodes = {};
     this.nodeLayer.clearLayers();
     this.links = {};
@@ -144,32 +144,34 @@ export class MapViewComponent implements OnInit {
         if (!this.nodes[lp.place_id]) {
           this.nodes[lp.place_id] = [lp.latitude, lp.longitude];
           const m = L.circleMarker([lp.latitude, lp.longitude], {
-            color: '#FF0000',
-            radius: 2
+            color: '#795548',
+            radius: 5,
+            weight: 1
           });
+          m.bindTooltip(lp.name);
           m.addTo(this.nodeLayer);
         }
 
         if (!this.links[lp.letter_id]) {
-          this.links[lp.letter_id] = { node1: [lp.latitude, lp.longitude], node2: [lp.latitude, lp.longitude], count: 1 };
+          this.links[lp.letter_id] = { node1: [lp.latitude, lp.longitude], node2: [lp.latitude, lp.longitude], count: 2 };
         } else {
           if (lp.role === 'origin') {
             this.links[lp.letter_id].node1 = [lp.latitude, lp.longitude];
           } else {
             this.links[lp.letter_id].node2 = [lp.latitude, lp.longitude];
-            this.linkNodes(this.links[lp.letter_id].node1, this.links[lp.letter_id].node2, this.links[lp.letter_id].count);
+            this.linkNodes(this.links[lp.letter_id].node1, this.links[lp.letter_id].node2, this.links[lp.letter_id].count, lp.date_year + '');
           }
         }
       }
 
 
     });
-    this.map.addLayer(this.nodeLayer);
     this.map.addLayer(this.linkLayer);
+    this.map.addLayer(this.nodeLayer);
 
   }
 
-  linkNodes(node1: [number, number], node2: [number, number], count: number) {
+  linkNodes(node1: [number, number], node2: [number, number], count: number, popup: string) {
     const offsetX: any = node2[1] - node1[1];
     const offsetY: any = node2[0] - node1[0];
 
@@ -186,12 +188,14 @@ export class MapViewComponent implements OnInit {
 
     var midpointLatLng: CurvePathDataElement = [midpointY, midpointX];
 
-    L.curve(['M', node1,
+    const m = L.curve(['M', node1,
       'Q', midpointLatLng,
-      node2
-    ],
-      { color: 'blue', fill: false, weight: count }
-    ).addTo(this.linkLayer);
+      node2],
+      { color: '#5470c6', fill: false, weight: count }
+    );
+    // console.log(m);
+    m.bindTooltip(popup);
+    m.addTo(this.linkLayer);
   }
 
   onChartRokInit(e: any) {
@@ -212,7 +216,7 @@ export class MapViewComponent implements OnInit {
 
   onClearSelection(e: any) {
     if (e.batch[0].areas.length === 0 && this.showSelection) {
-      this.limits = [this.tenant.date_year_min,this.tenant.date_year_max];
+      this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
       this.processData();
       // const params: any = {};
       // params.rokvydani = null;

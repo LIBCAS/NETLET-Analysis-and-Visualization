@@ -1,6 +1,14 @@
 // --- VARIABLES ---
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+  @include mat.toolbar-overrides((
+    container-background-color: var(--mat-sys-primary),
+    container-text-color: white,
+  ));
 
 :root {
+
   // config
   --app-color-info: #856404;
   --app-color-success: #2E7D32;
@@ -15,7 +23,7 @@
   --app-color-item-dragover-noallowed: var(--app-color-warn);
 
   // basic colors
-  --app-color-primary: var(--palette-primary-500);
+  --app-color-primary: var(--mat-sys-on-primary);
   --app-color-accent: var(--palette-accent-500) ;
   --app-color-warn: var(--palette-warn-500);
 
@@ -48,7 +56,7 @@
   --app-toolbar-height: 34px;
   --app-toolbar-color: var(--app-color-gray-7);
   --app-toolbar-border-color: var(--app-default-border-color);
-  --app-toolbar-bg-color: var(--app-default-bg);
+  --app-toolbar-bg-color: var(--mat-sys-primary);
   --app-toolbar-button-bg-active: var(--app-toolbar-border-color);
   --app-toolbar-button-height: var(--app-toolbar-height);
   --app-toolbar-radio-button-size: 14px;
@@ -118,59 +126,5 @@ $alerts: (
     color: var(--palette-warn-500),
     bg: var(--palette-warn-50),
     border: var(--palette-warn-100)
-  )/* ,
-  info: (
-    color: $app-color-info,
-    bg: #fff3cd,
-    border: rgba($app-color-info, .15)
-  ),
-  success: (
-    color: $app-color-success,
-    bg: rgba($app-color-success, .1),
-    border: rgba($app-color-success, .2)
-  ),
-  message: (
-    color: $app-gray-7,
-    bg: rgba($app-gray-7, .1),
-    border: rgba($app-gray-7, .2)
-  ) */
+  )
 );
-
-// states
-/* $states: (
-  sentiment_satisfied: $app-color-info,
-  mood_bad: $app-color-warn,
-  mood: $app-color-success,
-
-  LOADING: mat-color($mat-blue-gray, 600),
-  LOADED:  $app-color-success,
-  LOADING_FAILED: $app-color-warn,
-  INGESTING: mat-color($mat-blue-gray, 600),
-  INGESTED: $app-color-success,
-  INGESTING_FAILED: $app-color-warn,
-  EXPORT_PLANNED: $app-color-info,
-  EXPORTING: mat-color($mat-blue-gray, 600),
-  EXPORT_DONE: $app-color-success,
-  EXPORT_FAILED: $app-color-warn,
-  EXPORT_VALID_WARNING: $app-color-warn,
-  REINDEXING: mat-color($mat-blue-gray, 600),
-  REINDEX_DONE: $app-color-success,
-  REINDEX_FAILED: $app-color-warn,
-  UPLOADING: mat-color($mat-blue-gray, 600),
-  UPLOAD_DONE: $app-color-success,
-  UPLOAD_FAILED: $app-color-warn,
-  STOPPED: mat-color($mat-blue-gray, 600),
-  WAITING: mat-color($mat-teal, 500),
-  INTERNAL_DONE: $app-color-success,
-  INTERNAL_RUNNING: mat-color($mat-blue-gray, 600),
-  INTERNAL_PLANNED: $app-color-info,
-  INTERNAL_FAILED: $app-color-warn,
-  IMPORT_PLANNED: $app-color-info,
-  EXTERNAL_RUNNING: mat-color($mat-blue-gray, 600),
-  EXTERNAL_PLANNED: $app-color-info,
-  EXTERNAL_FAILED: $app-color-warn,
-  EXTERNAL_DONE: $app-color-success,
-  model: $app-badge-model-bg,
-  default: $app-gray-6
-); */
-

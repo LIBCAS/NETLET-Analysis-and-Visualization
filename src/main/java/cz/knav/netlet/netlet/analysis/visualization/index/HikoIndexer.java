@@ -137,18 +137,30 @@ public class HikoIndexer {
     public JSONObject full() {
         Date start = new Date();
         JSONObject ret = new JSONObject();
-        int tindexed = 0;
         int success = 0;
         try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             List<String> tenants = getTenants();
 
             for (String tenant : tenants) {
-                String t = tenant + "__letter_place";
-                String sql = "select * from " + tenant + "__letter_place as LP, " + tenant + "__places as P, " + tenant + "__letters as L "
+                getLetters(client, ret, tenant, success);
+            }
+        } catch (NamingException | SQLException | IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        Date end = new Date();
+        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        ret.put("total", success);
+        return ret;
+    }
+    
+    private void getLetters(SolrClient client, JSONObject ret, String tenant, int success) throws NamingException, SQLException {
+        String t = tenant + "__letter_place";
+        String sql = "select * from " + tenant + "__letter_place as LP, " + tenant + "__places as P, " + tenant + "__letters as L "
                         + "where LP.letter_id = L.id AND LP.place_id = P.id";
-                PreparedStatement ps = getConnection().prepareStatement(sql);
+        PreparedStatement ps = getConnection().prepareStatement(sql);
                 try (ResultSet rs = ps.executeQuery()) {
-                    tindexed = 0;
+                    int tindexed = 0;
                     while (rs.next()) {
 
                         SolrInputDocument doc = new SolrInputDocument();
@@ -193,15 +205,10 @@ public class HikoIndexer {
                     ret.put("error" + t, e);
                 }
                 ps.close();
-            }
-        } catch (NamingException | SQLException | IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            ret.put("error", ex);
-        }
-        Date end = new Date();
-        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
-        ret.put("total", success);
-        return ret;
+    }
+    
+    private void addIdentities() {
+        
     }
 
 }

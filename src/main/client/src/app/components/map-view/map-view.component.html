@@ -18,7 +18,8 @@
 </div>
 
 <div echarts style="height: 100px; width: 100%"
-    [options]="chartOptionsRok" 
-     (chartInit)="onChartRokInit($event)" (chartBrushEnd)="onRokSelected($event)" 
+     [options]="chartOptionsRok" 
+     (chartInit)="onChartRokInit($event)" 
+     (chartBrushEnd)="onRokSelected($event)" 
      (chartBrushSelected)="onClearSelection($event)">
 </div>
