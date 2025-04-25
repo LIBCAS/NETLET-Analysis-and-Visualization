@@ -140,7 +140,6 @@ public class HikoIndexer {
         int success = 0;
         try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             List<String> tenants = getTenants();
-
             for (String tenant : tenants) {
                 getLetters(client, ret, tenant, success);
             }
@@ -153,62 +152,84 @@ public class HikoIndexer {
         ret.put("total", success);
         return ret;
     }
-    
+
     private void getLetters(SolrClient client, JSONObject ret, String tenant, int success) throws NamingException, SQLException {
         String t = tenant + "__letter_place";
         String sql = "select * from " + tenant + "__letter_place as LP, " + tenant + "__places as P, " + tenant + "__letters as L "
-                        + "where LP.letter_id = L.id AND LP.place_id = P.id";
+                + "where LP.letter_id = L.id AND LP.place_id = P.id";
         PreparedStatement ps = getConnection().prepareStatement(sql);
-                try (ResultSet rs = ps.executeQuery()) {
-                    int tindexed = 0;
-                    while (rs.next()) {
+        try (ResultSet rs = ps.executeQuery()) {
+            int tindexed = 0;
+            while (rs.next()) {
 
-                        SolrInputDocument doc = new SolrInputDocument();
+                SolrInputDocument doc = new SolrInputDocument();
 
-                        String id = tenant + "_" + rs.getInt("LP.id");
+                String id = tenant + "_" + rs.getInt("LP.id");
 
-                        doc.addField("id", id);
-                        doc.addField("table", t);
-                        doc.addField("table_id", rs.getInt("LP.id"));
-                        doc.addField("tenant", tenant);
-                        doc.addField("letter_id", rs.getInt("LP.letter_id"));
-                        doc.addField("place_id", rs.getInt("LP.place_id"));
-                        doc.addField("role", rs.getString("LP.role"));
+                doc.addField("id", id);
+                doc.addField("table", t);
+                doc.addField("table_id", rs.getInt("LP.id"));
+                doc.addField("tenant", tenant);
+                doc.addField("letter_id", rs.getInt("LP.letter_id"));
+                doc.addField("place_id", rs.getInt("LP.place_id"));
+                doc.addField("role", rs.getString("LP.role"));
 
-                        doc.addField("date_computed", rs.getDate("L.date_computed"));
-                        doc.addField("date_year", rs.getLong("L.date_year"));
+                doc.addField("date_computed", rs.getDate("L.date_computed"));
+                doc.addField("date_year", rs.getLong("L.date_year"));
 
-                        doc.addField("name", rs.getString("P.name"));
-                        doc.addField("country", rs.getString("P.country"));
-                        doc.addField("note", rs.getString("P.note"));
-                        doc.addField("latitude", rs.getString("P.latitude"));
-                        doc.addField("longitude", rs.getString("P.longitude"));
-                        doc.addField("geoname_id", rs.getInt("P.geoname_id"));
-                        doc.addField("division", rs.getString("P.division"));
-                        if (rs.getString("latitude") != null) {
-                            doc.addField("coords", rs.getString("P.latitude") + "," + rs.getString("P.longitude"));
-                        }
-
-                        client.add("letter_place", doc);
-                        success++;
-                        if (success % 500 == 0) {
-                            client.commit("letter_place");
-                            LOGGER.log(Level.INFO, "Indexed {0} docs", success);
-                        }
-
-                        ret.put(t, tindexed++);
-
-                    }
-                    rs.close();
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, null, e);
-                    ret.put("error" + t, e);
+                doc.addField("name", rs.getString("P.name"));
+                doc.addField("country", rs.getString("P.country"));
+                doc.addField("note", rs.getString("P.note"));
+                doc.addField("latitude", rs.getString("P.latitude"));
+                doc.addField("longitude", rs.getString("P.longitude"));
+                doc.addField("geoname_id", rs.getInt("P.geoname_id"));
+                doc.addField("division", rs.getString("P.division"));
+                if (rs.getString("latitude") != null) {
+                    doc.addField("coords", rs.getString("P.latitude") + "," + rs.getString("P.longitude"));
                 }
-                ps.close();
+
+                addIdentities(tenant, rs.getInt("LP.letter_id"), doc);
+
+                client.add("letter_place", doc);
+                success++;
+                if (success % 500 == 0) {
+                    client.commit("letter_place");
+                    LOGGER.log(Level.INFO, "Indexed {0} docs", success);
+                }
+
+                ret.put(t, tindexed++); 
+            }
+            rs.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, null, e);
+            ret.put("error" + t, e);
+        }
+        ps.close();
     }
-    
-    private void addIdentities() {
-        
+
+    private void addIdentities(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
+
+        String sqlIdentity = "select * from " + tenant + "__identity_letter as IL, " + tenant + "__identities as I where IL.identity_id=I.id AND letter_id = " + letter_id;
+        PreparedStatement psIdentity = getConnection().prepareStatement(sqlIdentity);
+        try (ResultSet rs = psIdentity.executeQuery()) {
+            while (rs.next()) {
+                doc.addField("identity_id", rs.getInt("I.id"));
+                doc.addField("identity_role", rs.getString("IL.role"));
+                doc.addField("identity_name", rs.getString("I.name"));
+                
+                JSONObject identities = new JSONObject()
+                        .put("id", rs.getInt("I.id"))
+                        .put("role", rs.getString("IL.role"))
+                        .put("name", rs.getString("I.name"));
+                doc.addField("identities", identities.toString());
+                
+                
+            }
+            rs.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, null, e);
+        }
+        psIdentity.close(); 
     }
 
 }

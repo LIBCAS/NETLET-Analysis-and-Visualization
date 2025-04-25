@@ -159,7 +159,7 @@ export class MapViewComponent implements OnInit {
             this.links[lp.letter_id].node1 = [lp.latitude, lp.longitude];
           } else {
             this.links[lp.letter_id].node2 = [lp.latitude, lp.longitude];
-            this.linkNodes(this.links[lp.letter_id].node1, this.links[lp.letter_id].node2, this.links[lp.letter_id].count, lp.date_year + '');
+            this.linkNodes(this.links[lp.letter_id].node1, this.links[lp.letter_id].node2, this.links[lp.letter_id].count, lp.identities, lp.date_year);
           }
         }
       }
@@ -171,7 +171,7 @@ export class MapViewComponent implements OnInit {
 
   }
 
-  linkNodes(node1: [number, number], node2: [number, number], count: number, popup: string) {
+  linkNodes(node1: [number, number], node2: [number, number], count: number, identities: {id: number, role: string, name: string}[], year: number) {
     const offsetX: any = node2[1] - node1[1];
     const offsetY: any = node2[0] - node1[0];
 
@@ -194,6 +194,10 @@ export class MapViewComponent implements OnInit {
       { color: '#5470c6', fill: false, weight: count }
     );
     // console.log(m);
+    let popup = '<div>Rok:' + year + '</div>';
+    identities.forEach(i => {
+      popup += '<div>' + i.role + ': ' + i.name + '</div>';
+    })
     m.bindTooltip(popup);
     m.addTo(this.linkLayer);
   }

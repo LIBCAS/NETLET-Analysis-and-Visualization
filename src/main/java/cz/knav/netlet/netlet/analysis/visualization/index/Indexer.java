@@ -101,6 +101,7 @@ public class Indexer {
             String[] years = date_range.split(",");
             SolrQuery query = new SolrQuery("*")
                     .setRows(10000)
+                    .setFields("*,identities:[json]")
                     .setFacet(true)
                     .setParam("wt", "json")
                     .setParam("json.nl", "arrntv")
