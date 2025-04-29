@@ -25,11 +25,12 @@ import { BrushComponent } from 'echarts/components';
 import { ToolboxComponent } from 'echarts/components';
 import { Facet } from '../../shared/facet';
 import { HttpParams } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridComponent, TitleComponent, BrushComponent, ToolboxComponent]);
 
 @Component({
   selector: 'app-map-view',
-  imports: [TranslateModule, FormsModule,
+  imports: [TranslateModule, FormsModule, CommonModule,
     LeafletModule, NgxEchartsDirective,
     MatFormFieldModule, MatSelectModule, MatInputModule],
   templateUrl: './map-view.component.html',
@@ -262,12 +263,13 @@ export class MapViewComponent implements OnInit {
     this.chartOptionsRok = {
       animation: false,
       title: {
+        show: false,
         text: this.translation.instant('Rok')
       },
       toolbox: {
         show: this.limits !== undefined,
         feature: {
-          brush: { title: { 'clear': this.translation.instant('desc.clearSelection') }, show: true }
+          brush: { title: { 'clear': this.translation.instant('clearSelection') }, show: true }
         }
       },
       brush: {

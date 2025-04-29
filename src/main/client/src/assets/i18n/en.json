@@ -1,4 +1,5 @@
 {
   "tenant": "Catalog",
-  "tenants": "Catalogs"
+  "tenants": "Catalogs",
+  "clearSelection": "Clear selection"
 }
