@@ -49,47 +49,33 @@
   --app-default-bg: var(--app-color-gray-1); 
   --app-default-wrapper: 8px;
 
+  // bars
+  --app-topbar-height: 50px;
+  --app-topbar-border-color: var(--app-gray-3);
+  --app-controlbar-height: 45px;
+  --app-controlbar-bg-color: var(--app-gray-1);
+  --app-controlbar-border-color: var(--app-gray-3);
+
   // components
-  --app-navbar-active-item-color: #{rgba(var(--app-color-lightnes-rgb), .15)};
-  --app-navbar-session-color: #{rgba(var(--app-color-lightnes-rgb), .3)};
-
-  --app-toolbar-height: 34px;
-  --app-toolbar-color: var(--app-color-gray-7);
-  --app-toolbar-border-color: var(--app-default-border-color);
-  --app-toolbar-bg-color: var(--mat-sys-primary);
-  --app-toolbar-button-bg-active: var(--app-toolbar-border-color);
-  --app-toolbar-button-height: var(--app-toolbar-height);
-  --app-toolbar-radio-button-size: 14px;
-  
-  --app-breadcrumbsbar-height: 40px;
-
-  --app-menu-item-height: 28px;
-
-   // form
-   --app-form-bg-color: var(--app-color-gray-2);
-   --app-form-border-color-top-level: var(--app-color-gray-5);
-   --app-form-border-color: #d3d2d2;
-   --app-form-gap: 8px;
-   --app-form-header-height: 40px;
-   --app-form-title-weight: 600;
-   --app-form-header-button-color: var(--app-color-gray-7);
-   --app-form-field-border-color: var(--app-color-gray-3);
-
-  // footer
   --app-footer-bg-color: var(--app-color-darknes);
-  --app-footer-color: var(--app-color-gray-5);
+  --app-footer-color: var(--app-gray-6);
+
+  --app-paginator-form-field-height: 28px;
+
+  // layout
+  --app-container: 1280px;
+
+    // layout
+    --app-container: 1280px;
 
   // mat override
-  --mat-toolbar-standard-height: 56px;
-  --mat-text-button-horizontal-padding: 16px;
-  --mdc-outlined-card-container-shape: 0;
-
-  --mat-table-header-container-height: 28px;
-  --mat-table-row-item-container-height: 28px;
-
-  --mat-paginator-container-size: 0;
-
-  --mdc-icon-button-disabled-icon-color: var(--app-color-gray-4);
+  --app-button-height: 32px;
+  --app-checkbox-size: 14px;
+  --mat-paginator-container-background-color: transparent;
+  --mat-paginator-container-size: 44px;
+  --mdc-secondary-navigation-tab-container-height: 48px;
+  //--mat-toolbar-standard-height: 80px;
+  --mat-table-row-item-container-height: 36px;
 }
 
 
@@ -106,20 +92,6 @@ $gaps: (
   "8": 32,
 );
 
-// icon size
-$iconSize: (
-  "14": 14,
-  "15": 15,
-  "16": 16,
-  "17": 17,
-  "18": 18,
-  "19": 19,
-  "20": 20,
-  "21": 21,
-  "22": 22,
-  "23": 23,
-);
-
 // alerts
 $alerts: (
   warn: (
@@ -128,3 +100,4 @@ $alerts: (
     border: var(--palette-warn-100)
   )
 );
+

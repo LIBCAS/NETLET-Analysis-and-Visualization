@@ -69,7 +69,7 @@ export class MapViewComponent implements OnInit {
   nodeLayer: LayerGroup<CircleMarker> = new L.LayerGroup();
   linkLayer: LayerGroup<CircleMarker> = new L.LayerGroup();
 
-  nodes: { [id: number]: [number, number] } = {};
+  nodes: { [id: number]: {coords: [number, number], name: string} } = {};
   links: { [id: string]: { node1: [number, number], node2: [number, number], count: number, letters: Letter[] } } = {};
 
   chartOptionsRok: EChartsOption = {};
@@ -144,7 +144,7 @@ export class MapViewComponent implements OnInit {
       if (this.inLimits(letter.date_year) && letter.places && letter.origin) {
         letter.places.forEach((place: Place) => {
           if (place.latitude && !this.nodes[place.place_id]) {
-            this.nodes[place.place_id] = [place.latitude, place.longitude];
+            this.nodes[place.place_id] = {coords: [place.latitude, place.longitude], name: place.name};
             const m = L.circleMarker([place.latitude, place.longitude], {
               color: '#795548',
               radius: 5,
@@ -170,7 +170,6 @@ export class MapViewComponent implements OnInit {
             this.links[linkId].count = this.links[linkId].count + 1;
             this.links[linkId].letters.push(letter);
           }
-
         }
       };
 
@@ -209,18 +208,30 @@ export class MapViewComponent implements OnInit {
     const m = L.curve(['M', node1,
       'Q', midpointLatLng,
       node2],
-      { color: '#5470c6', fill: false, weight: Math.min(count, 4) }
+      { color: '#5470c6', fill: true, weight: Math.min(count, 4), fillColor: '#fff', fillOpacity: 0 }
     );
+
+    m.on('mouseover', () => {
+      m.setStyle({color: '#f00'});
+    });
+
+    m.on('mouseout', () => {
+      m.setStyle({color: '#5470c6'});
+    });
     // console.log(m);
     // let popup = '<div>Rok:' + year + '</div>';
     // identities.forEach(i => {
     //   popup += '<div>' + i.role + ': ' + i.name + '</div>';
     // })
 
-    let popup = '<div>Count:' + count + '</div>';
+    let popup = '<div>' + this.nodes[letters[0].origin].name + ' -> ' + this.nodes[letters[0].destination].name + '</div><div>Count:' + count + '</div>';
+    const roky: number[] = [];
     letters.forEach(letter => {
-      popup += '<div>Rok:' + letter.date_year + '</div>';
+      if (!roky.includes(letter.date_year)) {
+        roky.push(letter.date_year)
+      }
     });
+    popup += '<div>' + roky.join(', ') + '</div>';
     m.bindTooltip(popup, {sticky: true});
     m.addTo(this.linkLayer);
   }
