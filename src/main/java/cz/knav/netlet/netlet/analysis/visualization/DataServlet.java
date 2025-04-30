@@ -44,7 +44,7 @@ public class DataServlet extends HttpServlet {
                 if (json != null) {
                     response.getWriter().println(json.toString(2));
                 }
-                
+
             } else {
                 response.getWriter().print("actionNameParam -> " + actionNameParam);
             }
@@ -68,7 +68,7 @@ public class DataServlet extends HttpServlet {
         GET_TENANTS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = Indexer.getTenants().getJSONObject("facets").getJSONObject("tenant"); 
+                JSONObject ret = Indexer.getTenants().getJSONObject("facets").getJSONObject("tenant");
                 return ret;
             }
         },
@@ -87,14 +87,12 @@ public class DataServlet extends HttpServlet {
                 return json;
             }
         },
-        GET_PLACES {
+        GET_LETTERS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
                 if (request.getParameter("tenant") != null) {
-                ret.put("letter_place", 
-                        Indexer.getLetterPlace(request));
-                    
+                    ret = Indexer.getLetters(request);
                 }
                 return ret;
             }

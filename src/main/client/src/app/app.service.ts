@@ -65,7 +65,7 @@ export class AppService {
     return this.get('data/get_tenants')
   }
 
-  getPlaces(params: HttpParams): Observable<any> {
-    return this.get('data/get_places', params)
+  getLetters(params: HttpParams): Observable<any> {
+    return this.get('data/get_letters', params)
   }
 }

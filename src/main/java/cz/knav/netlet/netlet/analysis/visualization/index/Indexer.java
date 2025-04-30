@@ -86,7 +86,7 @@ public class Indexer {
         return ret;
     }
 
-    public static JSONObject getLetterPlace(HttpServletRequest request) {
+    public static JSONObject getLetters(HttpServletRequest request) {
         JSONObject ret = new JSONObject();
         NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
         rawJsonResponseParser.setWriterType("json");
@@ -101,7 +101,7 @@ public class Indexer {
             String[] years = date_range.split(",");
             SolrQuery query = new SolrQuery("*")
                     .setRows(10000)
-                    .setFields("*,identities:[json]")
+                    .setFields("*,places:[json],identities:[json]")
                     .setFacet(true)
                     .setParam("wt", "json")
                     .setParam("json.nl", "arrntv")

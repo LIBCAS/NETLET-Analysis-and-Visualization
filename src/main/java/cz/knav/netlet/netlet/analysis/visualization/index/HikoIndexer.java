@@ -138,6 +138,8 @@ public class HikoIndexer {
 
         String sql = "select * from " + tenant + "__letter_place as LP, " + tenant + "__places as P where LP.place_id = P.id AND LP.letter_id = " + letter_id;
         PreparedStatement psPlaces = getConnection().prepareStatement(sql); 
+        int origin = -1;
+        int destination = -1;
         try (ResultSet rs = psPlaces.executeQuery()) {
             while (rs.next()) {
 
@@ -146,13 +148,23 @@ public class HikoIndexer {
                 doc.addField("name", rs.getString("P.name"));
                 doc.addField("country", rs.getString("P.country"));
                 doc.addField("note", rs.getString("P.note"));
-                doc.addField("latitude", rs.getString("P.latitude"));
-                doc.addField("longitude", rs.getString("P.longitude"));
+                doc.addField("latitude", rs.getFloat("P.latitude"));
+                doc.addField("longitude", rs.getFloat("P.longitude"));
                 doc.addField("geoname_id", rs.getInt("P.geoname_id"));
                 doc.addField("division", rs.getString("P.division"));
                 if (rs.getString("P.latitude") != null) {
                     doc.addField("coords", rs.getString("P.latitude") + "," + rs.getString("P.longitude"));
                 } 
+                
+                if ("origin".equals(rs.getString("LP.role"))) {
+                    origin = rs.getInt("P.id");
+                    doc.setField("origin", origin);
+                }
+                
+                if ("destination".equals(rs.getString("LP.role"))) {
+                    destination = rs.getInt("P.id");
+                    doc.setField("destination", destination);
+                }
 
                 JSONObject places = new JSONObject()
                         .put("role", rs.getString("LP.role"))
@@ -160,8 +172,8 @@ public class HikoIndexer {
                         .put("name", rs.getString("P.name"))
                         .put("country", rs.getString("P.country"))
                         .put("note", rs.getString("P.note"))
-                        .put("latitude", rs.getString("P.latitude"))
-                        .put("longitude", rs.getString("P.longitude"))
+                        .put("latitude", rs.getFloat("P.latitude"))
+                        .put("longitude", rs.getFloat("P.longitude"))
                         .put("geoname_id", rs.getInt("P.geoname_id"))
                         .put("division", rs.getString("P.division"));
                 doc.addField("places", places.toString());

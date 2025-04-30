@@ -26,6 +26,7 @@ import { ToolboxComponent } from 'echarts/components';
 import { Facet } from '../../shared/facet';
 import { HttpParams } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { Letter, Place } from '../../shared/letter';
 echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridComponent, TitleComponent, BrushComponent, ToolboxComponent]);
 
 @Component({
@@ -69,8 +70,7 @@ export class MapViewComponent implements OnInit {
   linkLayer: LayerGroup<CircleMarker> = new L.LayerGroup();
 
   nodes: { [id: number]: [number, number] } = {};
-  links: { [id: string]: { node1: [number, number], node2: [number, number], count: number } } = {};
-
+  links: { [id: string]: { node1: [number, number], node2: [number, number], count: number, letters: Letter[] } } = {};
 
   chartOptionsRok: EChartsOption = {};
   chartRok: ECharts;
@@ -119,9 +119,9 @@ export class MapViewComponent implements OnInit {
     p.date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
     //}
     this.solrResponse = null;
-    this.service.getPlaces(p as HttpParams).subscribe((resp: any) => {
+    this.service.getLetters(p as HttpParams).subscribe((resp: any) => {
       this.solrResponse = resp;
-      this.setYearsChart(this.solrResponse.letter_place.facet_counts.facet_ranges.date_year);
+      this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);
       this.processData();
 
     });
@@ -140,39 +140,56 @@ export class MapViewComponent implements OnInit {
     this.nodeLayer.clearLayers();
     this.links = {};
     this.linkLayer.clearLayers();
-    this.solrResponse.letter_place.response.docs.forEach((lp: any) => {
-      if (lp.latitude && this.inLimits(lp.date_year)) {
-        if (!this.nodes[lp.place_id]) {
-          this.nodes[lp.place_id] = [lp.latitude, lp.longitude];
-          const m = L.circleMarker([lp.latitude, lp.longitude], {
-            color: '#795548',
-            radius: 5,
-            weight: 1
-          });
-          m.bindTooltip(lp.name);
-          m.addTo(this.nodeLayer);
-        }
-
-        if (!this.links[lp.letter_id]) {
-          this.links[lp.letter_id] = { node1: [lp.latitude, lp.longitude], node2: [lp.latitude, lp.longitude], count: 2 };
-        } else {
-          if (lp.role === 'origin') {
-            this.links[lp.letter_id].node1 = [lp.latitude, lp.longitude];
-          } else {
-            this.links[lp.letter_id].node2 = [lp.latitude, lp.longitude];
-            this.linkNodes(this.links[lp.letter_id].node1, this.links[lp.letter_id].node2, this.links[lp.letter_id].count, lp.identities, lp.date_year);
+    this.solrResponse.response.docs.forEach((letter: Letter) => {
+      if (this.inLimits(letter.date_year) && letter.places && letter.origin) {
+        letter.places.forEach((place: Place) => {
+          if (place.latitude && !this.nodes[place.place_id]) {
+            this.nodes[place.place_id] = [place.latitude, place.longitude];
+            const m = L.circleMarker([place.latitude, place.longitude], {
+              color: '#795548',
+              radius: 5,
+              weight: 1
+            });
+            m.bindTooltip(place.name);
+            m.addTo(this.nodeLayer);
           }
-        }
-      }
+        });
 
+        const linkId = letter.origin + '_' + letter.destination;
+        const place_origin = letter.places.find(p => p.role === 'origin');
+        const place_destination = letter.places.find(p => p.role === 'destination');
+
+        if (place_origin && place_destination && place_origin.latitude && place_destination.latitude) {
+          if (!this.links[linkId]) {
+            this.links[linkId] = { 
+              node1: [place_origin.latitude, place_origin.longitude], 
+              node2: [place_destination.latitude, place_destination.longitude], 
+              count: 1,
+              letters: [letter] };
+          } else {
+            this.links[linkId].count = this.links[linkId].count + 1;
+            this.links[linkId].letters.push(letter);
+          }
+
+        }
+      };
 
     });
+
+    
+    Object.keys(this.links).forEach(key => {
+      const link = this.links[key];
+      this.linkNodes(link.node1, link.node2, link.count, link.letters);
+    });
+
+    // this.linkNodes(this.links[letter.letter_id].node1, this.links[letter.letter_id].node2, this.links[letter.letter_id].count, letter.identities, letter.date_year);
+
     this.map.addLayer(this.linkLayer);
     this.map.addLayer(this.nodeLayer);
 
   }
 
-  linkNodes(node1: [number, number], node2: [number, number], count: number, identities: {id: number, role: string, name: string}[], year: number) {
+  linkNodes(node1: [number, number], node2: [number, number], count: number, letters: Letter[]) {
     const offsetX: any = node2[1] - node1[1];
     const offsetY: any = node2[0] - node1[0];
 
@@ -192,14 +209,19 @@ export class MapViewComponent implements OnInit {
     const m = L.curve(['M', node1,
       'Q', midpointLatLng,
       node2],
-      { color: '#5470c6', fill: false, weight: count }
+      { color: '#5470c6', fill: false, weight: Math.min(count, 4) }
     );
     // console.log(m);
-    let popup = '<div>Rok:' + year + '</div>';
-    identities.forEach(i => {
-      popup += '<div>' + i.role + ': ' + i.name + '</div>';
-    })
-    m.bindTooltip(popup);
+    // let popup = '<div>Rok:' + year + '</div>';
+    // identities.forEach(i => {
+    //   popup += '<div>' + i.role + ': ' + i.name + '</div>';
+    // })
+
+    let popup = '<div>Count:' + count + '</div>';
+    letters.forEach(letter => {
+      popup += '<div>Rok:' + letter.date_year + '</div>';
+    });
+    m.bindTooltip(popup, {sticky: true});
     m.addTo(this.linkLayer);
   }
 
