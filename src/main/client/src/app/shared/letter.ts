@@ -4,7 +4,8 @@ export interface Letter {
     destination: number,
     date_year: number,
     places: Place[],
-    identities: Identity[]
+    identities: Identity[],
+    identity_recipient: string[]
 }
 
 export interface Place {

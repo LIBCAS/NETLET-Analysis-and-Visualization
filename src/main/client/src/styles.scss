@@ -1,7 +1,6 @@
 @use '@angular/material' as mat;
 
 @use 'scss/theme-colors' as my-theme; 
-// @use 'scss/app-theme-colors' as my-theme; 
 
 @use 'scss/app-variables';
 @use 'scss/app-layout';
@@ -9,14 +8,14 @@
 @use 'scss/app-global';
 @use 'scss/app-mat-override';
 
-
-
 html {
   @include mat.theme((
     color: (
       primary: my-theme.$primary-palette,
       tertiary: my-theme.$tertiary-palette,
       theme-type: light,
-    )
+    ),
+    typography: Roboto,
+    density: 0,
   ));
 }

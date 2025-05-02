@@ -77,6 +77,7 @@ public class Indexer {
                 query.addFilterQuery("tenant:" + tenant);
             }
             query.set("wt", "json");
+            
             ret = new JSONObject(solr.query("letter_place", query).jsonStr());
 
         } catch (Exception ex) {
@@ -94,15 +95,18 @@ public class Indexer {
                 .withResponseParser(rawJsonResponseParser)
                 .build()) {
 
-            String date_range = request.getParameter("date_range");
-            if (date_range == null || date_range.isBlank()) {
-                date_range = "1000,2025";
+            String tenant_date_range = request.getParameter("tenant_date_range");
+            if (tenant_date_range == null || tenant_date_range.isBlank()) {
+                tenant_date_range = "1000,2025";
             }
-            String[] years = date_range.split(",");
+            String[] years = tenant_date_range.split(",");
             SolrQuery query = new SolrQuery("*")
                     .setRows(10000)
                     .setFields("*,places:[json],identities:[json]")
                     .setFacet(true)
+                    .addFacetField("identity_author")
+                    .addFacetField("identity_recipient")
+                    .addFacetField("identity_mentioned")
                     .setParam("wt", "json")
                     .setParam("json.nl", "arrntv")
                     .setParam("facet.range", "{!ex=ffdate_year}date_year")
@@ -116,9 +120,10 @@ public class Indexer {
             if (tenant != null && !tenant.isBlank()) {
                 query.addFilterQuery("tenant:" + tenant);
             }
-//            if (date_range != null && !date_range.isBlank()) {
-//                query.addFilterQuery("{!tag=ffdate_year}date_year:[" + date_range.replaceAll(",", " TO ") + "]");
-//            }
+            String date_range = request.getParameter("date_range");
+            if (date_range != null && !date_range.isBlank()) {
+                query.addFilterQuery("{!tag=ffdate_year}date_year:[" + date_range.replaceAll(",", " TO ") + "]");
+            }
 
             QueryRequest req = new QueryRequest(query);
 

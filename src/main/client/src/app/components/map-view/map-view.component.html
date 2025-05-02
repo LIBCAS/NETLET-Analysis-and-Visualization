@@ -1,7 +1,7 @@
+<div class="app-fxLayout app-row app-fill">
 
-<div class="app-fxLayout app-row">
-
-  <div style="flex: 1 1 50%">
+  <div style="flex: 1 30%; max-width: 300px;">
+    <div>
     <h4>{{ 'tenants' | translate}}</h4>
     <mat-form-field>
       <mat-label>{{ 'tenant' | translate}}</mat-label>
@@ -11,21 +11,30 @@
         }
       </mat-select>
     </mat-form-field>
-  </div>
-  
-  <div style="flex: 1 1 50%" class="app-fxFlex app-center-v">
-    <div echarts style="height: 100px; width: 100%;"
-        [options]="chartOptionsRok" 
-        (chartInit)="onChartRokInit($event)" 
-        (chartBrushEnd)="onRokSelected($event)" 
-        (chartBrushSelected)="onClearSelection($event)">
     </div>
-    <div *ngIf="limits">od: {{ limits[0] }} - do: {{ limits[1] }}</div>
+    <div>
+      <div echarts style="height: 100px; width: 100%;"
+          [options]="chartOptionsRok" 
+          (chartInit)="onChartRokInit($event)" 
+          (chartBrushEnd)="onRokSelected($event)" 
+          (chartBrushSelected)="onClearSelection($event)">
+      </div>
+      <div *ngIf="limits">od: {{ limits[0] }} - do: {{ limits[1] }}</div>
+    </div>
+    <div  style="height: 300px; width: 100%; overflow-y: scroll;">
+      <mat-list>
+        <mat-list-item *ngFor="let identity of recipients" 
+          (mouseout)="clearHighlight()" (mouseover)="highlightLinks(identity)">
+          {{ identity.name}} ({{identity.value}})
+        </mat-list-item>
+      </mat-list>
+    </div>
   </div>
-</div>
 
-<div style="height: 550px;"
-     leaflet 
-     [leafletOptions]="options"
-     (leafletMapReady)="onMapReady($event)">
+  <div style="height: 550px; flex: 1 70%" class="app-fxFlex"
+      leaflet 
+      [leafletOptions]="options"
+      (leafletMapReady)="onMapReady($event)">
+  </div>
+
 </div>

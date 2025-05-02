@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MatListModule } from '@angular/material/list';
 
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
@@ -33,7 +34,7 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridCo
   selector: 'app-map-view',
   imports: [TranslateModule, FormsModule, CommonModule,
     LeafletModule, NgxEchartsDirective,
-    MatFormFieldModule, MatSelectModule, MatInputModule],
+    MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule],
   templateUrl: './map-view.component.html',
   styleUrl: './map-view.component.scss',
   providers: [
@@ -65,11 +66,12 @@ export class MapViewComponent implements OnInit {
   };
 
   solrResponse: any;
+  recipients: Facet[] = [];
 
   nodeLayer: LayerGroup<CircleMarker> = new L.LayerGroup();
   linkLayer: LayerGroup<CircleMarker> = new L.LayerGroup();
 
-  nodes: { [id: number]: {coords: [number, number], name: string} } = {};
+  nodes: { [id: number]: { coords: [number, number], name: string } } = {};
   links: { [id: string]: { node1: [number, number], node2: [number, number], count: number, letters: Letter[] } } = {};
 
   chartOptionsRok: EChartsOption = {};
@@ -113,11 +115,11 @@ export class MapViewComponent implements OnInit {
     this.linkLayer.clearLayers();
     const p: any = {};
     p.tenant = this.tenant.val;
-    // if (this.limits) {
-    //   p.date_range = this.limits.toString();
-    // } else {
-    p.date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
-    //}
+    if (this.limits) {
+    } else {
+    }
+      p.date_range = this.limits.toString();
+      p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
     this.solrResponse = null;
     this.service.getLetters(p as HttpParams).subscribe((resp: any) => {
       this.solrResponse = resp;
@@ -136,6 +138,7 @@ export class MapViewComponent implements OnInit {
       return;
     }
 
+    this.recipients = this.solrResponse.facet_counts.facet_fields.identity_recipient;
     this.nodes = {};
     this.nodeLayer.clearLayers();
     this.links = {};
@@ -144,7 +147,7 @@ export class MapViewComponent implements OnInit {
       if (this.inLimits(letter.date_year) && letter.places && letter.origin) {
         letter.places.forEach((place: Place) => {
           if (place.latitude && !this.nodes[place.place_id]) {
-            this.nodes[place.place_id] = {coords: [place.latitude, place.longitude], name: place.name};
+            this.nodes[place.place_id] = { coords: [place.latitude, place.longitude], name: place.name };
             const m = L.circleMarker([place.latitude, place.longitude], {
               color: '#795548',
               radius: 5,
@@ -161,11 +164,12 @@ export class MapViewComponent implements OnInit {
 
         if (place_origin && place_destination && place_origin.latitude && place_destination.latitude) {
           if (!this.links[linkId]) {
-            this.links[linkId] = { 
-              node1: [place_origin.latitude, place_origin.longitude], 
-              node2: [place_destination.latitude, place_destination.longitude], 
+            this.links[linkId] = {
+              node1: [place_origin.latitude, place_origin.longitude],
+              node2: [place_destination.latitude, place_destination.longitude],
               count: 1,
-              letters: [letter] };
+              letters: [letter]
+            };
           } else {
             this.links[linkId].count = this.links[linkId].count + 1;
             this.links[linkId].letters.push(letter);
@@ -175,7 +179,7 @@ export class MapViewComponent implements OnInit {
 
     });
 
-    
+
     Object.keys(this.links).forEach(key => {
       const link = this.links[key];
       this.linkNodes(link.node1, link.node2, link.count, link.letters);
@@ -186,6 +190,25 @@ export class MapViewComponent implements OnInit {
     this.map.addLayer(this.linkLayer);
     this.map.addLayer(this.nodeLayer);
 
+    // console.log(this.linkLayer.getLayers())
+  }
+
+  highlightLinks(identity: Facet) {
+    this.linkLayer.getLayers().forEach((layer: any) => {
+      if (layer.options.letters.find((l: Letter) => l.identity_recipient?.findIndex(i => i === identity.name) > -1)) {
+        layer.setStyle({ color: '#f00' });
+        layer.bringToFront();
+      } else {
+        layer.setStyle({ color: '#5470c6' });
+      }
+    })
+
+  }
+
+  clearHighlight() {
+    this.linkLayer.getLayers().forEach((layer: any) => {
+        layer.setStyle({ color: '#5470c6' });
+    });
   }
 
   linkNodes(node1: [number, number], node2: [number, number], count: number, letters: Letter[]) {
@@ -211,12 +234,14 @@ export class MapViewComponent implements OnInit {
       { color: '#5470c6', fill: true, weight: Math.min(count, 4), fillColor: '#fff', fillOpacity: 0 }
     );
 
+    L.setOptions(m, {letters: letters})
+
     m.on('mouseover', () => {
-      m.setStyle({color: '#f00'});
+      m.setStyle({ color: '#f00' });
     });
 
     m.on('mouseout', () => {
-      m.setStyle({color: '#5470c6'});
+      m.setStyle({ color: '#5470c6' });
     });
     // console.log(m);
     // let popup = '<div>Rok:' + year + '</div>';
@@ -232,7 +257,7 @@ export class MapViewComponent implements OnInit {
       }
     });
     popup += '<div>' + roky.join(', ') + '</div>';
-    m.bindTooltip(popup, {sticky: true});
+    m.bindTooltip(popup, { sticky: true });
     m.addTo(this.linkLayer);
   }
 
@@ -247,6 +272,7 @@ export class MapViewComponent implements OnInit {
     this.limits = [parseInt(this.rokAxis[e.areas[0].coordRange[0]]), parseInt(this.rokAxis[e.areas[0].coordRange[1]])];
 
     this.processData();
+    this.getData();
     // const params: any = {};
     // params.rokvydani = [this.rokAxis[e.areas[0].coordRange[0]], this.rokAxis[e.areas[0].coordRange[1]]].toString();
     // this.router.navigate(['/results'], { queryParams: params, queryParamsHandling: 'merge' })

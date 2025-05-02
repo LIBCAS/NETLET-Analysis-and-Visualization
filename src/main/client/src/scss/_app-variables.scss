@@ -2,30 +2,37 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 
-  @include mat.toolbar-overrides((
-    container-background-color: var(--mat-sys-primary),
-    container-text-color: white,
-  ));
+@use 'theme-colors' as my-theme; 
+
+@include mat.toolbar-overrides((
+  container-background-color: var(--mat-sys-primary),
+  container-text-color: white,
+  title-text-size: 20px
+));
 
 :root {
 
-  // config
-  --app-color-info: #856404;
-  --app-color-success: #2E7D32;
-  --app-color-disabled: var(--app-color-gray-4);
-  --app-color-item-bg: var(--app-color-gray-1);
-  --app-color-item-selected: var(--palette-primary-50);
-  --app-color-item-active: var(--app-color-gray-8);
-  --app-color-item-invalid: var(--app-color-warn);
-  --app-color-item-invalid-no-rgb: var(--palette-warn-500-no-rgb);
-  --app-color-item-hover: var(--palette-primary-50);
-  --app-color-item-dragover-allowed: $app-color-success;
-  --app-color-item-dragover-noallowed: var(--app-color-warn);
+  //--app-test: mat.get-theme-color($my-theme, primary, default);
+ --app-test: #{map.get(my-theme.$primary-palette, 10)};
 
-  // basic colors
-  --app-color-primary: var(--mat-sys-on-primary);
-  --app-color-accent: var(--palette-accent-500) ;
-  --app-color-warn: var(--palette-warn-500);
+ // colors
+ --app-color-lightnes: #ffffff;
+ --app-color-lightnes-rgb: 255, 255, 255;
+ --app-color-darknes: #000000;
+ --app-color-darknes-rgb: 0, 0, 0;
+ --app-color-primary: var(--mat-sys-on-primary);
+ --app-color-warning: #f44336;
+
+ --app-color-info: #ff6f00;
+ --app-color-selected: #{rgba(var(--app-color-primary), .1)};
+ 
+ --app-color-success: #2e7d32;
+
+   // color markings
+   --app-color-block: #2e7d32;
+   --app-color-line: #9c27b0;
+   --app-color-word: #ffd600;
+
 
   --app-color-lightnes: #ffffff;
   --app-color-lightnes-rgb: 255, 255, 255;
@@ -44,11 +51,6 @@
   --app-color-gray-8: #424242;
   --app-color-gray-9: #212121;
 
-  // custom
-  --app-default-border-color: var(--app-color-gray-3);
-  --app-default-bg: var(--app-color-gray-1); 
-  --app-default-wrapper: 8px;
-
   // bars
   --app-topbar-height: 50px;
   --app-topbar-border-color: var(--app-gray-3);
@@ -65,9 +67,6 @@
   // layout
   --app-container: 1280px;
 
-    // layout
-    --app-container: 1280px;
-
   // mat override
   --app-button-height: 32px;
   --app-checkbox-size: 14px;
@@ -77,7 +76,6 @@
   //--mat-toolbar-standard-height: 80px;
   --mat-table-row-item-container-height: 36px;
 }
-
 
 // gaps
 $gaps: (
@@ -94,10 +92,7 @@ $gaps: (
 
 // alerts
 $alerts: (
-  warn: (
-    color: var(--palette-warn-500),
-    bg: var(--palette-warn-50),
-    border: var(--palette-warn-100)
-  )
+  warning: var(--app-color-warning),
+  info: var(--app-color-info),
+  success: var(--app-color-success)
 );
-

@@ -195,7 +195,9 @@ public class HikoIndexer {
                 doc.addField("identity_id", rs.getInt("I.id"));
                 doc.addField("identity_role", rs.getString("IL.role"));
                 doc.addField("identity_name", rs.getString("I.name"));
-
+                
+                doc.addField("identity_" + rs.getString("IL.role"), rs.getString("I.name"));
+                
                 JSONObject identities = new JSONObject()
                         .put("id", rs.getInt("I.id"))
                         .put("role", rs.getString("IL.role"))

@@ -1,201 +1,113 @@
 // --- MATERIAL OVERRIDE ---
-
-@use "app-mixins";
 @use '@angular/material' as mat;
-
-// :root {
-//   @include mat.toolbar-overrides((
-//     container-background-color: var(--palette-primary-500),
-//     container-text-color: red,
-//   ));
-// }
-
-
-
-// table
-.mat-mdc-table {
-  .mat-mdc-row {
-    &.app-selected {
-      background-color: var(--app-color-item-selected) !important;
-    }
-
-    &.app-invalid {
-      background-color: rgba(var(--app-color-item-invalid-no-rgb), .1) !important;
-
-      .mat-icon {
-        color: var(--app-color-item-invalid);
-      }
-    }
-
-    &.app-repre {
-      font-weight: 700;
-    }
-  }
-
-  &.app-striped {
-    .mat-mdc-row {
-      &:nth-child(odd) {
-        &:not(.app-selected) {
-          background-color: var(--app-color-gray-1);
-        }
-      }
-    }
-  }
-
-  &.app-hover {
-    .mat-mdc-row {
-      &:hover {
-        &:not(.app-selected, .app-row-detail) {
-          background-color: var(--app-color-gray-2);
-        }
-      }
-    }
-  }
-
-  &.app-resize {
-    table-layout: fixed;
-    //min-width: auto;
-    width: fit-content;
-
-    &.app-resizing {
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-
-
-    .mat-mdc-header-cell {
-      position: relative;
-
-      .app-resize-holder {
-        cursor: col-resize;
-        width: 10px;
-        height: 100%;
-        position: absolute;
-        right: 0;
-        top: 0;
-        z-index: 1;
-
-        &:after {
-          content: '';
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          right: 0;
-          border-right: 1px solid var(--app-default-border-color);
-        }
-      }
-    }
-
-    .mat-mdc-header-cell,
-    .mat-mdc-cell {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-
-  .mat-mdc-header-cell {
-    &.mat-column-isLocked {
-      padding: 0 8px;
-    }
+// paginator
+.mat-mdc-paginator {
+  .mat-mdc-form-field-infix {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    min-height: var(--app-paginator-form-field) !important;
   }
 
   .mat-mdc-icon-button {
     &.mat-mdc-button-base {
-      border-radius: 0;
-      --mdc-icon-button-state-layer-size: 34px;
+      --mdc-icon-button-state-layer-size: 36px;
       width: var(--mdc-icon-button-state-layer-size);
       height: var(--mdc-icon-button-state-layer-size);
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .mat-mdc-button-persistent-ripple {
-      border-radius: 0;
-    }
-  }
-
-  .mat-icon {
-    @include app-mixins.setIcon(20, $position: sub);
-  }
-
-  a {
-    .mat-icon {
-      @include app-mixins.setIcon(16);
+      padding: 6px;
     }
   }
 }
-
-// paginator
-.mat-mdc-paginator {
-  .app-toolbar & {
-    background-color: transparent;
-  }
-
-  .app-oa-y & {
-    position: sticky;
-    bottom: 0;
-  }
-}
-
-// menu
-.mat-mdc-menu-item {
-  min-height: var(--app-menu-item-height) !important;
-}
-
-// select
-.mat-mdc-option {
-  min-height: var(--app-menu-item-height) !important;
-  line-height: var(--app-menu-item-height) !important;
-
-  .mdc-list-item__primary-text {
-    white-space: nowrap !important;
-    display: inline-block;
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-
-// radio button
-.mat-mdc-radio-group {
-  .mat-mdc-radio-button {
-    &.mat-accent {
-      --mdc-radio-selected-icon-color: var(--app-color-primary);
-      --mdc-radio-selected-hover-icon-color:  var(--app-color-primary);
-      --mdc-radio-selected-focus-icon-color:  var(--app-color-primary);
-      --mat-radio-checked-ripple-color:  var(--app-color-primary);
-    }
-  }
-
-  
-}
-
 
 // form field
 .mat-mdc-form-field {
-  .mat-mdc-form-field-icon-suffix {
-    padding-right: 4px;
-    @include mat.icon-button-density(-6);
+  // clear bottom margin
+  .mat-mdc-form-field-subscript-wrapper {
+    line-height: 0;
+    height: 0;
+  }
+}
 
-    .mat-mdc-icon-button {
-      .mat-icon {
-        @include app-mixins.setIcon(20);
+// dialog
+.mat-mdc-dialog-container {
+  .mat-mdc-dialog-title {
+    margin: 0;
+    padding: 0 16px 8px 16px;
+  }
+
+  .mat-mdc-dialog-content {
+    padding: 16px !important;
+  }
+
+  .mat-mdc-dialog-actions {
+    padding: 0 16px 16px 16px !important;
+  }
+}
+
+// card
+@for $i from 0 through 24 {
+  .mat-mdc-card {
+    &.mat-elevation-z#{$i} {
+      @include mat.elevation($i);
+    }
+  }
+}
+
+.mat-mdc-card {
+  &.app-intro {
+    $app-width: 35%;
+    position: relative;
+
+    &:after {
+      content: '';
+      position: absolute;
+      width: $app-width;
+      height: 100%;
+      background-image: url(https://ucl.cas.cz/wp-content/uploads/2021/11/ucl-projekty6-1.jpg);
+      background-size: cover;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .mat-mdc-card-header,
+    .mat-mdc-card-content {
+      padding-left: calc($app-width + 16px);
+    }
+  }
+}
+
+// table
+.mat-mdc-table {
+  &.app-hovered {
+    .mat-mdc-row {
+      &:hover {
+        background-color: var(--app-color-selected);
+      }
+    }  
+  }
+
+  &.app-striped {
+    .mat-mdc-row {
+      &:nth-child(even) {
+        &:not(:hover) {
+          background-color: var(--app-gray-1);
+        }
+      }
+    }
+  }
+  
+  tbody {
+    .mat-mdc-row {
+      .mat-mdc-cell {
+        &.mat-column-action {
+          width: 50px;
+        }
       }
     }
   }
 
-  .mat-mdc-form-field-bottom-align {
-    --mat-form-field-subscript-text-line-height: 0;
-    height: 8px;
-
-    &::before {
-      height: 0;
-    }
+  .mat-mdc-icon-button.mat-mdc-button-base {
+    --mdc-icon-button-state-layer-size: 36px;
+    padding: 0;
   }
 }
 
