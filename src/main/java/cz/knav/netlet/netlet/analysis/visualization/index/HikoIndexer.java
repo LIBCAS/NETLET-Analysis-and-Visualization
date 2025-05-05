@@ -148,8 +148,8 @@ public class HikoIndexer {
                 doc.addField("name", rs.getString("P.name"));
                 doc.addField("country", rs.getString("P.country"));
                 doc.addField("note", rs.getString("P.note"));
-                doc.addField("latitude", rs.getFloat("P.latitude"));
-                doc.addField("longitude", rs.getFloat("P.longitude"));
+                doc.addField("latitude", rs.getObject("P.latitude"));
+                doc.addField("longitude", rs.getObject("P.longitude"));
                 doc.addField("geoname_id", rs.getInt("P.geoname_id"));
                 doc.addField("division", rs.getString("P.division"));
                 if (rs.getString("P.latitude") != null) {
@@ -172,8 +172,8 @@ public class HikoIndexer {
                         .put("name", rs.getString("P.name"))
                         .put("country", rs.getString("P.country"))
                         .put("note", rs.getString("P.note"))
-                        .put("latitude", rs.getFloat("P.latitude"))
-                        .put("longitude", rs.getFloat("P.longitude"))
+                        .put("latitude", rs.getObject("P.latitude"))
+                        .put("longitude", rs.getObject("P.longitude"))
                         .put("geoname_id", rs.getInt("P.geoname_id"))
                         .put("division", rs.getString("P.division"));
                 doc.addField("places", places.toString());

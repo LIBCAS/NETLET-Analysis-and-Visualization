@@ -1,5 +1,7 @@
 {
   "tenant": "Katalog",
   "tenants": "Katalogy",
-  "clearSelection": "Zzrušit výběr"
+  "clearSelection": "Zzrušit výběr",
+  "Recipients": "Adresat",
+  "Mentioned": "Zminene odsoby"
 }

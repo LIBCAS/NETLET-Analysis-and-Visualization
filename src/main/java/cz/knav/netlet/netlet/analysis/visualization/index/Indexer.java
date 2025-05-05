@@ -104,6 +104,7 @@ public class Indexer {
                     .setRows(10000)
                     .setFields("*,places:[json],identities:[json]")
                     .setFacet(true)
+                    .addFilterQuery("latitude:*")
                     .addFacetField("identity_author")
                     .addFacetField("identity_recipient")
                     .addFacetField("identity_mentioned")
@@ -114,7 +115,9 @@ public class Indexer {
                     .setParam("f.date_year.facet.range.end", years[1])
                     .setParam("f.date_year.facet.range.gap", "1")
                     // .setParam("f.date_year.facet.range.include", "lower")
-                    .setParam("f.date_year.facet.range.other", "after");
+                    .setParam("f.date_year.facet.range.other", "after")
+                    .setParam("stats", true)
+                    .setParam("stats.field", "latitude","longitude");
 
             String tenant = request.getParameter("tenant");
             if (tenant != null && !tenant.isBlank()) {

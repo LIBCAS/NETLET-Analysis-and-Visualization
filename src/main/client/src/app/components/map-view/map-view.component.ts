@@ -28,13 +28,16 @@ import { Facet } from '../../shared/facet';
 import { HttpParams } from '@angular/common/http';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Letter, Place } from '../../shared/letter';
+import { MatIconModule } from '@angular/material/icon';
 echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridComponent, TitleComponent, BrushComponent, ToolboxComponent]);
 
 @Component({
   selector: 'app-map-view',
   imports: [TranslateModule, FormsModule, CommonModule,
     LeafletModule, NgxEchartsDirective,
-    MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule],
+    MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule,
+  MatIconModule
+],
   templateUrl: './map-view.component.html',
   styleUrl: './map-view.component.scss',
   providers: [
@@ -136,6 +139,11 @@ export class MapViewComponent implements OnInit {
 
       this.recipients = this.solrResponse.facet_counts.facet_fields.identity_recipient;
       this.mentioned = this.solrResponse.facet_counts.facet_fields.identity_mentioned;
+      if (this.solrResponse.stats?.stats_fields.latitude) {
+        const lat = this.solrResponse.stats.stats_fields.latitude;
+        const lon = this.solrResponse.stats.stats_fields.longitude;
+        this.map.fitBounds(L.latLngBounds( [lat.max, lon.min], [lat.min, lon.max] ))
+      } 
       if (withMap) {
         this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);
       }
@@ -201,6 +209,17 @@ export class MapViewComponent implements OnInit {
     this.map.addLayer(this.nodeLayer);
 
     // console.log(this.linkLayer.getLayers())
+  }
+
+  activeIdentity: Facet = null;
+  clickRecipient(identity: Facet) {
+    if (identity === this.activeIdentity) {
+      this.activeIdentity = null;
+      this.clearHighlight();
+    } else {
+      this.activeIdentity = identity;
+      this.highlightRecipients(identity)
+    }
   }
 
   highlightRecipients(identity: Facet) {

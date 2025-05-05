@@ -1,5 +1,7 @@
 {
   "tenant": "Catalog",
   "tenants": "Catalogs",
-  "clearSelection": "Clear selection"
+  "clearSelection": "Clear selection",
+  "Recipients": "Recipients",
+  "Mentioned": "Mentioned"
 }

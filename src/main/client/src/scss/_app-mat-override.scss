@@ -11,27 +11,8 @@
 
   @include mat.list-overrides((
     list-item-hover-label-text-color: orange,
-    list-item-one-line-container-height: -2
+    list-item-one-line-container-height: -1.2
     ));
-}
-
-
-// paginator
-.mat-mdc-paginator {
-  .mat-mdc-form-field-infix {
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-    min-height: var(--app-paginator-form-field) !important;
-  }
-
-  .mat-mdc-icon-button {
-    &.mat-mdc-button-base {
-      --mdc-icon-button-state-layer-size: 36px;
-      width: var(--mdc-icon-button-state-layer-size);
-      height: var(--mdc-icon-button-state-layer-size);
-      padding: 6px;
-    }
-  }
 }
 
 // form field
@@ -57,73 +38,5 @@
 
   .mat-mdc-dialog-actions {
     padding: 0 16px 16px 16px !important;
-  }
-}
-
-// card
-@for $i from 0 through 24 {
-  .mat-mdc-card {
-    &.mat-elevation-z#{$i} {
-      @include mat.elevation($i);
-    }
-  }
-}
-
-.mat-mdc-card {
-  &.app-intro {
-    $app-width: 35%;
-    position: relative;
-
-    &:after {
-      content: '';
-      position: absolute;
-      width: $app-width;
-      height: 100%;
-      background-image: url(https://ucl.cas.cz/wp-content/uploads/2021/11/ucl-projekty6-1.jpg);
-      background-size: cover;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-
-    .mat-mdc-card-header,
-    .mat-mdc-card-content {
-      padding-left: calc($app-width + 16px);
-    }
-  }
-}
-
-// table
-.mat-mdc-table {
-  &.app-hovered {
-    .mat-mdc-row {
-      &:hover {
-        background-color: var(--app-color-selected);
-      }
-    }
-  }
-
-  &.app-striped {
-    .mat-mdc-row {
-      &:nth-child(even) {
-        &:not(:hover) {
-          background-color: var(--app-gray-1);
-        }
-      }
-    }
-  }
-
-  tbody {
-    .mat-mdc-row {
-      .mat-mdc-cell {
-        &.mat-column-action {
-          width: 50px;
-        }
-      }
-    }
-  }
-
-  .mat-mdc-icon-button.mat-mdc-button-base {
-    --mdc-icon-button-state-layer-size: 36px;
-    padding: 0;
   }
 }

@@ -24,9 +24,10 @@
     <div>
       <h3>{{ 'Recipients' | translate}}</h3>
       <mat-list  style="max-height: 300px; width: 100%; overflow-y: scroll;">
-        <mat-list-item *ngFor="let identity of recipients" 
-          (mouseout)="clearHighlight()" (mouseover)="highlightRecipients(identity)">
-          {{ identity.name}} ({{identity.value}})
+        <mat-list-item *ngFor="let identity of recipients"  [class.app-active]="identity === activeIdentity"
+        (click)="clickRecipient(identity)">
+          <mat-icon *ngIf="identity === activeIdentity">check</mat-icon>
+          {{ identity.name}} ({{identity.value}}) 
         </mat-list-item>
       </mat-list>
     </div>
@@ -34,7 +35,7 @@
       <h3>{{ 'Mentioned' | translate}}</h3>
       <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
         <mat-list-item *ngFor="let identity of mentioned" 
-          (mouseout)="clearHighlight()" (mouseover)="highlightLinks(identity)">
+          (mouseout)="clearHighlight()" (click)="highlightLinks(identity)">
           {{ identity.name}} ({{identity.value}})
         </mat-list-item>
       </mat-list>
