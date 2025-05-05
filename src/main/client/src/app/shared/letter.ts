@@ -5,7 +5,8 @@ export interface Letter {
     date_year: number,
     places: Place[],
     identities: Identity[],
-    identity_recipient: string[]
+    identity_recipient: string[],
+    identity_mentioned: string[]
 }
 
 export interface Place {

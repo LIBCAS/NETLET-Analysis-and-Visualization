@@ -4,12 +4,6 @@
 
 @use 'theme-colors' as my-theme; 
 
-@include mat.toolbar-overrides((
-  container-background-color: var(--mat-sys-primary),
-  container-text-color: white,
-  title-text-size: 20px
-));
-
 :root {
 
   //--app-test: mat.get-theme-color($my-theme, primary, default);
@@ -27,6 +21,9 @@
  --app-color-selected: #{rgba(var(--app-color-primary), .1)};
  
  --app-color-success: #2e7d32;
+
+ --app-color-map-link: #7a80ec;
+ --app-color-map-link-active: #c41f27;
 
    // color markings
    --app-color-block: #2e7d32;

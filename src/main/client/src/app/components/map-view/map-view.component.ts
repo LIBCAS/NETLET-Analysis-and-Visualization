@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
-import L, { circle, CircleMarker, LatLng, latLng, Layer, LayerGroup, Map, Marker, polygon, tileLayer } from 'leaflet';
+import L, { circle, CircleMarker, LatLng, latLng, LatLngBounds, Layer, LayerGroup, Map, Marker, polygon, tileLayer } from 'leaflet';
 import '@elfalem/leaflet-curve';
 import { CurveLatLngExpression, CurvePathDataElement } from '@elfalem/leaflet-curve';
 import { AppService } from '../../app.service';
@@ -26,7 +26,7 @@ import { BrushComponent } from 'echarts/components';
 import { ToolboxComponent } from 'echarts/components';
 import { Facet } from '../../shared/facet';
 import { HttpParams } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { Letter, Place } from '../../shared/letter';
 echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridComponent, TitleComponent, BrushComponent, ToolboxComponent]);
 
@@ -65,8 +65,12 @@ export class MapViewComponent implements OnInit {
     center: latLng(49.879966, 16.726909)
   };
 
+  linkColor = '#5470c6';
+  activeLinkColor = '#f00';
+
   solrResponse: any;
   recipients: Facet[] = [];
+  mentioned: Facet[] = [];
 
   nodeLayer: LayerGroup<CircleMarker> = new L.LayerGroup();
   linkLayer: LayerGroup<CircleMarker> = new L.LayerGroup();
@@ -82,13 +86,16 @@ export class MapViewComponent implements OnInit {
   showSelection: boolean = true;
 
   constructor(
+    @Inject(DOCUMENT) private document: Document,
     private router: Router,
     private translation: TranslateService,
     private service: AppService
   ) { }
 
   ngOnInit(): void {
-
+    this.linkColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
+    this.activeLinkColor = this.document.body.computedStyleMap().get('--app-color-map-link-active').toString();
+ 
   }
 
   onMapReady(map: Map) {
@@ -99,7 +106,7 @@ export class MapViewComponent implements OnInit {
 
   changeTenant() {
     this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
-    this.getData();
+    this.getData(true);
   }
 
   getTenants() {
@@ -108,23 +115,31 @@ export class MapViewComponent implements OnInit {
     });
   }
 
-  getData() {
-    this.nodes = {};
-    this.nodeLayer.clearLayers();
-    this.links = {};
-    this.linkLayer.clearLayers();
+  getData(withMap: boolean) {
+    if (withMap) {
+      this.nodes = {};
+      this.nodeLayer.clearLayers();
+      this.links = {};
+      this.linkLayer.clearLayers();
+    }
     const p: any = {};
     p.tenant = this.tenant.val;
-    if (this.limits) {
-    } else {
-    }
-      p.date_range = this.limits.toString();
-      p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
+    p.date_range = this.limits.toString();
+    p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
     this.solrResponse = null;
     this.service.getLetters(p as HttpParams).subscribe((resp: any) => {
       this.solrResponse = resp;
-      this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);
-      this.processData();
+
+      if (!this.solrResponse) {
+        return;
+      }
+
+      this.recipients = this.solrResponse.facet_counts.facet_fields.identity_recipient;
+      this.mentioned = this.solrResponse.facet_counts.facet_fields.identity_mentioned;
+      if (withMap) {
+        this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);
+      }
+      this.setMap();
 
     });
   }
@@ -133,12 +148,7 @@ export class MapViewComponent implements OnInit {
     return n >= this.limits[0] && n <= this.limits[1];
   }
 
-  processData() {
-    if (!this.solrResponse) {
-      return;
-    }
-
-    this.recipients = this.solrResponse.facet_counts.facet_fields.identity_recipient;
+  setMap() {
     this.nodes = {};
     this.nodeLayer.clearLayers();
     this.links = {};
@@ -193,13 +203,38 @@ export class MapViewComponent implements OnInit {
     // console.log(this.linkLayer.getLayers())
   }
 
+  highlightRecipients(identity: Facet) {
+    let bounds: LatLngBounds = null;
+    this.linkLayer.getLayers().forEach((layer: any) => {
+      const hit = layer.options.letters.find((l: Letter) => l.identity_recipient && l.identity_recipient.includes(identity.name));
+      if (hit) {
+        layer.setStyle({ color:  this.activeLinkColor});
+        layer.bringToFront();
+        if (bounds) {
+          bounds = bounds.extend(layer.getBounds());
+        } else {
+          bounds = layer.getBounds();
+        }
+        
+      } else {
+        layer.setStyle({ color: this.linkColor });
+      }
+    });
+
+    if (bounds) {
+      this.map.fitBounds(bounds);
+    }
+        
+
+  }
+
   highlightLinks(identity: Facet) {
     this.linkLayer.getLayers().forEach((layer: any) => {
-      if (layer.options.letters.find((l: Letter) => l.identity_recipient?.findIndex(i => i === identity.name) > -1)) {
-        layer.setStyle({ color: '#f00' });
+      if (layer.options.letters.find((l: Letter) => l.identity_mentioned?.includes(identity.name))) {
+        layer.setStyle({ color: this.activeLinkColor });
         layer.bringToFront();
       } else {
-        layer.setStyle({ color: '#5470c6' });
+        layer.setStyle({ color: this.linkColor });
       }
     })
 
@@ -207,7 +242,7 @@ export class MapViewComponent implements OnInit {
 
   clearHighlight() {
     this.linkLayer.getLayers().forEach((layer: any) => {
-        layer.setStyle({ color: '#5470c6' });
+      layer.setStyle({ color: this.linkColor });
     });
   }
 
@@ -231,17 +266,17 @@ export class MapViewComponent implements OnInit {
     const m = L.curve(['M', node1,
       'Q', midpointLatLng,
       node2],
-      { color: '#5470c6', fill: true, weight: Math.min(count, 4), fillColor: '#fff', fillOpacity: 0 }
+      { color: this.linkColor, fill: true, weight: Math.min(count, 4), fillColor: '#fff', fillOpacity: 0 }
     );
 
-    L.setOptions(m, {letters: letters})
+    L.setOptions(m, { letters: letters })
 
     m.on('mouseover', () => {
-      m.setStyle({ color: '#f00' });
+      m.setStyle({ color: this.activeLinkColor });
     });
 
     m.on('mouseout', () => {
-      m.setStyle({ color: '#5470c6' });
+      m.setStyle({ color: this.linkColor });
     });
     // console.log(m);
     // let popup = '<div>Rok:' + year + '</div>';
@@ -265,23 +300,19 @@ export class MapViewComponent implements OnInit {
     this.chartRok = e;
   }
 
-  onRokSelected(e: any) {
+  onSetYears(e: any) {
     if (!e.areas || e.areas.length === 0) {
       return;
     }
     this.limits = [parseInt(this.rokAxis[e.areas[0].coordRange[0]]), parseInt(this.rokAxis[e.areas[0].coordRange[1]])];
-
-    this.processData();
-    this.getData();
-    // const params: any = {};
-    // params.rokvydani = [this.rokAxis[e.areas[0].coordRange[0]], this.rokAxis[e.areas[0].coordRange[1]]].toString();
-    // this.router.navigate(['/results'], { queryParams: params, queryParamsHandling: 'merge' })
+    this.getData(false);
   }
 
   onClearSelection(e: any) {
     if (e.batch[0].areas.length === 0 && this.showSelection) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
-      this.processData();
+      this.setMap();
+      this.getData(false);
       // const params: any = {};
       // params.rokvydani = null;
       // this.router.navigate(['/results'], { queryParams: params, queryParamsHandling: 'merge' });
@@ -363,11 +394,12 @@ export class MapViewComponent implements OnInit {
         type: 'bar',
         data: this.rokSeries,
         barCategoryGap: 0,
+        color: this.linkColor,
         markArea: {
           silent: true,
           itemStyle: {
             opacity: 0.8,
-            color: '#ccc'
+            color: '#ccc0'
           },
           data: [
             [
@@ -402,9 +434,9 @@ export class MapViewComponent implements OnInit {
       });
     }, 50);
 
-    setTimeout(() => {
-      this.setSelection(minRokWithValue, maxRokWithValue);
-    }, 50);
+    // setTimeout(() => {
+    //   this.setSelection(minRokWithValue, maxRokWithValue);
+    // }, 50);
 
   }
 

@@ -1,5 +1,21 @@
 // --- MATERIAL OVERRIDE ---
 @use '@angular/material' as mat;
+
+:root {
+  @include mat.toolbar-overrides((
+    container-background-color: var(--mat-sys-primary),
+      container-text-color: white,
+      title-text-size: 20px
+      ));
+
+
+  @include mat.list-overrides((
+    list-item-hover-label-text-color: orange,
+    list-item-one-line-container-height: -2
+    ));
+}
+
+
 // paginator
 .mat-mdc-paginator {
   .mat-mdc-form-field-infix {
@@ -20,6 +36,7 @@
 
 // form field
 .mat-mdc-form-field {
+
   // clear bottom margin
   .mat-mdc-form-field-subscript-wrapper {
     line-height: 0;
@@ -82,7 +99,7 @@
       &:hover {
         background-color: var(--app-color-selected);
       }
-    }  
+    }
   }
 
   &.app-striped {
@@ -94,7 +111,7 @@
       }
     }
   }
-  
+
   tbody {
     .mat-mdc-row {
       .mat-mdc-cell {
@@ -110,4 +127,3 @@
     padding: 0;
   }
 }
-
