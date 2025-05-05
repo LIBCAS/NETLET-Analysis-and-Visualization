@@ -116,6 +116,7 @@ public class HikoIndexer {
 
                 addPlaces(tenant, rs.getInt("L.id"), doc);
                 addIdentities(tenant, rs.getInt("L.id"), doc);
+                addKeywords(tenant, rs.getInt("L.id"), doc);
 
                 client.add("letter_place", doc);
                 success++;
@@ -210,5 +211,29 @@ public class HikoIndexer {
             LOGGER.log(Level.SEVERE, null, e);
         }
         psIdentity.close();
+    }
+
+    private void addKeywords(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
+
+        String sql = "select * from " + 
+                tenant + "__keyword_letter as KL, " + 
+                tenant + "__keywords as K where KL.keyword_id=K.id AND letter_id = " + letter_id;
+        PreparedStatement ps = getConnection().prepareStatement(sql);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                
+                JSONObject k = new JSONObject(rs.getString("K.name"))
+                        .put("id", rs.getLong("K.id"))
+                        .put("category_id", rs.getLong("K.keyword_category_id"));
+                doc.addField("keywords_cs", k.getString("cs"));
+                doc.addField("keywords_en", k.getString("en"));
+                doc.addField("keywords", k.toString());
+
+            }
+            rs.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, null, e);
+        }
+        ps.close();
     }
 }

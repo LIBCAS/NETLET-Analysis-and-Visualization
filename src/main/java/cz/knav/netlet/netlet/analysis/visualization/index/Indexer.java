@@ -2,6 +2,7 @@ package cz.knav.netlet.netlet.analysis.visualization.index;
 
 import cz.knav.netlet.netlet.analysis.visualization.Options;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -108,6 +109,9 @@ public class Indexer {
                     .addFacetField("identity_author")
                     .addFacetField("identity_recipient")
                     .addFacetField("identity_mentioned")
+                    .addFacetField("{!ex=ffkeywords}keywords_cs")
+                    .setParam("f.keywords_cs.facet.mincount", "1")
+                    .setParam("f.identity_mentioned.facet.mincount", "1")
                     .setParam("wt", "json")
                     .setParam("json.nl", "arrntv")
                     .setParam("facet.range", "{!ex=ffdate_year}date_year")
@@ -127,6 +131,11 @@ public class Indexer {
             if (date_range != null && !date_range.isBlank()) {
                 query.addFilterQuery("{!tag=ffdate_year}date_year:[" + date_range.replaceAll(",", " TO ") + "]");
             }
+            
+            if (request.getParameter("keyword") != null){
+                query.addFilterQuery("{!tag=ffkeywords}keywords_cs:(+\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
+            }
+            
 
             QueryRequest req = new QueryRequest(query);
 

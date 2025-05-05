@@ -3,7 +3,8 @@ import { FacetRange } from "./facet-range"
 export interface Facet {
   name: string, 
   type: string, 
-  value: number 
+  value: number,
+  selected?: boolean 
 }
 
 export interface FacetFields {

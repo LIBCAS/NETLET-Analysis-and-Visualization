@@ -1,0 +1,29 @@
+<div class="app-home-layout">
+<mat-card appearance="outlined">
+    <mat-card-header>
+        <mat-card-title> Mapa </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <p>
+            Komparativně pojatá mapová zobrazení v rámci tří hlavních období
+        </p>
+      </mat-card-content>
+    <mat-card-actions align="end" class="app-mat-card-actions">
+        <button [routerLink]="['map']" mat-raised-button>{{ 'View' }}</button>
+    </mat-card-actions>
+</mat-card>
+
+<mat-card appearance="outlined">
+    <mat-card-header>
+        <mat-card-title>Keywords</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <p>
+            Kocitační sítě mapující v dopisech zmiňované osoby ve vztahu ke specifickým tématům či debatám.
+        </p>
+      </mat-card-content>
+    <mat-card-actions align="end">
+        <button [routerLink]="['keywords']" mat-raised-button >{{ 'View' }}</button>
+    </mat-card-actions>
+</mat-card>
+</div>
