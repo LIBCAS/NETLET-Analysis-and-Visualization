@@ -1,5 +1,7 @@
 // --- MATERIAL OVERRIDE ---
+@use 'sass:map';
 @use '@angular/material' as mat;
+@use 'theme-colors' as my-theme; 
 
 :root {
   @include mat.toolbar-overrides((
@@ -11,13 +13,18 @@
 
 
   @include mat.list-overrides((
-    list-item-hover-label-text-color: orange,
+    list-item-hover-label-text-color: #{map.get(map.get(my-theme.$primary-palette, error), 50)},
     list-item-one-line-container-height: 24px
     ));
 
     @include mat.form-field-overrides((
       container-height: 48px
     ));
+
+    @include mat.progress-bar-overrides((
+    active-indicator-color:  #{map.get(map.get(my-theme.$primary-palette, error), 50)},
+    track-color: #{map.get(map.get(my-theme.$primary-palette, error),10)}
+  ));
 }
 
 // form field

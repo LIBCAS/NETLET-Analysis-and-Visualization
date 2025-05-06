@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatListModule } from '@angular/material/list';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
@@ -37,7 +38,7 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridCo
   imports: [TranslateModule, FormsModule, CommonModule,
     LeafletModule, NgxEchartsDirective,
     MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule,
-  MatIconModule
+  MatIconModule, MatProgressBarModule
 ],
   templateUrl: './map-view.component.html',
   styleUrl: './map-view.component.scss',
@@ -47,6 +48,7 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridCo
 })
 export class MapViewComponent implements OnInit {
 
+  loading: boolean;
   map: Map;
   options = {
     layers: [
@@ -107,6 +109,7 @@ export class MapViewComponent implements OnInit {
   }
 
   getData(withMap: boolean) {
+    this.loading = true;
     if (withMap) {
       this.nodes = {};
       this.nodeLayer.clearLayers();
@@ -137,7 +140,7 @@ export class MapViewComponent implements OnInit {
         this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);
       }
       this.setMap();
-
+      this.loading = false;
     });
   }
 

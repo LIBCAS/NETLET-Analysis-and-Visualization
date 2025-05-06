@@ -13,7 +13,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {MatSliderModule} from '@angular/material/slider';
-
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 import { EChartsOption, ECharts } from 'echarts';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
@@ -27,7 +27,7 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridCo
 @Component({
   selector: 'app-keywords',
   imports: [TranslateModule, FormsModule, CommonModule,
-    NgxEchartsDirective,
+    NgxEchartsDirective, MatProgressBarModule,
     MatFormFieldModule, MatSelectModule, MatListModule,
     MatIconModule, MatCheckboxModule, MatSliderModule
   ],
@@ -38,7 +38,7 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridCo
   ]
 })
 export class KeywordsComponent {
-
+  loading: boolean;
   solrResponse: any;
   mentioned: JSONFacet[] = [];
   keywords_cs: JSONFacet[] = [];
@@ -90,6 +90,7 @@ export class KeywordsComponent {
   }
 
   getData() {
+    this.loading = true;
     const p: any = {};
     p.tenant = this.state.tenant.val;
     p.keyword = this.selectedKeywords;
@@ -109,7 +110,7 @@ export class KeywordsComponent {
       });
 
       this.setIdentitiesChart();
-
+      this.loading = false;
     });
   }
 

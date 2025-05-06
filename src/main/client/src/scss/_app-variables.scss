@@ -8,6 +8,7 @@
 
   //--app-test: mat.get-theme-color($my-theme, primary, default);
  --app-test: #{map.get(my-theme.$primary-palette, 10)};
+ --app-test2: #{map.get(map.get(my-theme.$primary-palette, error), 25)};
 
  // colors
  --app-color-lightnes: #ffffff;

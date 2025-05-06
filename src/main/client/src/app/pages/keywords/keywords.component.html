@@ -1,3 +1,5 @@
+
+<mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 <div class="app-fxLayout app-row app-fill">
   <div style="flex: 1 30%; max-width: 300px;">
     <div>
@@ -11,13 +13,13 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div>
+    <!-- <div>
       <mat-slider min="0" max="1" step="1"   [showTickMarks]="false" >
       {{ formatSliderLabel(chartType)}}
         <input matSliderThumb [(ngModel)]="chartType">
       </mat-slider>
 
-    </div>
+    </div> -->
 
     <div>
       <h3>{{ 'Keywords' | translate}}</h3>
