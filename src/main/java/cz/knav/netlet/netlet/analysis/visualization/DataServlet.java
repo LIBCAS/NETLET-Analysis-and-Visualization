@@ -1,7 +1,7 @@
 package cz.knav.netlet.netlet.analysis.visualization;
 
 import cz.knav.netlet.netlet.analysis.visualization.index.HikoIndexer;
-import cz.knav.netlet.netlet.analysis.visualization.index.Indexer;
+import cz.knav.netlet.netlet.analysis.visualization.index.IndexSearcher;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,7 +68,7 @@ public class DataServlet extends HttpServlet {
         GET_TENANTS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = Indexer.getTenants().getJSONObject("facets").getJSONObject("tenant");
+                JSONObject ret = IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant");
                 return ret;
             }
         },
@@ -87,16 +87,26 @@ public class DataServlet extends HttpServlet {
                 return json;
             }
         },
-        GET_LETTERS {
+        GET_MAP{
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
                 if (request.getParameter("tenant") != null) {
-                    ret = Indexer.getLetters(request);
+                    ret = IndexSearcher.getMapLetters(request);
                 }
                 return ret;
             }
-        };
+        },
+        GET_KEYWORDS {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                JSONObject ret = new JSONObject();
+                if (request.getParameter("tenant") != null) {
+                    ret = IndexSearcher.getKeywords(request);
+                }
+                return ret;
+            }
+        }; 
 
         abstract JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception;
     }

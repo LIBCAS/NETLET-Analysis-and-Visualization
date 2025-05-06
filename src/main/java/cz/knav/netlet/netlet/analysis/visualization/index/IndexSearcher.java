@@ -2,7 +2,6 @@ package cz.knav.netlet.netlet.analysis.visualization.index;
 
 import cz.knav.netlet.netlet.analysis.visualization.Options;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -20,9 +19,9 @@ import org.json.JSONObject;
  *
  * @author alberto
  */
-public class Indexer {
+public class IndexSearcher {
 
-    public static final Logger LOGGER = Logger.getLogger(Indexer.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(IndexSearcher.class.getName());
 
     public static JSONObject getTenants() {
         JSONObject ret = new JSONObject();
@@ -52,16 +51,54 @@ public class Indexer {
             
             QueryResponse queryResponse = request.process(solr, "letter_place");
             ret = new JSONObject(queryResponse.jsonStr());
-//           
-//            final JsonQueryRequest request =
-//    new JsonQueryRequest()
-//        .setQuery("*")
-//        .withFilter("inStock:true")
-//        .withStatFacet("avg_price", "avg(price)")
-//        .withStatFacet("min_manufacturedate_dt", "min(manufacturedate_dt)")
-//        .withStatFacet("num_suppliers", "unique(manu_exact)")
-//        .withStatFacet("median_weight", "percentile(weight,50)");
-//QueryResponse queryResponse = request.process(solrClient, COLLECTION_NAME);
+ 
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        return ret;
+    }
+    
+    public static JSONObject getKeywords(HttpServletRequest request) {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+            
+            final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_cs")
+                    .setLimit(100)
+                    .setMinCount(0);
+            
+            final TermsFacetMap categories_csFacet = new TermsFacetMap("keywords_category_cs")
+                    .setLimit(100)
+                    .withSubFacet("keywords", keywords_csFacet)
+                    .setMinCount(0)
+                    ;
+            
+            final TermsFacetMap identity_mentionedFacet = new TermsFacetMap("identity_mentioned")
+                    .setLimit(100)
+                    .setMinCount(0);
+            
+            JsonQueryRequest jrequest = new JsonQueryRequest()
+                    .setQuery("*:*")
+                    .setLimit(0)
+                    .withFacet("keywords_cs", keywords_csFacet)
+                    .withFacet("keywords_categories", categories_csFacet)
+                    .withFacet("identity_mentioned", identity_mentionedFacet);
+            String tenant = request.getParameter("tenant");
+            if (tenant != null && !tenant.isBlank()) {
+                jrequest = jrequest.withFilter("tenant:" + tenant);
+            }
+            String date_range = request.getParameter("date_range");
+            if (date_range != null && !date_range.isBlank()) {
+                jrequest = jrequest.withFilter("{!tag=ffdate_year}date_year:[" + date_range.replaceAll(",", " TO ") + "]");
+            }
+            
+            if (request.getParameter("keyword") != null){
+                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_cs:(+\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
+            }
+                    
+            QueryResponse queryResponse = jrequest.process(solr, "letter_place");
+            ret = new JSONObject(queryResponse.jsonStr());
+            
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             ret.put("error", ex);
@@ -88,7 +125,7 @@ public class Indexer {
         return ret;
     }
 
-    public static JSONObject getLetters(HttpServletRequest request) {
+    public static JSONObject getMapLetters(HttpServletRequest request) {
         JSONObject ret = new JSONObject();
         NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
         rawJsonResponseParser.setWriterType("json");
@@ -102,8 +139,8 @@ public class Indexer {
             }
             String[] years = tenant_date_range.split(",");
             SolrQuery query = new SolrQuery("*")
-                    .setRows(10000)
-                    .setFields("*,places:[json],identities:[json]")
+                    
+                    .setFields("date_year,identity_name,identity_recipient,origin,destination,places:[json],identities:[json]")
                     .setFacet(true)
                     .addFilterQuery("latitude:*")
                     .addFacetField("identity_author")
@@ -112,6 +149,7 @@ public class Indexer {
                     .addFacetField("{!ex=ffkeywords}keywords_cs")
                     .setParam("f.keywords_cs.facet.mincount", "1")
                     .setParam("f.identity_mentioned.facet.mincount", "1")
+                    .setParam("f.identity_recipient.facet.mincount", "1")
                     .setParam("wt", "json")
                     .setParam("json.nl", "arrntv")
                     .setParam("facet.range", "{!ex=ffdate_year}date_year")
@@ -123,6 +161,13 @@ public class Indexer {
                     .setParam("stats", true)
                     .setParam("stats.field", "latitude","longitude");
 
+            String rows = request.getParameter("rows");
+            if (rows != null && !rows.isBlank()) {
+                query.setRows(Integer.valueOf(rows));
+            } else {
+                query.setRows(10000);
+            }
+            
             String tenant = request.getParameter("tenant");
             if (tenant != null && !tenant.isBlank()) {
                 query.addFilterQuery("tenant:" + tenant);

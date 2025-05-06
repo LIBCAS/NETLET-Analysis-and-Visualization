@@ -8,7 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.Context;
@@ -28,8 +30,6 @@ import org.apache.solr.client.solrj.impl.Http2SolrClient;
 public class HikoIndexer {
 
     public static final Logger LOGGER = Logger.getLogger(HikoIndexer.class.getName());
-    String slovnik = "hiko";
-
     private Connection conn;
 
     public Connection getConnection() throws NamingException, SQLException {
@@ -61,23 +61,11 @@ public class HikoIndexer {
         return ret;
     }
 
-    private List<String> getTables() {
-        List<String> ret = new ArrayList();
-        List<String> tenants = getTenants();
-        List<Object> keys = Options.getInstance().getJSONArray("dbKeywordTables").toList();
-        for (String t : tenants) {
-            for (Object k : keys) {
-                ret.add(t + "__" + k);
-            }
-        }
-
-        return ret;
-    }
-
     public JSONObject full() {
         Date start = new Date();
         JSONObject ret = new JSONObject();
         int success = 0;
+        LOGGER.log(Level.INFO, "Indexing HIKO letters");
         try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             List<String> tenants = getTenants();
             for (String tenant : tenants) {
@@ -90,10 +78,12 @@ public class HikoIndexer {
         Date end = new Date();
         ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
         ret.put("total", success);
+        LOGGER.log(Level.INFO, "Indexing HIKO finished. {0} letters indexed", success);
         return ret;
     }
 
     private void getLetters(SolrClient client, JSONObject ret, String tenant, int success) throws NamingException, SQLException {
+        LOGGER.log(Level.INFO, "Indexing tenant: {0}.", tenant);
         String t = tenant + "__letter_place";
         String sql = "select * from " + tenant + "__letters as L ";
         PreparedStatement ps = getConnection().prepareStatement(sql);
@@ -113,14 +103,13 @@ public class HikoIndexer {
                 doc.addField("date_computed", rs.getDate("L.date_computed"));
                 doc.addField("date_year", rs.getLong("L.date_year"));
 
-
                 addPlaces(tenant, rs.getInt("L.id"), doc);
                 addIdentities(tenant, rs.getInt("L.id"), doc);
                 addKeywords(tenant, rs.getInt("L.id"), doc);
 
                 client.add("letter_place", doc);
                 success++;
-                if (success % 500 == 0) {
+                if ((success % 500) == 0) {
                     client.commit("letter_place");
                     LOGGER.log(Level.INFO, "Indexed {0} docs", success);
                 }
@@ -138,7 +127,7 @@ public class HikoIndexer {
     public void addPlaces(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
 
         String sql = "select * from " + tenant + "__letter_place as LP, " + tenant + "__places as P where LP.place_id = P.id AND LP.letter_id = " + letter_id;
-        PreparedStatement psPlaces = getConnection().prepareStatement(sql); 
+        PreparedStatement psPlaces = getConnection().prepareStatement(sql);
         int origin = -1;
         int destination = -1;
         try (ResultSet rs = psPlaces.executeQuery()) {
@@ -155,13 +144,13 @@ public class HikoIndexer {
                 doc.addField("division", rs.getString("P.division"));
                 if (rs.getString("P.latitude") != null) {
                     doc.addField("coords", rs.getString("P.latitude") + "," + rs.getString("P.longitude"));
-                } 
-                
+                }
+
                 if ("origin".equals(rs.getString("LP.role"))) {
                     origin = rs.getInt("P.id");
                     doc.setField("origin", origin);
                 }
-                
+
                 if ("destination".equals(rs.getString("LP.role"))) {
                     destination = rs.getInt("P.id");
                     doc.setField("destination", destination);
@@ -196,9 +185,9 @@ public class HikoIndexer {
                 doc.addField("identity_id", rs.getInt("I.id"));
                 doc.addField("identity_role", rs.getString("IL.role"));
                 doc.addField("identity_name", rs.getString("I.name"));
-                
+
                 doc.addField("identity_" + rs.getString("IL.role"), rs.getString("I.name"));
-                
+
                 JSONObject identities = new JSONObject()
                         .put("id", rs.getInt("I.id"))
                         .put("role", rs.getString("IL.role"))
@@ -215,23 +204,41 @@ public class HikoIndexer {
 
     private void addKeywords(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
 
-        String sql = "select * from " + 
-                tenant + "__keyword_letter as KL, " + 
-                tenant + "__keywords as K where KL.keyword_id=K.id AND letter_id = " + letter_id;
-        PreparedStatement ps = getConnection().prepareStatement(sql);
-        try (ResultSet rs = ps.executeQuery()) {
+        String sqlCat = " select * from " + tenant + "__keyword_categories";
+        Map<Long, String> categories = new HashMap<>();
+        PreparedStatement psCat = getConnection().prepareStatement(sqlCat);
+        try (ResultSet rs = psCat.executeQuery()) {
             while (rs.next()) {
-                
-                JSONObject k = new JSONObject(rs.getString("K.name"))
-                        .put("id", rs.getLong("K.id"))
-                        .put("category_id", rs.getLong("K.keyword_category_id"));
-                doc.addField("keywords_cs", k.getString("cs"));
-                doc.addField("keywords_en", k.getString("en"));
-                doc.addField("keywords", k.toString());
-
+                categories.put(rs.getLong("id"), rs.getString("name"));
             }
             rs.close();
         } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, null, e);
+        }
+        psCat.close();
+
+        String sql = "select * from "
+                + tenant + "__keyword_letter as KL, "
+                + tenant + "__keywords as K where KL.keyword_id=K.id AND letter_id = " + letter_id;
+        PreparedStatement ps = getConnection().prepareStatement(sql);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                long cat = rs.getLong("K.keyword_category_id");
+                JSONObject k = new JSONObject(rs.getString("K.name"))
+                        .put("id", rs.getLong("K.id"));
+                doc.addField("keywords_cs", k.optString("cs"));
+                doc.addField("keywords_en", k.optString("en"));
+                if (categories.containsKey(cat)) {
+                    JSONObject c = new JSONObject(categories.get(cat));
+                    doc.addField("keywords_category_cs", c.optString("cs"));
+                    doc.addField("keywords_category_en", c.optString("en"));
+                    k.put("category_id", cat).put("category_name", categories.get(cat));
+                }
+                doc.addField("keywords", k.toString());
+            }
+            rs.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error adding keywords for tenant: {0}", tenant);
             LOGGER.log(Level.SEVERE, null, e);
         }
         ps.close();

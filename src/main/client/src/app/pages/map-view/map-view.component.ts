@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import L, { circle, CircleMarker, LatLng, latLng, LatLngBounds, Layer, LayerGroup, Map, Marker, polygon, tileLayer } from 'leaflet';
@@ -29,6 +29,7 @@ import { HttpParams } from '@angular/common/http';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Letter, Place } from '../../shared/letter';
 import { MatIconModule } from '@angular/material/icon';
+import { AppState, Tenant } from '../../app-state';
 echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridComponent, TitleComponent, BrushComponent, ToolboxComponent]);
 
 @Component({
@@ -45,19 +46,6 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridCo
   ]
 })
 export class MapViewComponent implements OnInit {
-
-  tenants: {
-    val: string,
-    count: number,
-    date_year_max: number,
-    date_year_min: number
-  }[] = [];
-  tenant: {
-    val: string,
-    count: number,
-    date_year_max: number,
-    date_year_min: number
-  };
 
   map: Map;
   options = {
@@ -92,6 +80,7 @@ export class MapViewComponent implements OnInit {
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
     private translation: TranslateService,
+        public state: AppState,
     private service: AppService
   ) { }
 
@@ -103,19 +92,18 @@ export class MapViewComponent implements OnInit {
 
   onMapReady(map: Map) {
     this.map = map;
-    this.getTenants();
-
+    if (this.state.tenant) {
+      setTimeout(() => {
+        
+      this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
+      this.getData(true);
+      }, 10)
+    }
   }
 
   changeTenant() {
-    this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+    this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
     this.getData(true);
-  }
-
-  getTenants() {
-    this.service.getTenants().subscribe((resp: any) => {
-      this.tenants = resp.buckets;
-    });
   }
 
   getData(withMap: boolean) {
@@ -126,25 +114,26 @@ export class MapViewComponent implements OnInit {
       this.linkLayer.clearLayers();
     }
     const p: any = {};
-    p.tenant = this.tenant.val;
+    p.tenant = this.state.tenant.val;
     p.date_range = this.limits.toString();
-    p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
-    this.solrResponse = null;
-    this.service.getLetters(p as HttpParams).subscribe((resp: any) => {
-      this.solrResponse = resp;
+    p.tenant_date_range = this.state.tenant.date_year_min + ',' + this.state.tenant.date_year_max;
+    if (!withMap) {
+      p.rows = 0;
+    }
 
-      if (!this.solrResponse) {
+    this.service.getMap(p as HttpParams).subscribe((resp: any) => {
+      if (!resp) {
         return;
       }
-
-      this.recipients = this.solrResponse.facet_counts.facet_fields.identity_recipient;
-      this.mentioned = this.solrResponse.facet_counts.facet_fields.identity_mentioned;
-      if (this.solrResponse.stats?.stats_fields.latitude) {
-        const lat = this.solrResponse.stats.stats_fields.latitude;
-        const lon = this.solrResponse.stats.stats_fields.longitude;
+      this.recipients = resp.facet_counts.facet_fields.identity_recipient;
+      this.mentioned = resp.facet_counts.facet_fields.identity_mentioned;
+      if (resp.stats?.stats_fields.latitude) {
+        const lat = resp.stats.stats_fields.latitude;
+        const lon = resp.stats.stats_fields.longitude;
         this.map.fitBounds(L.latLngBounds( [lat.max, lon.min], [lat.min, lon.max] ))
       } 
       if (withMap) {
+        this.solrResponse = resp;
         this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);
       }
       this.setMap();
@@ -329,7 +318,7 @@ export class MapViewComponent implements OnInit {
 
   onClearSelection(e: any) {
     if (e.batch[0].areas.length === 0 && this.showSelection) {
-      this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+      this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
       this.setMap();
       this.getData(false);
       // const params: any = {};

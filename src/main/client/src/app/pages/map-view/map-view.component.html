@@ -5,8 +5,8 @@
     <h4>{{ 'tenants' | translate}}</h4>
     <mat-form-field>
       <mat-label>{{ 'tenant' | translate}}</mat-label>
-      <mat-select [(ngModel)]="tenant" (selectionChange)="changeTenant()">
-        @for (t of tenants; track t) {
+      <mat-select [(ngModel)]="state.tenant" (selectionChange)="changeTenant()">
+        @for (t of state.tenants; track t) {
           <mat-option [value]="t">{{ t.val | translate}}</mat-option>
         }
       </mat-select>

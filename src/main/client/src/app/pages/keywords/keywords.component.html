@@ -1,45 +1,52 @@
 <div class="app-fxLayout app-row app-fill">
-    <div style="flex: 1 30%; max-width: 300px;">
-        <div>
-        <h4>{{ 'tenants' | translate}}</h4>
-        <mat-form-field>
-          <mat-label>{{ 'tenant' | translate}}</mat-label>
-          <mat-select [(ngModel)]="tenant" (selectionChange)="changeTenant()">
-            @for (t of tenants; track t) {
-              <mat-option [value]="t">{{ t.val | translate}}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        </div>
-        
-        <div>
-          <h3>{{ 'Keywords' | translate}}</h3>
-          <mat-list  style="max-height: 300px; width: 100%; overflow-y: scroll;">
-            <mat-list-item *ngFor="let k of keywords_cs" 
-            (click)="clickKeyword(k)">
-              <mat-checkbox [checked]="k.selected">{{ k.name}} ({{k.value}}) </mat-checkbox>
-            </mat-list-item>
-          </mat-list>
-        </div>
-        <div>
-          <h3>{{ 'Mentioned' | translate}}</h3>
-          <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
-            <mat-list-item *ngFor="let identity of mentioned" 
-              (click)="clickMentioned(identity)">
-              {{ identity.name}} ({{identity.value}})
-            </mat-list-item>
-          </mat-list>
-        </div>
-      </div>
-    
-      <div style="flex: 1 70%" class="app-fxFlex">
-        <div style="overflow: auto; height: 800px">
-            
-        <div echarts style="width: 100%;" [style.height]="(mentioned.length * 38) + 'px'"
-          [options]="chartOptions" 
-          (chartInit)="onChartInit($event)">
-      </div>
-        </div>
+  <div style="flex: 1 30%; max-width: 300px;">
+    <div>
+      <h4>{{ 'tenants' | translate}}</h4>
+      <mat-form-field>
+        <mat-label>{{ 'tenant' | translate}}</mat-label>
+        <mat-select [(ngModel)]="state.tenant" (selectionChange)="changeTenant()">
+          @for (t of state.tenants; track t) {
+          <mat-option [value]="t">{{ t.val | translate}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-slider min="0" max="1" step="1"   [showTickMarks]="false" >
+      {{ formatSliderLabel(chartType)}}
+        <input matSliderThumb [(ngModel)]="chartType">
+      </mat-slider>
 
+    </div>
+
+    <div>
+      <h3>{{ 'Keywords' | translate}}</h3>
+      <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
+        <mat-list-item *ngFor="let k of keywords_cs" (click)="clickKeyword(k)">
+          <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
+        </mat-list-item>
+      </mat-list>
+    </div>
+    <div>
+      <h3>{{ 'Mentioned' | translate}}</h3>
+      <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
+        <mat-list-item *ngFor="let identity of mentioned" (click)="clickMentioned(identity)">
+          {{ identity.val}} ({{identity.count}})
+        </mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+
+  <div style="flex: 1 70%" class="app-fxFlex">
+    <div style="overflow: auto; height: 800px">
+      <div echarts style="width: 100%;" [style.height]="(mentioned.length * 38) + 'px'"
+        [options]="identitiesChartOptions" (chartInit)="onChartInit($event)">
       </div>
+
+      <div *ngIf="chartType" echarts style="width: 100%;" [style.height]="(mentioned.length * 38) + 'px'"
+        [options]="keywordsChartOptions" (chartInit)="onKeywordsChartInit($event)">
+      </div>
+    </div>
+
+  </div>
 </div>

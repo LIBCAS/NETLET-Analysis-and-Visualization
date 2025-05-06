@@ -1,16 +1,20 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, input } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../app.service';
-import { Facet } from '../../shared/facet';
-import { CommonModule, DOCUMENT } from '@angular/common';
-import { HttpParams } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { AppState, Tenant } from '../../app-state';
+import { Facet, JSONFacet } from '../../shared/facet';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import {MatSliderModule} from '@angular/material/slider';
+
+
 import { EChartsOption, ECharts } from 'echarts';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { BarChart } from 'echarts/charts';
@@ -25,7 +29,7 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridCo
   imports: [TranslateModule, FormsModule, CommonModule,
     NgxEchartsDirective,
     MatFormFieldModule, MatSelectModule, MatListModule,
-    MatIconModule, MatCheckboxModule
+    MatIconModule, MatCheckboxModule, MatSliderModule
   ],
   templateUrl: './keywords.component.html',
   styleUrl: './keywords.component.scss',
@@ -35,50 +39,49 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridCo
 })
 export class KeywordsComponent {
 
-  tenants: {
-    val: string,
-    count: number,
-    date_year_max: number,
-    date_year_min: number
-  }[] = [];
-  tenant: {
-    val: string,
-    count: number,
-    date_year_max: number,
-    date_year_min: number
-  };
-
   solrResponse: any;
-  recipients: Facet[] = [];
-  mentioned: Facet[] = [];
-  keywords_cs: Facet[] = [];
+  mentioned: JSONFacet[] = [];
+  keywords_cs: JSONFacet[] = [];
   selectedKeywords: string[] = [];
 
-  chartOptions: EChartsOption = {};
-  chart: ECharts;
+  identitiesChartOptions: EChartsOption = {};
+  identitiesChart: ECharts;
   barColor: string;
+
+  keywordsChartOptions: EChartsOption = {};
+  keywordsChart: ECharts;
+
+  chartType: number = 0; // 0:'keywords -> identities' --  1: 'identities -> keywords'
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
     private translation: TranslateService,
+    public state: AppState,
     private service: AppService
   ) { }
 
   ngOnInit(): void {
-    this.getTenants();
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
+    if (this.state.tenant) {
+      this.getData();
+    }
+  }
 
+  formatSliderLabel(value: number): string {
+    if (value === 0) {
+      return 'keywords -> identities';
+    } else {
+      return 'identities -> keywords';
+    }
   }
 
   onChartInit(e: any) {
-    this.chart = e;
+    this.identitiesChart = e;
   }
 
-  getTenants() {
-    this.service.getTenants().subscribe((resp: any) => {
-      this.tenants = resp.buckets;
-    });
+  onKeywordsChartInit(e: any) {
+    this.keywordsChart = e;
   }
 
   changeTenant() {
@@ -88,31 +91,31 @@ export class KeywordsComponent {
 
   getData() {
     const p: any = {};
-    p.tenant = this.tenant.val;
+    p.tenant = this.state.tenant.val;
     p.keyword = this.selectedKeywords;
     this.solrResponse = null;
-    this.service.getLetters(p as HttpParams).subscribe((resp: any) => {
+    this.service.getKeywords(p as HttpParams).subscribe((resp: any) => {
       this.solrResponse = resp;
 
       if (!this.solrResponse) {
         return;
       }
 
-      this.recipients = this.solrResponse.facet_counts.facet_fields.identity_recipient;
-      this.mentioned = this.solrResponse.facet_counts.facet_fields.identity_mentioned;
-      this.keywords_cs = this.solrResponse.facet_counts.facet_fields.keywords_cs;
+      // this.recipients = this.solrResponse.facets.identity_recipient.buckets;
+      this.mentioned = this.solrResponse.facets.identity_mentioned.buckets;
+      this.keywords_cs = this.solrResponse.facets.keywords_categories.buckets;
       this.keywords_cs.forEach(k => {
-        k.selected = this.selectedKeywords.includes(k.name);
+        k.selected = this.selectedKeywords.includes(k.val);
       });
 
-      this.setChart();
+      this.setIdentitiesChart();
 
     });
   }
 
-  setChart() {
+  setIdentitiesChart() {
 
-    this.chartOptions = {
+    this.identitiesChartOptions = {
       animation: false,
       title: {
         show: false,
@@ -138,12 +141,12 @@ export class KeywordsComponent {
             position: 'insideLeft',
             formatter: '{b}'
           },
-          data: this.mentioned.map(f => f.value).reverse()
+          data: this.mentioned.map(f => f.count).reverse()
         }
       ],
       yAxis: {
         type: 'category',
-        data: this.mentioned.map(f => f.name).reverse(),
+        data: this.mentioned.map(f => f.val).reverse(),
         axisLine: { show: false },
         axisLabel: { show: false },
         
@@ -151,18 +154,22 @@ export class KeywordsComponent {
     }
   }
 
-  clickKeyword(k: Facet) {
+  clickKeyword(k: JSONFacet) {
     k.selected = !k.selected;
-    this.selectedKeywords = this.keywords_cs.filter(k => k.selected).map(k => k.name);
+    this.selectedKeywords = this.keywords_cs.filter(k => k.selected).map(k => k.val);
     this.getData();
   }
 
-  activeIdentity: Facet = null;
-  clickMentioned(identity: Facet) {
+  activeIdentity: JSONFacet = null;
+  clickMentioned(identity: JSONFacet) {
     if (identity === this.activeIdentity) {
       this.activeIdentity = null;
     } else {
       this.activeIdentity = identity;
     }
+  }
+
+  setKeywordsChart() {
+
   }
 }

@@ -7,6 +7,12 @@ export interface Facet {
   selected?: boolean 
 }
 
+export interface JSONFacet {
+  val: string, 
+  count: number,
+  selected?: boolean 
+}
+
 export interface FacetFields {
   [key: string]: any
 }
