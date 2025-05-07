@@ -64,7 +64,7 @@ public class HikoIndexer {
     public JSONObject full() {
         Date start = new Date();
         JSONObject ret = new JSONObject();
-        int success = 0;
+        Integer success = 0;
         LOGGER.log(Level.INFO, "Indexing HIKO letters");
         try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             List<String> tenants = getTenants();
@@ -82,7 +82,7 @@ public class HikoIndexer {
         return ret;
     }
 
-    private void getLetters(SolrClient client, JSONObject ret, String tenant, int success) throws NamingException, SQLException {
+    private void getLetters(SolrClient client, JSONObject ret, String tenant, Integer success) throws NamingException, SQLException {
         LOGGER.log(Level.INFO, "Indexing tenant: {0}.", tenant);
         String t = tenant + "__letter_place";
         String sql = "select * from " + tenant + "__letters as L ";

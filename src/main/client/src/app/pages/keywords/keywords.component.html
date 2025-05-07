@@ -39,7 +39,25 @@
     </div>
   </div>
 
-  <div style="flex: 1 70%" class="app-fxFlex">
+  <div style="height: 100%; width: 100%; display: flex; flex-direction: column; align-content: flex-start;">
+    <div  style="height: 200px; width: 100%;">
+      <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year" (onChangeLimits)="changeLimits($event)" ></app-years-chart>
+    </div>
+    <div class="app-fxFlex">
+      <div style="overflow: auto; height: 800px">
+        <div echarts style="width: 100%;" [style.height]="(mentioned.length * 38) + 'px'"
+          [options]="identitiesChartOptions" (chartInit)="onChartInit($event)">
+        </div>
+  
+        <div *ngIf="chartType" echarts style="width: 100%;" [style.height]="(mentioned.length * 38) + 'px'"
+          [options]="keywordsChartOptions" (chartInit)="onKeywordsChartInit($event)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- <div style="flex: 1 70%" class="app-fxFlex">
     <div style="overflow: auto; height: 800px">
       <div echarts style="width: 100%;" [style.height]="(mentioned.length * 38) + 'px'"
         [options]="identitiesChartOptions" (chartInit)="onChartInit($event)">
@@ -50,5 +68,5 @@
       </div>
     </div>
 
-  </div>
+  </div> -->
 </div>

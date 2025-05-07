@@ -12,8 +12,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import {MatSliderModule} from '@angular/material/slider';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { EChartsOption, ECharts } from 'echarts';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
@@ -21,6 +21,7 @@ import { BarChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import * as echarts from 'echarts/core';
+import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 
 echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
 
@@ -29,8 +30,7 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridCo
   imports: [TranslateModule, FormsModule, CommonModule,
     NgxEchartsDirective, MatProgressBarModule,
     MatFormFieldModule, MatSelectModule, MatListModule,
-    MatIconModule, MatCheckboxModule, MatSliderModule
-  ],
+    MatIconModule, MatCheckboxModule, MatSliderModule, YearsChartComponent],
   templateUrl: './keywords.component.html',
   styleUrl: './keywords.component.scss',
   providers: [
@@ -40,9 +40,12 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridCo
 export class KeywordsComponent {
   loading: boolean;
   solrResponse: any;
+  limits: [number, number];
+
   mentioned: JSONFacet[] = [];
   keywords_cs: JSONFacet[] = [];
   selectedKeywords: string[] = [];
+
 
   identitiesChartOptions: EChartsOption = {};
   identitiesChart: ECharts;
@@ -64,7 +67,8 @@ export class KeywordsComponent {
   ngOnInit(): void {
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     if (this.state.tenant) {
-      this.getData();
+      this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
+      this.getData(true);
     }
   }
 
@@ -85,26 +89,34 @@ export class KeywordsComponent {
   }
 
   changeTenant() {
+    this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
     this.selectedKeywords = [];
-    this.getData();
+    this.getData(true);
   }
 
-  getData() {
+  changeLimits(limits: [number, number]) {
+    this.limits = limits;
+    this.getData(false);
+  }
+
+  getData(setResponse: boolean) {
     this.loading = true;
     const p: any = {};
     p.tenant = this.state.tenant.val;
     p.keyword = this.selectedKeywords;
-    this.solrResponse = null;
+    p.date_range = this.limits.toString();
+    p.tenant_date_range = this.state.tenant.date_year_min + ',' + this.state.tenant.date_year_max;
     this.service.getKeywords(p as HttpParams).subscribe((resp: any) => {
-      this.solrResponse = resp;
-
-      if (!this.solrResponse) {
+      if (!resp) {
         return;
       }
-
       // this.recipients = this.solrResponse.facets.identity_recipient.buckets;
-      this.mentioned = this.solrResponse.facets.identity_mentioned.buckets;
-      this.keywords_cs = this.solrResponse.facets.keywords_categories.buckets;
+      this.mentioned = resp.facets.identity_mentioned.buckets;
+      this.keywords_cs = resp.facets.keywords_categories.buckets;
+      if (setResponse) {
+        this.solrResponse = resp;
+      }
+
       this.keywords_cs.forEach(k => {
         k.selected = this.selectedKeywords.includes(k.val);
       });
@@ -150,7 +162,7 @@ export class KeywordsComponent {
         data: this.mentioned.map(f => f.val).reverse(),
         axisLine: { show: false },
         axisLabel: { show: false },
-        
+
       }
     }
   }
@@ -158,7 +170,7 @@ export class KeywordsComponent {
   clickKeyword(k: JSONFacet) {
     k.selected = !k.selected;
     this.selectedKeywords = this.keywords_cs.filter(k => k.selected).map(k => k.val);
-    this.getData();
+    this.getData(false);
   }
 
   activeIdentity: JSONFacet = null;

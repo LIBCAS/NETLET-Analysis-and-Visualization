@@ -12,39 +12,23 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatListModule } from '@angular/material/list';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
-
-import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
-import * as echarts from 'echarts/core';
-import { EChartsOption, ECharts } from 'echarts';
-import { BarChart } from 'echarts/charts';
-import { CanvasRenderer } from 'echarts/renderers';
-import { LegendComponent } from 'echarts/components';
-import { TooltipComponent } from 'echarts/components';
-import { GridComponent } from 'echarts/components';
-import { TitleComponent } from 'echarts/components';
-import { BrushComponent } from 'echarts/components';
-import { ToolboxComponent } from 'echarts/components';
-import { Facet } from '../../shared/facet';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { Facet, JSONFacet } from '../../shared/facet';
 import { HttpParams } from '@angular/common/http';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Letter, Place } from '../../shared/letter';
 import { MatIconModule } from '@angular/material/icon';
 import { AppState, Tenant } from '../../app-state';
-echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridComponent, TitleComponent, BrushComponent, ToolboxComponent]);
+import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 
 @Component({
   selector: 'app-map-view',
   imports: [TranslateModule, FormsModule, CommonModule,
-    LeafletModule, NgxEchartsDirective,
+    LeafletModule,
     MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule,
-  MatIconModule, MatProgressBarModule
-],
+    MatIconModule, MatProgressBarModule, YearsChartComponent],
   templateUrl: './map-view.component.html',
-  styleUrl: './map-view.component.scss',
-  providers: [
-    provideEchartsCore({ echarts }),
-  ]
+  styleUrl: './map-view.component.scss'
 })
 export class MapViewComponent implements OnInit {
 
@@ -62,43 +46,37 @@ export class MapViewComponent implements OnInit {
   activeLinkColor = '#f00';
 
   solrResponse: any;
-  recipients: Facet[] = [];
-  mentioned: Facet[] = [];
+  recipients: JSONFacet[] = [];
+  mentioned: JSONFacet[] = [];
 
   nodeLayer: LayerGroup<CircleMarker> = new L.LayerGroup();
   linkLayer: LayerGroup<CircleMarker> = new L.LayerGroup();
 
   nodes: { [id: number]: { coords: [number, number], name: string } } = {};
   links: { [id: string]: { node1: [number, number], node2: [number, number], count: number, letters: Letter[] } } = {};
-
-  chartOptionsRok: EChartsOption = {};
-  chartRok: ECharts;
-  rokAxis: string[] = [];
-  rokSeries: number[] = [];
   limits: [number, number];
-  showSelection: boolean = true;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
     private translation: TranslateService,
-        public state: AppState,
+    public state: AppState,
     private service: AppService
   ) { }
 
   ngOnInit(): void {
     this.linkColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     this.activeLinkColor = this.document.body.computedStyleMap().get('--app-color-map-link-active').toString();
- 
+
   }
 
   onMapReady(map: Map) {
     this.map = map;
     if (this.state.tenant) {
       setTimeout(() => {
-        
-      this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
-      this.getData(true);
+
+        this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
+        this.getData(true);
       }, 10)
     }
   }
@@ -122,22 +100,24 @@ export class MapViewComponent implements OnInit {
     p.tenant_date_range = this.state.tenant.date_year_min + ',' + this.state.tenant.date_year_max;
     if (!withMap) {
       p.rows = 0;
+    } else {
+      p.rows = 10000;
     }
 
     this.service.getMap(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
       }
-      this.recipients = resp.facet_counts.facet_fields.identity_recipient;
-      this.mentioned = resp.facet_counts.facet_fields.identity_mentioned;
+      this.recipients = resp.facets.identity_recipient.buckets;
+      this.mentioned = resp.facets.identity_mentioned.buckets;
       if (resp.stats?.stats_fields.latitude) {
         const lat = resp.stats.stats_fields.latitude;
         const lon = resp.stats.stats_fields.longitude;
-        this.map.fitBounds(L.latLngBounds( [lat.max, lon.min], [lat.min, lon.max] ))
-      } 
+        this.map.fitBounds(L.latLngBounds([lat.max, lon.min], [lat.min, lon.max]))
+      }
       if (withMap) {
         this.solrResponse = resp;
-        this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);
+        // this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);
       }
       this.setMap();
       this.loading = false;
@@ -203,8 +183,8 @@ export class MapViewComponent implements OnInit {
     // console.log(this.linkLayer.getLayers())
   }
 
-  activeIdentity: Facet = null;
-  clickRecipient(identity: Facet) {
+  activeIdentity: JSONFacet = null;
+  clickRecipient(identity: JSONFacet) {
     if (identity === this.activeIdentity) {
       this.activeIdentity = null;
       this.clearHighlight();
@@ -214,19 +194,19 @@ export class MapViewComponent implements OnInit {
     }
   }
 
-  highlightRecipients(identity: Facet) {
+  highlightRecipients(identity: JSONFacet) {
     let bounds: LatLngBounds = null;
     this.linkLayer.getLayers().forEach((layer: any) => {
-      const hit = layer.options.letters.find((l: Letter) => l.identity_recipient && l.identity_recipient.includes(identity.name));
+      const hit = layer.options.letters.find((l: Letter) => l.identity_recipient && l.identity_recipient.includes(identity.val));
       if (hit) {
-        layer.setStyle({ color:  this.activeLinkColor});
+        layer.setStyle({ color: this.activeLinkColor });
         layer.bringToFront();
         if (bounds) {
           bounds = bounds.extend(layer.getBounds());
         } else {
           bounds = layer.getBounds();
         }
-        
+
       } else {
         layer.setStyle({ color: this.linkColor });
       }
@@ -235,13 +215,13 @@ export class MapViewComponent implements OnInit {
     if (bounds) {
       this.map.fitBounds(bounds);
     }
-        
+
 
   }
 
-  highlightLinks(identity: Facet) {
+  highlightLinks(identity: JSONFacet) {
     this.linkLayer.getLayers().forEach((layer: any) => {
-      if (layer.options.letters.find((l: Letter) => l.identity_mentioned?.includes(identity.name))) {
+      if (layer.options.letters.find((l: Letter) => l.identity_mentioned?.includes(identity.val))) {
         layer.setStyle({ color: this.activeLinkColor });
         layer.bringToFront();
       } else {
@@ -307,148 +287,9 @@ export class MapViewComponent implements OnInit {
     m.addTo(this.linkLayer);
   }
 
-  onChartRokInit(e: any) {
-    this.chartRok = e;
-  }
-
-  onSetYears(e: any) {
-    if (!e.areas || e.areas.length === 0) {
-      return;
-    }
-    this.limits = [parseInt(this.rokAxis[e.areas[0].coordRange[0]]), parseInt(this.rokAxis[e.areas[0].coordRange[1]])];
+  changeLimits(limits: [number, number]) {
+    this.limits = limits;
     this.getData(false);
-  }
-
-  onClearSelection(e: any) {
-    if (e.batch[0].areas.length === 0 && this.showSelection) {
-      this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
-      this.setMap();
-      this.getData(false);
-      // const params: any = {};
-      // params.rokvydani = null;
-      // this.router.navigate(['/results'], { queryParams: params, queryParamsHandling: 'merge' });
-    }
-  }
-
-  setSelection(minWithValue: string, maxWithValue: string) {
-    if (this.showSelection) {
-      this.chartRok.dispatchAction({
-        type: 'brush',
-        areas: [
-          {
-            brushType: 'lineX',
-            coordRange: [minWithValue, maxWithValue],
-            xAxisIndex: 0
-          }
-        ]
-      });
-    }
-  }
-
-  setYearsChart(facet: { start: number, end: number, gap: string, after: number, counts: { name: string, type: string, value: number }[] }) {
-
-    this.rokSeries = facet.counts.map(c => c.value);
-    this.rokSeries.push(facet.after);
-    this.rokAxis = facet.counts.map(c => c.name);
-    this.rokAxis.push(facet.end + '');
-
-    let minRokWithValue = '1100';
-    let maxRokWithValue = '2025';
-    if (this.limits) {
-      minRokWithValue = this.limits[0] + '';
-      maxRokWithValue = this.limits[1] + '';
-    } else {
-      minRokWithValue = facet.start + '';
-      maxRokWithValue = facet.end + '';
-    }
-    this.chartOptionsRok = {
-      animation: false,
-      title: {
-        show: false,
-        text: this.translation.instant('Rok')
-      },
-      toolbox: {
-        show: this.limits !== undefined,
-        feature: {
-          brush: { title: { 'clear': this.translation.instant('clearSelection') }, show: true }
-        }
-      },
-      brush: {
-        toolbox: ['clear'],
-        brushType: 'lineX',
-        xAxisIndex: 0,
-        brushLink: 'all',
-        outOfBrush: {
-          colorAlpha: 0.2
-        }
-      },
-      tooltip: {
-        trigger: 'axis',
-      },
-      xAxis: {
-        type: 'category',
-        data: this.rokAxis,
-        boundaryGap: false,
-        axisLine: { onZero: false },
-        splitLine: { show: false },
-        min: 'dataMin',
-        max: 'dataMax',
-        axisPointer: {
-          z: 100
-        }
-      },
-      yAxis: {
-        show: false
-      },
-      series: [{
-        name: '',
-        type: 'bar',
-        data: this.rokSeries,
-        barCategoryGap: 0,
-        color: this.linkColor,
-        markArea: {
-          silent: true,
-          itemStyle: {
-            opacity: 0.8,
-            color: '#ccc0'
-          },
-          data: [
-            [
-              { xAxis: minRokWithValue },
-              { xAxis: maxRokWithValue }
-            ]
-          ]
-        },
-      }]
-    }
-    setTimeout(() => {
-      if (this.showSelection) {
-        this.chartRok.dispatchAction({
-          type: 'brush',
-          areas: [
-            {
-              brushType: 'lineX',
-              coordRange: [minRokWithValue, maxRokWithValue],
-              xAxisIndex: 0
-            }
-          ]
-        });
-      }
-
-      this.chartRok.dispatchAction({
-        type: 'takeGlobalCursor',
-        key: 'brush',
-        brushOption: {
-          brushType: 'lineX',
-          brushMode: 'single'
-        }
-      });
-    }, 50);
-
-    // setTimeout(() => {
-    //   this.setSelection(minRokWithValue, maxRokWithValue);
-    // }, 50);
-
   }
 
 }
