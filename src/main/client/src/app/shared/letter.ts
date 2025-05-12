@@ -5,6 +5,9 @@ export interface Letter {
     date_year: number,
     places: Place[],
     identities: Identity[],
+    keywords_cs: string[],
+    keywords_category_cs: string[],
+    identity_author: string[],
     identity_recipient: string[],
     identity_mentioned: string[]
 }

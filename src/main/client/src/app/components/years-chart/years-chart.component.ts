@@ -1,4 +1,4 @@
-import { Component, effect, Inject, input, output } from '@angular/core';
+import { Component, effect, Inject, input, NgZone, output } from '@angular/core';
 
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
@@ -43,6 +43,7 @@ export class YearsChartComponent {
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
+    private _ngZone: NgZone,
     private translation: TranslateService,
         public state: AppState
   ) {
@@ -192,7 +193,10 @@ export class YearsChartComponent {
         ]
       });
       this.setChartTitle();
+      
+    this._ngZone.run(() => {
       this.onChangeLimits.emit(this.limits);
+    });
     })
 
     setTimeout(() => {

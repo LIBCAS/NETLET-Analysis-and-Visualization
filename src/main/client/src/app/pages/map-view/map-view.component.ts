@@ -1,4 +1,4 @@
-import { Component, Inject, input, OnInit } from '@angular/core';
+import { Component, Inject, input, NgZone, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import L, { circle, CircleMarker, LatLng, latLng, LatLngBounds, Layer, LayerGroup, Map, Marker, polygon, tileLayer } from 'leaflet';
@@ -20,13 +20,14 @@ import { Letter, Place } from '../../shared/letter';
 import { MatIconModule } from '@angular/material/icon';
 import { AppState, Tenant } from '../../app-state';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
+import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 
 @Component({
   selector: 'app-map-view',
   imports: [TranslateModule, FormsModule, CommonModule,
     LeafletModule,
     MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule,
-    MatIconModule, MatProgressBarModule, YearsChartComponent],
+    MatIconModule, MatProgressBarModule, YearsChartComponent, LettersInfoComponent],
   templateUrl: './map-view.component.html',
   styleUrl: './map-view.component.scss'
 })
@@ -56,8 +57,12 @@ export class MapViewComponent implements OnInit {
   links: { [id: string]: { node1: [number, number], node2: [number, number], count: number, letters: Letter[] } } = {};
   limits: [number, number];
 
+  infoContent: string;
+  infoHeader: string;
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
+    private _ngZone: NgZone,
     private router: Router,
     private translation: TranslateService,
     public state: AppState,
@@ -67,7 +72,6 @@ export class MapViewComponent implements OnInit {
   ngOnInit(): void {
     this.linkColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     this.activeLinkColor = this.document.body.computedStyleMap().get('--app-color-map-link-active').toString();
-
   }
 
   onMapReady(map: Map) {
@@ -88,6 +92,7 @@ export class MapViewComponent implements OnInit {
 
   getData(withMap: boolean) {
     this.loading = true;
+    this.closeInfo();
     if (withMap) {
       this.nodes = {};
       this.nodeLayer.clearLayers();
@@ -195,10 +200,16 @@ export class MapViewComponent implements OnInit {
   }
 
   highlightRecipients(identity: JSONFacet) {
+    this.infoContent = '';
+    this.infoHeader = 'Letters to ' + identity.val;
     let bounds: LatLngBounds = null;
     this.linkLayer.getLayers().forEach((layer: any) => {
-      const hit = layer.options.letters.find((l: Letter) => l.identity_recipient && l.identity_recipient.includes(identity.val));
-      if (hit) {
+      const hit: Letter[] = layer.options.letters.filter((l: Letter) => l.identity_recipient && l.identity_recipient.includes(identity.val));
+      if (hit.length > 0) {
+        hit.forEach(l => {
+          this.infoContent += `<div>${this.nodes[l.origin].name} -> ${this.nodes[l.destination].name}: ${l.date_year}</div>`;
+        });
+
         layer.setStyle({ color: this.activeLinkColor });
         layer.bringToFront();
         if (bounds) {
@@ -220,8 +231,12 @@ export class MapViewComponent implements OnInit {
   }
 
   highlightLinks(identity: JSONFacet) {
+    this.infoContent = '';
+    this.infoHeader = 'Letters to ' + identity.val;
     this.linkLayer.getLayers().forEach((layer: any) => {
-      if (layer.options.letters.find((l: Letter) => l.identity_mentioned?.includes(identity.val))) {
+      const hit = layer.options.letters.find((l: Letter) => l.identity_recipient && l.identity_recipient.includes(identity.val));
+      if (hit) {
+        this.infoContent += `<div>${hit.date_year}</div>`;
         layer.setStyle({ color: this.activeLinkColor });
         layer.bringToFront();
       } else {
@@ -232,6 +247,8 @@ export class MapViewComponent implements OnInit {
   }
 
   clearHighlight() {
+    this.infoContent = '';
+    this.infoHeader = '';
     this.linkLayer.getLayers().forEach((layer: any) => {
       layer.setStyle({ color: this.linkColor });
     });
@@ -257,7 +274,7 @@ export class MapViewComponent implements OnInit {
     const m = L.curve(['M', node1,
       'Q', midpointLatLng,
       node2],
-      { color: this.linkColor, fill: true, weight: Math.min(count, 4), fillColor: '#fff', fillOpacity: 0 }
+      { color: this.linkColor, fill: false, weight: Math.min(count, 4), fillColor: '#fff', fillOpacity: 0 }
     );
 
     L.setOptions(m, { letters: letters })
@@ -269,27 +286,45 @@ export class MapViewComponent implements OnInit {
     m.on('mouseout', () => {
       m.setStyle({ color: this.linkColor });
     });
-    // console.log(m);
-    // let popup = '<div>Rok:' + year + '</div>';
-    // identities.forEach(i => {
-    //   popup += '<div>' + i.role + ': ' + i.name + '</div>';
-    // })
+    m.on('click', () => {
+      this._ngZone.run(() => {
+        let popup = '';
+        letters.forEach(letter => {
+          popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
+          if (letter.keywords_category_cs) {
+            popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+          } else if (letter.keywords_cs) {
+            popup += ` (${letter.keywords_cs.join(', ')})</div>`;
+          } else {
+            popup += `</div>`;
+          }
+        });
 
-    let popup = '<div>' + this.nodes[letters[0].origin].name + ' -> ' + this.nodes[letters[0].destination].name + '</div><div>Count:' + count + '</div>';
-    const roky: number[] = [];
-    letters.forEach(letter => {
-      if (!roky.includes(letter.date_year)) {
-        roky.push(letter.date_year)
-      }
+        this.infoContent = popup;
+        this.infoHeader = `Letters from ${this.nodes[letters[0].origin].name} -> ${this.nodes[letters[0].destination].name} (${letters.length})`;
+      });
     });
-    popup += '<div>' + roky.join(', ') + '</div>';
-    m.bindTooltip(popup, { sticky: true });
+
+    // let popup = '<div>' + this.nodes[letters[0].origin].name + ' -> ' + this.nodes[letters[0].destination].name + '</div><div>Count:' + count + '</div>';
+    // const roky: number[] = [];
+    // letters.forEach(letter => {
+    //   if (!roky.includes(letter.date_year)) {
+    //     roky.push(letter.date_year)
+    //   }
+    // });
+    // popup += '<div>' + roky.join(', ') + '</div>';
+    // m.bindTooltip(popup, { sticky: true });
     m.addTo(this.linkLayer);
   }
 
   changeLimits(limits: [number, number]) {
-    this.limits = limits;
-    this.getData(false);
+      this.limits = limits;
+      this.getData(false);
+  }
+
+  closeInfo() {
+    this.clearHighlight();
+    this.activeIdentity = null;
   }
 
 }

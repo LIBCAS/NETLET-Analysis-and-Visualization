@@ -1,0 +1,11 @@
+<mat-card appearance="outlined">
+    <mat-card-header>
+        <mat-card-title>{{ header() }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+            <div [innerHtml]="content()"></div>
+    </mat-card-content>
+    <mat-card-actions align="end" class="app-mat-card-actions">
+        <button mat-raised-button (click)="close()">{{ 'Close' }}</button>
+    </mat-card-actions>
+</mat-card>

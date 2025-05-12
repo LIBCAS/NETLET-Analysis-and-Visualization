@@ -38,6 +38,10 @@
     </div>
     <div class="app-fxFlex" leaflet [leafletOptions]="options"
       (leafletMapReady)="onMapReady($event)">
+    <div class="app-letters-info" *ngIf="infoHeader">
+      <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()" ></app-letters-info>
+    </div>
     </div>
   </div>
+  
 </div>

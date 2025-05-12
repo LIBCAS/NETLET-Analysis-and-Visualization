@@ -91,9 +91,8 @@ public class DataServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
-                if (request.getParameter("tenant") != null) {
-                    // ret = IndexSearcher.getMapLetters(request);
-                    ret = IndexSearcher.getKeywords(request);
+                if (request.getParameter("tenant") != null) { 
+                    ret = IndexSearcher.getMapLetters(request);
                 }
                 return ret;
             }
