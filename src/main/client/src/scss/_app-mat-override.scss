@@ -14,7 +14,7 @@
 
   @include mat.list-overrides((
     list-item-hover-label-text-color: #{map.get(map.get(my-theme.$primary-palette, error), 50)},
-    list-item-one-line-container-height: 24px
+    list-item-one-line-container-height: 32px
     ));
 
     @include mat.form-field-overrides((

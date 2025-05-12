@@ -1,5 +1,5 @@
 <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
-<div class="app-fxLayout app-row app-fill">
+<div class="app-fxLayout app-row app-fill" style="position: relative;">
   <div style="flex: 1 30%; max-width: 300px;">
     <div>
       <h4>{{ 'tenants' | translate}}</h4>
@@ -15,10 +15,10 @@
     <div>
       <h3>{{ 'Recipients' | translate}}</h3>
       <mat-list style="max-height: 200px; width: 100%; overflow-y: scroll;">
-        <mat-list-item *ngFor="let identity of recipients" [class.app-active]="identity === activeIdentity"
+        <mat-list-item *ngFor="let identity of recipients"
           (click)="clickRecipient(identity)">
-          <mat-icon *ngIf="identity === activeIdentity">check</mat-icon>
-          {{ identity.val}} ({{identity.count}})
+          <span [class.app-selected]="identity === activeIdentity"><mat-icon *ngIf="identity === activeIdentity" class="app-va-tb">check</mat-icon>
+          {{ identity.val}} ({{identity.count}})</span>
         </mat-list-item>
       </mat-list>
     </div>
@@ -32,15 +32,15 @@
       </mat-list>
     </div>
   </div>
-  <div style="height: 100%; width: 100%; display: flex; flex-direction: column; align-content: flex-start;">
-    <div  style="height: 200px; width: 100%;">
+  <div style="height: 100%; width: 100%; display: flex; flex-direction: column; align-content: flex-start; position: relative;">
+    <div style="height: 200px; width: 100%;">
       <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year" (onChangeLimits)="changeLimits($event)" ></app-years-chart>
     </div>
     <div class="app-fxFlex" leaflet [leafletOptions]="options"
       (leafletMapReady)="onMapReady($event)">
+    </div>
     <div class="app-letters-info" *ngIf="infoHeader">
       <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()" ></app-letters-info>
-    </div>
     </div>
   </div>
   

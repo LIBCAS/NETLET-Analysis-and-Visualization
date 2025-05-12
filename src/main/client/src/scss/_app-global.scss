@@ -1,4 +1,7 @@
 // --- GLOBAL ---
+@use 'sass:map';
+@use '@angular/material' as mat;
+@use 'theme-colors' as my-theme; 
 
 a {
   cursor: pointer;
@@ -240,4 +243,22 @@ fieldset {
 
 .app-keyword {
   margin-left: 5px;
+}
+
+.app-va-middle {
+  vertical-align: middle;
+}
+
+.app-va-tb {
+  vertical-align: text-bottom;
+}
+
+.app-selected {
+  color: #{map.get(map.get(my-theme.$primary-palette, error), 50)};
+}
+
+
+.app-info-content {
+  max-height: 400px;
+  overflow: auto;
 }

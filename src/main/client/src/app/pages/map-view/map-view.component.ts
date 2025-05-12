@@ -204,10 +204,19 @@ export class MapViewComponent implements OnInit {
     this.infoHeader = 'Letters to ' + identity.val;
     let bounds: LatLngBounds = null;
     this.linkLayer.getLayers().forEach((layer: any) => {
-      const hit: Letter[] = layer.options.letters.filter((l: Letter) => l.identity_recipient && l.identity_recipient.includes(identity.val));
-      if (hit.length > 0) {
-        hit.forEach(l => {
-          this.infoContent += `<div>${this.nodes[l.origin].name} -> ${this.nodes[l.destination].name}: ${l.date_year}</div>`;
+      const letters: Letter[] = layer.options.letters.filter((l: Letter) => l.identity_recipient && l.identity_recipient.includes(identity.val));
+      if (letters.length > 0) {
+        letters.forEach(letter => {
+          this.infoContent += `<div>${this.nodes[letter.origin].name} -> ${this.nodes[letter.destination].name}: ${letter.date_year}`;
+
+          if (letter.keywords_category_cs?.length>0) {
+            this.infoContent += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+          } else if (letter.keywords_cs?.length>0) {
+            this.infoContent += ` (${letter.keywords_cs.join(', ')})</div>`;
+          } else {
+            this.infoContent += `</div>`;
+          }
+
         });
 
         layer.setStyle({ color: this.activeLinkColor });
@@ -291,9 +300,9 @@ export class MapViewComponent implements OnInit {
         let popup = '';
         letters.forEach(letter => {
           popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
-          if (letter.keywords_category_cs) {
+          if (letter.keywords_category_cs?.length>0) {
             popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
-          } else if (letter.keywords_cs) {
+          } else if (letter.keywords_cs?.length>0) {
             popup += ` (${letter.keywords_cs.join(', ')})</div>`;
           } else {
             popup += `</div>`;
