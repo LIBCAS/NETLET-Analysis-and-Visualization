@@ -7,10 +7,11 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { AppState, Tenant } from '../../app-state';
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule, MatToolbarModule, MatButtonModule, MatIconModule,  MatDialogModule,
+  imports: [CommonModule, MatToolbarModule, MatButtonModule, MatIconModule, MatDialogModule,
     RouterModule, TranslateModule, MatMenuModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
@@ -18,7 +19,9 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 export class NavbarComponent {
   constructor(
     public dialog: MatDialog,
-    public translator: TranslateService) { }
+    public translator: TranslateService,
+    public state: AppState
+  ) { }
 
   onLanguageChanged(lang: string) {
     //localStorage.setItem('lang', lang);
@@ -27,5 +30,9 @@ export class NavbarComponent {
 
   ngOnInit(): void {
     this.onLanguageChanged('cs');
+  }
+
+  changeTenant(t: Tenant) {
+    this.state.tenant.set(t);
   }
 }

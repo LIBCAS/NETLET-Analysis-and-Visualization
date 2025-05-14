@@ -1,18 +1,7 @@
 <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
-  <div style="flex: 1 30%; max-width: 300px;">
-    <div>
-      <h4>{{ 'tenants' | translate}}</h4>
-      <mat-form-field>
-        <mat-label>{{ 'tenant' | translate}}</mat-label>
-        <mat-select [(ngModel)]="state.tenant" (selectionChange)="changeTenant()">
-          @for (t of state.tenants; track t) {
-          <mat-option [value]="t">{{ t.val | translate}}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-    </div>
-    <div>
+  <div style="flex: 1 30%;" class="app-filters">
+    <div *ngIf="recipients">
       <h3>{{ 'Recipients' | translate}}</h3>
       <mat-list style="max-height: 200px; width: 100%; overflow-y: scroll;">
         <mat-list-item *ngFor="let identity of recipients"
@@ -22,7 +11,7 @@
         </mat-list-item>
       </mat-list>
     </div>
-    <div>
+    <div *ngIf="mentioned">
       <h3>{{ 'Mentioned' | translate}}</h3>
       <mat-list style="max-height: 200px; width: 100%; overflow-y: scroll;">
         <mat-list-item *ngFor="let identity of mentioned" (mouseout)="clearHighlight()"

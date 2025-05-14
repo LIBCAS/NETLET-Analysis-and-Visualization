@@ -7,6 +7,14 @@
     </div>
     <div class="app-fxLayout app-row app-center-v">
      <!-- <a mat-button >{{ 'Login' | translate }}</a> -->
+      
+     <button mat-button [matMenuTriggerFor]="tenants">{{ (state.tenant() ? state.tenant().val : 'tenants') | translate}}</button>
+      <mat-menu #tenants="matMenu">
+        @for (t of state.tenants; track t) {
+        <button mat-menu-item (click)="changeTenant(t)">{{ t.val | translate}}</button>
+        }
+      </mat-menu>
+
      <button mat-button [matMenuTriggerFor]="menu">{{ translator.currentLang | translate}}</button>
       <mat-menu #menu="matMenu">
         <button mat-menu-item (click)="onLanguageChanged('cs')">Český</button>

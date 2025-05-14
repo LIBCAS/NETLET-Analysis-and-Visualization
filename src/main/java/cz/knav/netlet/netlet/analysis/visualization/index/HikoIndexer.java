@@ -134,7 +134,7 @@ public class HikoIndexer {
             while (rs.next()) {
 
                 doc.addField("role", rs.getString("LP.role"));
-                doc.addField("place_id", rs.getString("P.id"));
+                doc.addField("place_id", rs.getInt("P.id"));
                 doc.addField("name", rs.getString("P.name"));
                 doc.addField("country", rs.getString("P.country"));
                 doc.addField("note", rs.getString("P.note"));
@@ -158,7 +158,7 @@ public class HikoIndexer {
 
                 JSONObject places = new JSONObject()
                         .put("role", rs.getString("LP.role"))
-                        .put("place_id", rs.getString("P.id"))
+                        .put("place_id", rs.getInt("P.id"))
                         .put("name", rs.getString("P.name"))
                         .put("country", rs.getString("P.country"))
                         .put("note", rs.getString("P.note"))

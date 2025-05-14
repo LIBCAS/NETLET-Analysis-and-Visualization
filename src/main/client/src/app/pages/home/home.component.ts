@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -6,11 +7,59 @@ import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterModule, TranslateModule,
+  imports: [CommonModule, RouterModule, TranslateModule,
     MatCardModule, MatButtonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
+
+  cards = [
+    {
+      header: '',
+      text: 'Centralita aktérů korespondence v dané korespondenční síti',
+      route: 'identities'
+    },
+    {
+      header: '',
+      text: 'Míra jejich zprostředkovatelské pozice mezi dvěma a více sítěmi',
+      route: ''
+    },
+    {
+      header: 'Keywords',
+      text: 'Kocitační sítě mapující v dopisech zmiňované osoby ve vztahu ke specifickým tématům či debatám.',
+      route: 'keywords'
+    },
+    {
+      header: 'Map',
+      text: 'Digitální vizualizace zaměřené na geografický horizont jednotlivých osobních korespondenčních souborů.',
+      route: 'map'
+    },
+    {
+      header: '',
+      text: 'Komparativně pojatá mapová zobrazení v rámci tří hlavních období',
+      route: ''
+    },
+    {
+      header: '',
+      text: 'Statisticky pojaté grafy a časové osy porovnávající dynamiku vývoje jednotlivých korespondenčních celků v časové dimenzi',
+      route: ''
+    },
+    {
+      header: '',
+      text: 'Schémata zobrazující vztahy mezi jednotlivými pisateli a příjemci dopisů',
+      route: ''
+    },
+    {
+      header: '',
+      text: 'Sschémata zobrazující korespondenční vztahy mezi různými profesními skupinami',
+      route: ''
+    },
+    {
+      header: '',
+      text: 'Schémata zobrazující tematická propojení dopisů a korespondenčních celků',
+      route: ''
+    },
+  ]
 
 }

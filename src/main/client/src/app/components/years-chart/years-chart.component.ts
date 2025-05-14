@@ -49,7 +49,7 @@ export class YearsChartComponent {
   ) {
     effect(() => {
       const facet = this.dateYearFacet();
-      this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
+      this.limits = [this.state.tenant().date_year_min, this.state.tenant().date_year_max];
       if (this.chartRok) {
         this.setYearsChart(facet);
       }
@@ -76,7 +76,7 @@ export class YearsChartComponent {
 
   onClearSelection(e: any) {
     if (e.batch[0].areas.length === 0) {
-      this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
+      this.limits = [this.state.tenant().date_year_min, this.state.tenant().date_year_max];
       this.onChangeLimits.emit(this.limits);
       this.setChartTitle();
     }

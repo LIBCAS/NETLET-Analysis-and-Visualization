@@ -1,29 +1,15 @@
-<div class="app-home-layout">
-<mat-card appearance="outlined">
-    <mat-card-header>
-        <mat-card-title> Mapa </mat-card-title>
-    </mat-card-header>
+<div class="app-home-layout app-fxLayout app-row app-fill">
+<mat-card appearance="outlined" *ngFor="let card of cards">
+    <!-- <mat-card-header>
+        <mat-card-title> {{ card.header | translate}} </mat-card-title>
+    </mat-card-header> -->
     <mat-card-content>
         <p>
-            Digitální vizualizace zaměřené na geografický horizont jednotlivých osobních korespondenčních souborů.
+            {{ card.text }}
         </p>
       </mat-card-content>
     <mat-card-actions align="end" class="app-mat-card-actions">
-        <button [routerLink]="['map']" mat-raised-button>{{ 'View' }}</button>
-    </mat-card-actions>
-</mat-card>
-
-<mat-card appearance="outlined">
-    <mat-card-header>
-        <mat-card-title>Keywords</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-        <p>
-            Kocitační sítě mapující v dopisech zmiňované osoby ve vztahu ke specifickým tématům či debatám.
-        </p>
-      </mat-card-content>
-    <mat-card-actions align="end">
-        <button [routerLink]="['keywords']" mat-raised-button >{{ 'View' }}</button>
+        <button [routerLink]="[card.route]" [disabled]="card.route === ''" mat-raised-button>{{ 'View' | translate }}</button>
     </mat-card-actions>
 </mat-card>
 </div>

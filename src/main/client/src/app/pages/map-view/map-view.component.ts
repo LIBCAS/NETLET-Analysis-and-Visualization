@@ -1,4 +1,4 @@
-import { Component, Inject, input, NgZone, OnInit } from '@angular/core';
+import { Component, computed, effect, Inject, input, NgZone, OnInit, Signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import L, { circle, CircleMarker, LatLng, latLng, LatLngBounds, Layer, LayerGroup, Map, Marker, polygon, tileLayer } from 'leaflet';
@@ -47,8 +47,8 @@ export class MapViewComponent implements OnInit {
   activeLinkColor = '#f00';
 
   solrResponse: any;
-  recipients: JSONFacet[] = [];
-  mentioned: JSONFacet[] = [];
+  recipients: JSONFacet[];
+  mentioned: JSONFacet[];
 
   nodeLayer: LayerGroup<CircleMarker> = new L.LayerGroup();
   linkLayer: LayerGroup<CircleMarker> = new L.LayerGroup();
@@ -60,6 +60,8 @@ export class MapViewComponent implements OnInit {
   infoContent: string;
   infoHeader: string;
 
+  tenant: Tenant;
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private _ngZone: NgZone,
@@ -67,7 +69,14 @@ export class MapViewComponent implements OnInit {
     private translation: TranslateService,
     public state: AppState,
     private service: AppService
-  ) { }
+  ) {
+    effect(() => {
+      this.tenant = this.state.tenant();
+      if (this.tenant) {
+        this.changeTenant();
+      }
+    })
+   }
 
   ngOnInit(): void {
     this.linkColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
@@ -76,17 +85,17 @@ export class MapViewComponent implements OnInit {
 
   onMapReady(map: Map) {
     this.map = map;
-    if (this.state.tenant) {
+    if (this.tenant) {
       setTimeout(() => {
 
-        this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
+        this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
         this.getData(true);
       }, 10)
     }
   }
 
   changeTenant() {
-    this.limits = [this.state.tenant.date_year_min, this.state.tenant.date_year_max];
+    this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
     this.getData(true);
   }
 
@@ -100,9 +109,9 @@ export class MapViewComponent implements OnInit {
       this.linkLayer.clearLayers();
     }
     const p: any = {};
-    p.tenant = this.state.tenant.val;
+    p.tenant = this.tenant.val;
     p.date_range = this.limits.toString();
-    p.tenant_date_range = this.state.tenant.date_year_min + ',' + this.state.tenant.date_year_max;
+    p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
     if (!withMap) {
       p.rows = 0;
     } else {
@@ -147,6 +156,30 @@ export class MapViewComponent implements OnInit {
               color: '#795548',
               radius: 5,
               weight: 1
+            });
+            m.on('click', () => {
+              this._ngZone.run(() => {
+                let popup = '';
+                let lettersFrom = 0;
+                let lettersTo = 0;
+                this.linkLayer.getLayers().forEach((layer: any) => {
+                  lettersFrom += layer.options.letters.filter((l: Letter) => l.origin===place.place_id).length;
+                  lettersTo += layer.options.letters.filter((l: Letter) => l.destination===place.place_id).length;
+                  // letters.forEach(letter => {
+                  //   popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
+                  //   if (letter.keywords_category_cs?.length > 0) {
+                  //     popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+                  //   } else if (letter.keywords_cs?.length > 0) {
+                  //     popup += ` (${letter.keywords_cs.join(', ')})</div>`;
+                  //   } else {
+                  //     popup += `</div>`;
+                  //   }
+                  // });
+
+                });
+                this.infoContent = `<div>From: ${lettersFrom}</div><div>To: ${lettersTo}</div>`;
+                this.infoHeader = `Letters from/to ${place.name}`;
+              });
             });
             m.bindTooltip(place.name);
             m.addTo(this.nodeLayer);
@@ -209,9 +242,9 @@ export class MapViewComponent implements OnInit {
         letters.forEach(letter => {
           this.infoContent += `<div>${this.nodes[letter.origin].name} -> ${this.nodes[letter.destination].name}: ${letter.date_year}`;
 
-          if (letter.keywords_category_cs?.length>0) {
+          if (letter.keywords_category_cs?.length > 0) {
             this.infoContent += ` (${letter.keywords_category_cs.join(', ')})</div>`;
-          } else if (letter.keywords_cs?.length>0) {
+          } else if (letter.keywords_cs?.length > 0) {
             this.infoContent += ` (${letter.keywords_cs.join(', ')})</div>`;
           } else {
             this.infoContent += `</div>`;
@@ -300,9 +333,9 @@ export class MapViewComponent implements OnInit {
         let popup = '';
         letters.forEach(letter => {
           popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
-          if (letter.keywords_category_cs?.length>0) {
+          if (letter.keywords_category_cs?.length > 0) {
             popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
-          } else if (letter.keywords_cs?.length>0) {
+          } else if (letter.keywords_cs?.length > 0) {
             popup += ` (${letter.keywords_cs.join(', ')})</div>`;
           } else {
             popup += `</div>`;
@@ -327,8 +360,8 @@ export class MapViewComponent implements OnInit {
   }
 
   changeLimits(limits: [number, number]) {
-      this.limits = limits;
-      this.getData(false);
+    this.limits = limits;
+    this.getData(false);
   }
 
   closeInfo() {

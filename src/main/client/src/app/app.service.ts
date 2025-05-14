@@ -72,4 +72,8 @@ export class AppService {
   getKeywords(params: HttpParams): Observable<any> {
     return this.get('data/get_keywords', params)
   }
+
+  getIdentities(params: HttpParams): Observable<any> {
+    return this.get('data/get_identities', params)
+  }
 }

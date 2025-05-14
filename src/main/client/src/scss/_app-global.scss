@@ -5,7 +5,7 @@
 
 a {
   cursor: pointer;
-  color: var(--app-color-primary);
+  color: var(--mat-sys-on-primary);
     text-decoration: none;
 
   &:hover {
@@ -71,7 +71,7 @@ fieldset {
 
 // colors
 .app-color-primary {
-  color: var(--app-color-primary);
+  color: var(--mat-sys-on-primary);
 }
 
 .app-color-warning {
@@ -156,7 +156,7 @@ fieldset {
   border-bottom: 1px solid var(--app-topbar-border-color);
   border-top: 1px solid;
   border-color: rgba(var(--app-color-lightnes-rgb), .3);
-  background-color: var(--app-color-primary);
+  background-color: var(--mat-sys-on-primary);
 
   .app-breadcrumbs {
     color: rgba(var(--app-color-lightnes-rgb), .6);
@@ -202,7 +202,7 @@ fieldset {
     }
 
     &.app-active {
-      border-bottom: 2px solid var(--app-color-primary);
+      border-bottom: 2px solid var(--mat-sys-on-primary);
     }
   }
 
@@ -254,11 +254,16 @@ fieldset {
 }
 
 .app-selected {
-  color: #{map.get(map.get(my-theme.$primary-palette, error), 50)};
+  color: var(--app-color-selected);
 }
 
 
 .app-info-content {
   max-height: 400px;
   overflow: auto;
+}
+
+.app-filters {
+  max-width: 300px;
+  padding: 12px;
 }

@@ -1,35 +1,23 @@
-
 <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
-<div class="app-fxLayout app-row app-fill">
-  <div style="flex: 1 30%; max-width: 300px;">
-    <div>
-      <h4>{{ 'tenants' | translate}}</h4>
-      <mat-form-field>
-        <mat-label>{{ 'tenant' | translate}}</mat-label>
-        <mat-select [(ngModel)]="state.tenant" (selectionChange)="changeTenant()">
-          @for (t of state.tenants; track t) {
-          <mat-option [value]="t">{{ t.val | translate}}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-    </div>
-    <!-- <div>
-      <mat-slider min="0" max="1" step="1"   [showTickMarks]="false" >
-      {{ formatSliderLabel(chartType)}}
-        <input matSliderThumb [(ngModel)]="chartType">
-      </mat-slider>
+<div class="app-fxLayout app-row app-fill" style="position: relative;">
+  <div style="flex: 1 30%;" class="app-filters">
 
+    <!-- <div>
+      <mat-radio-group aria-label="Chart type" [(ngModel)]="chartType" (ngModelChange)="onChangeChartType()">
+        <mat-radio-button value="treemap">treemap</mat-radio-button>
+        <mat-radio-button value="tree">tree</mat-radio-button>
+      </mat-radio-group>
     </div> -->
 
-    <div>
+    <div *ngIf="keywords_cs">
       <h3>{{ 'Keywords' | translate}}</h3>
-      <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
-        <mat-list-item *ngFor="let k of keywords_cs" (click)="clickKeyword(k)">
+      <mat-list style="width: 100%;">
+        <mat-list-item *ngFor="let k of keywords_cs; let idx = index" (click)="clickKeyword(k)">
           <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
         </mat-list-item>
       </mat-list>
     </div>
-    <div>
+    <div *ngIf="mentioned">
       <h3>{{ 'Mentioned' | translate}}</h3>
       <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
         <mat-list-item *ngFor="let identity of mentioned" (click)="clickMentioned(identity)">
@@ -38,35 +26,27 @@
       </mat-list>
     </div>
   </div>
-
-  <div style="height: 100%; width: 100%; display: flex; flex-direction: column; align-content: flex-start;">
-    <div  style="height: 200px; width: 100%;">
-      <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year" (onChangeLimits)="changeLimits($event)" ></app-years-chart>
+  <div
+    style="height: 100%; width: 100%; display: flex; flex-direction: column; align-content: flex-start; position: relative;">
+    <div style="height: 200px; width: 100%;">
+      <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
+        (onChangeLimits)="changeLimits($event)"></app-years-chart>
     </div>
-    <div class="app-fxFlex">
+
+    <div  class="app-fxFlex">
+      <div style="overflow: auto; height:100%; ">
+        <div  echarts style="width: 100%;" 
+          [options]="treeMapOptions" (chartInit)="onTreeMapChartInit($event)">
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="app-fxFlex">
       <div style="overflow: auto; height: 800px">
-        <div echarts style="width: 100%;" [style.height]="(mentioned.length * 38) + 'px'"
+        <div *ngIf="chartType === 0" echarts style="width: 100%;" [style.height]="(mentioned.length * 32) + 'px'"
           [options]="identitiesChartOptions" (chartInit)="onChartInit($event)">
         </div>
-  
-        <div *ngIf="chartType" echarts style="width: 100%;" [style.height]="(mentioned.length * 38) + 'px'"
-          [options]="keywordsChartOptions" (chartInit)="onKeywordsChartInit($event)">
-        </div>
       </div>
-    </div>
+    </div> -->
   </div>
-
-
-  <!-- <div style="flex: 1 70%" class="app-fxFlex">
-    <div style="overflow: auto; height: 800px">
-      <div echarts style="width: 100%;" [style.height]="(mentioned.length * 38) + 'px'"
-        [options]="identitiesChartOptions" (chartInit)="onChartInit($event)">
-      </div>
-
-      <div *ngIf="chartType" echarts style="width: 100%;" [style.height]="(mentioned.length * 38) + 'px'"
-        [options]="keywordsChartOptions" (chartInit)="onKeywordsChartInit($event)">
-      </div>
-    </div>
-
-  </div> -->
 </div>

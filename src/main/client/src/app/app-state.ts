@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, signal } from "@angular/core";
 
 
 export interface Tenant {
@@ -13,5 +13,5 @@ export interface Tenant {
 }) export class AppState {
 
     public tenants: Tenant[] = [];
-    public tenant: Tenant;
+    public tenant = signal<Tenant>(null);
 }
