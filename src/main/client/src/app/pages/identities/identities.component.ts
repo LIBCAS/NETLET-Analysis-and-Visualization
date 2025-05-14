@@ -17,15 +17,16 @@ import { YearsChartComponent } from '../../components/years-chart/years-chart.co
 
 
 import { EChartsOption, ECharts } from 'echarts';
+import * as echarts from 'echarts/core';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { GraphChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import * as echarts from 'echarts/core';
-import { Identity, Letter } from '../../shared/letter';
+import { Letter } from '../../shared/letter';
 import { JSONFacet } from '../../shared/facet';
+import {LabelLayout, UniversalTransition} from "echarts/features";  
 
-echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
+echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-identities',
