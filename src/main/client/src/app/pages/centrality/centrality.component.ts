@@ -179,7 +179,7 @@ export class CentralityComponent {
   }
 
   processResponse() {
-    const categories = [{ name: 'author' }, { name: 'recipient' }, { name: 'mentioned' }];
+    const categories = [{ name: 'mentioned' }];
     const links: any[] = [];
     const nodes: any[] = [];
     const h = this.graphChart.getHeight();
@@ -190,34 +190,34 @@ export class CentralityComponent {
       this.authors[0].count,
       this.recipients[0].count);
     if (this.mentioned[0]) {
-      maxCount = Math.max(maxCount, this.mentioned[0]?.count);
+      maxCount = this.mentioned[0].count;
     }
-    this.authors.forEach((identity: JSONFacet) => {
-      const pos = this.setPosition(h, w, identity.count, maxCount);
-      nodes.push({
-        // id: identity.id + '',
-        id: identity.val + '_author',
-        name: identity.val,
-        value: identity.count,
-        category: 'author',
-        symbolSize: maxSize * identity.count / maxCount + minSize,
-        x: pos.x,
-        y: pos.y
-      })
-    });
-    this.recipients.forEach((identity: JSONFacet) => {
-      const pos = this.setPosition(h, w, identity.count, maxCount);
-      nodes.push({
-        // id: identity.id + '',
-        id: identity.val + '_recipient',
-        name: identity.val,
-        value: identity.count,
-        category: 'recipient',
-        symbolSize: maxSize * identity.count / maxCount + minSize,
-        x: pos.x,
-        y: pos.y
-      })
-    });
+    // this.authors.forEach((identity: JSONFacet) => {
+    //   const pos = this.setPosition(h, w, identity.count, maxCount);
+    //   nodes.push({
+    //     // id: identity.id + '',
+    //     id: identity.val + '_author',
+    //     name: identity.val,
+    //     value: identity.count,
+    //     category: 'author',
+    //     symbolSize: maxSize * identity.count / maxCount + minSize,
+    //     x: pos.x,
+    //     y: pos.y
+    //   })
+    // });
+    // this.recipients.forEach((identity: JSONFacet) => {
+    //   const pos = this.setPosition(h, w, identity.count, maxCount);
+    //   nodes.push({
+    //     // id: identity.id + '',
+    //     id: identity.val + '_recipient',
+    //     name: identity.val,
+    //     value: identity.count,
+    //     category: 'recipient',
+    //     symbolSize: maxSize * identity.count / maxCount + minSize,
+    //     x: pos.x,
+    //     y: pos.y
+    //   })
+    // });
     this.mentioned.forEach((identity: JSONFacet) => {
       const pos = this.setPosition(h, w, identity.count, maxCount);
       nodes.push({
@@ -231,26 +231,6 @@ export class CentralityComponent {
         y: pos.y
       })
     });
-
-    // this.solrResponse.response.docs.forEach((letter: Letter) => {
-    //   if (this.inLimits(letter.date_year) && letter.identities) {
-    //     const a = letter.identities.find(i => i.role === 'author');
-    //     const r = letter.identities.find(i => i.role === 'recipient');
-    //     const id = a.id + '_' + r.id;
-    //     const link = links.find(l => l.id === id);
-    //     if (!link) {
-    //       links.push({
-    //         id: id,
-    //         source: a.name + '_author',
-    //         target: r.name + '_recipient',
-    //         label: a.name + ' > ' + r.name,
-    //         count: 1
-    //       });
-    //     } else {
-    //       link.count++
-    //     }
-    //   }
-    // });
 
     this.graphData = {
       categories,
