@@ -25,6 +25,7 @@
         <servlet-name>StaticServlet</servlet-name>
         <url-pattern>/identities</url-pattern>
         <url-pattern>/keywords</url-pattern>
+        <url-pattern>/professions</url-pattern>
         <url-pattern>/map</url-pattern>
         <url-pattern>/home</url-pattern>
     </servlet-mapping>

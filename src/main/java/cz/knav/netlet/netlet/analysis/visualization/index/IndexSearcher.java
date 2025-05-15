@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.Http2SolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
+import org.apache.solr.client.solrj.request.json.DomainMap;
+import org.apache.solr.client.solrj.request.json.JsonFacetMap;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.request.json.RangeFacetMap;
 import org.apache.solr.client.solrj.request.json.TermsFacetMap;
@@ -266,5 +268,73 @@ public class IndexSearcher {
         }
         return ret;
     }
+    
+    public static JSONObject getProfessions(HttpServletRequest request) {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+                            
+            String tenant_date_range = request.getParameter("tenant_date_range");
+            if (tenant_date_range == null || tenant_date_range.isBlank()) {
+                tenant_date_range = "1000,2025";
+            }
+            String[] years = tenant_date_range.split(",");
+            RangeFacetMap rangeFacet = new RangeFacetMap("date_year", Long.parseLong(years[0]), Long.parseLong(years[1]), 1)
+                    .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+
+            String rowsP = request.getParameter("rows");
+            int rows = 0;
+            if (rowsP != null && !rowsP.isBlank()) {
+                rows = Integer.valueOf(rowsP);
+            } 
+                                        
+        NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
+        rawJsonResponseParser.setWriterType("json");
+            JsonQueryRequest jrequest = new JsonQueryRequest()
+                    .setQuery("*:*")
+                    .setLimit(rows)
+                    .withFilter("professions_recipient_cs:*")
+                    .withFilter("professions_author_cs:*")
+                    .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,identities:[json],professions:[json]")
+                    .withFacet("date_year", rangeFacet)
+                    .withFacet("tenants", new TermsFacetMap("tenant") 
+                                .setLimit(100)
+                                .withDomain(new DomainMap().withTagsToExclude("fftenant"))
+                                .setMinCount(1))
+                    .withFacet("professions_author", new TermsFacetMap("professions_author_cs") 
+                                .setLimit(100)
+                                .setMinCount(1))
+                    .withFacet("professions_recipient", new TermsFacetMap("professions_recipient_cs") 
+                                .setLimit(100)
+                                .setMinCount(1))
+                    .withFacet("professions_mentioned", new TermsFacetMap("professions_mentioned_cs")
+                                .setLimit(100)
+                                .setMinCount(1))
+                    
+                    ;
+            String tenant = request.getParameter("tenant");
+            if (tenant != null && !tenant.isBlank()) {
+                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:" + tenant);
+            }
+            String date_range = request.getParameter("date_range");
+            if (date_range != null && !date_range.isBlank()) {
+                jrequest = jrequest.withFilter("{!tag=ffdate_year}date_year:[" + date_range.replaceAll(",", " TO ") + "]");
+            }
+//            QueryResponse queryResponse = jrequest.process(solr, "letter_place");
+//            ret = new JSONObject(queryResponse.jsonStr());
+            
+            jrequest.setResponseParser(rawJsonResponseParser);
+            NamedList<Object> resp = solr.request(jrequest, "letter_place");
+            String jsonResponse = (String) resp.get("response");
+            ret = new JSONObject(jsonResponse);
+            
+            
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        return ret;
+    }
+    
+    
 
 }

@@ -31,6 +31,7 @@ import { Configuration } from './shared/config';
                 this.config = cfg as Configuration;
                 return this.http.get('api/data/get_tenants').pipe(tap((res: any) => {
                     this.state.tenants = res.buckets;
+                    this.state.tenants.forEach(t => {t.available = true});
                 }));
             }),
             catchError((err) => {

@@ -14,37 +14,35 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Tenant, AppState } from '../../app-state';
 import { AppService } from '../../app.service';
 import { YearsChartComponent } from '../../components/years-chart/years-chart.component';
+import { JSONFacet } from '../../shared/facet';
+import { Letter } from '../../shared/letter';
 
-
-import { EChartsOption, ECharts } from 'echarts';
 import * as echarts from 'echarts/core';
-import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
+import { EChartsOption, ECharts } from 'echarts'; import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { GraphChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import { Letter } from '../../shared/letter';
-import { JSONFacet } from '../../shared/facet';
-import { LabelLayout, UniversalTransition } from "echarts/features";
+import { LabelLayout } from "echarts/features";
+import { MatCardModule } from '@angular/material/card';
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
-  selector: 'app-identities',
+  selector: 'app-professions',
   imports: [TranslateModule, FormsModule, CommonModule,
-    NgxEchartsDirective, MatProgressBarModule,
+    NgxEchartsDirective, MatProgressBarModule, MatCardModule,
     MatFormFieldModule, MatSelectModule, MatListModule,
     MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent
   ],
   providers: [
     provideEchartsCore({ echarts }),
   ],
-  templateUrl: './identities.component.html',
-  styleUrl: './identities.component.scss'
+  templateUrl: './professions.component.html',
+  styleUrl: './professions.component.scss'
 })
-export class IdentitiesComponent {
-
-
+export class ProfessionsComponent {
   loading: boolean;
+  invalidTenant: boolean;
   solrResponse: any;
   limits: [number, number];
   tenant: Tenant;
@@ -66,9 +64,9 @@ export class IdentitiesComponent {
     }[]
   }
 
-  authors: JSONFacet[];
-  recipients: JSONFacet[];
-  mentioned: JSONFacet[];
+  professions_author: JSONFacet[];
+  professions_recipient: JSONFacet[];
+  professions_mentioned: JSONFacet[];
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -129,11 +127,12 @@ export class IdentitiesComponent {
     this.graphChart.dispatchAction({
       type: 'downplay'
     });
-    
+
   }
 
   getData(setResponse: boolean) {
     this.loading = true;
+    this.invalidTenant = false;
     const p: any = {};
     p.tenant = this.tenant.val;
     //p.keyword = this.selectedKeywords;
@@ -144,16 +143,24 @@ export class IdentitiesComponent {
     } else {
       p.rows = 10000;
     }
-    this.service.getIdentities(p as HttpParams).subscribe((resp: any) => {
+    this.service.getProfessions(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
       }
       if (setResponse) {
+        const ts: JSONFacet[] = resp.facets.tenants.buckets;
+        this.state.tenants.forEach(t => {t.available = !!ts.find(ta => ta.val === t.val)});
+        if (!this.state.tenant().available) {
+          // this.state.tenant.set(null);
+          this.loading = false;
+          this.invalidTenant = true;
+          return;
+        }
         this.solrResponse = resp;
       }
-      this.authors = resp.facets.identity_author.buckets;
-      this.recipients = resp.facets.identity_recipient.buckets;
-      this.mentioned = resp.facets.identity_mentioned.buckets;
+      this.professions_author = resp.facets.professions_author.buckets;
+      this.professions_recipient = resp.facets.professions_recipient.buckets;
+      // this.professions_mentioned = resp.facets.professions_mentioned.buckets;
       this.processResponse();
       this.loading = false;
     });
@@ -164,7 +171,7 @@ export class IdentitiesComponent {
   }
 
   processResponse() {
-    const categories = [{ name: 'author' }, { name: 'recipient' }, { name: 'mentioned' }];
+    const categories = [{ name: 'author' }, { name: 'recipient' }];
     const links: any[] = [];
     const nodes: any[] = [];
     const h = this.graphChart.getHeight();
@@ -172,10 +179,9 @@ export class IdentitiesComponent {
     const maxSize = 60;
     const minSize = 10;
     const maxCount: number = Math.max(
-      this.authors[0].count,
-      this.recipients[0].count,
-      this.mentioned[0]?.count);
-    this.authors.forEach((identity: JSONFacet) => {
+      this.professions_author[0].count,
+      this.professions_recipient[0].count);
+    this.professions_author.forEach((identity: JSONFacet) => {
       nodes.push({
         // id: identity.id + '',
         id: identity.val + '_author',
@@ -187,7 +193,7 @@ export class IdentitiesComponent {
         y: Math.random() * h
       })
     });
-    this.recipients.forEach((identity: JSONFacet) => {
+    this.professions_recipient.forEach((identity: JSONFacet) => {
       nodes.push({
         // id: identity.id + '',
         id: identity.val + '_recipient',
@@ -199,36 +205,43 @@ export class IdentitiesComponent {
         y: Math.random() * h
       })
     });
-    this.mentioned.forEach((identity: JSONFacet) => {
-      nodes.push({
-        // id: identity.id + '',
-        id: identity.val + '_mentioned',
-        name: identity.val,
-        value: identity.count,
-        category: 'mentioned',
-        symbolSize: maxSize * identity.count / maxCount + minSize,
-        x: Math.random() * w,
-        y: Math.random() * h
-      })
-    });
+    // this.professions_mentioned.forEach((identity: JSONFacet) => {
+    //   nodes.push({
+    //     // id: identity.id + '',
+    //     id: identity.val + '_mentioned',
+    //     name: identity.val,
+    //     value: identity.count,
+    //     category: 'mentioned',
+    //     symbolSize: maxSize * identity.count / maxCount + minSize,
+    //     x: Math.random() * w,
+    //     y: Math.random() * h
+    //   })
+    // });
 
     this.solrResponse.response.docs.forEach((letter: Letter) => {
       if (this.inLimits(letter.date_year) && letter.identities) {
-        const a = letter.identities.find(i => i.role === 'author');
-        const r = letter.identities.find(i => i.role === 'recipient');
-        const id = a.id + '_' + r.id;
-        const link = links.find(l => l.id === id);
-        if (!link) {
-          links.push({
-            id: id,
-            source: a.name + '_author',
-            target: r.name + '_recipient',
-            label: a.name + ' > ' + r.name,
-            count: 1
+        const a = letter.identities.find(i => i.role === 'author').professions;
+        const r = letter.identities.find(i => i.role === 'recipient').professions;
+        if (a && r) {
+          a.forEach(pa => {
+            r.forEach(pr => {
+              const id = pa.id + '_' + pr.id;
+              const link = links.find(l => l.id === id);
+              if (!link) {
+                links.push({
+                  id: id,
+                  source: pa.cs + '_author',
+                  target: pr.cs + '_recipient',
+                  label: pa.cs + ' > ' + pr.cs,
+                  count: 1
+                });
+              } else {
+                link.count++
+              }
+            });
           });
-        } else {
-          link.count++
         }
+
       }
     });
 

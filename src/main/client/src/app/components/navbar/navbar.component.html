@@ -11,7 +11,7 @@
      <button mat-button [matMenuTriggerFor]="tenants">{{ (state.tenant() ? state.tenant().val : 'tenants') | translate}}</button>
       <mat-menu #tenants="matMenu">
         @for (t of state.tenants; track t) {
-        <button mat-menu-item (click)="changeTenant(t)">{{ t.val | translate}}</button>
+        <button [disabled]="!t.available" mat-menu-item (click)="changeTenant(t)">{{ t.val | translate}}</button>
         }
       </mat-menu>
 

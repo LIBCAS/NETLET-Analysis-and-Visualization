@@ -116,6 +116,16 @@ public class DataServlet extends HttpServlet {
                 }
                 return ret;
             }
+        },
+        GET_PROFESSIONS {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                JSONObject ret = new JSONObject();
+                if (request.getParameter("tenant") != null) {
+                    ret = IndexSearcher.getProfessions(request);
+                }
+                return ret;
+            }
         }; 
 
         abstract JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception;

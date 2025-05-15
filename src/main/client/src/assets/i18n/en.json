@@ -3,5 +3,6 @@
   "tenants": "Catalogs",
   "clearSelection": "Clear selection",
   "Recipients": "Recipients",
-  "Mentioned": "Mentioned"
+  "Mentioned": "Mentioned",
+  "invalidTenant": "There is no available data for this Catalog"
 }

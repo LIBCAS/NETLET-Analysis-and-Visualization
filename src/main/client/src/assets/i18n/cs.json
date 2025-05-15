@@ -3,5 +3,6 @@
   "tenants": "Katalogy",
   "clearSelection": "Zzrušit výběr",
   "Recipients": "Adresat",
-  "Mentioned": "Zminene odsoby"
+  "Mentioned": "Zminene odsoby",
+  "invalidTenant": "Nejsou k dispozice data pro tento Katalog"
 }

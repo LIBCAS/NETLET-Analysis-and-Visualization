@@ -76,4 +76,8 @@ export class AppService {
   getIdentities(params: HttpParams): Observable<any> {
     return this.get('data/get_identities', params)
   }
+
+  getProfessions(params: HttpParams): Observable<any> {
+    return this.get('data/get_professions', params)
+  }
 }

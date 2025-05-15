@@ -5,7 +5,8 @@ export interface Tenant {
     val: string,
     count: number,
     date_year_max: number,
-    date_year_min: number
+    date_year_min: number,
+    available: boolean
   }
 
 @Injectable({
