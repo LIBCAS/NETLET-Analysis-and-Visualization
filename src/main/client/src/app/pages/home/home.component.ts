@@ -19,7 +19,7 @@ export class HomeComponent {
     {
       header: '',
       text: 'Centralita aktérů korespondence v dané korespondenční síti',
-      route: ''
+      route: 'centrality'
     },
     {
       header: '',

@@ -25,11 +25,12 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { Letter } from '../../shared/letter';
 import { JSONFacet } from '../../shared/facet';
 import { LabelLayout } from "echarts/features";
+import { identity } from 'rxjs';
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
-  selector: 'app-identities',
+  selector: 'app-centrality',
   imports: [TranslateModule, FormsModule, CommonModule,
     NgxEchartsDirective, MatProgressBarModule,
     MatFormFieldModule, MatSelectModule, MatListModule,
@@ -38,10 +39,10 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Grid
   providers: [
     provideEchartsCore({ echarts }),
   ],
-  templateUrl: './identities.component.html',
-  styleUrl: './identities.component.scss'
+  templateUrl: './centrality.component.html',
+  styleUrl: './centrality.component.scss'
 })
-export class IdentitiesComponent {
+export class CentralityComponent {
 
 
   loading: boolean;
@@ -129,7 +130,7 @@ export class IdentitiesComponent {
     this.graphChart.dispatchAction({
       type: 'downplay'
     });
-    
+
   }
 
   getData(setResponse: boolean) {
@@ -163,6 +164,20 @@ export class IdentitiesComponent {
     return n >= this.limits[0] && n <= this.limits[1];
   }
 
+  setPosition(h: number, w: number, count: number, maxCount: number): { x: number, y: number } {
+    let x = Math.random() * w,
+      y = Math.random() * h;
+
+    // const centerX = w / 2;
+    // const centerY = h / 2;
+    // const radius = ((maxCount - count) / (maxCount - 1)) * centerY;
+    // const angle = Math.random() * Math.PI;
+    // x = Math.cos(angle) * radius;
+    // y = Math.sin(angle) * radius;
+
+    return { x, y }
+  }
+
   processResponse() {
     const categories = [{ name: 'author' }, { name: 'recipient' }, { name: 'mentioned' }];
     const links: any[] = [];
@@ -171,11 +186,14 @@ export class IdentitiesComponent {
     const w = this.graphChart.getWidth() - 20;
     const maxSize = 60;
     const minSize = 10;
-    const maxCount: number = Math.max(
+    let maxCount: number = Math.max(
       this.authors[0].count,
-      this.recipients[0].count,
-      this.mentioned[0]?.count);
+      this.recipients[0].count);
+    if (this.mentioned[0]) {
+      maxCount = Math.max(maxCount, this.mentioned[0]?.count);
+    }
     this.authors.forEach((identity: JSONFacet) => {
+      const pos = this.setPosition(h, w, identity.count, maxCount);
       nodes.push({
         // id: identity.id + '',
         id: identity.val + '_author',
@@ -183,11 +201,12 @@ export class IdentitiesComponent {
         value: identity.count,
         category: 'author',
         symbolSize: maxSize * identity.count / maxCount + minSize,
-        x: Math.random() * w,
-        y: Math.random() * h
+        x: pos.x,
+        y: pos.y
       })
     });
     this.recipients.forEach((identity: JSONFacet) => {
+      const pos = this.setPosition(h, w, identity.count, maxCount);
       nodes.push({
         // id: identity.id + '',
         id: identity.val + '_recipient',
@@ -195,11 +214,12 @@ export class IdentitiesComponent {
         value: identity.count,
         category: 'recipient',
         symbolSize: maxSize * identity.count / maxCount + minSize,
-        x: Math.random() * w,
-        y: Math.random() * h
+        x: pos.x,
+        y: pos.y
       })
     });
     this.mentioned.forEach((identity: JSONFacet) => {
+      const pos = this.setPosition(h, w, identity.count, maxCount);
       nodes.push({
         // id: identity.id + '',
         id: identity.val + '_mentioned',
@@ -207,30 +227,30 @@ export class IdentitiesComponent {
         value: identity.count,
         category: 'mentioned',
         symbolSize: maxSize * identity.count / maxCount + minSize,
-        x: Math.random() * w,
-        y: Math.random() * h
+        x: pos.x,
+        y: pos.y
       })
     });
 
-    this.solrResponse.response.docs.forEach((letter: Letter) => {
-      if (this.inLimits(letter.date_year) && letter.identities) {
-        const a = letter.identities.find(i => i.role === 'author');
-        const r = letter.identities.find(i => i.role === 'recipient');
-        const id = a.id + '_' + r.id;
-        const link = links.find(l => l.id === id);
-        if (!link) {
-          links.push({
-            id: id,
-            source: a.name + '_author',
-            target: r.name + '_recipient',
-            label: a.name + ' > ' + r.name,
-            count: 1
-          });
-        } else {
-          link.count++
-        }
-      }
-    });
+    // this.solrResponse.response.docs.forEach((letter: Letter) => {
+    //   if (this.inLimits(letter.date_year) && letter.identities) {
+    //     const a = letter.identities.find(i => i.role === 'author');
+    //     const r = letter.identities.find(i => i.role === 'recipient');
+    //     const id = a.id + '_' + r.id;
+    //     const link = links.find(l => l.id === id);
+    //     if (!link) {
+    //       links.push({
+    //         id: id,
+    //         source: a.name + '_author',
+    //         target: r.name + '_recipient',
+    //         label: a.name + ' > ' + r.name,
+    //         count: 1
+    //       });
+    //     } else {
+    //       link.count++
+    //     }
+    //   }
+    // });
 
     this.graphData = {
       categories,
@@ -238,7 +258,7 @@ export class IdentitiesComponent {
       nodes
     };
 
-    // console.log(this.graphData)
+    console.log(this.graphData)
     this.graphOptions = {
       title: {
         show: false,
