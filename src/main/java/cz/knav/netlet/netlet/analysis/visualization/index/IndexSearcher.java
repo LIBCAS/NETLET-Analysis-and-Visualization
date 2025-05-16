@@ -36,6 +36,7 @@ public class IndexSearcher {
 
             final JsonQueryRequest request = new JsonQueryRequest()
                     .setQuery("*:*")
+                    //.withFilter("status:publish")
                     .withFilter("-date_year:0")
                     .setLimit(0)
                     .withFacet("tenant", tenantFacet);
@@ -86,6 +87,7 @@ public class IndexSearcher {
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     .withFilter("keywords_category_"+lang+":*")
+                    //.withFilter("status:publish")
                     .setLimit(0)
                     .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_"+lang+",keywords_"+lang+"")
                     .withFacet("date_year", rangeFacet)
@@ -166,6 +168,7 @@ public class IndexSearcher {
             rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
+                    //.withFilter("status:publish")
                     .setLimit(rows)
                     .withFilter("origin:*")
                     .withFilter("destination:*")
@@ -174,6 +177,13 @@ public class IndexSearcher {
                     .withFacet("keywords_cs", keywords_csFacet)
                     .withFacet("keywords_categories", categories_csFacet)
                     .withFacet("identity_mentioned", identity_mentionedFacet)
+                    .withFacet("tenants", new TermsFacetMap("tenant")
+                            .setLimit(100)
+                            .withDomain(new DomainMap()
+                                    .withQuery("origin:* AND destination:*")
+                                    //.withTagsToExclude("fftenant")
+                            )
+                            .setMinCount(1))
                     .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
                             .setLimit(100)
                             .setMinCount(1))
@@ -229,6 +239,7 @@ public class IndexSearcher {
             rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
+                    //.withFilter("status:publish")
                     .setLimit(rows)
                     .withFilter("identity_recipient:*")
                     .withFilter("identity_author:*")
@@ -296,6 +307,7 @@ public class IndexSearcher {
             rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
+                    //.withFilter("status:publish")
                     .setLimit(rows)
                     .withFilter("professions_recipient_"+lang+":*")
                     .withFilter("professions_author_"+lang+":*")

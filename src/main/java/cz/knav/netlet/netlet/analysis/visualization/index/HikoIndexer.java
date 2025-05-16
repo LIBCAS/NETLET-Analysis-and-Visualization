@@ -100,6 +100,7 @@ public class HikoIndexer {
                 doc.addField("table_id", rs.getInt("L.id"));
                 doc.addField("tenant", tenant);
                 doc.addField("letter_id", rs.getInt("L.id"));
+                doc.addField("status", rs.getString("L.status")); 
                 doc.addField("date_computed", rs.getDate("L.date_computed"));
                 doc.addField("date_year", rs.getLong("L.date_year"));
 

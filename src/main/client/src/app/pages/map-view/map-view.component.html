@@ -1,5 +1,10 @@
 <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
-<div class="app-fxLayout app-row app-fill" style="position: relative;">
+            <mat-card *ngIf="invalidTenant" appearance="outlined" class="app-invalidTenant">
+                <mat-card-header>
+                    <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
+                </mat-card-header>
+            </mat-card>
+<div class="app-fxLayout app-row app-fill" style="position: relative;" *ngIf="!invalidTenant">
   <div style="flex: 1 30%;" class="app-filters">
     <div *ngIf="recipients">
       <h3>{{ 'field.recipients' | translate}}</h3>

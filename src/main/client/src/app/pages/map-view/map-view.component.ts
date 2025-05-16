@@ -21,11 +21,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { AppState, Tenant } from '../../app-state';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-map-view',
   imports: [TranslateModule, FormsModule, CommonModule,
-    LeafletModule,
+    LeafletModule, MatCardModule,
     MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule,
     MatIconModule, MatProgressBarModule, YearsChartComponent, LettersInfoComponent],
   templateUrl: './map-view.component.html',
@@ -34,6 +35,7 @@ import { LettersInfoComponent } from "../../components/letters-info/letters-info
 export class MapViewComponent implements OnInit {
 
   loading: boolean;
+  invalidTenant: boolean;
   map: Map;
   options = {
     layers: [
@@ -76,10 +78,10 @@ export class MapViewComponent implements OnInit {
         this.changeTenant();
       }
     })
-   }
+  }
 
   ngOnInit(): void {
-    this.state.tenants.forEach(t => {t.available = true});
+    this.state.tenants.forEach(t => { t.available = true });
     this.linkColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     this.activeLinkColor = this.document.body.computedStyleMap().get('--app-color-map-link-active').toString();
   }
@@ -102,6 +104,7 @@ export class MapViewComponent implements OnInit {
 
   getData(withMap: boolean) {
     this.loading = true;
+    this.invalidTenant = false;
     this.closeInfo();
     if (withMap) {
       this.nodes = {};
@@ -123,13 +126,21 @@ export class MapViewComponent implements OnInit {
       if (!resp) {
         return;
       }
-      this.recipients = resp.facets.identity_recipient.buckets;
-      this.mentioned = resp.facets.identity_mentioned.buckets;
+      const ts: JSONFacet[] = resp.facets.tenants.buckets;
+      this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
+      if (!this.state.tenant().available) {
+        // this.state.tenant.set(null);
+        this.loading = false;
+        this.invalidTenant = true;
+        return;
+      }
       if (resp.stats?.stats_fields.latitude) {
         const lat = resp.stats.stats_fields.latitude;
         const lon = resp.stats.stats_fields.longitude;
         this.map.fitBounds(L.latLngBounds([lat.max, lon.min], [lat.min, lon.max]))
       }
+      this.recipients = resp.facets.identity_recipient ? resp.facets.identity_recipient.buckets : [];
+      this.mentioned = resp.facets.identity_mentioned ? resp.facets.identity_mentioned.buckets : [];
       if (withMap) {
         this.solrResponse = resp;
         // this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);
@@ -164,8 +175,8 @@ export class MapViewComponent implements OnInit {
                 let lettersFrom = 0;
                 let lettersTo = 0;
                 this.linkLayer.getLayers().forEach((layer: any) => {
-                  lettersFrom += layer.options.letters.filter((l: Letter) => l.origin===place.place_id).length;
-                  lettersTo += layer.options.letters.filter((l: Letter) => l.destination===place.place_id).length;
+                  lettersFrom += layer.options.letters.filter((l: Letter) => l.origin === place.place_id).length;
+                  lettersTo += layer.options.letters.filter((l: Letter) => l.destination === place.place_id).length;
                   // letters.forEach(letter => {
                   //   popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
                   //   if (letter.keywords_category_cs?.length > 0) {
