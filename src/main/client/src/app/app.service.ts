@@ -66,18 +66,18 @@ export class AppService {
   }
 
   getMap(params: HttpParams): Observable<any> {
-    return this.get('data/get_map', params)
+    return this.get('data/map', params)
   }
 
   getKeywords(params: HttpParams): Observable<any> {
-    return this.get('data/get_keywords', params)
+    return this.get('data/keywords', params)
   }
 
   getIdentities(params: HttpParams): Observable<any> {
-    return this.get('data/get_identities', params)
+    return this.get('data/identities', params)
   }
 
   getProfessions(params: HttpParams): Observable<any> {
-    return this.get('data/get_professions', params)
+    return this.get('data/professions', params)
   }
 }

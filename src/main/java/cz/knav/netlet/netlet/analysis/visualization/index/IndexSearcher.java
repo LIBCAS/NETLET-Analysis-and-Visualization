@@ -85,10 +85,17 @@ public class IndexSearcher {
             rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
+                    .withFilter("keywords_category_"+lang+":*")
                     .setLimit(0)
                     .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_"+lang+",keywords_"+lang+"")
                     .withFacet("date_year", rangeFacet)
-                    //.withFacet("keywords_cs", keywords_csFacet)
+                    .withFacet("tenants", new TermsFacetMap("tenant")
+                            .setLimit(100)
+                            .withDomain(new DomainMap()
+                                    .withQuery("keywords_category_"+lang+":*")
+                                    //.withTagsToExclude("fftenant")
+                            )
+                            .setMinCount(1))
                     .withFacet("keywords_categories", categoriesFacet)
                     // .withFacet("identity_mentioned", identity_mentionedFacet)
                     .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
@@ -99,7 +106,7 @@ public class IndexSearcher {
                             .setMinCount(1));
             String tenant = request.getParameter("tenant");
             if (tenant != null && !tenant.isBlank()) {
-                jrequest = jrequest.withFilter("tenant:" + tenant);
+                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:" + tenant);
             }
             String date_range = request.getParameter("date_range");
             if (date_range != null && !date_range.isBlank()) {
@@ -232,6 +239,7 @@ public class IndexSearcher {
                             .setMinCount(1))
                     .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
                             .setLimit(100)
+                            .withDomain(new DomainMap().withTagsToExclude("ffrecipients"))
                             .setMinCount(1))
                     .withFacet("identity_author", new TermsFacetMap("identity_author")
                             .setLimit(100)
@@ -245,8 +253,8 @@ public class IndexSearcher {
                 jrequest = jrequest.withFilter("{!tag=ffdate_year}date_year:[" + date_range.replaceAll(",", " TO ") + "]");
             }
 
-            if (request.getParameter("keyword") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_cs:(+\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
+            if (request.getParameter("recipient") != null) {
+                jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(+\"" + String.join("\" OR \"", request.getParameterValues("recipient")) + "\")");
             }
 //            QueryResponse queryResponse = jrequest.process(solr, "letter_place");
 //            ret = new JSONObject(queryResponse.jsonStr());

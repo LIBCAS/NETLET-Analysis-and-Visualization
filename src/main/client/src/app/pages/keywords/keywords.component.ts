@@ -23,13 +23,14 @@ import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from
 import { CanvasRenderer } from 'echarts/renderers';
 import * as echarts from 'echarts/core';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
+import { MatCardModule } from '@angular/material/card';
 
 echarts.use([BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
 
 @Component({
   selector: 'app-keywords',
   imports: [TranslateModule, FormsModule, CommonModule,
-    NgxEchartsDirective, MatProgressBarModule,
+    NgxEchartsDirective, MatProgressBarModule, MatCardModule,
     MatFormFieldModule, MatSelectModule, MatListModule,
     MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent
   ],
@@ -41,6 +42,7 @@ echarts.use([BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent,
 })
 export class KeywordsComponent {
   loading: boolean;
+  invalidTenant: boolean;
   solrResponse: any;
   limits: [number, number];
 
@@ -143,6 +145,7 @@ export class KeywordsComponent {
 
   getData(setResponse: boolean) {
     this.loading = true;
+    this.invalidTenant = false;
     const p: any = {};
     p.tenant = this.tenant.val;
     p.keyword = this.selectedKeywords;
@@ -153,12 +156,20 @@ export class KeywordsComponent {
       if (!resp) {
         return;
       }
+      if (setResponse) {
+        this.solrResponse = resp;
+        const ts: JSONFacet[] = resp.facets.tenants.buckets;
+        this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
+        if (!this.state.tenant().available) {
+          // this.state.tenant.set(null);
+          this.loading = false;
+          this.invalidTenant = true;
+          return;
+        }
+      }
       // this.recipients = this.solrResponse.facets.identity_recipient.buckets;
       // this.mentioned = resp.facets.identity_mentioned.buckets;
       this.keywords_cs = resp.facets.keywords_categories.buckets;
-      if (setResponse) {
-        this.solrResponse = resp;
-      }
 
       this.keywords_cs.forEach(k => {
         k.selected = this.selectedKeywords.includes(k.val);
@@ -264,7 +275,7 @@ export class KeywordsComponent {
     this.chartHeight = this.chartType === 'treemap' ? 500 : (this.totalBuckets * 10);
     return {
       title: {
-        text: 'Categories',
+        text: 'Zmiňované osoby ve vztahu ke specifickým tématům či debatám',
         left: 'center'
       },
       tooltip: {

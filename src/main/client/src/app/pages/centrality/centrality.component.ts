@@ -67,9 +67,11 @@ export class CentralityComponent {
     }[]
   }
 
-  authors: JSONFacet[];
+  // authors: JSONFacet[];
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
+  
+  selectedRecipients: string[] = [];
 
   colors = [
     "#d87c7c",
@@ -113,13 +115,19 @@ export class CentralityComponent {
 
   changeTenant() {
     this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
-    //this.selectedKeywords = [];
+    this.selectedRecipients = [];
     this.getData(true);
   }
 
   changeLimits(limits: [number, number]) {
     this.limits = limits;
     this.getData(false);
+  }
+
+  clickRecipient(k: JSONFacet) {
+    k.selected = !k.selected;
+    this.selectedRecipients = this.recipients.filter(k => k.selected).map(k => k.val);
+    this.getData(true);
   }
 
   showNode(identity: JSONFacet, category: string) {
@@ -151,7 +159,7 @@ export class CentralityComponent {
     this.loading = true;
     const p: any = {};
     p.tenant = this.tenant.val;
-    //p.keyword = this.selectedKeywords;
+    p.recipient = this.selectedRecipients;
     p.date_range = this.limits.toString();
     p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
     if (!setResponse) {
@@ -166,8 +174,13 @@ export class CentralityComponent {
       if (setResponse) {
         this.solrResponse = resp;
       }
-      this.authors = resp.facets.identity_author.buckets;
+      
       this.recipients = resp.facets.identity_recipient.buckets;
+
+      this.recipients.forEach(k => {
+        k.selected = this.selectedRecipients.includes(k.val);
+      });
+
       this.mentioned = resp.facets.identity_mentioned.buckets;
       this.processResponse();
       this.loading = false;
@@ -201,37 +214,10 @@ export class CentralityComponent {
     const maxSize = 60;
     const minSize = 10;
     let maxCount: number = Math.max(
-      this.authors[0].count,
       this.recipients[0].count);
     if (this.mentioned[0]) {
       maxCount = this.mentioned[0].count;
     }
-    // this.authors.forEach((identity: JSONFacet) => {
-    //   const pos = this.setPosition(h, w, identity.count, maxCount);
-    //   nodes.push({
-    //     // id: identity.id + '',
-    //     id: identity.val + '_author',
-    //     name: identity.val,
-    //     value: identity.count,
-    //     category: 'author',
-    //     symbolSize: maxSize * identity.count / maxCount + minSize,
-    //     x: pos.x,
-    //     y: pos.y
-    //   })
-    // });
-    // this.recipients.forEach((identity: JSONFacet) => {
-    //   const pos = this.setPosition(h, w, identity.count, maxCount);
-    //   nodes.push({
-    //     // id: identity.id + '',
-    //     id: identity.val + '_recipient',
-    //     name: identity.val,
-    //     value: identity.count,
-    //     category: 'recipient',
-    //     symbolSize: maxSize * identity.count / maxCount + minSize,
-    //     x: pos.x,
-    //     y: pos.y
-    //   })
-    // });
     this.mentioned.forEach((identity: JSONFacet, index: number) => {
       const pos = this.setPosition(h, w, identity.count, maxCount);
       nodes.push({
@@ -256,13 +242,13 @@ export class CentralityComponent {
       nodes
     };
 
-    console.log(this.graphData)
+    //console.log(this.graphData)
     this.graphOptions = {
       title: {
-        show: false,
-        text: 'Identities',
-        top: 'bottom',
-        left: 'right'
+        show: true,
+        text: this.translation.instant('field.mentioned'),
+        // top: 'bottom',
+        left: 'center'
       },
       tooltip: {
         formatter: (params: any) => {
@@ -273,7 +259,7 @@ export class CentralityComponent {
       },
       legend: [
         {
-          // selectedMode: 'single',
+          show: false,
           data: this.graphData.categories.map(function (a) {
             return a.name;
           })

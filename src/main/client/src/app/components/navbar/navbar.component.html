@@ -20,7 +20,7 @@
     <button mat-button [matMenuTriggerFor]="tenants">{{'tenants' | translate}}</button>
     <mat-menu #tenants="matMenu">
       @for (t of state.tenants; track t) {
-      <button [disabled]="!t.available" mat-menu-item (click)="changeTenant(t)">{{ t.val | translate}}</button>
+      <a [disabled]="!t.available" mat-menu-item (click)="changeTenant(t)"><mat-icon *ngIf="state.tenant()?.val === t.val">check</mat-icon>{{ t.val | translate}}</a>
       }
     </mat-menu>
 

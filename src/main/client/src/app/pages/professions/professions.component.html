@@ -1,5 +1,10 @@
 <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
-<div class="app-fxLayout app-row app-fill" style="position: relative;">
+            <mat-card *ngIf="invalidTenant" appearance="outlined" class="app-invalidTenant">
+                <mat-card-header>
+                    <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
+                </mat-card-header>
+            </mat-card>
+<div class="app-fxLayout app-row app-fill" style="position: relative;" *ngIf="!invalidTenant">
     <div style="flex: 1 30%;" class="app-filters">
         <div *ngIf="professions_author">
             <h3>{{ 'field.authors' | translate}}</h3>
@@ -22,11 +27,6 @@
 
     </div>
     <div class="app-content">
-            <mat-card *ngIf="invalidTenant" appearance="outlined" class="app-invalidTenant">
-                <mat-card-header>
-                    <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
-                </mat-card-header>
-            </mat-card>
         <div style="height: 200px; width: 100%;">
             <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
                 (onChangeLimits)="changeLimits($event)"></app-years-chart>

@@ -87,7 +87,7 @@ public class DataServlet extends HttpServlet {
                 return json;
             }
         },
-        GET_MAP{
+        MAP{
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
@@ -97,7 +97,7 @@ public class DataServlet extends HttpServlet {
                 return ret;
             }
         },
-        GET_IDENTITIES{
+        IDENTITIES{
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
@@ -107,7 +107,7 @@ public class DataServlet extends HttpServlet {
                 return ret;
             }
         },
-        GET_KEYWORDS {
+        KEYWORDS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
@@ -117,7 +117,7 @@ public class DataServlet extends HttpServlet {
                 return ret;
             }
         },
-        GET_PROFESSIONS {
+        PROFESSIONS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();

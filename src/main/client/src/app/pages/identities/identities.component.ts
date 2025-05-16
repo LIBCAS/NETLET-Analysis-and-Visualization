@@ -174,8 +174,7 @@ export class IdentitiesComponent {
     const minSize = 10;
     const maxCount: number = Math.max(
       this.authors[0].count,
-      this.recipients[0].count,
-      this.mentioned[0]?.count);
+      this.recipients[0].count);
     this.authors.forEach((identity: JSONFacet) => {
       nodes.push({
         // id: identity.id + '',
@@ -239,7 +238,7 @@ export class IdentitiesComponent {
       nodes
     };
 
-    // console.log(this.graphData)
+    //console.log(this.graphData)
     this.graphOptions = {
       title: {
         show: false,

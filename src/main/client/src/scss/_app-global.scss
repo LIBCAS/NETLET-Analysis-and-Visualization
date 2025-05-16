@@ -278,3 +278,13 @@ fieldset {
   max-width: 300px;
   padding: 12px;
 }
+
+.app-invalidTenant {
+    top: 100px;
+    height: 120px;
+    text-align: center;
+    align-items: center;
+    padding: 20px;
+    width: 400px;
+    left: calc(50% - 200px);
+}
