@@ -79,6 +79,7 @@ export class MapViewComponent implements OnInit {
    }
 
   ngOnInit(): void {
+    this.state.tenants.forEach(t => {t.available = true});
     this.linkColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     this.activeLinkColor = this.document.body.computedStyleMap().get('--app-color-map-link-active').toString();
   }

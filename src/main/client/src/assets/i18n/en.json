@@ -4,9 +4,11 @@
   "view": "View",
   "views": "Views",
   "clearSelection": "Clear selection",
-  "Authors": "Authors",
-  "Recipients": "Recipients",
-  "Mentioned": "Mentioned",
-  "Keywords": "Keywords",
+  "field": {
+    "authors": "Authors",
+    "recipients": "Recipients",
+    "mentioned": "Mentioned",
+    "keywords": "Keywords"
+  },
   "invalidTenant": "There is no available data for this Catalog"
 }

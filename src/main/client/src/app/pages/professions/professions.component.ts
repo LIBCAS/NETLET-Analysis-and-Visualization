@@ -84,6 +84,7 @@ export class ProfessionsComponent {
   }
 
   ngOnInit(): void {
+    this.translation.onLangChange.subscribe(() => { this.getData(true) });
     if (this.tenant) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
       this.getData(true);
@@ -138,6 +139,7 @@ export class ProfessionsComponent {
     //p.keyword = this.selectedKeywords;
     p.date_range = this.limits.toString();
     p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
+    p.lang = this.translation.currentLang;
     if (!setResponse) {
       p.rows = 0;
     } else {
@@ -149,7 +151,7 @@ export class ProfessionsComponent {
       }
       if (setResponse) {
         const ts: JSONFacet[] = resp.facets.tenants.buckets;
-        this.state.tenants.forEach(t => {t.available = !!ts.find(ta => ta.val === t.val)});
+        this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
         if (!this.state.tenant().available) {
           // this.state.tenant.set(null);
           this.loading = false;
@@ -205,18 +207,6 @@ export class ProfessionsComponent {
         y: Math.random() * h
       })
     });
-    // this.professions_mentioned.forEach((identity: JSONFacet) => {
-    //   nodes.push({
-    //     // id: identity.id + '',
-    //     id: identity.val + '_mentioned',
-    //     name: identity.val,
-    //     value: identity.count,
-    //     category: 'mentioned',
-    //     symbolSize: maxSize * identity.count / maxCount + minSize,
-    //     x: Math.random() * w,
-    //     y: Math.random() * h
-    //   })
-    // });
 
     this.solrResponse.response.docs.forEach((letter: Letter) => {
       if (this.inLimits(letter.date_year) && letter.identities) {
@@ -230,9 +220,9 @@ export class ProfessionsComponent {
               if (!link) {
                 links.push({
                   id: id,
-                  source: pa.cs + '_author',
-                  target: pr.cs + '_recipient',
-                  label: pa.cs + ' > ' + pr.cs,
+                  source: pa[this.translation.currentLang] + '_author',
+                  target: pr[this.translation.currentLang] + '_recipient',
+                  label: pa[this.translation.currentLang] + ' > ' + pr[this.translation.currentLang],
                   count: 1
                 });
               } else {

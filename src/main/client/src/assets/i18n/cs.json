@@ -4,9 +4,11 @@
   "view": "Zobrazení",
   "views": "Typy zobrazení",
   "clearSelection": "Zrušit výběr",
-  "Authors": "Autor",
-  "Recipients": "Adresat",
-  "Mentioned": "Zminene odsoby",
-  "Keywords": "Klíčová slova",
+  "field": {
+    "authors": "Autor",
+    "recipients": "Adresát",
+    "mentioned": "Zmíněné osoby",
+    "keywords": "Klíčová slova"
+  },
   "invalidTenant": "Nejsou k dispozice data pro tento Katalog"
 }

@@ -10,7 +10,7 @@
     </div> -->
 
     <div *ngIf="keywords_cs">
-      <h3>{{ 'Keywords' | translate}}</h3>
+      <h3>{{ 'field.keywords' | translate}}</h3>
       <mat-list style="width: 100%;">
         <mat-list-item *ngFor="let k of keywords_cs; let idx = index" (click)="clickKeyword(k)">
           <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
@@ -18,7 +18,7 @@
       </mat-list>
     </div>
     <div *ngIf="mentioned">
-      <h3>{{ 'Mentioned' | translate}}</h3>
+      <h3>{{ 'field.mentioned' | translate}}</h3>
       <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
         <mat-list-item *ngFor="let identity of mentioned" (click)="clickMentioned(identity)">
           {{ identity.val}} ({{identity.count}})
@@ -26,8 +26,7 @@
       </mat-list>
     </div>
   </div>
-  <div
-    style="height: 100%; width: 100%; display: flex; flex-direction: column; align-content: flex-start; position: relative;">
+  <div class="app-content">
     <div style="height: 200px; width: 100%;">
       <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
         (onChangeLimits)="changeLimits($event)"></app-years-chart>

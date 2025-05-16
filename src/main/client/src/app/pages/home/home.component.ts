@@ -15,8 +15,6 @@ import { AppState } from '../../app-state';
 })
 export class HomeComponent {
 
-  
-
   constructor(public state: AppState){}
 
   ngOnInit() {

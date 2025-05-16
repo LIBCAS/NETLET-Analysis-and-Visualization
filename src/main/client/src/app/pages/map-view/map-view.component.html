@@ -2,7 +2,7 @@
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
   <div style="flex: 1 30%;" class="app-filters">
     <div *ngIf="recipients">
-      <h3>{{ 'Recipients' | translate}}</h3>
+      <h3>{{ 'field.recipients' | translate}}</h3>
       <mat-list style="max-height: 200px; width: 100%; overflow-y: scroll;">
         <mat-list-item *ngFor="let identity of recipients"
           (click)="clickRecipient(identity)">
@@ -12,7 +12,7 @@
       </mat-list>
     </div>
     <div *ngIf="mentioned">
-      <h3>{{ 'Mentioned' | translate}}</h3>
+      <h3>{{ 'field.mentioned' | translate}}</h3>
       <mat-list style="max-height: 200px; width: 100%; overflow-y: scroll;">
         <mat-list-item *ngFor="let identity of mentioned" (mouseout)="clearHighlight()"
           (click)="highlightLinks(identity)">
@@ -21,11 +21,11 @@
       </mat-list>
     </div>
   </div>
-  <div style="height: 100%; width: 100%; display: flex; flex-direction: column; align-content: flex-start; position: relative;">
+  <div class="app-content">
     <div style="height: 200px; width: 100%;">
       <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year" (onChangeLimits)="changeLimits($event)" ></app-years-chart>
     </div>
-    <div class="app-fxFlex" leaflet [leafletOptions]="options"
+    <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"
       (leafletMapReady)="onMapReady($event)">
     </div>
     <div class="app-letters-info" *ngIf="infoHeader">

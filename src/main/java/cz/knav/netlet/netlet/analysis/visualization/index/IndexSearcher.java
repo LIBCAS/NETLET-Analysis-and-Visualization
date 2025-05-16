@@ -53,22 +53,26 @@ public class IndexSearcher {
     public static JSONObject getKeywords(HttpServletRequest request) {
         JSONObject ret = new JSONObject();
         try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+            String lang = request.getParameter("lang");
+            if (lang == null) {
+                lang = "cs";
+            }
 
             final TermsFacetMap identity_mentionedFacet = new TermsFacetMap("identity_mentioned")
                     .setLimit(100)
-                    .setMinCount(1); 
-            
-            final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_cs")
+                    .setMinCount(1);
+
+            final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_"+lang)
                     .setLimit(100)
                     .setMinCount(1)
                     .withSubFacet("identities", identity_mentionedFacet);
 
-            final TermsFacetMap categoriesFacet = new TermsFacetMap("keywords_category_cs")
+            final TermsFacetMap categoriesFacet = new TermsFacetMap("keywords_category_"+lang)
                     .setLimit(100)
                     .setMinCount(1)
                     //.setSort("index")
                     .withSubFacet("keywords", keywords_csFacet);
-                            
+
             String tenant_date_range = request.getParameter("tenant_date_range");
             if (tenant_date_range == null || tenant_date_range.isBlank()) {
                 tenant_date_range = "1000,2025";
@@ -77,24 +81,22 @@ public class IndexSearcher {
             RangeFacetMap rangeFacet = new RangeFacetMap("date_year", Long.parseLong(years[0]), Long.parseLong(years[1]), 1)
                     .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
 
-        NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-        rawJsonResponseParser.setWriterType("json");
+            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
+            rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     .setLimit(0)
-                    .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
+                    .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_"+lang+",keywords_"+lang+"")
                     .withFacet("date_year", rangeFacet)
                     //.withFacet("keywords_cs", keywords_csFacet)
                     .withFacet("keywords_categories", categoriesFacet)
                     // .withFacet("identity_mentioned", identity_mentionedFacet)
-                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient") 
-                                .setLimit(100)
-                                .setMinCount(1))
+                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
+                            .setLimit(100)
+                            .setMinCount(1))
                     .withFacet("identity_author", new TermsFacetMap("identity_author")
-                                .setLimit(100)
-                                .setMinCount(1))
-                    
-                    ;
+                            .setLimit(100)
+                            .setMinCount(1));
             String tenant = request.getParameter("tenant");
             if (tenant != null && !tenant.isBlank()) {
                 jrequest = jrequest.withFilter("tenant:" + tenant);
@@ -105,17 +107,16 @@ public class IndexSearcher {
             }
 
             if (request.getParameter("keyword") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_cs:(+\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
+                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_"+lang+":(+\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
             }
 //            QueryResponse queryResponse = jrequest.process(solr, "letter_place");
 //            ret = new JSONObject(queryResponse.jsonStr());
-            
+
             jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "letter_place");
             String jsonResponse = (String) resp.get("response");
             ret = new JSONObject(jsonResponse);
-            
-            
+
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             ret.put("error", ex);
@@ -139,7 +140,7 @@ public class IndexSearcher {
             final TermsFacetMap identity_mentionedFacet = new TermsFacetMap("identity_mentioned")
                     .setLimit(100)
                     .setMinCount(1);
-                            
+
             String tenant_date_range = request.getParameter("tenant_date_range");
             if (tenant_date_range == null || tenant_date_range.isBlank()) {
                 tenant_date_range = "1000,2025";
@@ -152,28 +153,26 @@ public class IndexSearcher {
             int rows = 0;
             if (rowsP != null && !rowsP.isBlank()) {
                 rows = Integer.valueOf(rowsP);
-            } 
+            }
 
-        NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-        rawJsonResponseParser.setWriterType("json");
+            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
+            rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     .setLimit(rows)
                     .withFilter("origin:*")
                     .withFilter("destination:*")
                     .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
-                    .withFacet("date_year", rangeFacet) 
+                    .withFacet("date_year", rangeFacet)
                     .withFacet("keywords_cs", keywords_csFacet)
                     .withFacet("keywords_categories", categories_csFacet)
                     .withFacet("identity_mentioned", identity_mentionedFacet)
-                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient") 
-                                .setLimit(100)
-                                .setMinCount(1))
+                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
+                            .setLimit(100)
+                            .setMinCount(1))
                     .withFacet("identity_author", new TermsFacetMap("identity_author")
-                                .setLimit(100)
-                                .setMinCount(1))
-                    
-                    ;
+                            .setLimit(100)
+                            .setMinCount(1));
             String tenant = request.getParameter("tenant");
             if (tenant != null && !tenant.isBlank()) {
                 jrequest = jrequest.withFilter("tenant:" + tenant);
@@ -188,25 +187,23 @@ public class IndexSearcher {
             }
 //            QueryResponse queryResponse = jrequest.process(solr, "letter_place");
 //            ret = new JSONObject(queryResponse.jsonStr());
-            
+
             jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "letter_place");
             String jsonResponse = (String) resp.get("response");
             ret = new JSONObject(jsonResponse);
-            
-            
+
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             ret.put("error", ex);
         }
         return ret;
     }
-    
-    
+
     public static JSONObject getIdentityLetters(HttpServletRequest request) {
         JSONObject ret = new JSONObject();
         try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
-                            
+
             String tenant_date_range = request.getParameter("tenant_date_range");
             if (tenant_date_range == null || tenant_date_range.isBlank()) {
                 tenant_date_range = "1000,2025";
@@ -219,10 +216,10 @@ public class IndexSearcher {
             int rows = 0;
             if (rowsP != null && !rowsP.isBlank()) {
                 rows = Integer.valueOf(rowsP);
-            } 
+            }
 
-        NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-        rawJsonResponseParser.setWriterType("json");
+            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
+            rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     .setLimit(rows)
@@ -230,17 +227,15 @@ public class IndexSearcher {
                     .withFilter("identity_author:*")
                     .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_year", rangeFacet)
-                    .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned") 
-                                .setLimit(100)
-                                .setMinCount(1))
-                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient") 
-                                .setLimit(100)
-                                .setMinCount(1))
+                    .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned")
+                            .setLimit(100)
+                            .setMinCount(1))
+                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
+                            .setLimit(100)
+                            .setMinCount(1))
                     .withFacet("identity_author", new TermsFacetMap("identity_author")
-                                .setLimit(100)
-                                .setMinCount(1))
-                    
-                    ;
+                            .setLimit(100)
+                            .setMinCount(1));
             String tenant = request.getParameter("tenant");
             if (tenant != null && !tenant.isBlank()) {
                 jrequest = jrequest.withFilter("tenant:" + tenant);
@@ -255,24 +250,26 @@ public class IndexSearcher {
             }
 //            QueryResponse queryResponse = jrequest.process(solr, "letter_place");
 //            ret = new JSONObject(queryResponse.jsonStr());
-            
+
             jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "letter_place");
             String jsonResponse = (String) resp.get("response");
             ret = new JSONObject(jsonResponse);
-            
-            
+
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             ret.put("error", ex);
         }
         return ret;
     }
-    
+
     public static JSONObject getProfessions(HttpServletRequest request) {
         JSONObject ret = new JSONObject();
         try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
-                            
+            String lang = request.getParameter("lang");
+            if (lang == null) {
+                lang = "cs";
+            }
             String tenant_date_range = request.getParameter("tenant_date_range");
             if (tenant_date_range == null || tenant_date_range.isBlank()) {
                 tenant_date_range = "1000,2025";
@@ -285,32 +282,30 @@ public class IndexSearcher {
             int rows = 0;
             if (rowsP != null && !rowsP.isBlank()) {
                 rows = Integer.valueOf(rowsP);
-            } 
-                                        
-        NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-        rawJsonResponseParser.setWriterType("json");
+            }
+
+            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
+            rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     .setLimit(rows)
-                    .withFilter("professions_recipient_cs:*")
-                    .withFilter("professions_author_cs:*")
+                    .withFilter("professions_recipient_"+lang+":*")
+                    .withFilter("professions_author_"+lang+":*")
                     .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,identities:[json],professions:[json]")
                     .withFacet("date_year", rangeFacet)
-                    .withFacet("tenants", new TermsFacetMap("tenant") 
-                                .setLimit(100)
-                                .withDomain(new DomainMap().withTagsToExclude("fftenant"))
-                                .setMinCount(1))
-                    .withFacet("professions_author", new TermsFacetMap("professions_author_cs") 
-                                .setLimit(100)
-                                .setMinCount(1))
-                    .withFacet("professions_recipient", new TermsFacetMap("professions_recipient_cs") 
-                                .setLimit(100)
-                                .setMinCount(1))
-                    .withFacet("professions_mentioned", new TermsFacetMap("professions_mentioned_cs")
-                                .setLimit(100)
-                                .setMinCount(1))
-                    
-                    ;
+                    .withFacet("tenants", new TermsFacetMap("tenant")
+                            .setLimit(100)
+                            .withDomain(new DomainMap().withTagsToExclude("fftenant"))
+                            .setMinCount(1))
+                    .withFacet("professions_author", new TermsFacetMap("professions_author_"+lang+"")
+                            .setLimit(100)
+                            .setMinCount(1))
+                    .withFacet("professions_recipient", new TermsFacetMap("professions_recipient_"+lang+"")
+                            .setLimit(100)
+                            .setMinCount(1))
+                    .withFacet("professions_mentioned", new TermsFacetMap("professions_mentioned_"+lang+"")
+                            .setLimit(100)
+                            .setMinCount(1));
             String tenant = request.getParameter("tenant");
             if (tenant != null && !tenant.isBlank()) {
                 jrequest = jrequest.withFilter("{!tag=fftenant}tenant:" + tenant);
@@ -321,20 +316,17 @@ public class IndexSearcher {
             }
 //            QueryResponse queryResponse = jrequest.process(solr, "letter_place");
 //            ret = new JSONObject(queryResponse.jsonStr());
-            
+
             jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "letter_place");
             String jsonResponse = (String) resp.get("response");
             ret = new JSONObject(jsonResponse);
-            
-            
+
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             ret.put("error", ex);
         }
         return ret;
     }
-    
-    
 
 }

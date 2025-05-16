@@ -28,5 +28,5 @@ export interface Identity {
     role: string,
     name: string,
     geoname_id: number,
-    professions: {cs: string, en: string, id: number}[]
+    professions: {[lang:string]: any, cs: string, en: string, id: number}[]
 }

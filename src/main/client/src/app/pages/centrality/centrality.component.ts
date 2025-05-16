@@ -100,6 +100,7 @@ export class CentralityComponent {
   }
 
   ngOnInit(): void {
+    this.state.tenants.forEach(t => {t.available = true});
     if (this.tenant) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
       this.getData(true);

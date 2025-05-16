@@ -94,6 +94,9 @@ export class KeywordsComponent {
   }
 
   ngOnInit(): void {
+    
+    this.translation.onLangChange.subscribe(() => { this.getData(true) });
+    this.state.tenants.forEach(t => {t.available = true});
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     if (this.tenant) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
@@ -145,6 +148,7 @@ export class KeywordsComponent {
     p.keyword = this.selectedKeywords;
     p.date_range = this.limits.toString();
     p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
+    p.lang = this.translation.currentLang;
     this.service.getKeywords(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
