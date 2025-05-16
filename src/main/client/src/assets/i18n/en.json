@@ -1,8 +1,12 @@
 {
   "tenant": "Catalog",
   "tenants": "Catalogs",
+  "view": "View",
+  "views": "Views",
   "clearSelection": "Clear selection",
+  "Authors": "Authors",
   "Recipients": "Recipients",
   "Mentioned": "Mentioned",
+  "Keywords": "Keywords",
   "invalidTenant": "There is no available data for this Catalog"
 }

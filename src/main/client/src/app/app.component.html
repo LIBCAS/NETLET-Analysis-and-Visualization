@@ -3,6 +3,7 @@
 <div class="app-fxLayout app-column app-fill">
     <app-navbar></app-navbar>
     <div class="app-fxFlex app-oh">
+      <div class="app-container-header" *ngIf="state.tenant()">{{ 'tenant' | translate }}: {{ state.tenant().val }}</div>
       <router-outlet></router-outlet> 
     </div>
     <app-footer></app-footer>

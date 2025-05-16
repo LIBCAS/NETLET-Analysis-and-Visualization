@@ -71,6 +71,19 @@ export class CentralityComponent {
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
 
+  colors = [
+    "#d87c7c",
+    "#919e8b",
+    "#d7ab82",
+    "#6e7074",
+    "#61a0a8",
+    "#efa18d",
+    "#787464",
+    "#cc7e63",
+    "#724e58",
+    "#4b565b"
+  ];
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
@@ -168,12 +181,12 @@ export class CentralityComponent {
     let x = Math.random() * w,
       y = Math.random() * h;
 
-    // const centerX = w / 2;
-    // const centerY = h / 2;
-    // const radius = ((maxCount - count) / (maxCount - 1)) * centerY;
-    // const angle = Math.random() * Math.PI;
-    // x = Math.cos(angle) * radius;
-    // y = Math.sin(angle) * radius;
+    const centerX = w / 2;
+    const centerY = h / 2;
+    const radius = ((maxCount - count) / (maxCount - 1));
+    const angle = Math.random() * 2 * Math.PI;
+    x = Math.cos(angle) * radius * centerX + centerX;
+    y = Math.sin(angle) * radius * centerY + centerY;
 
     return { x, y }
   }
@@ -218,7 +231,7 @@ export class CentralityComponent {
     //     y: pos.y
     //   })
     // });
-    this.mentioned.forEach((identity: JSONFacet) => {
+    this.mentioned.forEach((identity: JSONFacet, index: number) => {
       const pos = this.setPosition(h, w, identity.count, maxCount);
       nodes.push({
         // id: identity.id + '',
@@ -228,7 +241,11 @@ export class CentralityComponent {
         category: 'mentioned',
         symbolSize: maxSize * identity.count / maxCount + minSize,
         x: pos.x,
-        y: pos.y
+        y: pos.y,
+        itemStyle: {
+          color: this.colors[index % this.colors.length]
+        }
+
       })
     });
 

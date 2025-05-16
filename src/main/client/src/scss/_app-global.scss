@@ -257,6 +257,11 @@ fieldset {
   color: var(--app-color-selected);
 }
 
+.app-container-header {
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+}
 
 .app-info-content {
   max-height: 400px;

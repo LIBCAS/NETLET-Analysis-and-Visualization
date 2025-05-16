@@ -1,25 +1,33 @@
 <mat-toolbar color="primary" class="app-fxLayout-row">
-    <div class="app-fxFlex">
-      <a [routerLink]="['/']" class="app-fxFlex app-fxLayout app-row app-center-v">
-        <img src="https://netlet.lib.cas.cz/wp-content/uploads/2023/08/netlet-logo-white.svg" title="Netlet" class="app-logo" />
-        <span class="app-logo-desc">Analysis & Visualization</span>
-      </a>
-    </div>
-    <div class="app-fxLayout app-row app-center-v">
-     <!-- <a mat-button >{{ 'Login' | translate }}</a> -->
-      
-     <button mat-button [matMenuTriggerFor]="tenants">{{ (state.tenant() ? state.tenant().val : 'tenants') | translate}}</button>
-      <mat-menu #tenants="matMenu">
-        @for (t of state.tenants; track t) {
-        <button [disabled]="!t.available" mat-menu-item (click)="changeTenant(t)">{{ t.val | translate}}</button>
-        }
-      </mat-menu>
+  <div class="app-fxFlex">
+    <a [routerLink]="['/']" queryParamsHandling="preserve" class="app-fxFlex app-fxLayout app-row app-center-v">
+      <img src="https://netlet.lib.cas.cz/wp-content/uploads/2023/08/netlet-logo-white.svg" title="Netlet"
+        class="app-logo" />
+      <span class="app-logo-desc">Analysis & Visualization</span>
+    </a>
+  </div>
+  <div class="app-fxLayout app-row app-center-v">
+    <!-- <a mat-button >{{ 'Login' | translate }}</a> -->
 
-     <button mat-button [matMenuTriggerFor]="menu">{{ translator.currentLang | translate}}</button>
-      <mat-menu #menu="matMenu">
-        <button mat-menu-item (click)="onLanguageChanged('cs')">Český</button>
-        <button mat-menu-item (click)="onLanguageChanged('en')">English</button>
-      </mat-menu>
-    </div>
-  </mat-toolbar>
-  
+    
+    <button mat-button [matMenuTriggerFor]="views">{{'views' | translate}}</button>
+    <mat-menu #views="matMenu">
+      @for (t of state.views; track t) {
+      <button *ngIf="t.route"  mat-menu-item [routerLink]="[t.route]" queryParamsHandling="preserve" [title]="t.text">{{ t.route | translate}}</button>
+      }
+    </mat-menu>
+
+    <button mat-button [matMenuTriggerFor]="tenants">{{'tenants' | translate}}</button>
+    <mat-menu #tenants="matMenu">
+      @for (t of state.tenants; track t) {
+      <button [disabled]="!t.available" mat-menu-item (click)="changeTenant(t)">{{ t.val | translate}}</button>
+      }
+    </mat-menu>
+
+    <button mat-button [matMenuTriggerFor]="menu">{{ translator.currentLang | translate}}</button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="onLanguageChanged('cs')">Český</button>
+      <button mat-menu-item (click)="onLanguageChanged('en')">English</button>
+    </mat-menu>
+  </div>
+</mat-toolbar>

@@ -1,8 +1,12 @@
 {
   "tenant": "Katalog",
   "tenants": "Katalogy",
-  "clearSelection": "Zzrušit výběr",
+  "view": "Zobrazení",
+  "views": "Typy zobrazení",
+  "clearSelection": "Zrušit výběr",
+  "Authors": "Autor",
   "Recipients": "Adresat",
   "Mentioned": "Zminene odsoby",
+  "Keywords": "Klíčová slova",
   "invalidTenant": "Nejsou k dispozice data pro tento Katalog"
 }

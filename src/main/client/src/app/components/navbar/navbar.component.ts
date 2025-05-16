@@ -5,7 +5,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppState, Tenant } from '../../app-state';
 
@@ -18,6 +18,7 @@ import { AppState, Tenant } from '../../app-state';
 })
 export class NavbarComponent {
   constructor(
+    private router: Router,
     public dialog: MatDialog,
     public translator: TranslateService,
     public state: AppState
@@ -33,6 +34,7 @@ export class NavbarComponent {
   }
 
   changeTenant(t: Tenant) {
+    this.router.navigate([], {queryParams: {tenant:t.val}});
     this.state.tenant.set(t);
   }
 }
