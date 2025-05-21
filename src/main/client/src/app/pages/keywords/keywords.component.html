@@ -1,9 +1,9 @@
 <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
-            <mat-card *ngIf="invalidTenant" appearance="outlined" class="app-invalidTenant">
-                <mat-card-header>
-                    <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
-                </mat-card-header>
-            </mat-card>
+<mat-card *ngIf="invalidTenant" appearance="outlined" class="app-invalidTenant">
+  <mat-card-header>
+    <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
+  </mat-card-header>
+</mat-card>
 <div class="app-fxLayout app-row app-fill" style="position: relative;" *ngIf="!invalidTenant">
   <div style="flex: 1 30%;" class="app-filters">
 
@@ -17,17 +17,21 @@
     <div *ngIf="keywords_cs">
       <h3>{{ 'field.keywords' | translate}}</h3>
       <mat-list style="width: 100%;">
-        <mat-list-item *ngFor="let k of keywords_cs; let idx = index" (click)="clickKeyword(k)">
+        @for(k of keywords_cs; track $index; let idx = $index){
+        <mat-list-item (click)="clickKeyword(k)">
           <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
         </mat-list-item>
+        }
       </mat-list>
     </div>
     <div *ngIf="mentioned">
       <h3>{{ 'field.mentioned' | translate}}</h3>
       <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
-        <mat-list-item *ngFor="let identity of mentioned" (click)="clickMentioned(identity)">
+        @for(identity of mentioned; track $index; let idx = $index){
+        <mat-list-item (click)="clickMentioned(identity)">
           {{ identity.val}} ({{identity.count}})
         </mat-list-item>
+        }
       </mat-list>
     </div>
   </div>
@@ -37,10 +41,9 @@
         (onChangeLimits)="changeLimits($event)"></app-years-chart>
     </div>
 
-    <div  class="app-fxFlex">
+    <div class="app-fxFlex">
       <div style="overflow: auto; height:100%; ">
-        <div  echarts style="width: 100%;" 
-          [options]="treeMapOptions" (chartInit)="onTreeMapChartInit($event)">
+        <div echarts style="width: 100%;" [options]="treeMapOptions" (chartInit)="onTreeMapChartInit($event)">
         </div>
       </div>
     </div>

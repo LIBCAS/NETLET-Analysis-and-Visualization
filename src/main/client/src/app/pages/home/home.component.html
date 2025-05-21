@@ -1,15 +1,18 @@
 <div class="app-home-layout app-fxLayout app-row app-fill">
-<mat-card appearance="outlined" *ngFor="let card of state.views">
-    <mat-card-header>
-        <mat-card-title> {{ card.route | translate}} </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-        <p>
-            {{ card.text }}
-        </p>
-      </mat-card-content>
-    <mat-card-actions align="end" class="app-mat-card-actions">
-        <button [routerLink]="[card.route]" queryParamsHandling="preserve" [disabled]="card.route === ''" mat-raised-button>{{ 'View' | translate }}</button>
-    </mat-card-actions>
-</mat-card>
+    @for(card of state.views; track $index){
+    <mat-card appearance="outlined">
+        <mat-card-header>
+            <mat-card-title> {{ card.route | translate}} </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <p>
+                {{ card.text }}
+            </p>
+        </mat-card-content>
+        <mat-card-actions align="end" class="app-mat-card-actions">
+            <button [routerLink]="[card.route]" queryParamsHandling="preserve" [disabled]="card.route === ''"
+                mat-raised-button>{{ 'View' | translate }}</button>
+        </mat-card-actions>
+    </mat-card>
+    }
 </div>

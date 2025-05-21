@@ -1,41 +1,45 @@
 <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
-            <mat-card *ngIf="invalidTenant" appearance="outlined" class="app-invalidTenant">
-                <mat-card-header>
-                    <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
-                </mat-card-header>
-            </mat-card>
+<mat-card *ngIf="invalidTenant" appearance="outlined" class="app-invalidTenant">
+  <mat-card-header>
+    <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
+  </mat-card-header>
+</mat-card>
 <div class="app-fxLayout app-row app-fill" style="position: relative;" *ngIf="!invalidTenant">
   <div style="flex: 1 30%;" class="app-filters">
     <div *ngIf="recipients">
       <h3>{{ 'field.recipients' | translate}}</h3>
       <mat-list style="max-height: 200px; width: 100%; overflow-y: scroll;">
-        <mat-list-item *ngFor="let identity of recipients"
-          (click)="clickRecipient(identity)">
-          <span [class.app-selected]="identity === activeIdentity"><mat-icon *ngIf="identity === activeIdentity" class="app-va-tb">check</mat-icon>
-          {{ identity.val}} ({{identity.count}})</span>
+        @for(identity of recipients; track $index; let idx = $index){
+        <mat-list-item (click)="clickRecipient(identity)">
+          <span [class.app-selected]="identity === activeIdentity"><mat-icon *ngIf="identity === activeIdentity"
+              class="app-va-tb">check</mat-icon>
+            {{ identity.val}} ({{identity.count}})</span>
         </mat-list-item>
+        }
       </mat-list>
     </div>
     <div *ngIf="mentioned">
       <h3>{{ 'field.mentioned' | translate}}</h3>
       <mat-list style="max-height: 200px; width: 100%; overflow-y: scroll;">
-        <mat-list-item *ngFor="let identity of mentioned" (mouseout)="clearHighlight()"
-          (click)="highlightLinks(identity)">
+        @for(identity of mentioned; track $index; let idx = $index){
+        <mat-list-item (mouseout)="clearHighlight()" (click)="highlightLinks(identity)">
           {{ identity.val}} ({{identity.count}})
         </mat-list-item>
+        }
       </mat-list>
     </div>
   </div>
   <div class="app-content">
     <div style="height: 200px; width: 100%;">
-      <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year" (onChangeLimits)="changeLimits($event)" ></app-years-chart>
+      <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
+        (onChangeLimits)="changeLimits($event)"></app-years-chart>
     </div>
     <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"
       (leafletMapReady)="onMapReady($event)">
     </div>
     <div class="app-letters-info" *ngIf="infoHeader">
-      <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()" ></app-letters-info>
+      <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
     </div>
   </div>
-  
+
 </div>
