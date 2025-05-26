@@ -106,7 +106,8 @@ public class HikoIndexer {
 
                 addPlaces(tenant, rs.getInt("L.id"), doc);
                 addIdentities(tenant, rs.getInt("L.id"), doc);
-                addKeywords(tenant, rs.getInt("L.id"), doc);
+                // addKeywords(tenant, rs.getInt("L.id"), doc);
+                addGlobalKeywords(tenant, rs.getInt("L.id"), doc);
 
                 client.add("letter_place", doc);
                 success++;
@@ -193,7 +194,8 @@ public class HikoIndexer {
                         .put("id", rs.getInt("I.id"))
                         .put("role", rs.getString("IL.role"))
                         .put("name", rs.getString("I.name"));
-                addProfessions(tenant, rs.getInt("I.id"), doc, identity);
+                // addProfessions(tenant, rs.getInt("I.id"), doc, identity);
+                addGlobalProfessions(tenant, rs.getInt("I.id"), doc, identity);
                 doc.addField("identities", identity.toString());
 
             }
@@ -262,6 +264,87 @@ public class HikoIndexer {
         String sql = "select * from "
                 + tenant + "__keyword_letter as KL, "
                 + tenant + "__keywords as K where KL.keyword_id=K.id AND letter_id = " + letter_id;
+        PreparedStatement ps = getConnection().prepareStatement(sql);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                long cat = rs.getLong("K.keyword_category_id");
+                JSONObject k = new JSONObject(rs.getString("K.name"))
+                        .put("id", rs.getLong("K.id"));
+                doc.addField("keywords_cs", k.optString("cs"));
+                doc.addField("keywords_en", k.optString("en"));
+                if (categories.containsKey(cat)) {
+                    JSONObject c = new JSONObject(categories.get(cat));
+                    doc.addField("keywords_category_cs", c.optString("cs"));
+                    doc.addField("keywords_category_en", c.optString("en"));
+                    k.put("category_id", cat).put("category_name", categories.get(cat));
+                }
+                doc.addField("keywords", k.toString());
+            }
+            rs.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error adding keywords for tenant: {0}", tenant);
+            LOGGER.log(Level.SEVERE, null, e);
+        }
+        ps.close();
+    }
+    
+    private void addGlobalProfessions(String tenant, int identity_id, SolrInputDocument doc, JSONObject identity) throws SQLException, NamingException {
+
+        String sql = "select * from " + 
+                tenant + "__identity_profession as IL, global_professions as P left join global_profession_categories as PC on PC.id=P.profession_category_id "
+                + " where IL.global_profession_id=P.id AND identity_id = " + identity_id;
+        
+        
+        PreparedStatement ps = getConnection().prepareStatement(sql);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                 
+                JSONObject k = new JSONObject(rs.getString("P.name"))
+                        .put("id", rs.getLong("P.id")); 
+                
+                doc.addField("professions_id", rs.getInt("P.id"));
+                doc.addField("professions_cs", k.optString("cs", null));
+                doc.addField("professions_en", k.optString("en", null));
+                doc.addField("professions_" + identity.getString("role") + "_cs", k.optString("cs", null));
+                doc.addField("professions_" + identity.getString("role") + "_en", k.optString("en", null));
+                
+                if (rs.getString("PC.name") != null) {
+                    JSONObject pc = new JSONObject(rs.getString("PC.name"))
+                        .put("id", rs.getLong("PC.id"));
+                    k.put("category", pc);
+                    doc.addField("professions_category_id", rs.getInt("PC.id"));
+                    doc.addField("professions_category_cs", pc.optString("cs", null));
+                    doc.addField("professions_category_en", pc.optString("en", null));
+                    doc.addField("professions_category_" + identity.getString("role") + "_cs", pc.optString("cs", null));
+                    doc.addField("professions_category_" + identity.getString("role") + "_en", pc.optString("en", null));
+                }
+                identity.append("professions", k);
+                doc.addField("professions", k.toString());
+            }
+            rs.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, null, e);
+        }
+        ps.close();
+    }
+    
+    private void addGlobalKeywords(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
+
+        String sqlCat = " select * from global_keyword_categories";
+        Map<Long, String> categories = new HashMap<>();
+        PreparedStatement psCat = getConnection().prepareStatement(sqlCat);
+        try (ResultSet rs = psCat.executeQuery()) {
+            while (rs.next()) {
+                categories.put(rs.getLong("id"), rs.getString("name"));
+            }
+            rs.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, null, e);
+        }
+        psCat.close();
+
+        String sql = "select * from "
+                + tenant + "__keyword_letter as KL, global_keywords as K where KL.global_keyword_id=K.id AND letter_id = " + letter_id;
         PreparedStatement ps = getConnection().prepareStatement(sql);
         try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {

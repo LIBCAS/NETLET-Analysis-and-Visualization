@@ -9,11 +9,13 @@
   <div class="app-fxLayout app-row app-center-v">
     <!-- <a mat-button >{{ 'Login' | translate }}</a> -->
 
-    <span class="app-container-header" *ngIf="state.tenant()">{{ 'tenant' | translate }}: {{ state.tenant().val }}</span>
+    <span class="app-container-header" *ngIf="state.tenant()">{{ 'tenant' | translate }}: {{ state.tenant().val }}
+      <span *ngIf="state.currentView">.&nbsp;&nbsp;{{ 'view' | translate }}: {{ state.currentView.route| translate }}</span>
+    </span>
     <button mat-button [matMenuTriggerFor]="views">{{'views' | translate}}</button>
     <mat-menu #views="matMenu">
       @for (t of state.views; track t) {
-      <button *ngIf="t.route"  mat-menu-item [routerLink]="[t.route]" queryParamsHandling="preserve" [title]="t.text">{{ t.route | translate}}</button>
+      <a matButton *ngIf="t.route"  mat-menu-item [routerLink]="[t.route]" queryParamsHandling="preserve" [title]="t.text" (click)="state.currentView = t">{{ t.route | translate}}</a>
       }
     </mat-menu>
 

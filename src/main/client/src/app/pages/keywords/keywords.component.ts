@@ -74,7 +74,6 @@ export class KeywordsComponent {
     '#c4ccd3'
   ];
 
-  chartType: 'treemap' | 'tree' = 'treemap';
   chartHeight: number = 400;
   totalBuckets = 0;
 
@@ -140,7 +139,7 @@ export class KeywordsComponent {
 
   changeLimits(limits: [number, number]) {
     this.limits = limits;
-    this.getData(true);
+    this.getData(false);
   }
 
   getData(setResponse: boolean) {
@@ -175,57 +174,12 @@ export class KeywordsComponent {
         k.selected = this.selectedKeywords.includes(k.val);
       });
 
-      if (this.chartType) {
         const ops = this.setTreeMapChart();
         // this.treeMapOptions = this.setTreeMapChart();
         this.treeMapChart.setOption(ops);
-      } else {
-        this.setIdentitiesChart();
-      }
 
       this.loading = false;
     });
-  }
-
-  setIdentitiesChart() {
-
-    this.identitiesChartOptions = {
-      animation: false,
-      title: {
-        show: false,
-        text: this.translation.instant('Identities')
-      },
-      tooltip: {
-        trigger: 'axis',
-      },
-      xAxis: {
-        type: 'value',
-        axisLabel: { show: false },
-      },
-      series: [
-        {
-          name: 'identities',
-          type: 'bar',
-          barWidth: 36,
-          color: this.barColor,
-          barGap: 2,
-          label: {
-            show: true,
-            align: 'left',
-            position: 'insideLeft',
-            formatter: '{b}'
-          },
-          data: this.mentioned.map(f => f.count).reverse()
-        }
-      ],
-      yAxis: {
-        type: 'category',
-        data: this.mentioned.map(f => f.val).reverse(),
-        axisLine: { show: false },
-        axisLabel: { show: false },
-
-      }
-    }
   }
 
   clickKeyword(k: JSONFacet) {
@@ -247,7 +201,7 @@ export class KeywordsComponent {
     const formatUtil = echarts.format;
     const data: any = [];
     this.totalBuckets = 0;
-    this.solrResponse.facets.keywords_categories.buckets.forEach((cat: any) => {
+    this.keywords_cs.forEach((cat: any) => {
       const ks: any = [];
       cat.keywords.buckets.forEach((k: any) => {
         const ids: any = [];
@@ -272,7 +226,7 @@ export class KeywordsComponent {
       })
     });
 
-    this.chartHeight = this.chartType === 'treemap' ? 500 : (this.totalBuckets * 10);
+    this.chartHeight = 500;
     return {
       title: {
         text: 'Zmiňované osoby ve vztahu ke specifickým tématům či debatám',
@@ -297,7 +251,7 @@ export class KeywordsComponent {
       series: [
         {
           name: 'Categories',
-          type: this.chartType,
+          type: 'treemap',
           colorMappingBy: 'id',
           visibleMin: 300,
           label: {

@@ -45,7 +45,7 @@ export class YearsChartComponent {
     @Inject(DOCUMENT) private document: Document,
     private _ngZone: NgZone,
     private translation: TranslateService,
-        public state: AppState
+    public state: AppState
   ) {
     effect(() => {
       const facet = this.dateYearFacet();
@@ -54,7 +54,7 @@ export class YearsChartComponent {
         this.setYearsChart(facet);
       }
     });
-   }
+  }
 
   ngOnInit(): void {
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
@@ -83,27 +83,28 @@ export class YearsChartComponent {
   }
 
   setSelection(minWithValue: string, maxWithValue: string) {
-      this.chartRok.dispatchAction({
-        type: 'brush',
-        areas: [
-          {
-            brushType: 'lineX',
-            coordRange: [minWithValue, maxWithValue],
-            xAxisIndex: 0
-          }
-        ]
-      });
+    this.chartRok.dispatchAction({
+      type: 'brush',
+      areas: [
+        {
+          brushType: 'lineX',
+          coordRange: [minWithValue, maxWithValue],
+          xAxisIndex: 0
+        }
+      ]
+    });
   }
 
   setChartTitle() {
-    this.chartRok.setOption({title: {
-      show: true,
-      text: this.limits[0] + ' - ' + this.limits[1]
-    }
-  })
+    this.chartRok.setOption({
+      title: {
+        show: true,
+        text: this.limits[0] + ' - ' + this.limits[1]
+      }
+    })
   }
 
-  setYearsChart(facet: { buckets: JSONFacet[], after: {count: number}}) {
+  setYearsChart(facet: { buckets: JSONFacet[], after: { count: number } }) {
 
     this.rokSeries = facet.buckets.map(c => c.count);
     this.rokSeries.push(facet.after.count);
@@ -112,24 +113,25 @@ export class YearsChartComponent {
 
     let minRokWithValue = '1100';
     let maxRokWithValue = '2025';
-    
-      minRokWithValue = this.limits[0] + '';
-      maxRokWithValue = this.limits[1] + '';
+
+    minRokWithValue = this.limits[0] + '';
+    maxRokWithValue = this.limits[1] + '';
 
     this.chartOptionsRok = {
       animation: false,
+      grid: {
+        // left: 0,
+        // right: 0,
+        top: 30,
+        bottom: 25
+      },
       title: {
         show: true,
         left: 'center',
-        top: 10,
+        top: 8,
         text: this.limits[0] + ' - ' + this.limits[1]
       },
-      toolbox: {
-        show: this.limits !== undefined,
-        feature: {
-          brush: { title: { 'clear': this.translation.instant('clearSelection') }, show: true }
-        }
-      },
+      toolbox: { show: false },
       brush: {
         toolbox: ['clear'],
         brushType: 'lineX',
@@ -193,23 +195,23 @@ export class YearsChartComponent {
         ]
       });
       this.setChartTitle();
-      
-    this._ngZone.run(() => {
-      this.onChangeLimits.emit(this.limits);
-    });
+
+      this._ngZone.run(() => {
+        this.onChangeLimits.emit(this.limits);
+      });
     })
 
     setTimeout(() => {
-        this.chartRok.dispatchAction({
-          type: 'brush',
-          areas: [
-            {
-              brushType: 'lineX',
-              coordRange: [minRokWithValue, maxRokWithValue],
-              xAxisIndex: 0
-            }
-          ]
-        });
+      this.chartRok.dispatchAction({
+        type: 'brush',
+        areas: [
+          {
+            brushType: 'lineX',
+            coordRange: [minRokWithValue, maxRokWithValue],
+            xAxisIndex: 0
+          }
+        ]
+      });
 
       this.chartRok.dispatchAction({
         type: 'takeGlobalCursor',

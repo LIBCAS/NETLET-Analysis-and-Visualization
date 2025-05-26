@@ -245,15 +245,18 @@ public class IndexSearcher {
                     .withFilter("identity_author:*")
                     .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_year", rangeFacet)
-                    .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned")
+                    .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned") 
                             .setLimit(100)
+                            .setSort("index")
                             .setMinCount(1))
                     .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
                             .setLimit(100)
+                            .setSort("index")
                             .withDomain(new DomainMap().withTagsToExclude("ffrecipients"))
                             .setMinCount(1))
                     .withFacet("identity_author", new TermsFacetMap("identity_author")
                             .setLimit(100)
+                            .setSort("index")
                             .setMinCount(1));
             String tenant = request.getParameter("tenant");
             if (tenant != null && !tenant.isBlank()) {

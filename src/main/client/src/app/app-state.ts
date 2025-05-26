@@ -62,4 +62,5 @@ export interface Tenant {
       route: ''
     },
   ];
+  currentView: {header: string, text: string, route: string};
 }

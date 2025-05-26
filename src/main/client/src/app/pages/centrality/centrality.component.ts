@@ -70,7 +70,7 @@ export class CentralityComponent {
   // authors: JSONFacet[];
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
-  
+
   selectedRecipients: string[] = [];
 
   colors = [
@@ -102,7 +102,7 @@ export class CentralityComponent {
   }
 
   ngOnInit(): void {
-    this.state.tenants.forEach(t => {t.available = true});
+    this.state.tenants.forEach(t => { t.available = true });
     if (this.tenant) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
       this.getData(true);
@@ -174,7 +174,7 @@ export class CentralityComponent {
       if (setResponse) {
         this.solrResponse = resp;
       }
-      
+
       this.recipients = resp.facets.identity_recipient.buckets;
 
       this.recipients.forEach(k => {
@@ -191,7 +191,7 @@ export class CentralityComponent {
     return n >= this.limits[0] && n <= this.limits[1];
   }
 
-  setPosition(h: number, w: number, count: number, maxCount: number): { x: number, y: number } {
+  setPosition(h: number, w: number, count: number, maxCount: number): { x: number, y: number, radius: number, angle: number } {
     let x = Math.random() * w,
       y = Math.random() * h;
 
@@ -202,7 +202,7 @@ export class CentralityComponent {
     x = Math.cos(angle) * radius * centerX + centerX;
     y = Math.sin(angle) * radius * centerY + centerY;
 
-    return { x, y }
+    return { x, y, radius, angle }
   }
 
   processResponse() {
@@ -213,10 +213,10 @@ export class CentralityComponent {
     const w = this.graphChart.getWidth() - 20;
     const maxSize = 60;
     const minSize = 10;
-    let maxCount: number = Math.max(
-      this.recipients[0].count);
+    let maxCount = Math.max(...this.recipients.map(r => r.count));
+
     if (this.mentioned[0]) {
-      maxCount = this.mentioned[0].count;
+      maxCount = Math.max(...this.mentioned.map(r => r.count));
     }
     this.mentioned.forEach((identity: JSONFacet, index: number) => {
       const pos = this.setPosition(h, w, identity.count, maxCount);
@@ -229,6 +229,8 @@ export class CentralityComponent {
         symbolSize: maxSize * identity.count / maxCount + minSize,
         x: pos.x,
         y: pos.y,
+        // radiusAxis: pos.radius,
+        // angleAxis: pos.angle,
         itemStyle: {
           color: this.colors[index % this.colors.length]
         }

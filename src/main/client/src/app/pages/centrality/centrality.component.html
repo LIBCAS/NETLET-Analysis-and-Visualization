@@ -14,7 +14,7 @@
     <div *ngIf="mentioned">
       <h3>{{ 'field.mentioned' | translate}}</h3>
       <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
-        @for(k of recipients; track $index; let idx = $index){
+        @for(k of mentioned; track $index; let idx = $index){
         <mat-list-item (mouseover)="showNode(k, 'mentioned')"
           (mouseout)="hideNode()">
           <span [style.color]="colors[idx % colors.length]">{{ k.val}} ({{k.count}}) </span>
@@ -25,7 +25,7 @@
 
   </div>
   <div class="app-content">
-    <div style="height: 200px; width: 100%;">
+    <div class="app-years">
       <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
         (onChangeLimits)="changeLimits($event)"></app-years-chart>
     </div>

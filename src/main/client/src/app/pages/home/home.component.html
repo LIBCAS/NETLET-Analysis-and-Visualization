@@ -10,8 +10,8 @@
             </p>
         </mat-card-content>
         <mat-card-actions align="end" class="app-mat-card-actions">
-            <button [routerLink]="[card.route]" queryParamsHandling="preserve" [disabled]="card.route === ''"
-                mat-raised-button>{{ 'View' | translate }}</button>
+            <a [routerLink]="[card.route]" queryParamsHandling="preserve" [disabled]="card.route === ''"
+                mat-raised-button>{{ 'View' | translate }}</a>
         </mat-card-actions>
     </mat-card>
     }

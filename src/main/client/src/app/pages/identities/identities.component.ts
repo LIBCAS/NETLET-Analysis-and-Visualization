@@ -172,9 +172,11 @@ export class IdentitiesComponent {
     const w = this.graphChart.getWidth() - 20;
     const maxSize = 60;
     const minSize = 10;
-    const maxCount: number = Math.max(
-      this.authors[0].count,
-      this.recipients[0].count);
+    let maxCount = Math.max(...this.authors.map(r => r.count), ...this.recipients.map(r => r.count));
+
+    // const maxCount: number = Math.max(
+    //   this.authors[0].count,
+    //   this.recipients[0].count);
     this.authors.forEach((identity: JSONFacet) => {
       nodes.push({
         // id: identity.id + '',

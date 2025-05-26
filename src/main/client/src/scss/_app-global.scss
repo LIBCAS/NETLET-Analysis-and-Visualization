@@ -258,11 +258,11 @@ fieldset {
 }
 
 .app-container-header {
-  font-size: 1.2em;
+  font-size: 1.01em;
   font-weight: bold;
   // text-align: center;
   position: absolute;
-    left: 50%;
+  left: 30%;
 }
 
 .app-info-content {
@@ -277,6 +277,11 @@ fieldset {
 .app-filters {
   max-width: 300px;
   padding: 12px;
+}
+
+.app-years {
+  height: 150px; 
+  width: 100%;
 }
 
 .app-invalidTenant {
