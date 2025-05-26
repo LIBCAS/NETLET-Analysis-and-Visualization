@@ -6,7 +6,8 @@ export interface Tenant {
     count: number,
     date_year_max: number,
     date_year_min: number,
-    available: boolean
+    available: boolean,
+    selected: boolean,
   }
 
 @Injectable({
@@ -24,7 +25,7 @@ export interface Tenant {
     {
       header: '',
       text: 'Míra jejich zprostředkovatelské pozice mezi dvěma a více sítěmi',
-      route: ''
+      route: 'relation'
     },
     {
       header: 'Keywords',

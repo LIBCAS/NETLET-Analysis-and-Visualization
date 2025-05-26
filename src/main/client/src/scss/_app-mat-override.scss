@@ -4,6 +4,7 @@
 @use 'theme-colors' as my-theme;
 
 :root {
+
   @include mat.toolbar-overrides((
     container-background-color: var(--mat-sys-primary),
     container-text-color: white,
@@ -30,6 +31,23 @@
     protected-container-shape: 4px
   ));
 
+  @include mat.expansion-overrides((
+    container-shape: 0px,
+    container-background-color: none
+  ));
+
+  @include mat.card-overrides((
+    elevated-container-shape: 0px,
+    outlined-container-shape: 0px,
+    outlined-container-elevation: red
+  ));
+
+}
+
+@for $i from 0 through 5 {
+    mat-card.mat-elevation-z#{$i} {
+        @include mat.elevation($i);
+    }
 }
 
 // form field

@@ -63,12 +63,12 @@ public class IndexSearcher {
                     .setLimit(100)
                     .setMinCount(1);
 
-            final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_"+lang)
+            final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_" + lang)
                     .setLimit(100)
                     .setMinCount(1)
                     .withSubFacet("identities", identity_mentionedFacet);
 
-            final TermsFacetMap categoriesFacet = new TermsFacetMap("keywords_category_"+lang)
+            final TermsFacetMap categoriesFacet = new TermsFacetMap("keywords_category_" + lang)
                     .setLimit(100)
                     .setMinCount(1)
                     //.setSort("index")
@@ -86,16 +86,16 @@ public class IndexSearcher {
             rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
-                    .withFilter("keywords_category_"+lang+":*")
+                    .withFilter("keywords_category_" + lang + ":*")
                     //.withFilter("status:publish")
                     .setLimit(0)
-                    .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_"+lang+",keywords_"+lang+"")
+                    .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_" + lang + ",keywords_" + lang + "")
                     .withFacet("date_year", rangeFacet)
                     .withFacet("tenants", new TermsFacetMap("tenant")
                             .setLimit(100)
                             .withDomain(new DomainMap()
-                                    .withQuery("keywords_category_"+lang+":*")
-                                    //.withTagsToExclude("fftenant")
+                                    .withQuery("keywords_category_" + lang + ":*")
+                            //.withTagsToExclude("fftenant")
                             )
                             .setMinCount(1))
                     .withFacet("keywords_categories", categoriesFacet)
@@ -116,7 +116,7 @@ public class IndexSearcher {
             }
 
             if (request.getParameter("keyword") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_"+lang+":(+\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
+                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(+\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
             }
 //            QueryResponse queryResponse = jrequest.process(solr, "letter_place");
 //            ret = new JSONObject(queryResponse.jsonStr());
@@ -181,7 +181,7 @@ public class IndexSearcher {
                             .setLimit(100)
                             .withDomain(new DomainMap()
                                     .withQuery("origin:* AND destination:*")
-                                    //.withTagsToExclude("fftenant")
+                            //.withTagsToExclude("fftenant")
                             )
                             .setMinCount(1))
                     .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
@@ -245,21 +245,25 @@ public class IndexSearcher {
                     .withFilter("identity_author:*")
                     .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_year", rangeFacet)
-                    .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned") 
+                    .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned")
                             .setLimit(100)
                             .setSort("index")
                             .setMinCount(1))
                     .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
-                            .setLimit(100)
+                            .setLimit(1000)
                             .setSort("index")
                             .withDomain(new DomainMap().withTagsToExclude("ffrecipients"))
                             .setMinCount(1))
                     .withFacet("identity_author", new TermsFacetMap("identity_author")
-                            .setLimit(100)
+                            .setLimit(1000)
                             .setSort("index")
                             .setMinCount(1));
             String tenant = request.getParameter("tenant");
             if (tenant != null && !tenant.isBlank()) {
+                String other_tenant = request.getParameter("other_tenant");
+                if (other_tenant != null && !other_tenant.isBlank()) {
+                    tenant += " OR tenant:" + other_tenant;
+                }
                 jrequest = jrequest.withFilter("tenant:" + tenant);
             }
             String date_range = request.getParameter("date_range");
@@ -312,21 +316,21 @@ public class IndexSearcher {
                     .setQuery("*:*")
                     //.withFilter("status:publish")
                     .setLimit(rows)
-                    .withFilter("professions_recipient_"+lang+":*")
-                    .withFilter("professions_author_"+lang+":*")
+                    .withFilter("professions_recipient_" + lang + ":*")
+                    .withFilter("professions_author_" + lang + ":*")
                     .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,identities:[json],professions:[json]")
                     .withFacet("date_year", rangeFacet)
                     .withFacet("tenants", new TermsFacetMap("tenant")
                             .setLimit(100)
                             .withDomain(new DomainMap().withTagsToExclude("fftenant"))
                             .setMinCount(1))
-                    .withFacet("professions_author", new TermsFacetMap("professions_author_"+lang+"")
+                    .withFacet("professions_author", new TermsFacetMap("professions_author_" + lang + "")
                             .setLimit(100)
                             .setMinCount(1))
-                    .withFacet("professions_recipient", new TermsFacetMap("professions_recipient_"+lang+"")
+                    .withFacet("professions_recipient", new TermsFacetMap("professions_recipient_" + lang + "")
                             .setLimit(100)
                             .setMinCount(1))
-                    .withFacet("professions_mentioned", new TermsFacetMap("professions_mentioned_"+lang+"")
+                    .withFacet("professions_mentioned", new TermsFacetMap("professions_mentioned_" + lang + "")
                             .setLimit(100)
                             .setMinCount(1));
             String tenant = request.getParameter("tenant");

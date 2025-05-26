@@ -8,7 +8,8 @@
     "authors": "Authors",
     "recipients": "Recipients",
     "mentioned": "Mentioned",
-    "keywords": "Keywords"
+    "keywords": "Keywords",
+    "relation_tenants": "Catalogs for comparition"
   },
   "invalidTenant": "There is no available data for this Catalog"
 }

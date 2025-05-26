@@ -276,7 +276,8 @@ fieldset {
 
 .app-filters {
   max-width: 300px;
-  padding: 12px;
+  padding: 2px;
+  overflow-y: auto;
 }
 
 .app-years {
