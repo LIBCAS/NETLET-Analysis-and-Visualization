@@ -7,32 +7,34 @@
 <div class="app-fxLayout app-row app-fill" style="position: relative;" *ngIf="!invalidTenant">
   <div style="flex: 1 30%;" class="app-filters">
 
-    <!-- <div>
-      <mat-radio-group aria-label="Chart type" [(ngModel)]="chartType" (ngModelChange)="onChangeChartType()">
-        <mat-radio-button value="treemap">treemap</mat-radio-button>
-        <mat-radio-button value="tree">tree</mat-radio-button>
-      </mat-radio-group>
-    </div> -->
-
     <div *ngIf="keywords_cs">
-      <h3>{{ 'field.keywords' | translate}}</h3>
-      <mat-list style="width: 100%;">
-        @for(k of keywords_cs; track $index; let idx = $index){
-        <mat-list-item (click)="clickKeyword(k)">
-          <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
-        </mat-list-item>
-        }
-      </mat-list>
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.keywords' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          @for(k of keywords_cs; track $index; let idx = $index){
+          <mat-list-item (click)="clickKeyword(k)">
+            <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
+
     </div>
     <div *ngIf="mentioned">
-      <h3>{{ 'field.mentioned' | translate}}</h3>
-      <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
-        @for(identity of mentioned; track $index; let idx = $index){
-        <mat-list-item (click)="clickMentioned(identity)">
-          {{ identity.val}} ({{identity.count}})
-        </mat-list-item>
-        }
-      </mat-list>
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.mentioned' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          @for(identity of mentioned; track $index; let idx = $index){
+          <mat-list-item (click)="clickMentioned(identity)">
+            {{ identity.val}} ({{identity.count}})
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
     </div>
   </div>
   <div class="app-content">

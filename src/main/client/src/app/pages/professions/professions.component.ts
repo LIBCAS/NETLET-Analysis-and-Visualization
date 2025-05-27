@@ -24,6 +24,7 @@ import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from
 import { CanvasRenderer } from 'echarts/renderers';
 import { LabelLayout } from "echarts/features";
 import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
@@ -31,7 +32,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Grid
   selector: 'app-professions',
   imports: [TranslateModule, FormsModule, CommonModule,
     NgxEchartsDirective, MatProgressBarModule, MatCardModule,
-    MatFormFieldModule, MatSelectModule, MatListModule,
+    MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule,
     MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent
   ],
   providers: [

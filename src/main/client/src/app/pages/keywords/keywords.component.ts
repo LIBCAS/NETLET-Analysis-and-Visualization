@@ -24,6 +24,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 import * as echarts from 'echarts/core';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 echarts.use([BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
 
@@ -31,7 +32,7 @@ echarts.use([BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent,
   selector: 'app-keywords',
   imports: [TranslateModule, FormsModule, CommonModule,
     NgxEchartsDirective, MatProgressBarModule, MatCardModule,
-    MatFormFieldModule, MatSelectModule, MatListModule,
+    MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule,
     MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent
   ],
   templateUrl: './keywords.component.html',

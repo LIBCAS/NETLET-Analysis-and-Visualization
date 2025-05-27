@@ -7,26 +7,35 @@
 <div class="app-fxLayout app-row app-fill" style="position: relative;" *ngIf="!invalidTenant">
   <div style="flex: 1 30%;" class="app-filters">
     <div *ngIf="recipients">
-      <h3>{{ 'field.recipients' | translate}}</h3>
-      <mat-list style="max-height: 200px; width: 100%; overflow-y: scroll;">
-        @for(identity of recipients; track $index; let idx = $index){
-        <mat-list-item (click)="clickRecipient(identity)">
-          <span [class.app-selected]="identity === activeIdentity"><mat-icon *ngIf="identity === activeIdentity"
-              class="app-va-tb">check</mat-icon>
-            {{ identity.val}} ({{identity.count}})</span>
-        </mat-list-item>
-        }
-      </mat-list>
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          @for(identity of recipients; track $index; let idx = $index){
+          <mat-list-item (click)="clickRecipient(identity)">
+            <span [class.app-selected]="identity === activeIdentity"><mat-icon *ngIf="identity === activeIdentity"
+                class="app-va-tb">check</mat-icon>
+              {{ identity.val}} ({{identity.count}})</span>
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
     </div>
     <div *ngIf="mentioned">
-      <h3>{{ 'field.mentioned' | translate}}</h3>
-      <mat-list style="max-height: 150px; width: 100%; overflow-y: scroll;">
-        @for(identity of mentioned; track $index; let idx = $index){
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.mentioned' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          @for(identity of mentioned; track $index; let idx = $index){
         <mat-list-item (mouseout)="clearHighlight()" (click)="highlightLinks(identity)">
           {{ identity.val}} ({{identity.count}})
         </mat-list-item>
         }
-      </mat-list>
+        </mat-list>
+      </mat-expansion-panel>
+      
     </div>
   </div>
   <div class="app-content">

@@ -28,7 +28,9 @@
   ));
 
   @include mat.button-overrides((
-    protected-container-shape: 4px
+    protected-container-shape: 4px,
+    outlined-container-shape: 4px
+
   ));
 
   @include mat.expansion-overrides((
@@ -38,8 +40,7 @@
 
   @include mat.card-overrides((
     elevated-container-shape: 0px,
-    outlined-container-shape: 0px,
-    outlined-container-elevation: red
+    outlined-container-shape: 0px
   ));
 
 }

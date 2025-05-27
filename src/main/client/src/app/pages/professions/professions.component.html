@@ -7,26 +7,33 @@
 <div class="app-fxLayout app-row app-fill" style="position: relative;" *ngIf="!invalidTenant">
     <div style="flex: 1 30%;" class="app-filters">
         <div *ngIf="professions_author">
-            <h3>{{ 'field.authors' | translate}}</h3>
-            <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
-                @for(k of professions_author; track $index; let idx = $index){
-                <mat-list-item (mouseover)="showNode(k, 'author')" (mouseout)="hideNode()">
-                    {{ k.val}} ({{k.count}})
-                </mat-list-item>
-                }
-            </mat-list>
+            <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-list>
+                    @for(k of professions_author; track $index; let idx = $index){
+                    <mat-list-item (mouseover)="showNode(k, 'author')" (mouseout)="hideNode()">
+                        {{ k.val}} ({{k.count}})
+                    </mat-list-item>
+                    }
+                </mat-list>
+            </mat-expansion-panel>
         </div>
         <div *ngIf="professions_recipient">
-            <h3>{{ 'field.recipients' | translate}}</h3>
-            <mat-list style="max-height: 300px; width: 100%; overflow-y: scroll;">
-                @for(k of professions_recipient; track $index; let idx = $index){
-                <mat-list-item (mouseover)="showNode(k, 'recipient')" (mouseout)="hideNode()">
-                    {{ k.val}} ({{k.count}})
-                </mat-list-item>
-                }
-            </mat-list>
+            <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-list>
+                    @for(k of professions_recipient; track $index; let idx = $index){
+                    <mat-list-item (mouseover)="showNode(k, 'recipient')" (mouseout)="hideNode()">
+                        {{ k.val}} ({{k.count}})
+                    </mat-list-item>
+                    }
+                </mat-list>
+            </mat-expansion-panel>
         </div>
-
     </div>
     <div class="app-content">
         <div class="app-years">

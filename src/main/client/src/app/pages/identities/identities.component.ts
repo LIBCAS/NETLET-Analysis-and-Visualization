@@ -25,13 +25,14 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { Letter } from '../../shared/letter';
 import { JSONFacet } from '../../shared/facet';
 import { LabelLayout } from "echarts/features";
+import { MatExpansionModule } from '@angular/material/expansion';
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-identities',
   imports: [TranslateModule, FormsModule, CommonModule,
-    NgxEchartsDirective, MatProgressBarModule,
+    NgxEchartsDirective, MatProgressBarModule, MatExpansionModule,
     MatFormFieldModule, MatSelectModule, MatListModule,
     MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent
   ],
