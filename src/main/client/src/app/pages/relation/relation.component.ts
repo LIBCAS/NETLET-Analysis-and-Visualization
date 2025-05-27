@@ -172,13 +172,33 @@ loading: boolean;
 
     const centerX = w / 2 - (zone * w/10.0);
     const centerY = h / 2;
-    const radius = ((maxCount - count) / (maxCount - 1));
+    let radius = ((maxCount - count) / (maxCount - 1));
+    radius = radius + (Math.random() * .1 * radius);
     const angle = (Math.random() * Math.PI) + (zone * Math.PI / 2.0);
     x = Math.cos(angle) * radius * centerX + centerX;
     y = Math.sin(angle) * radius * centerY + centerY;
 
     return { x, y, radius, angle }
   }
+
+  isDisabled(t: Tenant): boolean {
+    return t.date_year_min > this.tenant.date_year_min;
+  }
+
+  intersection(t : Tenant) : {start: number, end: number} {
+
+  
+    //get the range with the smaller starting point (min) and greater start (max)
+    let min = (t.date_year_min < this.tenant.date_year_min  ? t : this.tenant)
+    let max = (min === t ? this.tenant : t)
+
+    //min ends before max starts -> no intersection
+    if (min.date_year_max < max.date_year_min) {
+      return {start: 0, end: 0}; //the ranges don't intersect
+    }
+
+    return {start: max.date_year_min , end: (min.date_year_max < max.date_year_max ? min.date_year_max : max.date_year_max)}
+}
 
   processResponse() {
     const categories = [{ name: 'author' }, { name: 'recipient' }];

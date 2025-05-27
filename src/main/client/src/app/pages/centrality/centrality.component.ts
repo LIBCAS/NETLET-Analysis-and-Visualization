@@ -198,7 +198,8 @@ export class CentralityComponent {
 
     const centerX = w / 2;
     const centerY = h / 2;
-    const radius = ((maxCount - count) / (maxCount - 1));
+    let radius = ((maxCount - count) / (maxCount - 1));
+    radius = radius + (Math.random() * .1 * radius);
     const angle = Math.random() * 2 * Math.PI;
     x = Math.cos(angle) * radius * centerX + centerX;
     y = Math.sin(angle) * radius * centerY + centerY;
