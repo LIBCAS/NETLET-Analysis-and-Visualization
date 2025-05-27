@@ -243,7 +243,7 @@ public class IndexSearcher {
                     .setLimit(rows)
                     .withFilter("identity_recipient:*")
                     .withFilter("identity_author:*")
-                    .returnFields("date_year,identity_name,identity_recipient,identity_author,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
+                    .returnFields("tenant,date_year,identity_name,identity_recipient,identity_author,identity_mentioned,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_year", rangeFacet)
                     .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned")
                             .setLimit(1000)

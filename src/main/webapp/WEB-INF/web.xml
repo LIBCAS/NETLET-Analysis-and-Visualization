@@ -23,7 +23,8 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>StaticServlet</servlet-name>
-        <url-pattern>/centrality</url-pattern>Rubrika_Nazev
+        <url-pattern>/centrality</url-pattern>
+        <url-pattern>/relation</url-pattern>
         <url-pattern>/keywords</url-pattern>
         <url-pattern>/identities</url-pattern>
         <url-pattern>/professions</url-pattern>

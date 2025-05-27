@@ -1,5 +1,6 @@
 export interface Letter {
     letter_id: number,
+    tenant: string,
     origin: number,
     destination: number,
     date_year: number,

@@ -9,7 +9,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
-import {MatExpansionModule} from '@angular/material/expansion';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EChartsOption, ECharts } from 'echarts';
@@ -41,7 +41,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Grid
   styleUrl: './relation.component.scss'
 })
 export class RelationComponent {
-loading: boolean;
+  loading: boolean;
   solrResponse: any;
   limits: [number, number];
   tenant: Tenant;
@@ -83,7 +83,7 @@ loading: boolean;
   }
 
   ngOnInit(): void {
-    this.state.tenants.forEach(t => {t.available = true});
+    this.state.tenants.forEach(t => { t.available = true });
     if (this.tenant) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
       this.getData(true);
@@ -106,7 +106,9 @@ loading: boolean;
   }
 
   clickTenant(k: Tenant) {
-    k.selected = !k.selected;
+    this.state.tenants.forEach(t => t.selected = false);
+    // k.selected = !k.selected;
+    k.selected = true;
     this.getData(true);
   }
 
@@ -132,7 +134,7 @@ loading: boolean;
     this.graphChart.dispatchAction({
       type: 'downplay'
     });
-    
+
   }
 
   getData(setResponse: boolean) {
@@ -166,109 +168,135 @@ loading: boolean;
     return n >= this.limits[0] && n <= this.limits[1];
   }
 
-  setPosition(h: number, w: number, count: number, maxCount: number, zone: number): { x: number, y: number, radius: number, angle: number } {
-    let x = Math.random() * w,
-      y = Math.random() * h;
-
-    const centerX = w / 2 - (zone * w/10.0);
-    const centerY = h / 2;
-    let radius = ((maxCount - count) / (maxCount - 1));
-    radius = radius + (Math.random() * .1 * radius);
-    const angle = (Math.random() * Math.PI) + (zone * Math.PI / 2.0);
-    x = Math.cos(angle) * radius * centerX + centerX;
-    y = Math.sin(angle) * radius * centerY + centerY;
-
-    return { x, y, radius, angle }
-  }
 
   isDisabled(t: Tenant): boolean {
     return t.date_year_min > this.tenant.date_year_min;
   }
 
-  intersection(t : Tenant) : {start: number, end: number} {
+  setPosition(h: number, w: number, count: number, maxCount: number, zone: number): { x: number, y: number, radius: number } {
+    let x = Math.random() * w,
+      y = Math.random() * h;
 
-  
+    const centerX = w / 2; // - (zone * w / 10.0);
+    const centerY = h / 2;
+    let radius = ((maxCount - count) / (maxCount - 1));
+    radius = radius * zone + (Math.random() * .1 * radius);
+    // const angle = (Math.random() * Math.PI) + (zone * Math.PI / 2.0);
+    // x = Math.cos(angle) * radius * centerX + centerX;
+    // y = Math.sin(angle) * radius * centerY + centerY;
+
+    x = radius * centerX + centerX;
+
+    return { x, y, radius }
+  }
+
+  intersection(t: Tenant): { start: number, end: number } {
+
+
     //get the range with the smaller starting point (min) and greater start (max)
-    let min = (t.date_year_min < this.tenant.date_year_min  ? t : this.tenant)
+    let min = (t.date_year_min < this.tenant.date_year_min ? t : this.tenant)
     let max = (min === t ? this.tenant : t)
 
     //min ends before max starts -> no intersection
     if (min.date_year_max < max.date_year_min) {
-      return {start: 0, end: 0}; //the ranges don't intersect
+      return { start: 0, end: 0 }; //the ranges don't intersect
     }
 
-    return {start: max.date_year_min , end: (min.date_year_max < max.date_year_max ? min.date_year_max : max.date_year_max)}
-}
+    return { start: max.date_year_min, end: (min.date_year_max < max.date_year_max ? min.date_year_max : max.date_year_max) }
+  }
 
   processResponse() {
-    const categories = [{ name: 'author' }, { name: 'recipient' }];
+    const categories = [{ name: this.tenant.val }];
+    const other = this.state.tenants.find(t => t.selected);
+    if (other) {
+      categories.push({ name: other.val });
+    }
+    categories.push({ name: 'both' });
     const links: any[] = [];
     const nodes: any[] = [];
     const h = this.graphChart.getHeight();
     const w = this.graphChart.getWidth() - 20;
     const maxSize = 60;
     const minSize = 10;
-    let maxCount = Math.max(...this.authors.map(r => r.count), ...this.recipients.map(r => r.count));
-    this.authors.forEach((identity: JSONFacet) => {
-      const pos = this.setPosition(h, w, identity.count, maxCount, 1);
-      nodes.push({
-        // id: identity.id + '',
-        id: identity.val + '_author',
-        name: identity.val + ' ' + identity.count,
-        value: identity.count,
-        category: 'author',
-        symbolSize: maxSize * identity.count / maxCount + minSize,
-        angle: pos.angle,
-        x: pos.x,
-        y: pos.y,
-      })
-    });
-    this.recipients.forEach((identity: JSONFacet) => {
-      const pos = this.setPosition(h, w, identity.count, maxCount, - 1);
-      nodes.push({
-        // id: identity.id + '',
-        id: identity.val + '_recipient',
-        name: identity.val + ' ' + identity.count,
-        value: identity.count,
-        category: 'recipient',
-        symbolSize: maxSize * identity.count / maxCount + minSize,
-        angle: pos.angle,
-        x: pos.x,
-        y: pos.y,
-      })
-    });
-    // this.mentioned.forEach((identity: JSONFacet) => {
+    // let maxCount = Math.max(...this.authors.map(r => r.count), ...this.recipients.map(r => r.count));
+    let maxCount = Math.max(...this.mentioned.map(r => r.count));
+    // this.authors.forEach((identity: JSONFacet) => {
+    //   const pos = this.setPosition(h, w, identity.count, maxCount, 1);
     //   nodes.push({
     //     // id: identity.id + '',
-    //     id: identity.val + '_mentioned',
-    //     name: identity.val,
+    //     id: identity.val + '_author',
+    //     name: identity.val + ' ' + identity.count,
     //     value: identity.count,
-    //     category: 'mentioned',
+    //     category: 'author',
     //     symbolSize: maxSize * identity.count / maxCount + minSize,
-    //     x: Math.random() * w,
-    //     y: Math.random() * h
+    //     angle: pos.angle,
+    //     x: pos.x,
+    //     y: pos.y,
     //   })
     // });
-
-    this.solrResponse.response.docs.forEach((letter: Letter) => {
-      if (this.inLimits(letter.date_year) && letter.identities) {
-        const a = letter.identities.find(i => i.role === 'author');
-        const r = letter.identities.find(i => i.role === 'recipient');
-        const id = a.id + '_' + r.id;
-        const link = links.find(l => l.id === id);
-        if (!link) {
-          links.push({
-            id: id,
-            source: a.name + '_author',
-            target: r.name + '_recipient',
-            label: a.name + ' > ' + r.name,
-            count: 1
-          });
-        } else {
-          link.count++
+    // this.recipients.forEach((identity: JSONFacet) => {
+    //   const pos = this.setPosition(h, w, identity.count, maxCount, - 1);
+    //   nodes.push({
+    //     // id: identity.id + '',
+    //     id: identity.val + '_recipient',
+    //     name: identity.val + ' ' + identity.count,
+    //     value: identity.count,
+    //     category: 'recipient',
+    //     symbolSize: maxSize * identity.count / maxCount + minSize,
+    //     angle: pos.angle,
+    //     x: pos.x,
+    //     y: pos.y,
+    //   })
+    // });
+    this.mentioned.forEach((identity: JSONFacet) => {
+      const t1 = this.solrResponse.response.docs.find((letter: Letter) => { return letter.tenant === this.tenant.val && letter.identity_mentioned?.includes(identity.val)  });
+      let zone = 0;
+      let category = null;
+      if (t1) {
+        category = this.tenant.val;
+        zone = 1;
+      }
+      if (other) {
+        const t2 = this.solrResponse.response.docs.find((letter: Letter) => { return letter.tenant === other.val && letter.identity_mentioned?.includes(identity.val) });
+        if (t2 && t1) {
+          category = 'both';
+          zone = 0;
+        } else if (t2) {
+          category = other.val;
+        zone = -1;
         }
       }
+      const pos = this.setPosition(h, w, identity.count, maxCount, zone);
+      nodes.push({
+        id: identity.val + '_mentioned',
+        name: identity.val,
+        value: identity.count,
+        category: category,
+        symbolSize: maxSize * identity.count / maxCount + minSize,
+        x: pos.x,
+        y: pos.y,
+      })
     });
+
+    // this.solrResponse.response.docs.forEach((letter: Letter) => {
+    //   if (this.inLimits(letter.date_year) && letter.identities) {
+    //     const a = letter.identities.find(i => i.role === 'author');
+    //     const r = letter.identities.find(i => i.role === 'recipient');
+    //     const id = a.id + '_' + r.id;
+    //     const link = links.find(l => l.id === id);
+    //     if (!link) {
+    //       links.push({
+    //         id: id,
+    //         source: a.name + '_author',
+    //         target: r.name + '_recipient',
+    //         label: a.name + ' > ' + r.name,
+    //         count: 1
+    //       });
+    //     } else {
+    //       link.count++
+    //     }
+    //   }
+    // });
 
     this.graphData = {
       categories,
