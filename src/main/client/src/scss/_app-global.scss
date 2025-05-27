@@ -265,10 +265,15 @@ fieldset {
   left: 30%;
 }
 
+.app-info-row>div:nth-child(even) {
+  background-color: #ddd;
+}
+
 .app-info-content {
   max-height: 400px;
   overflow: auto;
 }
+
 
 .app-content{
   height: 100%; width: 100%; display: flex; flex-direction: column; align-content: flex-start; position: relative;
