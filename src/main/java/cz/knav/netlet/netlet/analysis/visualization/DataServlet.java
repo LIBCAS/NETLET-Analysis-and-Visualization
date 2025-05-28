@@ -107,6 +107,16 @@ public class DataServlet extends HttpServlet {
                 return ret;
             }
         },
+        RELATION{
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                JSONObject ret = new JSONObject();
+                if (request.getParameter("tenant") != null) { 
+                    ret = IndexSearcher.relation(request);
+                }
+                return ret;
+            }
+        },
         KEYWORDS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {

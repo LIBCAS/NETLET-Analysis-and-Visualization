@@ -65,6 +65,10 @@ export class AppService {
     return this.get('data/get_tenants')
   }
 
+  getRelation(params: HttpParams): Observable<any> {
+    return this.get('data/relation', params)
+  }
+
   getMap(params: HttpParams): Observable<any> {
     return this.get('data/map', params)
   }

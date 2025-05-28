@@ -51,6 +51,82 @@ public class IndexSearcher {
         return ret;
     }
 
+    public static JSONObject relation(HttpServletRequest request) {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+
+            String tenant_date_range = request.getParameter("tenant_date_range");
+            if (tenant_date_range == null || tenant_date_range.isBlank()) {
+                tenant_date_range = "1000,2025";
+            }
+            String[] years = tenant_date_range.split(",");
+            RangeFacetMap rangeFacet = new RangeFacetMap("date_year", Long.parseLong(years[0]), Long.parseLong(years[1]), 1)
+                    .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+
+            String rowsP = request.getParameter("rows");
+            int rows = 0;
+            if (rowsP != null && !rowsP.isBlank()) {
+                rows = Integer.valueOf(rowsP);
+            }
+
+            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
+            rawJsonResponseParser.setWriterType("json");
+            JsonQueryRequest jrequest = new JsonQueryRequest()
+                    .setQuery("*:*")
+                    .setSort("date_year asc")
+                    //.withFilter("status:publish")
+                    .withFilter("identity_mentioned:*")
+                    .returnFields("tenant,date_year,identity_name,identity_recipient,identity_author,identity_mentioned,places:[json],identities:[json],keywords_category_cs,keywords_cs")
+                    .withFacet("date_year", rangeFacet)
+                    .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned")
+                            .setLimit(1000)
+                            .setSort("index")
+                            .setMinCount(1)
+                                .withSubFacet("tenant", new TermsFacetMap("tenant")
+                                .setLimit(100)
+                                .setMinCount(1))
+                            )
+                            //                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
+                            //                            .setLimit(1000)
+                            //                            .setSort("index")
+                            //                            .withDomain(new DomainMap().withTagsToExclude("ffrecipients"))
+                            //                            .setMinCount(1))
+                            //                    .withFacet("identity_author", new TermsFacetMap("identity_author")
+                            //                            .setLimit(1000)
+                            //                            .setSort("index")
+                            //                            .setMinCount(1))
+                            .setLimit(rows);
+            String tenant = request.getParameter("tenant");
+            if (tenant != null && !tenant.isBlank()) {
+                String other_tenant = request.getParameter("other_tenant");
+                if (other_tenant != null && !other_tenant.isBlank()) {
+                    tenant += " OR tenant:" + other_tenant;
+                }
+                jrequest = jrequest.withFilter("tenant:" + tenant);
+            }
+            String date_range = request.getParameter("date_range");
+            if (date_range != null && !date_range.isBlank()) {
+                jrequest = jrequest.withFilter("{!tag=ffdate_year}date_year:[" + date_range.replaceAll(",", " TO ") + "]");
+            }
+
+            if (request.getParameter("recipient") != null) {
+                jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(+\"" + String.join("\" OR \"", request.getParameterValues("recipient")) + "\")");
+            }
+//            QueryResponse queryResponse = jrequest.process(solr, "letter_place");
+//            ret = new JSONObject(queryResponse.jsonStr());
+
+            jrequest.setResponseParser(rawJsonResponseParser);
+            NamedList<Object> resp = solr.request(jrequest, "letter_place");
+            String jsonResponse = (String) resp.get("response");
+            ret = new JSONObject(jsonResponse);
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        return ret;
+    }
+
     public static JSONObject getKeywords(HttpServletRequest request) {
         JSONObject ret = new JSONObject();
         try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {

@@ -3,19 +3,21 @@
     <div style="flex: 1 30%;" class="app-filters">
 
         <div *ngIf="tenant">
-            <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0"  [expanded]="true">
+            <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
                 <mat-expansion-panel-header>
                     <mat-panel-title> {{ 'field.relation_tenants' | translate}} </mat-panel-title>
                 </mat-expansion-panel-header>
                 <mat-list>
-                @for(k of state.tenants; track $index; let idx = $index;){
+                    @for(k of state.tenants; track $index; let idx = $index;){
                     @let is = intersection(k);
-                <mat-list-item (click)="clickTenant(k)">
-                    <mat-checkbox [disabled]="k.val === tenant.val || is.start === 0" [checked]="k.selected || k.val === tenant.val">{{ k.val}} {{k.date_year_min}} - {{k.date_year_max}} ({{k.count}}) </mat-checkbox>
-                </mat-list-item>
-                }
-            </mat-list>
-            </mat-expansion-panel>            
+                    <mat-list-item (click)="clickTenant(k)">
+                        <mat-checkbox [disabled]="k.val === tenant.val || is.start === 0"
+                            [checked]="k.selected || k.val === tenant.val">{{ k.val}} {{k.date_year_min}} -
+                            {{k.date_year_max}} ({{k.count}}) </mat-checkbox>
+                    </mat-list-item>
+                    }
+                </mat-list>
+            </mat-expansion-panel>
         </div>
 
         <!-- <div *ngIf="authors">
@@ -50,16 +52,16 @@
         <div *ngIf="mentioned">
             <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0">
                 <mat-expansion-panel-header>
-                    <mat-panel-title> {{ 'field.mentioned' | translate}} </mat-panel-title>
+                    <mat-panel-title> {{ 'field.mentioned' | translate}} ({{mentioned.length}})</mat-panel-title>
                 </mat-expansion-panel-header>
                 <mat-list>
-                @for(k of mentioned; track $index; let idx = $index){
-                <mat-list-item (mouseover)="showNode(k, 'mentioned')" (mouseout)="hideNode()">
-                    {{ k.val}} ({{k.count}})
-                </mat-list-item>
-                }
-            </mat-list>
-            </mat-expansion-panel>  
+                    @for(k of mentioned; track $index; let idx = $index){
+                    <mat-list-item (mouseover)="showNode(k, 'mentioned')" (mouseout)="hideNode()">
+                        {{ k.val}} ({{k.count}})
+                    </mat-list-item>
+                    }
+                </mat-list>
+            </mat-expansion-panel>
         </div>
 
     </div>
@@ -75,6 +77,10 @@
                     (chartInit)="onGraphChartInit($event)">
                 </div>
             </div>
+
+        </div>
+        <div class="app-letters-info" *ngIf="infoHeader">
+            <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
         </div>
     </div>
 </div>

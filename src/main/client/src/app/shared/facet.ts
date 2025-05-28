@@ -10,7 +10,8 @@ export interface Facet {
 export interface JSONFacet {
   val: string, 
   count: number,
-  selected?: boolean 
+  selected?: boolean,
+  [subfacet: string]: any; 
 }
 
 export interface FacetFields {

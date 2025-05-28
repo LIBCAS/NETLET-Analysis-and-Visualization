@@ -299,3 +299,13 @@ fieldset {
     width: 400px;
     left: calc(50% - 200px);
 }
+
+
+
+.app-letters-info {
+    position: absolute;
+    width: 400px;
+    right: 20px;
+    top:210px;
+    z-index: 2000;
+}

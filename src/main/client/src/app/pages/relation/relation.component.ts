@@ -1,6 +1,6 @@
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
-import { Component, effect, Inject } from '@angular/core';
+import { Component, effect, Inject, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,6 +24,7 @@ import { AppService } from '../../app.service';
 import { YearsChartComponent } from '../../components/years-chart/years-chart.component';
 import { JSONFacet } from '../../shared/facet';
 import { Letter } from '../../shared/letter';
+import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
@@ -32,8 +33,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Grid
   imports: [TranslateModule, FormsModule, CommonModule,
     NgxEchartsDirective, MatProgressBarModule, MatExpansionModule,
     MatFormFieldModule, MatSelectModule, MatListModule,
-    MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent
-  ],
+    MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -70,6 +70,7 @@ export class RelationComponent {
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
+    private _ngZone: NgZone,
     private translation: TranslateService,
     public state: AppState,
     private service: AppService
@@ -90,9 +91,51 @@ export class RelationComponent {
     }
   }
 
+
+  infoContent: string;
+  infoHeader: string;
+  closeInfo() {
+    this.infoHeader = null;
+    this.infoContent = null;
+  }
+
   onGraphChartInit(e: any) {
     this.graphChart = e;
+
+    this.graphChart.on('click', (params: any) => {
+      if (params.data) {
+        this._ngZone.run(() => {
+          const identity = params.data.name;
+
+          this.infoContent = '';
+          const letters: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => { return letter.identity_mentioned?.includes(identity) });
+          this.infoHeader = 'Letters in which ' + identity + ' is mentioned (' + letters.length + ')';
+          letters.forEach(letter => {
+            this.infoContent += `<div>${letter.identity_author?.[0]} -> ${letter.identity_recipient?.[0]}: ${letter.date_year}</div>`;
+            // if (letter.places) {
+            //   const origin = letter.places.find(p => p.role === 'origin').name;
+            //   const destination = letter.places.find(p => p.role === 'destination').name;
+            // } else {
+
+            // }
+
+            // if (letter.keywords_category_cs?.length > 0) {
+            //   this.infoContent += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+            // } else if (letter.keywords_cs?.length > 0) {
+            //   this.infoContent += ` (${letter.keywords_cs.join(', ')})</div>`;
+            // } else {
+            //   this.infoContent += `</div>`;
+            // }
+
+          });
+        });
+
+      }
+    })
+
   }
+
+
 
   changeTenant() {
     this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
@@ -106,6 +149,7 @@ export class RelationComponent {
   }
 
   clickTenant(k: Tenant) {
+    this.closeInfo();
     this.state.tenants.forEach(t => t.selected = false);
     // k.selected = !k.selected;
     k.selected = true;
@@ -149,15 +193,15 @@ export class RelationComponent {
     } else {
       p.rows = 10000;
     }
-    this.service.getIdentities(p as HttpParams).subscribe((resp: any) => {
+    this.service.getRelation(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
       }
       if (setResponse) {
         this.solrResponse = resp;
       }
-      this.authors = resp.facets.identity_author.buckets;
-      this.recipients = resp.facets.identity_recipient.buckets;
+      //this.authors = resp.facets.identity_author.buckets;
+      //this.recipients = resp.facets.identity_recipient.buckets;
       this.mentioned = resp.facets.identity_mentioned.buckets;
       this.processResponse();
       this.loading = false;
@@ -248,24 +292,35 @@ export class RelationComponent {
     //     y: pos.y,
     //   })
     // });
+    console.time();
     this.mentioned.forEach((identity: JSONFacet) => {
-      const t1 = this.solrResponse.response.docs.find((letter: Letter) => { return letter.tenant === this.tenant.val && letter.identity_mentioned?.includes(identity.val)  });
       let zone = 0;
       let category = null;
-      if (t1) {
-        category = this.tenant.val;
-        zone = 1;
-      }
-      if (other) {
-        const t2 = this.solrResponse.response.docs.find((letter: Letter) => { return letter.tenant === other.val && letter.identity_mentioned?.includes(identity.val) });
-        if (t2 && t1) {
+
+      if (identity['tenant'].buckets) {
+        const tenants: JSONFacet[] = identity['tenant'].buckets;
+        if (tenants.length > 1) {
           category = 'both';
-          zone = 0;
-        } else if (t2) {
-          category = other.val;
-        zone = -1;
+        } else {
+          category = tenants[0].val;
+          zone = category === this.tenant.val ? -1 : 1;
         }
       }
+      // const t1 = this.solrResponse.response.docs.find((letter: Letter) => { return letter.tenant === this.tenant.val && letter.identity_mentioned?.includes(identity.val)  });
+      // if (t1) {
+      //   category = this.tenant.val;
+      //   zone = 1;
+      // }
+      // if (other) {
+      //   const t2 = this.solrResponse.response.docs.find((letter: Letter) => { return letter.tenant === other.val && letter.identity_mentioned?.includes(identity.val) });
+      //   if (t2 && t1) {
+      //     category = 'both';
+      //     zone = 0;
+      //   } else if (t2) {
+      //     category = other.val;
+      //     zone = -1;
+      //   }
+      // }
       const pos = this.setPosition(h, w, identity.count, maxCount, zone);
       nodes.push({
         id: identity.val + '_mentioned',
