@@ -1,0 +1,55 @@
+<mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+<mat-card *ngIf="invalidTenant" appearance="outlined" class="app-invalidTenant">
+  <mat-card-header>
+    <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
+  </mat-card-header>
+</mat-card>
+<div class="app-fxLayout app-row app-fill" style="position: relative;">
+  <div style="flex: 1 30%;" class="app-filters">
+    <div *ngIf="recipients">
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          @for(identity of recipients; track $index; let idx = $index){
+          <mat-list-item (click)="clickRecipient(identity)">
+            <span [class.app-selected]="identity === activeIdentity"><mat-icon *ngIf="identity === activeIdentity"
+                class="app-va-tb">check</mat-icon>
+              {{ identity.val}} ({{identity.count}})</span>
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
+    </div>
+    <div *ngIf="mentioned">
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.mentioned' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          @for(identity of mentioned; track $index; let idx = $index){
+        <mat-list-item (mouseout)="clearHighlight()" (click)="highlightLinks(identity)">
+          {{ identity.val}} ({{identity.count}})
+        </mat-list-item>
+        }
+        </mat-list>
+      </mat-expansion-panel>
+      
+    </div>
+  </div>
+  <div class="app-content">
+    <div class="app-years">
+      <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
+        (onChangeLimits)="changeLimits($event)"></app-years-chart>
+    </div>
+    <div style="height: 100%; width: 100%;" id="echarts-lmap" class="app-fxFlex"></div>
+    <!-- <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"
+      (leafletMapReady)="onMapReady($event)">
+    </div> -->
+    <div class="app-letters-info" *ngIf="infoHeader">
+      <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
+    </div>
+  </div>
+
+</div>
