@@ -1,6 +1,20 @@
 <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
   <div style="flex: 1 30%;" class="app-filters">
+    <div *ngIf="authors">
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          @for(k of authors; track $index; let idx = $index){
+          <mat-list-item (mouseover)="showNode(k, 'author')" (mouseout)="hideNode()">
+            {{ k.val}} ({{k.count}})
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
+    </div>
     <div *ngIf="recipients">
       <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
         <mat-expansion-panel-header>
@@ -43,5 +57,11 @@
         </div>
       </div>
     </div>
+
+    
+    <div class="app-letters-info" *ngIf="infoHeader">
+      <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
+    </div>
+    
   </div>
 </div>

@@ -22,6 +22,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.impl.Http2SolrClient;
+import org.json.JSONArray;
 
 /**
  *
@@ -61,13 +62,31 @@ public class HikoIndexer {
         return ret;
     }
 
+    public List<String> getTenantsFromIndex() {
+        List<String> ret = new ArrayList();
+        try {
+            JSONObject json = IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant");
+            JSONArray ja = json.getJSONArray("buckets");
+            for (int i = 0; i < ja.length(); i++) {
+                ret.add(ja.getJSONObject(i).getString("val"));
+            }
+            
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.add("error");
+        }
+
+        return ret;
+    }
+
     public JSONObject full() {
         Date start = new Date();
         JSONObject ret = new JSONObject();
         Integer success = 0;
         LOGGER.log(Level.INFO, "Indexing HIKO letters");
         try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
-            List<String> tenants = getTenants();
+            //List<String> tenants = getTenants();
+            List<String> tenants = getTenantsFromIndex();
             for (String tenant : tenants) {
                 getLetters(client, ret, tenant, success);
             }

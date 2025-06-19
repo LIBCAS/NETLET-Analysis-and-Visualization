@@ -1,6 +1,6 @@
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
-import { Component, effect, Inject } from '@angular/core';
+import { Component, effect, Inject, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -27,6 +27,8 @@ import { JSONFacet } from '../../shared/facet';
 import { LabelLayout } from "echarts/features";
 import { identity } from 'rxjs';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { AppConfiguration } from '../../app-configuration';
+import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
@@ -35,8 +37,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Grid
   imports: [TranslateModule, FormsModule, CommonModule,
     NgxEchartsDirective, MatProgressBarModule, MatExpansionModule,
     MatFormFieldModule, MatSelectModule, MatListModule,
-    MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent
-  ],
+    MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -68,7 +69,7 @@ export class CentralityComponent {
     }[]
   }
 
-  // authors: JSONFacet[];
+  authors: JSONFacet[];
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
 
@@ -87,10 +88,15 @@ export class CentralityComponent {
     "#4b565b"
   ];
 
+  infoContent: string;
+  infoHeader: string;
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
+    private _ngZone: NgZone,
     private router: Router,
     private translation: TranslateService,
+    private config: AppConfiguration,
     public state: AppState,
     private service: AppService
   ) {
@@ -112,6 +118,12 @@ export class CentralityComponent {
 
   onGraphChartInit(e: any) {
     this.graphChart = e;
+
+    this.graphChart.on('click', (params: any) => {
+      if (params.dataType === 'node' && params.data.category === 'mentioned') {
+        this.mentionedLabel(params.data.name);
+      }
+    })
   }
 
   changeTenant() {
@@ -158,6 +170,7 @@ export class CentralityComponent {
 
   getData(setResponse: boolean) {
     this.loading = true;
+    this.closeInfo();
     const p: any = {};
     p.tenant = this.tenant.val;
     p.recipient = this.selectedRecipients;
@@ -176,6 +189,7 @@ export class CentralityComponent {
         this.solrResponse = resp;
       }
 
+      this.authors = resp.facets.identity_author.buckets;
       this.recipients = resp.facets.identity_recipient.buckets;
 
       this.recipients.forEach(k => {
@@ -207,19 +221,44 @@ export class CentralityComponent {
     return { x, y, radius, angle }
   }
 
+  mentionedLabel(identity: string) {
+    this._ngZone.run(() => {
+      const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
+
+      let popup = '';
+      letters.forEach((letter: Letter) => {
+        popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
+        if (letter.keywords_category_cs?.length > 0) {
+          popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+        } else if (letter.keywords_cs?.length > 0) {
+          popup += ` (${letter.keywords_cs.join(', ')})</div>`;
+        } else {
+          popup += `</div>`;
+        }
+
+        this.infoHeader = `${identity} is mentioned in:`;
+        this.infoContent = popup;
+      });
+    });
+  }
+
   processResponse() {
-    const categories = [{ name: 'mentioned' }];
+    const categories = [{ name: 'mentioned' }, { name: 'recipients' }, { name: 'authors' }];
     const links: any[] = [];
     const nodes: any[] = [];
     const h = this.graphChart.getHeight();
     const w = this.graphChart.getWidth() - 20;
     const maxSize = 60;
     const minSize = 10;
-    let maxCount = Math.max(...this.recipients.map(r => r.count));
+    let maxCount = Math.max(
+      ...this.mentioned.filter(i => !this.config.tenants_identities[this.tenant.val].includes(i.val)).map(r => r.count),
+      ...this.recipients.filter(i => !this.config.tenants_identities[this.tenant.val].includes(i.val)).map(r => r.count),
+      ...this.authors.filter(i => !this.config.tenants_identities[this.tenant.val].includes(i.val)).map(r => r.count)
+    );
 
-    if (this.mentioned[0]) {
-      maxCount = Math.max(...this.mentioned.map(r => r.count));
-    }
+    // if (this.mentioned[0]) {
+    //   maxCount = Math.max(...this.mentioned.map(r => r.count));
+    // }
     this.mentioned.forEach((identity: JSONFacet, index: number) => {
       const pos = this.setPosition(h, w, identity.count, maxCount);
       nodes.push({
@@ -227,17 +266,60 @@ export class CentralityComponent {
         id: identity.val + '_mentioned',
         name: identity.val,
         value: identity.count,
+        //label: this.mentionedLabel(identity.val);
         category: 'mentioned',
         symbolSize: maxSize * identity.count / maxCount + minSize,
         x: pos.x,
         y: pos.y,
         // radiusAxis: pos.radius,
         // angleAxis: pos.angle,
-        itemStyle: {
-          color: this.colors[index % this.colors.length]
-        }
+        // itemStyle: {
+        //   color: this.colors[index % this.colors.length]
+        // }
 
       })
+    });
+    this.recipients.forEach((identity: JSONFacet, index: number) => {
+      if (!this.config.tenants_identities[this.tenant.val].includes(identity.val)) {
+        const pos = this.setPosition(h, w, identity.count, maxCount);
+        nodes.push({
+          // id: identity.id + '',
+          id: identity.val + '_recipient',
+          name: identity.val,
+          value: identity.count,
+          category: 'recipients',
+          symbolSize: maxSize * identity.count / maxCount + minSize,
+          x: pos.x,
+          y: pos.y,
+          // radiusAxis: pos.radius,
+          // angleAxis: pos.angle,
+          // itemStyle: {
+          //   color: this.colors[index % this.colors.length]
+          // }
+
+        })
+      }
+    });
+    this.authors.forEach((identity: JSONFacet, index: number) => {
+      if (!this.config.tenants_identities[this.tenant.val].includes(identity.val)) {
+        const pos = this.setPosition(h, w, identity.count, maxCount);
+        nodes.push({
+          // id: identity.id + '',
+          id: identity.val + '_author',
+          name: identity.val,
+          value: identity.count,
+          category: 'authors',
+          symbolSize: maxSize * identity.count / maxCount + minSize,
+          x: pos.x,
+          y: pos.y,
+          // radiusAxis: pos.radius,
+          // angleAxis: pos.angle,
+          // itemStyle: {
+          //   color: this.colors[index % this.colors.length]
+          // }
+
+        })
+      }
     });
 
     this.graphData = {
@@ -250,7 +332,7 @@ export class CentralityComponent {
     this.graphOptions = {
       title: {
         show: true,
-        text: this.translation.instant('field.mentioned'),
+        text: this.translation.instant('Centralita'),
         // top: 'bottom',
         left: 'center'
       },
@@ -263,7 +345,8 @@ export class CentralityComponent {
       },
       legend: [
         {
-          show: false,
+          show: true,
+          bottom: 5,
           data: this.graphData.categories.map(function (a) {
             return a.name;
           })
@@ -310,5 +393,10 @@ export class CentralityComponent {
         }
       ]
     };
+  }
+
+  closeInfo() {
+    this.infoContent = null;
+    this.infoHeader = null;
   }
 }

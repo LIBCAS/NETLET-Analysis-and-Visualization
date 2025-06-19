@@ -17,6 +17,10 @@ import { Configuration } from './shared/config';
         return this.config.defaultLang;
     }
 
+    public get tenants_identities() {
+        return this.config.tenants_identities;
+    }
+
     constructor(
         private http: HttpClient,
         public state: AppState) { }

@@ -30,7 +30,7 @@ import {
 import L, { latLng, Map, tileLayer as LtileLayer, MapOptions } from "leaflet";
 
 import { EChartsOption, ECharts, EffectScatterSeriesOption, ScatterSeriesOption, VisualMapComponentOption, GraphSeriesOption } from 'echarts';
-import { use, init, ComposeOption } from "echarts/core";
+import { use, init, EChartsType, ComposeOption } from "echarts/core";
 
 import * as echarts from 'echarts/core';
 import { GraphChart } from 'echarts/charts';
@@ -78,7 +78,7 @@ export class MapComponent {
   mentioned: JSONFacet[];
 
   graphOptions: ECOption = {};
-  graphChart: ECharts;
+  graphChart: EChartsType;
 
   nodes: { [id: number]: { coords: [number, number], name: string } } = {};
   links: { [id: string]: { node1: [number, number], node2: [number, number], count: number, letters: Letter[] } } = {};
@@ -177,7 +177,51 @@ export class MapComponent {
   }
 
   activeIdentity: JSONFacet = null;
-  clickRecipient(identity: JSONFacet) { }
+  clickRecipient(identity: JSONFacet) {
+
+  }
+
+  graphData: {
+    links: {
+      source: string,
+      target: string
+    }[],
+    nodes: {
+      category: number,
+      id: string,
+      name: string
+      symbolSize: number
+      value: number
+    }[]
+  }
+
+  
+
+  hideNode() {
+    this.graphChart.dispatchAction({
+      type: 'hideTip'
+    });
+    this.graphChart.dispatchAction({
+      type: 'downplay'
+    });
+
+  }
+
+  showNode(identity: JSONFacet) {
+    //const idx = this.graphData.nodes.findIndex(n => n.id === identity.val + '_' + category);
+    const idx = this.graphData.nodes.findIndex(n => n.id === identity.val);
+    // currentIndex = (currentIndex + 1) % dataLen;
+    // this.graphChart.dispatchAction({
+    //   type: 'showTip',
+    //   seriesIndex: 0,
+    //   dataIndex: idx
+    // });
+    this.graphChart.dispatchAction({
+      type: 'highlight',
+      seriesIndex: 0,
+      dataIndex: idx
+    });
+  }
 
   clearHighlight() { }
 
@@ -243,7 +287,10 @@ export class MapComponent {
     // this.map.addLayer(this.linkLayer);
     // this.map.addLayer(this.nodeLayer);
 
-
+    this.graphData = {
+      links,
+      nodes
+    };
 
     this.graphOptions = {
       lmap: {
@@ -310,19 +357,19 @@ export class MapComponent {
     }
 
     const d = document.getElementById("echarts-lmap");
-    const chart = init(d);
+    this.graphChart = init(d);
 
-    chart.setOption(this.graphOptions);
+    this.graphChart.setOption(this.graphOptions);
 
-    chart.on('click', (params: any) => {
+    this.graphChart.on('click', (params: any) => {
       console.log(params)
       if (params.dataType === 'node') {
         this._ngZone.run(() => {
           const place = params.data.id;
-          let lettersFrom: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => { return letter.origin === place});
+          let lettersFrom: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => { return letter.origin === place });
           let lettersTo: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => { return letter.destination === place });
-            // lettersFrom += layer.options.letters.filter((l: Letter) => l.origin === place.place_id).length;
-            // lettersTo += layer.options.letters.filter((l: Letter) => l.destination === place.place_id).length;
+          // lettersFrom += layer.options.letters.filter((l: Letter) => l.origin === place.place_id).length;
+          // lettersTo += layer.options.letters.filter((l: Letter) => l.destination === place.place_id).length;
 
           this.infoHeader = `Letters from/to ${params.data.name}`;
           this.infoContent = `<div>From: ${lettersFrom.length}</div><div>To: ${lettersTo.length}</div>`;
@@ -330,22 +377,22 @@ export class MapComponent {
       } else if (params.dataType === 'edge') {
 
         this._ngZone.run(() => {
-          let popup ='';
-          let letters: Letter[] = [...this.solrResponse.response.docs.filter((letter: Letter) => letter.origin+'' === params.data.source ),
-                                  ... this.solrResponse.response.docs.filter((letter: Letter) => letter.destination+'' === params.data.target )];
+          let popup = '';
+          let letters: Letter[] = [...this.solrResponse.response.docs.filter((letter: Letter) => letter.origin + '' === params.data.source),
+          ... this.solrResponse.response.docs.filter((letter: Letter) => letter.destination + '' === params.data.target)];
           letters.forEach((letter: Letter) => {
-          popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
-          if (letter.keywords_category_cs?.length > 0) {
-            popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
-          } else if (letter.keywords_cs?.length > 0) {
-            popup += ` (${letter.keywords_cs.join(', ')})</div>`;
-          } else {
-            popup += `</div>`;
-          }
-        });
+            popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
+            if (letter.keywords_category_cs?.length > 0) {
+              popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+            } else if (letter.keywords_cs?.length > 0) {
+              popup += ` (${letter.keywords_cs.join(', ')})</div>`;
+            } else {
+              popup += `</div>`;
+            }
+          });
 
-        this.infoContent = popup;
-        this.infoHeader = `Letters from ${params.data.label} (${letters.length})`;
+          this.infoContent = popup;
+          this.infoHeader = `Letters from ${params.data.label} (${letters.length})`;
         });
 
       }
@@ -353,7 +400,7 @@ export class MapComponent {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const lmapComponent = chart.getModel().getComponent("lmap");
+    const lmapComponent = this.graphChart.getModel().getComponent("lmap");
     // Get the instance of Leaflet
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

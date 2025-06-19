@@ -71,6 +71,8 @@ export class IdentitiesComponent {
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
 
+  positions: { [id: string]: { x: number, y: number } } = {};
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
@@ -87,7 +89,7 @@ export class IdentitiesComponent {
   }
 
   ngOnInit(): void {
-    this.state.tenants.forEach(t => {t.available = true});
+    this.state.tenants.forEach(t => { t.available = true });
     if (this.tenant) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
       this.getData(true);
@@ -110,7 +112,8 @@ export class IdentitiesComponent {
   }
 
   showNode(identity: JSONFacet, category: string) {
-    const idx = this.graphData.nodes.findIndex(n => n.id === identity.val + '_' + category);
+    //const idx = this.graphData.nodes.findIndex(n => n.id === identity.val + '_' + category);
+    const idx = this.graphData.nodes.findIndex(n => n.id === identity.val);
     // currentIndex = (currentIndex + 1) % dataLen;
     this.graphChart.dispatchAction({
       type: 'showTip',
@@ -131,7 +134,7 @@ export class IdentitiesComponent {
     this.graphChart.dispatchAction({
       type: 'downplay'
     });
-    
+
   }
 
   getData(setResponse: boolean) {
@@ -165,12 +168,19 @@ export class IdentitiesComponent {
     return n >= this.limits[0] && n <= this.limits[1];
   }
 
+  setPosition(id: string) {
+    const h = this.graphChart.getHeight();
+    const w = this.graphChart.getWidth() - 20;
+    if (!this.positions[id]) {
+      this.positions[id] = { x: Math.random() * w, y: Math.random() * h }
+    }
+    return this.positions[id];
+  }
+
   processResponse() {
     const categories = [{ name: 'author' }, { name: 'recipient' }, { name: 'mentioned' }];
     const links: any[] = [];
     const nodes: any[] = [];
-    const h = this.graphChart.getHeight();
-    const w = this.graphChart.getWidth() - 20;
     const maxSize = 60;
     const minSize = 10;
     let maxCount = Math.max(...this.authors.map(r => r.count), ...this.recipients.map(r => r.count));
@@ -179,41 +189,62 @@ export class IdentitiesComponent {
     //   this.authors[0].count,
     //   this.recipients[0].count);
     this.authors.forEach((identity: JSONFacet) => {
+      const pos = this.setPosition(identity.val);
       nodes.push({
-        // id: identity.id + '',
-        id: identity.val + '_author',
+        id: identity.val + '',
+        // id: identity.val + '_author',
         name: identity.val,
         value: identity.count,
         category: 'author',
         symbolSize: maxSize * identity.count / maxCount + minSize,
-        x: Math.random() * w,
-        y: Math.random() * h
+        x: pos.x,
+        y: pos.y,
+
+        itemStyle: {
+          color: 'rgb(6, 120, 0)'
+        }
       })
     });
     this.recipients.forEach((identity: JSONFacet) => {
-      nodes.push({
-        // id: identity.id + '',
-        id: identity.val + '_recipient',
-        name: identity.val,
-        value: identity.count,
-        category: 'recipient',
-        symbolSize: maxSize * identity.count / maxCount + minSize,
-        x: Math.random() * w,
-        y: Math.random() * h
-      })
+      const pos = this.setPosition(identity.val);
+      const node = nodes.find(n => n.id === identity.val);
+      if (node) {
+        //  const green = identity.count / (node.value + identity.count) * 255;
+        const dist = node.value / (node.value + identity.count);
+        const red = dist * (255 - 6) + 6;
+        const green = dist * 40 + 120;
+        const blue = 0;
+        node.itemStyle.color = `rgb(${red},${green},${blue})`;
+        node.symbolSize = maxSize * (node.value + identity.count) / maxCount + minSize;
+      } else {
+        nodes.push({
+          id: identity.val + '',
+          // id: identity.val + '_recipient',
+          name: identity.val,
+          value: identity.count,
+          category: 'recipient',
+          symbolSize: maxSize * identity.count / maxCount + minSize,
+          x: pos.x,
+          y: pos.y,
+
+          itemStyle: {
+            color: 'rgb(255, 160, 0)'
+          }
+        })
+      }
     });
-    this.mentioned.forEach((identity: JSONFacet) => {
-      nodes.push({
-        // id: identity.id + '',
-        id: identity.val + '_mentioned',
-        name: identity.val,
-        value: identity.count,
-        category: 'mentioned',
-        symbolSize: maxSize * identity.count / maxCount + minSize,
-        x: Math.random() * w,
-        y: Math.random() * h
-      })
-    });
+    // this.mentioned.forEach((identity: JSONFacet) => {
+    //   nodes.push({
+    //     // id: identity.id + '',
+    //     id: identity.val + '_mentioned',
+    //     name: identity.val,
+    //     value: identity.count,
+    //     category: 'mentioned',
+    //     symbolSize: maxSize * identity.count / maxCount + minSize,
+    //     x: Math.random() * w,
+    //     y: Math.random() * h
+    //   })
+    // });
 
     this.solrResponse.response.docs.forEach((letter: Letter) => {
       if (this.inLimits(letter.date_year) && letter.identities) {
@@ -224,8 +255,10 @@ export class IdentitiesComponent {
         if (!link) {
           links.push({
             id: id,
-            source: a.name + '_author',
-            target: r.name + '_recipient',
+            // source: a.name + '_author',
+            // target: r.name + '_recipient',
+            source: a.name,
+            target: r.name,
             label: a.name + ' > ' + r.name,
             count: 1
           });
@@ -258,6 +291,7 @@ export class IdentitiesComponent {
       },
       legend: [
         {
+          show: false,
           // selectedMode: 'single',
           data: this.graphData.categories.map(function (a) {
             return a.name;
