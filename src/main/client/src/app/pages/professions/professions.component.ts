@@ -19,14 +19,14 @@ import { Letter } from '../../shared/letter';
 
 import * as echarts from 'echarts/core';
 import { EChartsOption, ECharts } from 'echarts'; import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
-import { GraphChart } from 'echarts/charts';
+import { GraphChart, PieChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { LabelLayout } from "echarts/features";
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 
-echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
+echarts.use([CanvasRenderer, PieChart, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-professions',
@@ -49,6 +49,10 @@ export class ProfessionsComponent {
   tenant: Tenant;
   graphOptions: EChartsOption = {};
   graphChart: ECharts;
+
+
+  pieOptions: EChartsOption = {};
+  pieChart: ECharts;
 
   graphData: {
     categories: { name: string }[],
@@ -94,6 +98,10 @@ export class ProfessionsComponent {
 
   onGraphChartInit(e: any) {
     this.graphChart = e;
+  }
+
+  onPieChartInit(e: any) {
+    this.pieChart = e;
   }
 
   changeTenant() {
@@ -173,7 +181,53 @@ export class ProfessionsComponent {
     return n >= this.limits[0] && n <= this.limits[1];
   }
 
+  setPieChart() {
+    const proffesions = this.solrResponse.facets.professions_author.buckets;
+    const data: any[] = [];
+    this.professions_author.forEach((p: JSONFacet) => {
+      data.push({
+        id: p.val,
+        name: p.val,
+        value: p.count
+      })
+    });
+
+    this.pieOptions = {
+      title: {
+        show: true,
+        text: 'Professions',
+        left: 'center'
+      },
+      legend: {
+        type: 'scroll',
+        orient: 'vertical',
+        right: 10,
+        // top: 20,
+        // bottom: 20,
+        data: data.map(a => a.name)
+      },
+      tooltip: {
+        // formatter: (params: any) => {
+        //   return params.dataType === 'edge' ?
+        //     `${params.data.label} (${params.data.count})` :
+        //     params.name
+        // }
+      },
+      series: [
+        {
+          type: 'pie',
+          radius: '55%',
+          center: ['40%', '50%'],
+          selectedMode: 'single',
+          data: data
+        }
+      ]
+    }
+  }
+
   processResponse() {
+
+    this.setPieChart();
     const categories = [{ name: 'author' }, { name: 'recipient' }];
     const links: any[] = [];
     const nodes: any[] = [];
@@ -245,10 +299,9 @@ export class ProfessionsComponent {
     // console.log(this.graphData)
     this.graphOptions = {
       title: {
-        show: false,
-        text: 'Identities',
-        top: 'bottom',
-        left: 'right'
+        show: true,
+        text: 'Korespondenční vztahy mezi různými profesními skupinami',
+        left: 'center'
       },
       tooltip: {
         formatter: (params: any) => {
@@ -259,6 +312,7 @@ export class ProfessionsComponent {
       },
       legend: [
         {
+          bottom: 10,
           // selectedMode: 'single',
           data: this.graphData.categories.map(function (a) {
             return a.name;

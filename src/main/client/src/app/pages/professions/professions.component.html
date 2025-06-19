@@ -35,18 +35,29 @@
             </mat-expansion-panel>
         </div>
     </div>
-    <div class="app-content">
+    <div class="app-fill-w" style="overflow: auto; ">
         <div class="app-years">
             <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
                 (onChangeLimits)="changeLimits($event)"></app-years-chart>
         </div>
 
         <div class="app-fxFlex">
-            <div style="overflow: auto; height:100%; ">
-                <div echarts style="width: 100%; height:100%;" [options]="graphOptions"
-                    (chartInit)="onGraphChartInit($event)">
-                </div>
-            </div>
+            <mat-card appearance="outlined">
+                <mat-card-content>
+                    <div style="overflow: auto; height:400px; ">
+                        <div echarts style="width: 100%; height:100%;" [options]="pieOptions"
+                            (chartInit)="onPieChartInit($event)">
+                        </div>
+                    </div>
+                </mat-card-content></mat-card>
+            <mat-card appearance="outlined">
+                <mat-card-content>
+                    <div style="overflow: auto; height:500px; ">
+                        <div echarts style="width: 100%; height:100%;" [options]="graphOptions"
+                            (chartInit)="onGraphChartInit($event)">
+                        </div>
+                    </div>
+                </mat-card-content></mat-card>
         </div>
     </div>
 </div>

@@ -45,7 +45,7 @@
     </div>
 
   </div>
-  <div class="app-content">
+    <div class="app-content app-fill-w app-fill-h">
     <div class="app-years">
       <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
         (onChangeLimits)="changeLimits($event)"></app-years-chart>
@@ -62,6 +62,6 @@
     <div class="app-letters-info" *ngIf="infoHeader">
       <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
     </div>
-    
+
   </div>
 </div>

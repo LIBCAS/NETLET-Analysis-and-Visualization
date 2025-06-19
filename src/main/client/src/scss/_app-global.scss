@@ -274,9 +274,16 @@ fieldset {
   overflow: auto;
 }
 
+.app-fill-h {
+  height: 100%; 
+}
+
+.app-fill-w {
+  width: 100%; 
+}
 
 .app-content{
-  height: 100%; width: 100%; display: flex; flex-direction: column; align-content: flex-start; position: relative;
+  display: flex; flex-direction: column; align-content: flex-start; position: relative;
 }
 
 .app-filters {

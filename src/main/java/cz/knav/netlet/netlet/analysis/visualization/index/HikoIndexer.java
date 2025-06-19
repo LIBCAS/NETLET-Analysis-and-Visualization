@@ -213,8 +213,10 @@ public class HikoIndexer {
                         .put("id", rs.getInt("I.id"))
                         .put("role", rs.getString("IL.role"))
                         .put("name", rs.getString("I.name"));
-                // addProfessions(tenant, rs.getInt("I.id"), doc, identity);
-                addGlobalProfessions(tenant, rs.getInt("I.id"), doc, identity);
+                int p = addGlobalProfessions(tenant, rs.getInt("I.id"), doc, identity);
+                if (p == 0) {
+                   addProfessions(tenant, rs.getInt("I.id"), doc, identity);
+                }
                 doc.addField("identities", identity.toString());
 
             }
@@ -307,17 +309,17 @@ public class HikoIndexer {
         ps.close();
     }
     
-    private void addGlobalProfessions(String tenant, int identity_id, SolrInputDocument doc, JSONObject identity) throws SQLException, NamingException {
+    private int addGlobalProfessions(String tenant, int identity_id, SolrInputDocument doc, JSONObject identity) throws SQLException, NamingException {
 
         String sql = "select * from " + 
                 tenant + "__identity_profession as IL, global_professions as P left join global_profession_categories as PC on PC.id=P.profession_category_id "
                 + " where IL.global_profession_id=P.id AND identity_id = " + identity_id;
         
-        
+        int ret = 0;
         PreparedStatement ps = getConnection().prepareStatement(sql);
         try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                 
+                ret++;
                 JSONObject k = new JSONObject(rs.getString("P.name"))
                         .put("id", rs.getLong("P.id")); 
                 
@@ -345,6 +347,7 @@ public class HikoIndexer {
             LOGGER.log(Level.SEVERE, null, e);
         }
         ps.close();
+        return ret;
     }
     
     private void addGlobalKeywords(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
