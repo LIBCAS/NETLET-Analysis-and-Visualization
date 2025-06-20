@@ -9,8 +9,7 @@
   <div class="app-fxLayout app-row app-center-v">
     <!-- <a mat-button >{{ 'Login' | translate }}</a> -->
 
-    <span class="app-container-header" *ngIf="state.tenant()">{{ 'tenant' | translate }}: {{ state.tenant().val }}
-      <span *ngIf="state.currentView">.&nbsp;&nbsp;{{ 'view' | translate }}: {{ state.currentView.route| translate }}</span>
+    <span class="app-container-header" *ngIf="state.selectedTenants().length > 0">{{ 'tenant' | translate }}: {{ formatTenants() }}<span *ngIf="state.currentView">.&nbsp;&nbsp;{{ 'view' | translate }}: {{ state.currentView.route| translate }}</span>
     </span>
     <button mat-button [matMenuTriggerFor]="views">{{'views' | translate}}</button>
     <mat-menu #views="matMenu">
@@ -20,9 +19,16 @@
     </mat-menu>
 
     <button mat-button [matMenuTriggerFor]="tenants">{{'tenants' | translate}}</button>
-    <mat-menu #tenants="matMenu">
+    <!-- <mat-menu #tenants="matMenu">
       @for (t of state.tenants; track t) {
       <a [disabled]="!t.available" mat-menu-item (click)="changeTenant(t)"><mat-icon *ngIf="state.tenant()?.val === t.val">check</mat-icon>{{ t.val | translate}}</a>
+      }
+    </mat-menu> -->
+    <mat-menu #tenants="matMenu">
+      @for (t of state.tenants; track t) {
+        <div mat-menu-item>
+      <mat-checkbox (change)="selectTenant(t)" [(ngModel)]="t.selected" >{{ t.val | translate}}</mat-checkbox>
+        </div>
       }
     </mat-menu>
 

@@ -76,7 +76,7 @@ export class RelationComponent {
     private service: AppService
   ) {
     effect(() => {
-      this.tenant = this.state.tenant();
+      this.tenant = this.state.selectedTenants()[0];
       if (this.tenant) {
         this.changeTenant();
       }

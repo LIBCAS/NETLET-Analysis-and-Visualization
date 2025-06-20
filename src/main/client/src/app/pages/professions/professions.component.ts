@@ -46,7 +46,7 @@ export class ProfessionsComponent {
   invalidTenant: boolean;
   solrResponse: any;
   limits: [number, number];
-  tenant: Tenant;
+  tenants: Tenant[] = [];
   graphOptions: EChartsOption = {};
   graphChart: ECharts;
 
@@ -81,8 +81,8 @@ export class ProfessionsComponent {
     private service: AppService
   ) {
     effect(() => {
-      this.tenant = this.state.tenant();
-      if (this.tenant) {
+      this.tenants = this.state.selectedTenants();
+      if (this.tenants.length > 0) {
         this.changeTenant();
       }
     })
@@ -91,8 +91,8 @@ export class ProfessionsComponent {
   ngOnInit(): void {
     this.translation.onLangChange.subscribe(() => { this.getData(true) });
     this.state.currentView = this.state.views.find(v => v.route === 'professions');
-    if (this.tenant) {
-      this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+    if (this.tenants.length > 0) {
+      this.limits = this.state.getTenantsRange();
       this.getData(true);
     }
   }
@@ -106,8 +106,7 @@ export class ProfessionsComponent {
   }
 
   changeTenant() {
-    this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
-    //this.selectedKeywords = [];
+    this.limits = this.state.getTenantsRange();
     this.getData(true);
   }
 
@@ -145,10 +144,9 @@ export class ProfessionsComponent {
     this.loading = true;
     this.invalidTenant = false;
     const p: any = {};
-    p.tenant = this.tenant.val;
-    //p.keyword = this.selectedKeywords;
+    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant_date_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits.toString();
-    p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
     p.lang = this.translation.currentLang;
     if (!setResponse) {
       p.rows = 0;
@@ -162,16 +160,16 @@ export class ProfessionsComponent {
       if (setResponse) {
         const ts: JSONFacet[] = resp.facets.tenants.buckets;
         this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
-        if (!this.state.tenant().available) {
-          // this.state.tenant.set(null);
-          this.loading = false;
-          this.invalidTenant = true;
-          return;
-        }
+        // if (!this.state.tenant().available) {
+        //   // this.state.tenant.set(null);
+        //   this.loading = false;
+        //   this.invalidTenant = true;
+        //   return;
+        // }
         this.solrResponse = resp;
       }
-      this.professions_author = resp.facets.professions_author.buckets;
-      this.professions_recipient = resp.facets.professions_recipient.buckets;
+      this.professions_author = resp.facets.professions_author ? resp.facets.professions_author.buckets : null;
+      this.professions_recipient = resp.facets.professions_recipient ? resp.facets.professions_recipient.buckets : null;
       // this.professions_mentioned = resp.facets.professions_mentioned.buckets;
       this.processResponse();
       this.loading = false;
@@ -183,7 +181,6 @@ export class ProfessionsComponent {
   }
 
   setPieChart() {
-    const proffesions = this.solrResponse.facets.professions_author.buckets;
     const data: any[] = [];
     this.professions_author.forEach((p: JSONFacet) => {
       data.push({
@@ -200,12 +197,15 @@ export class ProfessionsComponent {
         left: 'center'
       },
       legend: {
-        type: 'scroll',
+        type: data.length > 90 ? 'scroll' : 'plain',
         orient: 'vertical',
         right: 10,
-        // top: 20,
-        // bottom: 20,
-        data: data.map(a => a.name)
+        data: data.map(a => a.name),
+        formatter: name => {
+          var series: any = this.pieChart.getOption()['series'];
+          var value = series[0].data.filter((row:any) => row.name === name)[0].value
+          return name + ' - ' + value;
+},
       },
       tooltip: {
         // formatter: (params: any) => {
@@ -218,7 +218,7 @@ export class ProfessionsComponent {
         {
           type: 'pie',
           radius: '55%',
-          center: ['40%', '50%'],
+          center: ['30%', '50%'],
           selectedMode: 'single',
           data: data
         }
@@ -228,6 +228,9 @@ export class ProfessionsComponent {
 
   processResponse() {
 
+    if (this.solrResponse.response.numFound === 0) {
+      return;
+    }
     this.setPieChart();
     const categories = [{ name: 'author' }, { name: 'recipient' }];
     const links: any[] = [];

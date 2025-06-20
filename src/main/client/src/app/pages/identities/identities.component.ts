@@ -49,7 +49,7 @@ export class IdentitiesComponent {
   loading: boolean;
   solrResponse: any;
   limits: [number, number];
-  tenant: Tenant;
+  tenants: Tenant[] = [];
   graphOptions: EChartsOption = {};
   graphChart: ECharts;
 
@@ -83,8 +83,9 @@ export class IdentitiesComponent {
     private service: AppService
   ) {
     effect(() => {
-      this.tenant = this.state.tenant();
-      if (this.tenant) {
+      
+      this.tenants = this.state.selectedTenants();
+      if (this.tenants.length > 0) {
         this.changeTenant();
       }
     })
@@ -93,8 +94,8 @@ export class IdentitiesComponent {
   ngOnInit(): void {
     this.state.tenants.forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'identities');
-    if (this.tenant) {
-      this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+    if (this.tenants.length > 0) {
+      this.limits = this.state.getTenantsRange();
       this.getData(true);
     }
   }
@@ -104,7 +105,7 @@ export class IdentitiesComponent {
   }
 
   changeTenant() {
-    this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+    this.limits = this.state.getTenantsRange();
     //this.selectedKeywords = [];
     this.getData(true);
   }
@@ -143,10 +144,9 @@ export class IdentitiesComponent {
   getData(setResponse: boolean) {
     this.loading = true;
     const p: any = {};
-    p.tenant = this.tenant.val;
-    //p.keyword = this.selectedKeywords;
+    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant_date_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits.toString();
-    p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
     if (!setResponse) {
       p.rows = 0;
     } else {
@@ -280,10 +280,10 @@ export class IdentitiesComponent {
     //console.log(this.graphData)
     this.graphOptions = {
       title: {
-        show: false,
-        text: 'Identities',
-        top: 'bottom',
-        left: 'right'
+        show: true,
+        text: 'Vztahy mezi jednotlivými pisateli a příjemci dopisů',
+        left: 'center',
+        top: 10
       },
       tooltip: {
         formatter: (params: any) => {

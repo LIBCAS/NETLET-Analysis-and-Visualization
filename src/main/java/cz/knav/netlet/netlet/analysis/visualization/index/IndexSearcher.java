@@ -195,9 +195,10 @@ public class IndexSearcher {
                     .withFacet("identity_author", new TermsFacetMap("identity_author")
                             .setLimit(1000)
                             .setMinCount(1));
-            String tenant = request.getParameter("tenant");
-            if (tenant != null && !tenant.isBlank()) {
-                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:" + tenant);
+            
+            String[] tenants = request.getParameterValues("tenant");
+            if (tenants.length > 0) {
+                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
             }
             String date_range = request.getParameter("date_range");
             if (date_range != null && !date_range.isBlank()) {
@@ -279,9 +280,9 @@ public class IndexSearcher {
                     .withFacet("identity_author", new TermsFacetMap("identity_author")
                             .setLimit(1000)
                             .setMinCount(1));
-            String tenant = request.getParameter("tenant");
-            if (tenant != null && !tenant.isBlank()) {
-                jrequest = jrequest.withFilter("tenant:" + tenant);
+            String[] tenants = request.getParameterValues("tenant");
+            if (tenants.length > 0) {
+                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
             }
             String date_range = request.getParameter("date_range");
             if (date_range != null && !date_range.isBlank()) {
@@ -347,13 +348,9 @@ public class IndexSearcher {
                             .setLimit(1000)
                             .setSort("index")
                             .setMinCount(1));
-            String tenant = request.getParameter("tenant");
-            if (tenant != null && !tenant.isBlank()) {
-                String other_tenant = request.getParameter("other_tenant");
-                if (other_tenant != null && !other_tenant.isBlank()) {
-                    tenant += " OR tenant:" + other_tenant;
-                }
-                jrequest = jrequest.withFilter("tenant:" + tenant);
+            String[] tenants = request.getParameterValues("tenant");
+            if (tenants.length > 0) {
+                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
             }
             String date_range = request.getParameter("date_range");
             if (date_range != null && !date_range.isBlank()) {
@@ -425,9 +422,9 @@ public class IndexSearcher {
                     .withFacet("professions_mentioned", new TermsFacetMap("professions_mentioned_" + lang)
                             .setLimit(1000)
                             .setMinCount(1));
-            String tenant = request.getParameter("tenant");
-            if (tenant != null && !tenant.isBlank()) {
-                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:" + tenant);
+            String[] tenants = request.getParameterValues("tenant");
+            if (tenants.length > 0) {
+                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
             }
             String date_range = request.getParameter("date_range");
             if (date_range != null && !date_range.isBlank()) {

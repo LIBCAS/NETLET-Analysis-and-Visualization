@@ -17,8 +17,12 @@ import { Configuration } from './shared/config';
         return this.config.defaultLang;
     }
 
-    public get excluded_identities() {
-        return this.config.excluded_identities;
+    public excluded_identities() {
+        const ret: string[] = [];
+        this.state.tenants.filter(t => t.selected).forEach(t => {
+            ret.push(...this.config.excluded_identities[t.val]);
+        })
+        return ret;
     }
 
     public get colors() {

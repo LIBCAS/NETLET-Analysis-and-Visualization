@@ -24,10 +24,13 @@ export class AppComponent {
     const urlParams = new URLSearchParams(this.document.location.search);
     const tenant = urlParams.get('tenant');
     if (tenant) {
-      const st = this.state.tenants.find(t => t.val === tenant);
-      if (st) {
-        this.state.tenant.set(st);
-      }
+      tenant.split(',').forEach(tenant =>  {
+        const st = this.state.tenants.find(t => t.val === tenant);
+        if (st) {
+          st.selected = true;
+        }
+      });
+      this.state.setSelectedTenants();
     }
   }
 }

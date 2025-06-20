@@ -50,7 +50,7 @@ export class CentralityComponent {
   loading: boolean;
   solrResponse: any;
   limits: [number, number];
-  tenant: Tenant;
+  tenants: Tenant[] = [];
   graphOptions: EChartsOption = {};
   graphChart: ECharts;
 
@@ -100,8 +100,8 @@ export class CentralityComponent {
     private service: AppService
   ) {
     effect(() => {
-      this.tenant = this.state.tenant();
-      if (this.tenant) {
+      this.tenants = this.state.selectedTenants();
+      if (this.tenants.length > 0) {
         this.changeTenant();
       }
     })
@@ -110,8 +110,8 @@ export class CentralityComponent {
   ngOnInit(): void {
     this.state.tenants.forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'centrality');
-    if (this.tenant) {
-      this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+    if (this.tenants.length > 0) {
+      this.limits = this.state.getTenantsRange();
       this.getData(true);
     }
   }
@@ -127,7 +127,7 @@ export class CentralityComponent {
   }
 
   changeTenant() {
-    this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+    this.limits = this.state.getTenantsRange();
     this.selectedRecipients = [];
     this.getData(true);
   }
@@ -172,10 +172,10 @@ export class CentralityComponent {
     this.loading = true;
     this.closeInfo();
     const p: any = {};
-    p.tenant = this.tenant.val;
-    p.recipient = this.selectedRecipients;
+    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant_date_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits.toString();
-    p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
+    p.recipient = this.selectedRecipients;
     if (!setResponse) {
       p.rows = 0;
     } else {
@@ -263,9 +263,9 @@ export class CentralityComponent {
     const maxSize = 60;
     const minSize = 10;
     let maxCount = Math.max(
-      ...this.mentioned.filter(i => !this.config.excluded_identities[this.tenant.val].includes(i.val)).map(r => r.count),
-      ...this.recipients.filter(i => !this.config.excluded_identities[this.tenant.val].includes(i.val)).map(r => r.count),
-      ...this.authors.filter(i => !this.config.excluded_identities[this.tenant.val].includes(i.val)).map(r => r.count)
+      ...this.mentioned.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count),
+      ...this.recipients.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count),
+      ...this.authors.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count)
     );
     this.mentioned.forEach((identity: JSONFacet, index: number) => {
       const pos = this.setPosition(h, w, identity.count, maxCount);
@@ -287,7 +287,7 @@ export class CentralityComponent {
       })
     });
     this.recipients.forEach((identity: JSONFacet, index: number) => {
-      if (!this.config.excluded_identities[this.tenant.val].includes(identity.val)) {
+      if (!this.config.excluded_identities().includes(identity.val)) {
         const pos = this.setPosition(h, w, identity.count, maxCount);
         nodes.push({
           // id: identity.id + '',
@@ -308,7 +308,7 @@ export class CentralityComponent {
       }
     });
     this.authors.forEach((identity: JSONFacet, index: number) => {
-      if (!this.config.excluded_identities[this.tenant.val].includes(identity.val)) {
+      if (!this.config.excluded_identities().includes(identity.val)) {
         const pos = this.setPosition(h, w, identity.count, maxCount);
         nodes.push({
           // id: identity.id + '',

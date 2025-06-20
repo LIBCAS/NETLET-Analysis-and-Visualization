@@ -8,10 +8,13 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppState, Tenant } from '../../app-state';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-navbar',
   imports: [CommonModule, MatToolbarModule, MatButtonModule, MatIconModule, MatDialogModule,
+    MatCheckboxModule, FormsModule,
     RouterModule, TranslateModule, MatMenuModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
@@ -35,6 +38,16 @@ export class NavbarComponent {
 
   changeTenant(t: Tenant) {
     this.router.navigate([], {queryParams: {tenant:t.val}});
-    this.state.tenant.set(t);
+    //this.state.tenant.set(t);
+  }
+
+  selectTenant(t: Tenant) {
+    this.state.setSelectedTenants();
+    this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
+    //this.state.tenant.set(t);
+  }
+
+  formatTenants() {
+    return this.state.selectedTenants().map(t => t.val)
   }
 }

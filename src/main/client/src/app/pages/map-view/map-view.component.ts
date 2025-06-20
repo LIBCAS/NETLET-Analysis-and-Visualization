@@ -63,8 +63,7 @@ export class MapViewComponent implements OnInit {
   infoContent: string;
   infoHeader: string;
 
-  tenant: Tenant;
-
+  tenants: Tenant[] = [];
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private _ngZone: NgZone,
@@ -74,8 +73,8 @@ export class MapViewComponent implements OnInit {
     private service: AppService
   ) {
     effect(() => {
-      this.tenant = this.state.tenant();
-      if (this.tenant) {
+      this.tenants = this.state.selectedTenants();
+      if (this.tenants.length > 0) {
         this.changeTenant();
       }
     })
@@ -89,17 +88,17 @@ export class MapViewComponent implements OnInit {
 
   onMapReady(map: Map) {
     this.map = map;
-    if (this.tenant) {
+    if (this.tenants.length > 0) {
       setTimeout(() => {
 
-        this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+        this.limits = this.state.getTenantsRange();
         this.getData(true);
       }, 10)
     }
   }
 
   changeTenant() {
-    this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+    this.limits = this.state.getTenantsRange();
     this.getData(true);
   }
 
@@ -114,9 +113,9 @@ export class MapViewComponent implements OnInit {
       this.linkLayer.clearLayers();
     }
     const p: any = {};
-    p.tenant = this.tenant.val;
+    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant_date_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits.toString();
-    p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
     if (!withMap) {
       p.rows = 0;
     } else {
@@ -129,12 +128,12 @@ export class MapViewComponent implements OnInit {
       }
       const ts: JSONFacet[] = resp.facets.tenants.buckets;
       this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
-      if (!this.state.tenant().available) {
-        // this.state.tenant.set(null);
-        this.loading = false;
-        this.invalidTenant = true;
-        return;
-      }
+      // if (!this.state.tenant().available) {
+      //   // this.state.tenant.set(null);
+      //   this.loading = false;
+      //   this.invalidTenant = true;
+      //   return;
+      // }
       if (resp.stats?.stats_fields.latitude) {
         const lat = resp.stats.stats_fields.latitude;
         const lon = resp.stats.stats_fields.longitude;

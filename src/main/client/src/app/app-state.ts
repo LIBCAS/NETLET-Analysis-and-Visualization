@@ -15,7 +15,8 @@ export interface Tenant {
 }) export class AppState {
 
     public tenants: Tenant[] = [];
-    public tenant = signal<Tenant>(null);
+    // public tenant = signal<Tenant>(null);
+    public selectedTenants = signal<Tenant[]>([]);
     views = [
     {
       header: '',
@@ -64,4 +65,20 @@ export interface Tenant {
     },
   ];
   currentView: {header: string, text: string, route: string};
+
+  setSelectedTenants() {
+    this.selectedTenants.set(this.tenants.filter(t => t.selected));
+  }
+
+  getTenantsRange(): [number, number] {
+    let min =new Date().getFullYear();
+    let max = 0; 
+    this.tenants.forEach(t => {
+      if (t.selected) {
+        min = Math.min(min, t.date_year_min);
+        max = Math.max(max, t.date_year_max);
+      }
+    });
+    return [min,max];
+  }
 }

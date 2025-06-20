@@ -82,7 +82,7 @@ export class KeywordsComponent {
   chartHeight: number = 400;
   totalBuckets = 0;
 
-  tenant: Tenant;
+  tenants: Tenant[]=[];
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -92,8 +92,8 @@ export class KeywordsComponent {
     private service: AppService
   ) {
     effect(() => {
-      this.tenant = this.state.tenant();
-      if (this.tenant) {
+      this.tenants = this.state.selectedTenants();
+      if (this.tenants.length > 0) {
         this.changeTenant();
       }
     })
@@ -105,8 +105,8 @@ export class KeywordsComponent {
     this.state.tenants.forEach(t => {t.available = true});
     this.state.currentView = this.state.views.find(v => v.route === 'keywords');
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
-    if (this.tenant) {
-      this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+    if (this.tenants.length > 0) {
+      this.limits = this.state.getTenantsRange();
       this.getData(true);
     }
   }
@@ -138,7 +138,7 @@ export class KeywordsComponent {
   }
 
   changeTenant() {
-    this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+    this.limits = this.state.getTenantsRange();
     this.selectedKeywords = [];
     this.getData(true);
   }
@@ -152,10 +152,10 @@ export class KeywordsComponent {
     this.loading = true;
     this.invalidTenant = false;
     const p: any = {};
-    p.tenant = this.tenant.val;
-    p.keyword = this.selectedKeywords;
+    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant_date_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits.toString();
-    p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
+    p.keyword = this.selectedKeywords;
     p.lang = this.translation.currentLang;
     p.includeAuthors = this.includeAuthors;
     p.includeRecipients = this.includeRecipients;
@@ -167,12 +167,12 @@ export class KeywordsComponent {
         this.solrResponse = resp;
         const ts: JSONFacet[] = resp.facets.tenants.buckets;
         this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
-        if (!this.state.tenant().available) {
-          // this.state.tenant.set(null);
-          this.loading = false;
-          this.invalidTenant = true;
-          return;
-        }
+        // if (!this.tenant.available) {
+        //   // this.state.tenant.set(null);
+        //   this.loading = false;
+        //   this.invalidTenant = true;
+        //   return;
+        // }
       }
       this.authors = resp.facets.identity_author.buckets;
       this.recipients = this.solrResponse.facets.identity_recipient.buckets;
