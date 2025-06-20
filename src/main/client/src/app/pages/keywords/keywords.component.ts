@@ -47,6 +47,10 @@ export class KeywordsComponent {
   solrResponse: any;
   limits: [number, number];
 
+  includeAuthors: boolean = true;
+  includeRecipients: boolean = false;
+  authors: JSONFacet[];
+  recipients: JSONFacet[];
   mentioned: JSONFacet[];
   keywords_cs: JSONFacet[];
   selectedKeywords: string[] = [];
@@ -99,6 +103,7 @@ export class KeywordsComponent {
     
     this.translation.onLangChange.subscribe(() => { this.getData(true) });
     this.state.tenants.forEach(t => {t.available = true});
+    this.state.currentView = this.state.views.find(v => v.route === 'keywords');
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     if (this.tenant) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
@@ -152,6 +157,8 @@ export class KeywordsComponent {
     p.date_range = this.limits.toString();
     p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
     p.lang = this.translation.currentLang;
+    p.includeAuthors = this.includeAuthors;
+    p.includeRecipients = this.includeRecipients;
     this.service.getKeywords(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
@@ -167,7 +174,8 @@ export class KeywordsComponent {
           return;
         }
       }
-      // this.recipients = this.solrResponse.facets.identity_recipient.buckets;
+      this.authors = resp.facets.identity_author.buckets;
+      this.recipients = this.solrResponse.facets.identity_recipient.buckets;
       // this.mentioned = resp.facets.identity_mentioned.buckets;
       this.keywords_cs = resp.facets.keywords_categories.buckets;
 

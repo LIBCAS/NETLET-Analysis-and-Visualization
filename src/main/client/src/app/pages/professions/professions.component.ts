@@ -90,6 +90,7 @@ export class ProfessionsComponent {
 
   ngOnInit(): void {
     this.translation.onLangChange.subscribe(() => { this.getData(true) });
+    this.state.currentView = this.state.views.find(v => v.route === 'professions');
     if (this.tenant) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
       this.getData(true);

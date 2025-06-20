@@ -15,6 +15,7 @@ export const routes: Routes = [
     {path: 'relation', component: RelationComponent},
     {path: 'identities', component: IdentitiesComponent},
     {path: 'map', component: MapComponent},
+    {path: 'map-view', component: MapViewComponent},
     {path: 'professions', component: ProfessionsComponent},
     {path: 'keywords', component: KeywordsComponent}
 ];

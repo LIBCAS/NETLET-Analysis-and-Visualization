@@ -125,8 +125,10 @@ public class HikoIndexer {
 
                 addPlaces(tenant, rs.getInt("L.id"), doc);
                 addIdentities(tenant, rs.getInt("L.id"), doc);
-                // addKeywords(tenant, rs.getInt("L.id"), doc);
-                addGlobalKeywords(tenant, rs.getInt("L.id"), doc);
+                int k = addGlobalKeywords(tenant, rs.getInt("L.id"), doc);
+                if (k ==0) {
+                    addKeywords(tenant, rs.getInt("L.id"), doc);
+                }
 
                 client.add("letter_place", doc);
                 success++;
@@ -350,8 +352,8 @@ public class HikoIndexer {
         return ret;
     }
     
-    private void addGlobalKeywords(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
-
+    private int addGlobalKeywords(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
+        int ret = 0;
         String sqlCat = " select * from global_keyword_categories";
         Map<Long, String> categories = new HashMap<>();
         PreparedStatement psCat = getConnection().prepareStatement(sqlCat);
@@ -370,6 +372,7 @@ public class HikoIndexer {
         PreparedStatement ps = getConnection().prepareStatement(sql);
         try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
+                ret++;
                 long cat = rs.getLong("K.keyword_category_id");
                 JSONObject k = new JSONObject(rs.getString("K.name"))
                         .put("id", rs.getLong("K.id"));
@@ -389,5 +392,6 @@ public class HikoIndexer {
             LOGGER.log(Level.SEVERE, null, e);
         }
         ps.close();
+        return ret;
     }
 }

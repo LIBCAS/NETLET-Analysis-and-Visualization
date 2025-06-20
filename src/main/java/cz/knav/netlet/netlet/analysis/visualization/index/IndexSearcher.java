@@ -86,11 +86,15 @@ public class IndexSearcher {
                                 .setLimit(100)
                                 .setMinCount(1))
                             )
-                            //                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
-                            //                            .setLimit(1000)
-                            //                            .setSort("index")
-                            //                            .withDomain(new DomainMap().withTagsToExclude("ffrecipients"))
-                            //                            .setMinCount(1))
+                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
+                            .setLimit(-1)
+                            .setSort("index")
+                            .withDomain(new DomainMap().withTagsToExclude("ffrecipients"))
+                            .setMinCount(1)
+                                .withSubFacet("tenant", new TermsFacetMap("tenant")
+                                .setLimit(100)
+                                .setMinCount(1))
+                    )
                             //                    .withFacet("identity_author", new TermsFacetMap("identity_author")
                             //                            .setLimit(1000)
                             //                            .setSort("index")
@@ -135,14 +139,23 @@ public class IndexSearcher {
                 lang = "cs";
             }
 
-            final TermsFacetMap identity_mentionedFacet = new TermsFacetMap("identity_mentioned")
-                    .setLimit(1000)
-                    .setMinCount(1);
-
             final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_" + lang)
                     .setLimit(1000)
-                    .setMinCount(1)
-                    .withSubFacet("identities", identity_mentionedFacet);
+                    .setMinCount(1);
+                    
+            if (Boolean.parseBoolean(request.getParameter("includeAuthors"))) {
+                final TermsFacetMap identity_authorFacet = new TermsFacetMap("identity_author")
+                        .setLimit(1000)
+                        .setMinCount(1);
+                keywords_csFacet.withSubFacet("identities", identity_authorFacet);
+            }
+                    
+            if (Boolean.parseBoolean(request.getParameter("includeRecipients"))) {
+                final TermsFacetMap identity_authorFacet = new TermsFacetMap("identity_recipient")
+                        .setLimit(1000)
+                        .setMinCount(1);
+                keywords_csFacet.withSubFacet("identities", identity_authorFacet);
+            }
 
             final TermsFacetMap categoriesFacet = new TermsFacetMap("keywords_category_" + lang)
                     .setLimit(1000)

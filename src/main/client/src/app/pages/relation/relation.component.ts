@@ -85,6 +85,7 @@ export class RelationComponent {
 
   ngOnInit(): void {
     this.state.tenants.forEach(t => { t.available = true });
+    this.state.currentView = this.state.views.find(v => v.route === 'relation');
     if (this.tenant) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
       this.getData(true);
@@ -157,7 +158,8 @@ export class RelationComponent {
   }
 
   showNode(identity: JSONFacet, category: string) {
-    const idx = this.graphData.nodes.findIndex(n => n.id === identity.val + '_' + category);
+    const idx = this.graphData.nodes.findIndex(n => n.id === identity.val);
+    //const idx = this.graphData.nodes.findIndex(n => n.id === identity.val + '_' + category);
     // currentIndex = (currentIndex + 1) % dataLen;
     this.graphChart.dispatchAction({
       type: 'showTip',
@@ -201,7 +203,7 @@ export class RelationComponent {
         this.solrResponse = resp;
       }
       //this.authors = resp.facets.identity_author.buckets;
-      //this.recipients = resp.facets.identity_recipient.buckets;
+      this.recipients = resp.facets.identity_recipient.buckets;
       this.mentioned = resp.facets.identity_mentioned.buckets;
       this.processResponse();
       this.loading = false;
@@ -292,8 +294,7 @@ export class RelationComponent {
     //     y: pos.y,
     //   })
     // });
-    console.time();
-    this.mentioned.forEach((identity: JSONFacet) => {
+    this.recipients.forEach((identity: JSONFacet) => {
       let zone = 0;
       let category = null;
 
@@ -323,7 +324,7 @@ export class RelationComponent {
       // }
       const pos = this.setPosition(h, w, identity.count, maxCount, zone);
       nodes.push({
-        id: identity.val + '_mentioned',
+        id: identity.val,
         name: identity.val,
         value: identity.count,
         category: category,

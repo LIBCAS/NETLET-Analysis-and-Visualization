@@ -17,8 +17,12 @@ import { Configuration } from './shared/config';
         return this.config.defaultLang;
     }
 
-    public get tenants_identities() {
-        return this.config.tenants_identities;
+    public get excluded_identities() {
+        return this.config.excluded_identities;
+    }
+
+    public get colors() {
+        return this.config.colors;
     }
 
     constructor(

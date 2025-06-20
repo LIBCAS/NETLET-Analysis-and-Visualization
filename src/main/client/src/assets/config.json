@@ -1,19 +1,48 @@
 {
-    "tenants_identities": {
-        "pamatky": ["Wirth, Zdeněk"],
-        "tgm": ["Masaryk, Tomáš Garrigue"],
-        "blekastad": ["Blekastad, Milada"],
-        "musil": ["Musil, Alois"],
-        "kalivoda": ["Kalivoda, Robert"],
-        "brezina": ["Březina, Otokar"],
-        "deml": ["Deml, Jakub"],
-        "komensky": ["Komenský, Jan Amos"],
-        "polanus": ["Polanus, Amandus"],
+    "excluded_identities": {
+        "pamatky": [
+            "Wirth, Zdeněk"
+        ],
+        "tgm": [
+            "Masaryk, Tomáš Garrigue"
+        ],
+        "blekastad": [
+            "Blekastad, Milada"
+        ],
+        "musil": [
+            "Musil, Alois"
+        ],
+        "kalivoda": [
+            "Kalivoda, Robert"
+        ],
+        "brezina": [
+            "Březina, Otokar"
+        ],
+        "deml": [
+            "Deml, Jakub"
+        ],
+        "komensky": [
+            "Komenský, Jan Amos"
+        ],
+        "polanus": [
+            "Polanus, Amandus"
+        ],
         "studenti": [],
         "ucenci": [],
-        "sachs": ["Sachs von Löwenheim, Philipp Jakob"],
-        "neumann": ["Neumann, Jaromír"],
+        "sachs": [
+            "Sachs von Löwenheim, Philipp Jakob"
+        ],
+        "neumann": [
+            "Neumann, Jaromír"
+        ],
         "patocka": [],
-        "marci": ["Marci, Johannes Marcus"]
+        "marci": [
+            "Marci, Johannes Marcus"
+        ]
+    },
+    "colors": {
+        "author": "rgb(6, 120, 0)",
+        "recipient": "rgb(255,160, 10)",
+        "mentioned": "rgb(152, 156, 223)"
     }
 }

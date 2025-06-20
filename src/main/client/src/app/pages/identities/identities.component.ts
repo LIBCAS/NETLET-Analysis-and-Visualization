@@ -26,6 +26,7 @@ import { Letter } from '../../shared/letter';
 import { JSONFacet } from '../../shared/facet';
 import { LabelLayout } from "echarts/features";
 import { MatExpansionModule } from '@angular/material/expansion';
+import { AppConfiguration } from '../../app-configuration';
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
@@ -77,6 +78,7 @@ export class IdentitiesComponent {
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
     private translation: TranslateService,
+    private config: AppConfiguration,
     public state: AppState,
     private service: AppService
   ) {
@@ -90,6 +92,7 @@ export class IdentitiesComponent {
 
   ngOnInit(): void {
     this.state.tenants.forEach(t => { t.available = true });
+    this.state.currentView = this.state.views.find(v => v.route === 'identities');
     if (this.tenant) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
       this.getData(true);
@@ -201,7 +204,7 @@ export class IdentitiesComponent {
         y: pos.y,
 
         itemStyle: {
-          color: 'rgb(6, 120, 0)'
+          color: this.config.colors['author']
         }
       })
     });
@@ -228,7 +231,7 @@ export class IdentitiesComponent {
           y: pos.y,
 
           itemStyle: {
-            color: 'rgb(255, 160, 0)'
+            color: this.config.colors['recipient']
           }
         })
       }

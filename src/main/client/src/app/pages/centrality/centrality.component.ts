@@ -87,7 +87,6 @@ export class CentralityComponent {
     "#724e58",
     "#4b565b"
   ];
-
   infoContent: string;
   infoHeader: string;
 
@@ -110,6 +109,7 @@ export class CentralityComponent {
 
   ngOnInit(): void {
     this.state.tenants.forEach(t => { t.available = true });
+    this.state.currentView = this.state.views.find(v => v.route === 'centrality');
     if (this.tenant) {
       this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
       this.getData(true);
@@ -243,7 +243,19 @@ export class CentralityComponent {
   }
 
   processResponse() {
-    const categories = [{ name: 'mentioned' }, { name: 'recipients' }, { name: 'authors' }];
+    const categories = [{
+      name: 'authors', itemStyle: {
+        color: this.config.colors['author']
+      }
+    }, {
+      name: 'recipients', itemStyle: {
+        color: this.config.colors['recipient']
+      }
+    }, {
+      name: 'mentioned', itemStyle: {
+        color: this.config.colors['mentioned']
+      }
+    }];
     const links: any[] = [];
     const nodes: any[] = [];
     const h = this.graphChart.getHeight();
@@ -251,18 +263,13 @@ export class CentralityComponent {
     const maxSize = 60;
     const minSize = 10;
     let maxCount = Math.max(
-      ...this.mentioned.filter(i => !this.config.tenants_identities[this.tenant.val].includes(i.val)).map(r => r.count),
-      ...this.recipients.filter(i => !this.config.tenants_identities[this.tenant.val].includes(i.val)).map(r => r.count),
-      ...this.authors.filter(i => !this.config.tenants_identities[this.tenant.val].includes(i.val)).map(r => r.count)
+      ...this.mentioned.filter(i => !this.config.excluded_identities[this.tenant.val].includes(i.val)).map(r => r.count),
+      ...this.recipients.filter(i => !this.config.excluded_identities[this.tenant.val].includes(i.val)).map(r => r.count),
+      ...this.authors.filter(i => !this.config.excluded_identities[this.tenant.val].includes(i.val)).map(r => r.count)
     );
-
-    // if (this.mentioned[0]) {
-    //   maxCount = Math.max(...this.mentioned.map(r => r.count));
-    // }
     this.mentioned.forEach((identity: JSONFacet, index: number) => {
       const pos = this.setPosition(h, w, identity.count, maxCount);
       nodes.push({
-        // id: identity.id + '',
         id: identity.val + '_mentioned',
         name: identity.val,
         value: identity.count,
@@ -273,14 +280,14 @@ export class CentralityComponent {
         y: pos.y,
         // radiusAxis: pos.radius,
         // angleAxis: pos.angle,
-        // itemStyle: {
-        //   color: this.colors[index % this.colors.length]
-        // }
+        itemStyle: {
+          color: this.config.colors['mentioned']
+        }
 
       })
     });
     this.recipients.forEach((identity: JSONFacet, index: number) => {
-      if (!this.config.tenants_identities[this.tenant.val].includes(identity.val)) {
+      if (!this.config.excluded_identities[this.tenant.val].includes(identity.val)) {
         const pos = this.setPosition(h, w, identity.count, maxCount);
         nodes.push({
           // id: identity.id + '',
@@ -293,15 +300,15 @@ export class CentralityComponent {
           y: pos.y,
           // radiusAxis: pos.radius,
           // angleAxis: pos.angle,
-          // itemStyle: {
-          //   color: this.colors[index % this.colors.length]
-          // }
+          itemStyle: {
+            color: this.config.colors['recipient']
+          }
 
         })
       }
     });
     this.authors.forEach((identity: JSONFacet, index: number) => {
-      if (!this.config.tenants_identities[this.tenant.val].includes(identity.val)) {
+      if (!this.config.excluded_identities[this.tenant.val].includes(identity.val)) {
         const pos = this.setPosition(h, w, identity.count, maxCount);
         nodes.push({
           // id: identity.id + '',
@@ -314,9 +321,9 @@ export class CentralityComponent {
           y: pos.y,
           // radiusAxis: pos.radius,
           // angleAxis: pos.angle,
-          // itemStyle: {
-          //   color: this.colors[index % this.colors.length]
-          // }
+          itemStyle: {
+            color: this.config.colors['author']
+          }
 
         })
       }
@@ -332,7 +339,7 @@ export class CentralityComponent {
     this.graphOptions = {
       title: {
         show: true,
-        text: this.translation.instant('Centralita'),
+        text: this.translation.instant('Centralita aktérů korespondence v dané korespondenční síti'),
         // top: 'bottom',
         left: 'center'
       },
@@ -347,9 +354,8 @@ export class CentralityComponent {
         {
           show: true,
           bottom: 5,
-          data: this.graphData.categories.map(function (a) {
-            return a.name;
-          })
+          data: this.graphData.categories
+          // data: [{ name: 'mentioned' }, { name: 'recipients' }, { name: 'authors' }]
         }
       ],
       animationDuration: 1500,

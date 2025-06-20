@@ -6,6 +6,22 @@
 </mat-card>
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
   <div style="flex: 1 30%;" class="app-filters">
+    <div *ngIf="authors">
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          @for(identity of authors; track $index; let idx = $index){
+          <mat-list-item (click)="clickRecipient(identity)">
+            <span [class.app-selected]="identity === activeIdentity"><mat-icon *ngIf="identity === activeIdentity"
+                class="app-va-tb">check</mat-icon>
+              {{ identity.val}} ({{identity.count}})</span>
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
+    </div>
     <div *ngIf="recipients">
       <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
         <mat-expansion-panel-header>

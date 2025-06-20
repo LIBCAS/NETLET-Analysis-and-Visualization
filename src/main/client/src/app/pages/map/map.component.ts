@@ -74,6 +74,7 @@ export class MapComponent {
   };
 
   solrResponse: any;
+  authors: JSONFacet[];
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
 
@@ -107,6 +108,7 @@ export class MapComponent {
 
   ngOnInit(): void {
     this.state.tenants.forEach(t => { t.available = true });
+    this.state.currentView = this.state.views.find(v => v.route === 'map');
   }
 
   onMapReady(map: Map) {
@@ -160,6 +162,7 @@ export class MapComponent {
         const lon = resp.stats.stats_fields.longitude;
         this.map.fitBounds(L.latLngBounds([lat.max, lon.min], [lat.min, lon.max]))
       }
+      this.authors = resp.facets.identity_recipient ? resp.facets.identity_author.buckets : [];
       this.recipients = resp.facets.identity_recipient ? resp.facets.identity_recipient.buckets : [];
       this.mentioned = resp.facets.identity_mentioned ? resp.facets.identity_mentioned.buckets : [];
       if (withMap) {
