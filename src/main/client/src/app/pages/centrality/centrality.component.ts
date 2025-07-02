@@ -72,6 +72,9 @@ export class CentralityComponent {
   authors: JSONFacet[];
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
+  keywords: JSONFacet[];
+
+  filters: {field: string, value: string}[] = [];
 
   selectedRecipients: string[] = [];
 
@@ -143,6 +146,11 @@ export class CentralityComponent {
     this.getData(true);
   }
 
+  addFilter(field: string, val: string) {
+    this.filters.push({field: field, value: val});
+    this.getData(true);
+  }
+
   showNode(identity: JSONFacet, category: string) {
     const idx = this.graphData.nodes.findIndex(n => n.id === identity.val + '_' + category);
     // currentIndex = (currentIndex + 1) % dataLen;
@@ -176,6 +184,9 @@ export class CentralityComponent {
     p.tenant_date_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits.toString();
     p.recipient = this.selectedRecipients;
+    this.filters.forEach(f => {
+      p[f.field] = f.value;
+    })
     if (!setResponse) {
       p.rows = 0;
     } else {
@@ -197,6 +208,9 @@ export class CentralityComponent {
       });
 
       this.mentioned = resp.facets.identity_mentioned.buckets;
+
+      this.keywords = resp.facets.keywords_categories.buckets;
+
       this.processResponse();
       this.loading = false;
     });

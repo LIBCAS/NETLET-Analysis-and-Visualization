@@ -1,5 +1,6 @@
 package cz.knav.netlet.netlet.analysis.visualization;
 
+import cz.knav.netlet.netlet.analysis.visualization.index.HikoDbIndexer;
 import cz.knav.netlet.netlet.analysis.visualization.index.HikoIndexer;
 import cz.knav.netlet.netlet.analysis.visualization.index.IndexSearcher;
 import java.io.IOException;
@@ -79,6 +80,36 @@ public class DataServlet extends HttpServlet {
                 JSONObject json = new JSONObject();
                 try {
                     HikoIndexer hi = new HikoIndexer();
+                    json = hi.full();
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE, null, ex);
+                    json.put("error", ex.toString());
+                }
+                return json;
+            }
+        },
+        INDEX_HIKO_TENANT {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+                JSONObject json = new JSONObject();
+                try {
+                    HikoIndexer hi = new HikoIndexer();
+                    json = hi.indexTenant(req.getParameter("tenant"));
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE, null, ex);
+                    json.put("error", ex.toString());
+                }
+                return json;
+            }
+        },
+        INDEX_HIKO_DB {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+                JSONObject json = new JSONObject();
+                try {
+                    HikoDbIndexer hi = new HikoDbIndexer();
                     json.put("keywords", hi.full());
                 } catch (Exception ex) {
                     LOGGER.log(Level.SEVERE, null, ex);

@@ -162,8 +162,8 @@ export class MapViewComponent implements OnInit {
     this.solrResponse.response.docs.forEach((letter: Letter) => {
       if (this.inLimits(letter.date_year) && letter.places && letter.origin) {
         letter.places.forEach((place: Place) => {
-          if (place.latitude && !this.nodes[place.place_id]) {
-            this.nodes[place.place_id] = { coords: [place.latitude, place.longitude], name: place.name };
+          if (place.latitude && !this.nodes[place.id]) {
+            this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name };
             const m = L.circleMarker([place.latitude, place.longitude], {
               color: '#795548',
               radius: 5,
@@ -175,8 +175,8 @@ export class MapViewComponent implements OnInit {
                 let lettersFrom = 0;
                 let lettersTo = 0;
                 this.linkLayer.getLayers().forEach((layer: any) => {
-                  lettersFrom += layer.options.letters.filter((l: Letter) => l.origin === place.place_id).length;
-                  lettersTo += layer.options.letters.filter((l: Letter) => l.destination === place.place_id).length;
+                  lettersFrom += layer.options.letters.filter((l: Letter) => l.origin === place.id).length;
+                  lettersTo += layer.options.letters.filter((l: Letter) => l.destination === place.id).length;
                   // letters.forEach(letter => {
                   //   popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
                   //   if (letter.keywords_category_cs?.length > 0) {
@@ -344,7 +344,7 @@ export class MapViewComponent implements OnInit {
       this._ngZone.run(() => {
         let popup = '';
         letters.forEach(letter => {
-          popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
+          popup += `<div>${letter.letter_id}.- ${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
           if (letter.keywords_category_cs?.length > 0) {
             popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
           } else if (letter.keywords_cs?.length > 0) {

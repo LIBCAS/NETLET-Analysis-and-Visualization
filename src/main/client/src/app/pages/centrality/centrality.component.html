@@ -44,6 +44,22 @@
       </mat-expansion-panel>
     </div>
 
+    @if (keywords) {
+      
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.keywords' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          @for(k of keywords; track $index; let idx = $index){
+          <mat-list-item (click)="addFilter('keyword', k.val)">
+            <span [style.color]="colors[idx % colors.length]">{{ k.val}} ({{k.count}}) </span>
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
+    }
+
   </div>
     <div class="app-content app-fill-w app-fill-h">
     <div class="app-years">

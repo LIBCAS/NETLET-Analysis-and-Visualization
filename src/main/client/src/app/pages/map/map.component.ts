@@ -145,7 +145,7 @@ export class MapComponent {
     if (!withMap) {
       p.rows = 0;
     } else {
-      p.rows = 10000;
+      p.rows = 20000;
     }
 
     this.service.getMap(p as HttpParams).subscribe((resp: any) => {
@@ -252,9 +252,9 @@ export class MapComponent {
     this.solrResponse.response.docs.forEach((letter: Letter) => {
       if (this.inLimits(letter.date_year) && letter.places && letter.origin) {
         letter.places.forEach((place: Place) => {
-          if (place.latitude && !this.nodes[place.place_id]) {
-            this.nodes[place.place_id] = { coords: [place.latitude, place.longitude], name: place.name };
-            nodes.push({ id: place.place_id, name: place.name, value: [place.longitude, place.latitude, 1] });
+          if (place.latitude && !this.nodes[place.id]) {
+            this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name };
+            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1] });
           }
         });
 
@@ -285,7 +285,6 @@ export class MapComponent {
       };
 
     });
-
     Object.keys(this.links).forEach(key => {
       const link = this.links[key];
       // this.linkNodes(link.node1, link.node2, link.count, link.letters);
@@ -385,10 +384,11 @@ export class MapComponent {
 
         this._ngZone.run(() => {
           let popup = '';
-          let letters: Letter[] = [...this.solrResponse.response.docs.filter((letter: Letter) => letter.origin + '' === params.data.source),
-          ... this.solrResponse.response.docs.filter((letter: Letter) => letter.destination + '' === params.data.target)];
+          // let letters: Letter[] = [...this.solrResponse.response.docs.filter((letter: Letter) => letter.origin + '' === params.data.source),
+          // ... this.solrResponse.response.docs.filter((letter: Letter) => letter.destination + '' === params.data.target)];
+          let letters: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin + '' === params.data.source && letter.destination + '' === params.data.target);
           letters.forEach((letter: Letter) => {
-            popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
+            popup += `<div>${letter.letter_id}.- ${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
             if (letter.keywords_category_cs?.length > 0) {
               popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
             } else if (letter.keywords_cs?.length > 0) {

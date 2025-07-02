@@ -197,7 +197,7 @@ export class ProfessionsComponent {
         left: 'center'
       },
       legend: {
-        type: data.length > 90 ? 'scroll' : 'plain',
+        type: data.length > 45 ? 'scroll' : 'plain',
         orient: 'vertical',
         right: 10,
         data: data.map(a => a.name),

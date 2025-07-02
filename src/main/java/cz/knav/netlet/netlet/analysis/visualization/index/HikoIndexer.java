@@ -2,25 +2,27 @@ package cz.knav.netlet.netlet.analysis.visualization.index;
 
 import cz.knav.netlet.netlet.analysis.visualization.Options;
 import java.io.IOException;
-import java.sql.Connection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.Http2SolrClient;
 import org.json.JSONArray;
 
@@ -31,367 +33,209 @@ import org.json.JSONArray;
 public class HikoIndexer {
 
     public static final Logger LOGGER = Logger.getLogger(HikoIndexer.class.getName());
-    private Connection conn;
+    final DateTimeFormatter dformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    final DateTimeFormatter dtformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    public Connection getConnection() throws NamingException, SQLException {
-        if (conn == null || conn.isClosed()) {
-            Context initContext = new InitialContext();
-            Context envContext = (Context) initContext.lookup("java:/comp/env");
-            DataSource ds = (DataSource) envContext.lookup("jdbc/hiko");
-            conn = ds.getConnection();
-        }
-        return conn;
-    }
-
-    public List<String> getTenants() {
-        List<String> ret = new ArrayList();
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("select table_prefix from tenants");
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    ret.add(rs.getString("table_prefix"));
-                }
-                rs.close();
-            }
-            ps.close();
-        } catch (NamingException | SQLException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            ret.add("error");
-        }
-
-        return ret;
-    }
-
-    public List<String> getTenantsFromIndex() {
-        List<String> ret = new ArrayList();
-        try {
-            JSONObject json = IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant");
-            JSONArray ja = json.getJSONArray("buckets");
-            for (int i = 0; i < ja.length(); i++) {
-                ret.add(ja.getJSONObject(i).getString("val"));
-            }
-            
-        } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            ret.add("error");
-        }
-
-        return ret;
-    }
+    JSONObject globalKeywordCategories = new JSONObject();
 
     public JSONObject full() {
         Date start = new Date();
         JSONObject ret = new JSONObject();
-        Integer success = 0;
         LOGGER.log(Level.INFO, "Indexing HIKO letters");
         try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             //List<String> tenants = getTenants();
-            List<String> tenants = getTenantsFromIndex();
+            getGlobalKeywordCategories();
+            Set<String> tenants = Options.getInstance().getJSONObject("test_mappings").keySet();
             for (String tenant : tenants) {
-                getLetters(client, ret, tenant, success);
+                getLetters(client, ret, tenant);
             }
-        } catch (NamingException | SQLException | IOException ex) {
+            client.commit("hiko");
+        } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             ret.put("error", ex);
         }
         Date end = new Date();
         ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
-        ret.put("total", success);
-        LOGGER.log(Level.INFO, "Indexing HIKO finished. {0} letters indexed", success);
+        LOGGER.log(Level.INFO, "Indexing HIKO finished. {0} letters indexed");
         return ret;
     }
 
-    private void getLetters(SolrClient client, JSONObject ret, String tenant, Integer success) throws NamingException, SQLException {
+    public JSONObject indexTenant(String tenant) {
+        Date start = new Date();
+        JSONObject ret = new JSONObject();
+        LOGGER.log(Level.INFO, "Indexing HIKO letters");
+        try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+            //List<String> tenants = getTenants();
+            getGlobalKeywordCategories();
+            getLetters(client, ret, tenant);
+            client.commit("hiko");
+        } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        Date end = new Date();
+        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        LOGGER.log(Level.INFO, "Indexing HIKO finished. {0} letters indexed");
+        return ret;
+    }
+
+    private void getGlobalKeywordCategories() throws URISyntaxException, IOException, InterruptedException {
+        String url = Options.getInstance().getString("hiko_api")
+                .replace("{tenant}", "hiko-test10")
+                + "/global-keyword-categories?per_page=100";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(url))
+                .header("Authorization", Options.getInstance().getString("hiko_api_bearer"))
+                .GET()
+                .build();
+        HttpResponse<String> response = HttpClient
+                .newBuilder()
+                .build()
+                .send(request, BodyHandlers.ofString());
+        JSONArray docs = new JSONObject(response.body()).getJSONArray("data");
+        for (int i = 0; i < docs.length(); i++) {
+            JSONObject d = docs.getJSONObject(i);
+            globalKeywordCategories.put(d.getInt("id") + "", d);
+        }
+    }
+
+    private void getLetters(SolrClient client, JSONObject ret, String tenant) throws URISyntaxException, IOException, InterruptedException {
         LOGGER.log(Level.INFO, "Indexing tenant: {0}.", tenant);
-        String t = tenant + "__letter_place";
-        String sql = "select * from " + tenant + "__letters as L ";
-        PreparedStatement ps = getConnection().prepareStatement(sql);
-        try (ResultSet rs = ps.executeQuery()) {
-            int tindexed = 0;
-            while (rs.next()) {
+        String url = Options.getInstance().getString("hiko_api")
+                .replace("{tenant}", Options.getInstance().getJSONObject("test_mappings").getString(tenant))
+                + "/letters?page=1";
+        HttpClient httpclient = HttpClient
+                .newBuilder()
+                .build();
+        int indexed = 0;
+        try {
+            while (url != null) {
+                // LOGGER.log(Level.INFO, "Requesting: {0}.", url);
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI(url))
+                        .header("Authorization", Options.getInstance().getString("hiko_api_bearer"))
+                        .GET()
+                        .build();
+                HttpResponse<String> response = httpclient.send(request, BodyHandlers.ofString());
+                JSONObject resp = new JSONObject(response.body());
+                JSONArray docs = resp.getJSONArray("data");
+                for (int i = 0; i < docs.length(); i++) {
+                    JSONObject rs = docs.getJSONObject(i);
+                    SolrInputDocument doc = new SolrInputDocument();
 
-                SolrInputDocument doc = new SolrInputDocument();
+                    String id = tenant + "_" + rs.getInt("id");
 
-                String id = tenant + "_" + rs.getInt("L.id");
+                    doc.addField("id", id);
+                    doc.addField("table_id", rs.getInt("id"));
+                    doc.addField("tenant", tenant);
+                    doc.addField("letter_id", rs.getInt("id"));
+                    doc.addField("status", rs.optString("status"));
 
-                doc.addField("id", id);
-                doc.addField("table", t);
-                doc.addField("table_id", rs.getInt("L.id"));
-                doc.addField("tenant", tenant);
-                doc.addField("letter_id", rs.getInt("L.id"));
-                doc.addField("status", rs.getString("L.status")); 
-                doc.addField("date_computed", rs.getDate("L.date_computed"));
-                doc.addField("date_year", rs.getLong("L.date_year"));
+                    LocalDate date = LocalDate.parse(rs.optString("date_computed"), dformatter);
+                    doc.addField("date_computed", date.atStartOfDay().format(dtformatter));
+                    doc.addField("date_year", rs.optInt("date_year"));
 
-                addPlaces(tenant, rs.getInt("L.id"), doc);
-                addIdentities(tenant, rs.getInt("L.id"), doc);
-                int k = addGlobalKeywords(tenant, rs.getInt("L.id"), doc);
-                if (k ==0) {
-                    addKeywords(tenant, rs.getInt("L.id"), doc);
+                    addPlaces(rs.getJSONArray("places"), doc);
+                    addIdentities(rs.getJSONArray("identities"), doc);
+                    addGlobalKeywords(rs.getJSONArray("global_keywords"), doc);
+                    addGlobalKeywords(rs.optJSONArray("keywords"), doc);
+//                int k = addGlobalKeywords(tenant, rs.getInt("L.id"), doc);
+//                if (k == 0) {
+//                    addKeywords(tenant, rs.getInt("L.id"), doc);
+//                }
+
+                    client.add("hiko", doc);
+                    indexed++;
+                    if ((indexed % 500) == 0) {
+                        client.commit("hiko");
+                        LOGGER.log(Level.INFO, "Indexed {0} docs", indexed);
+                    }
+
                 }
-
-                client.add("letter_place", doc);
-                success++;
-                if ((success % 500) == 0) {
-                    client.commit("letter_place");
-                    LOGGER.log(Level.INFO, "Indexed {0} docs", success);
-                }
-
-                ret.put(t, tindexed++);
+                ret.put(tenant, indexed++);
+                url = resp.optString("next_page_url", null);
             }
-            rs.close();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, null, e);
-            ret.put("error" + t, e);
+            ret.put("error" + tenant, e);
         }
-        ps.close();
     }
 
-    public void addPlaces(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
+    private void addGlobalKeywords(JSONArray keywords, SolrInputDocument doc) throws SQLException, NamingException {
 
-        String sql = "select * from " + tenant + "__letter_place as LP, " + tenant + "__places as P where LP.place_id = P.id AND LP.letter_id = " + letter_id;
-        PreparedStatement psPlaces = getConnection().prepareStatement(sql);
-        int origin = -1;
-        int destination = -1;
-        try (ResultSet rs = psPlaces.executeQuery()) {
-            while (rs.next()) {
-
-                doc.addField("role", rs.getString("LP.role"));
-                doc.addField("place_id", rs.getInt("P.id"));
-                doc.addField("name", rs.getString("P.name"));
-                doc.addField("country", rs.getString("P.country"));
-                doc.addField("note", rs.getString("P.note"));
-                doc.addField("latitude", rs.getObject("P.latitude"));
-                doc.addField("longitude", rs.getObject("P.longitude"));
-                doc.addField("geoname_id", rs.getInt("P.geoname_id"));
-                doc.addField("division", rs.getString("P.division"));
-                if (rs.getString("P.latitude") != null) {
-                    doc.addField("coords", rs.getString("P.latitude") + "," + rs.getString("P.longitude"));
-                }
-
-                if ("origin".equals(rs.getString("LP.role"))) {
-                    origin = rs.getInt("P.id");
-                    doc.setField("origin", origin);
-                }
-
-                if ("destination".equals(rs.getString("LP.role"))) {
-                    destination = rs.getInt("P.id");
-                    doc.setField("destination", destination);
-                }
-
-                JSONObject places = new JSONObject()
-                        .put("role", rs.getString("LP.role"))
-                        .put("place_id", rs.getInt("P.id"))
-                        .put("name", rs.getString("P.name"))
-                        .put("country", rs.getString("P.country"))
-                        .put("note", rs.getString("P.note"))
-                        .put("latitude", rs.getObject("P.latitude"))
-                        .put("longitude", rs.getObject("P.longitude"))
-                        .put("geoname_id", rs.getInt("P.geoname_id"))
-                        .put("division", rs.getString("P.division"));
-                doc.addField("places", places.toString());
-
-            }
-            rs.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
-        }
-        psPlaces.close();
-    }
-
-    private void addIdentities(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
-
-        String sqlIdentity = "select * from " + tenant + "__identity_letter as IL, " + tenant + "__identities as I where IL.identity_id=I.id AND letter_id = " + letter_id;
-        PreparedStatement psIdentity = getConnection().prepareStatement(sqlIdentity);
-        try (ResultSet rs = psIdentity.executeQuery()) {
-            while (rs.next()) {
-                doc.addField("identity_id", rs.getInt("I.id"));
-                doc.addField("identity_role", rs.getString("IL.role"));
-                doc.addField("identity_name", rs.getString("I.name"));
-
-                doc.addField("identity_" + rs.getString("IL.role"), rs.getString("I.name"));
-
-                JSONObject identity = new JSONObject()
-                        .put("id", rs.getInt("I.id"))
-                        .put("role", rs.getString("IL.role"))
-                        .put("name", rs.getString("I.name"));
-                int p = addGlobalProfessions(tenant, rs.getInt("I.id"), doc, identity);
-                if (p == 0) {
-                   addProfessions(tenant, rs.getInt("I.id"), doc, identity);
-                }
-                doc.addField("identities", identity.toString());
-
-            }
-            rs.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
-        }
-        psIdentity.close();
-    }
-    
-    private void addProfessions(String tenant, int identity_id, SolrInputDocument doc, JSONObject identity) throws SQLException, NamingException {
-
-        String sql = "select * from " + tenant + "__identity_profession as IL, " + 
-                tenant + "__professions as P left join " + 
-                tenant + "__profession_categories as PC on PC.id=P.profession_category_id where IL.profession_id=P.id AND identity_id = " + identity_id;
-        
-        
-        PreparedStatement ps = getConnection().prepareStatement(sql);
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                 
-                JSONObject k = new JSONObject(rs.getString("P.name"))
-                        .put("id", rs.getLong("P.id")); 
-                
-                doc.addField("professions_id", rs.getInt("P.id"));
-                doc.addField("professions_cs", k.optString("cs", null));
-                doc.addField("professions_en", k.optString("en", null));
-                doc.addField("professions_" + identity.getString("role") + "_cs", k.optString("cs", null));
-                doc.addField("professions_" + identity.getString("role") + "_en", k.optString("en", null));
-                
-                if (rs.getString("PC.name") != null) {
-                    JSONObject pc = new JSONObject(rs.getString("PC.name"))
-                        .put("id", rs.getLong("PC.id"));
-                    k.put("category", pc);
-                    doc.addField("professions_category_id", rs.getInt("PC.id"));
-                    doc.addField("professions_category_cs", pc.optString("cs", null));
-                    doc.addField("professions_category_en", pc.optString("en", null));
-                    doc.addField("professions_category_" + identity.getString("role") + "_cs", pc.optString("cs", null));
-                    doc.addField("professions_category_" + identity.getString("role") + "_en", pc.optString("en", null));
-                }
-                identity.append("professions", k);
-                doc.addField("professions", k.toString());
-            }
-            rs.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
-        }
-        ps.close();
-    }
-
-    private void addKeywords(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
-
-        String sqlCat = " select * from " + tenant + "__keyword_categories";
-        Map<Long, String> categories = new HashMap<>();
-        PreparedStatement psCat = getConnection().prepareStatement(sqlCat);
-        try (ResultSet rs = psCat.executeQuery()) {
-            while (rs.next()) {
-                categories.put(rs.getLong("id"), rs.getString("name"));
-            }
-            rs.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
-        }
-        psCat.close();
-
-        String sql = "select * from "
-                + tenant + "__keyword_letter as KL, "
-                + tenant + "__keywords as K where KL.keyword_id=K.id AND letter_id = " + letter_id;
-        PreparedStatement ps = getConnection().prepareStatement(sql);
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                long cat = rs.getLong("K.keyword_category_id");
-                JSONObject k = new JSONObject(rs.getString("K.name"))
-                        .put("id", rs.getLong("K.id"));
-                doc.addField("keywords_cs", k.optString("cs"));
-                doc.addField("keywords_en", k.optString("en"));
-                if (categories.containsKey(cat)) {
-                    JSONObject c = new JSONObject(categories.get(cat));
+        for (int i = 0; i < keywords.length(); i++) {
+            JSONObject rs = keywords.getJSONObject(i);
+            long cat = rs.getLong("keyword_category_id");
+            JSONObject k = rs.getJSONObject("name");
+            doc.addField("keywords_cs", k.optString("cs"));
+            doc.addField("keywords_en", k.optString("en"));
+            if (globalKeywordCategories.has(cat + "")) {
+                JSONObject c = globalKeywordCategories.getJSONObject(cat + "").getJSONObject("name");
+                if (!doc.containsKey("keywords_category_cs") || !doc.getFieldValues("keywords_category_cs").contains(c.optString("cs"))) {
                     doc.addField("keywords_category_cs", c.optString("cs"));
                     doc.addField("keywords_category_en", c.optString("en"));
-                    k.put("category_id", cat).put("category_name", categories.get(cat));
                 }
-                doc.addField("keywords", k.toString());
+                k.put("category_name", c);
             }
-            rs.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error adding keywords for tenant: {0}", tenant);
-            LOGGER.log(Level.SEVERE, null, e);
+            doc.addField("keywords", rs.toString());
         }
-        ps.close();
     }
-    
-    private int addGlobalProfessions(String tenant, int identity_id, SolrInputDocument doc, JSONObject identity) throws SQLException, NamingException {
 
-        String sql = "select * from " + 
-                tenant + "__identity_profession as IL, global_professions as P left join global_profession_categories as PC on PC.id=P.profession_category_id "
-                + " where IL.global_profession_id=P.id AND identity_id = " + identity_id;
-        
-        int ret = 0;
-        PreparedStatement ps = getConnection().prepareStatement(sql);
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                ret++;
-                JSONObject k = new JSONObject(rs.getString("P.name"))
-                        .put("id", rs.getLong("P.id")); 
-                
-                doc.addField("professions_id", rs.getInt("P.id"));
-                doc.addField("professions_cs", k.optString("cs", null));
-                doc.addField("professions_en", k.optString("en", null));
-                doc.addField("professions_" + identity.getString("role") + "_cs", k.optString("cs", null));
-                doc.addField("professions_" + identity.getString("role") + "_en", k.optString("en", null));
-                
-                if (rs.getString("PC.name") != null) {
-                    JSONObject pc = new JSONObject(rs.getString("PC.name"))
-                        .put("id", rs.getLong("PC.id"));
-                    k.put("category", pc);
-                    doc.addField("professions_category_id", rs.getInt("PC.id"));
-                    doc.addField("professions_category_cs", pc.optString("cs", null));
-                    doc.addField("professions_category_en", pc.optString("en", null));
-                    doc.addField("professions_category_" + identity.getString("role") + "_cs", pc.optString("cs", null));
-                    doc.addField("professions_category_" + identity.getString("role") + "_en", pc.optString("en", null));
-                }
-                identity.append("professions", k);
-                doc.addField("professions", k.toString());
+    private void addPlaces(JSONArray places, SolrInputDocument doc) throws SQLException, NamingException {
+
+        for (int i = 0; i < places.length(); i++) {
+            JSONObject rs = places.getJSONObject(i);
+            String role = rs.getJSONObject("pivot").optString("role");
+            doc.addField("role", role);
+            doc.addField("place_id", rs.getInt("id"));
+            doc.addField("name", rs.optString("name"));
+            doc.addField("country", rs.optString("country"));
+            doc.addField("note", rs.optString("note"));
+            doc.addField("latitude", rs.optFloat("latitude"));
+            doc.addField("longitude", rs.optFloat("longitude"));
+            doc.addField("geoname_id", rs.optInt("geoname_id"));
+            doc.addField("division", rs.optString("division"));
+            if (!Float.isNaN(rs.optFloat("latitude"))) {
+                doc.addField("coords", rs.optFloat("latitude") + "," + rs.optFloat("longitude"));
             }
-            rs.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
+            if ("origin".equals(role)) {
+                doc.setField("origin", rs.getInt("id"));
+            }
+            if ("destination".equals(role)) {
+                doc.setField("destination", rs.getInt("id"));
+            }
+            rs.put("role", role);
+            doc.addField("places", rs.toString());
+
         }
-        ps.close();
-        return ret;
     }
-    
-    private int addGlobalKeywords(String tenant, int letter_id, SolrInputDocument doc) throws SQLException, NamingException {
-        int ret = 0;
-        String sqlCat = " select * from global_keyword_categories";
-        Map<Long, String> categories = new HashMap<>();
-        PreparedStatement psCat = getConnection().prepareStatement(sqlCat);
-        try (ResultSet rs = psCat.executeQuery()) {
-            while (rs.next()) {
-                categories.put(rs.getLong("id"), rs.getString("name"));
-            }
-            rs.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
-        }
-        psCat.close();
 
-        String sql = "select * from "
-                + tenant + "__keyword_letter as KL, global_keywords as K where KL.global_keyword_id=K.id AND letter_id = " + letter_id;
-        PreparedStatement ps = getConnection().prepareStatement(sql);
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                ret++;
-                long cat = rs.getLong("K.keyword_category_id");
-                JSONObject k = new JSONObject(rs.getString("K.name"))
-                        .put("id", rs.getLong("K.id"));
-                doc.addField("keywords_cs", k.optString("cs"));
-                doc.addField("keywords_en", k.optString("en"));
-                if (categories.containsKey(cat)) {
-                    JSONObject c = new JSONObject(categories.get(cat));
-                    doc.addField("keywords_category_cs", c.optString("cs"));
-                    doc.addField("keywords_category_en", c.optString("en"));
-                    k.put("category_id", cat).put("category_name", categories.get(cat));
-                }
-                doc.addField("keywords", k.toString());
-            }
-            rs.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error adding keywords for tenant: {0}", tenant);
-            LOGGER.log(Level.SEVERE, null, e);
+    private void addIdentities(JSONArray identities, SolrInputDocument doc) throws SQLException, NamingException {
+
+        for (int i = 0; i < identities.length(); i++) {
+            JSONObject rs = identities.getJSONObject(i);
+            String role = rs.getJSONObject("pivot").optString("role");
+            doc.addField("identity_id", rs.getInt("id"));
+            doc.addField("identity_role", role);
+            doc.addField("identity_name", rs.getString("name"));
+
+            doc.addField("identity_" + role, rs.getString("name"));
+
+            JSONObject identity = new JSONObject()
+                    .put("id", rs.getInt("id"))
+                    .put("role", role)
+                    .put("name", rs.getString("name"));
+//                int p = addGlobalProfessions(tenant, rs.getInt("I.id"), doc, identity);
+//                if (p == 0) {
+//                   addProfessions(tenant, rs.getInt("I.id"), doc, identity);
+//                }
+            doc.addField("identities", identity.toString());
+
         }
-        ps.close();
-        return ret;
+    }
+
+    private void getGlobalProffessions() {
+        //    https://hiko-test10.historicka-korespondence.cz/api/v2/global-profession-categories
+        //    https://hiko-test10.historicka-korespondence.cz/api/v2/global-professions
     }
 }

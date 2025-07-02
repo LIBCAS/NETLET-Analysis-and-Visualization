@@ -16,7 +16,7 @@ export interface Letter {
 export interface Place {
     role: string,
     name: string,
-    place_id: number,
+    id: number,
     geoname_id: number,
     country:string,
     note:string,
