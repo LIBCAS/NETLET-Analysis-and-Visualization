@@ -23,10 +23,16 @@ export class AppComponent {
   ngOnInit() {
     const urlParams = new URLSearchParams(this.document.location.search);
     const tenant = urlParams.get('tenant');
+    let mainTenant = false;
     if (tenant) {
       tenant.split(',').forEach(tenant =>  {
         const st = this.state.tenants.find(t => t.val === tenant);
         if (st) {
+          if (!mainTenant) {
+            this.state.tenant.set(st);
+            mainTenant = true;
+          }
+          
           st.selected = true;
         }
       });

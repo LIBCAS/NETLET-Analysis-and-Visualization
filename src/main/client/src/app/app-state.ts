@@ -15,7 +15,7 @@ export interface Tenant {
 }) export class AppState {
 
     public tenants: Tenant[] = [];
-    // public tenant = signal<Tenant>(null);
+    public tenant = signal<Tenant>(null);
     public selectedTenants = signal<Tenant[]>([]);
     views = [
     {

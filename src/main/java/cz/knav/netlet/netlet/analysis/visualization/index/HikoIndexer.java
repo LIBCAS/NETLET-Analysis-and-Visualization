@@ -11,6 +11,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -88,14 +89,16 @@ public class HikoIndexer {
                 .header("Authorization", Options.getInstance().getString("hiko_api_bearer"))
                 .GET()
                 .build();
-        HttpResponse<String> response = HttpClient
+        
+        try (HttpClient httpclient = HttpClient
                 .newBuilder()
-                .build()
-                .send(request, BodyHandlers.ofString());
-        JSONArray docs = new JSONObject(response.body()).getJSONArray("data");
-        for (int i = 0; i < docs.length(); i++) {
-            JSONObject d = docs.getJSONObject(i);
-            globalKeywordCategories.put(d.getInt("id") + "", d);
+                .build()) {
+            HttpResponse<String> response = httpclient.send(request, BodyHandlers.ofString());
+            JSONArray docs = new JSONObject(response.body()).getJSONArray("data");
+            for (int i = 0; i < docs.length(); i++) {
+                JSONObject d = docs.getJSONObject(i);
+                globalKeywordCategories.put(d.getInt("id") + "", d);
+            }
         }
     }
 
@@ -104,20 +107,25 @@ public class HikoIndexer {
         String url = Options.getInstance().getString("hiko_api")
                 .replace("{tenant}", Options.getInstance().getJSONObject("test_mappings").getString(tenant))
                 + "/letters?page=1";
-        HttpClient httpclient = HttpClient
-                .newBuilder()
-                .build();
+//        HttpClient httpclient = HttpClient
+//                .newBuilder()
+//                .build();
         int indexed = 0;
-        try {
+        String r = "";
+        try (HttpClient httpclient = HttpClient
+                .newBuilder()
+                .build()) {
             while (url != null) {
                 // LOGGER.log(Level.INFO, "Requesting: {0}.", url);
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI(url))
+                        .timeout(Duration.ofSeconds(10))
                         .header("Authorization", Options.getInstance().getString("hiko_api_bearer"))
                         .GET()
                         .build();
                 HttpResponse<String> response = httpclient.send(request, BodyHandlers.ofString());
-                JSONObject resp = new JSONObject(response.body());
+                r = response.body();
+                JSONObject resp = new JSONObject(r);
                 JSONArray docs = resp.getJSONArray("data");
                 for (int i = 0; i < docs.length(); i++) {
                     JSONObject rs = docs.getJSONObject(i);
@@ -154,9 +162,13 @@ public class HikoIndexer {
                 }
                 ret.put(tenant, indexed++);
                 url = resp.optString("next_page_url", null);
+                Thread.sleep(1000);
             }
+            // httpclient.close();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
+            LOGGER.log(Level.SEVERE, "Error indexing {0}", url); 
+            LOGGER.log(Level.SEVERE, "Response is {0}", r); 
+            LOGGER.log(Level.SEVERE, null, e); 
             ret.put("error" + tenant, e);
         }
     }
@@ -165,7 +177,7 @@ public class HikoIndexer {
 
         for (int i = 0; i < keywords.length(); i++) {
             JSONObject rs = keywords.getJSONObject(i);
-            long cat = rs.getLong("keyword_category_id");
+            long cat = rs.optLong("keyword_category_id");
             JSONObject k = rs.getJSONObject("name");
             doc.addField("keywords_cs", k.optString("cs"));
             doc.addField("keywords_en", k.optString("en"));

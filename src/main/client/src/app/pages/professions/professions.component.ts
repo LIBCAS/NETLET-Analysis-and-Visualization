@@ -89,7 +89,7 @@ export class ProfessionsComponent {
   }
 
   ngOnInit(): void {
-    this.translation.onLangChange.subscribe(() => { this.getData(true) });
+    // this.translation.onLangChange.subscribe(() => { this.getData(true) });
     this.state.currentView = this.state.views.find(v => v.route === 'professions');
     if (this.tenants.length > 0) {
       this.limits = this.state.getTenantsRange();
@@ -155,6 +155,11 @@ export class ProfessionsComponent {
     }
     this.service.getProfessions(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
+        return;
+      }
+      if (resp.response.numFound === 0) {
+        this.invalidTenant = true;
+        this.loading = false;
         return;
       }
       if (setResponse) {
