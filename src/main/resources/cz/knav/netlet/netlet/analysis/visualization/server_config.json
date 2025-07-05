@@ -1,22 +1,24 @@
 {
     "solr": "http://localhost:8983/solr",
-    "hiko_api": "https://{tenant}.historicka-korespondence.cz/api/v2",
-    "hiko_api_bearer": "Bearer 5|jx7gYoWVA6D2Vgot5cX4xN1LxeOdKdtHiomOdr4B10b9a7f1", 
+    "hiko": {
+        "api": "https://{tenant}.historicka-korespondence.cz/api/v2",
+        "bearer": "5|jx7gYoWVA6D2Vgot5cX4xN1LxeOdKdtHiomOdr4B10b9a7f1"
+    },
     "test_mappings": {
-            "brezina": "hiko-test",
-            "deml": "hiko-test2",
-            "blekastad": "hiko-test3",
-            "kalivoda": "hiko-test4",
-            "komensky": "hiko-test5",
-            "marci": "hiko-test6",
-            "musil": "hiko-test7",
-            "neumann": "hiko-test8",
-            "pamatky": "hiko-test9",
-            "patocka": "hiko-test10",
-            "polanus": "hiko-test11",
-            "sachs": "hiko-test12",
-            "studenti": "hiko-test13",
-            "tgm": "hiko-test14",
-            "ucenci": "hiko-test15"
-        }
+        "brezina": "hiko-test",
+        "deml": "hiko-test2",
+        "blekastad": "hiko-test3",
+        "kalivoda": "hiko-test4",
+        "komensky": "hiko-test5",
+        "marci": "hiko-test6",
+        "musil": "hiko-test7",
+        "neumann": "hiko-test8",
+        "pamatky": "hiko-test9",
+        "patocka": "hiko-test10",
+        "polanus": "hiko-test11",
+        "sachs": "hiko-test12",
+        "studenti": "hiko-test13",
+        "tgm": "hiko-test14",
+        "ucenci": "hiko-test15"
+    }
 }

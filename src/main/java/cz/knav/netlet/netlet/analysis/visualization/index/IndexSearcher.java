@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.Http2SolrClient;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.json.DomainMap;
 import org.apache.solr.client.solrj.request.json.JsonFacetMap;
@@ -26,8 +26,8 @@ public class IndexSearcher {
 
     public static JSONObject getTenants() {
         JSONObject ret = new JSONObject();
-        try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
-
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) { 
+  
             final TermsFacetMap tenantFacet = new TermsFacetMap("tenant")
                     .setLimit(100)
                     .setMinCount(0)
@@ -53,7 +53,7 @@ public class IndexSearcher {
 
     public static JSONObject relation(HttpServletRequest request) {
         JSONObject ret = new JSONObject();
-        try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
             String tenant_date_range = request.getParameter("tenant_date_range");
             if (tenant_date_range == null || tenant_date_range.isBlank()) {
@@ -116,8 +116,9 @@ public class IndexSearcher {
             if (request.getParameter("recipient") != null) {
                 jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(+\"" + String.join("\" OR \"", request.getParameterValues("recipient")) + "\")");
             }
-//            QueryResponse queryResponse = jrequest.process(solr, "hiko");
-//            ret = new JSONObject(queryResponse.jsonStr());
+            
+//            QueryResponse queryResponse = jrequest.process(solr, "hiko"); 
+//            ret = new JSONObject(queryResponse.jsonStr()); 
 
             jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "hiko");
@@ -133,8 +134,8 @@ public class IndexSearcher {
 
     public static JSONObject getKeywords(HttpServletRequest request) {
         JSONObject ret = new JSONObject();
-        try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
-            String lang = request.getParameter("lang");
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+            String lang = request.getParameter("lang"); 
             if (lang == null) {
                 lang = "cs";
             }
@@ -225,10 +226,10 @@ public class IndexSearcher {
 
     public static JSONObject getMapLetters(HttpServletRequest request) {
         JSONObject ret = new JSONObject();
-        try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
             final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_cs")
-                    .setLimit(1000)
+                    .setLimit(1000)     
                     .setMinCount(1);
 
             final TermsFacetMap categories_csFacet = new TermsFacetMap("keywords_category_cs")
@@ -307,9 +308,9 @@ public class IndexSearcher {
         return ret;
     }
 
-    public static JSONObject getIdentityLetters(HttpServletRequest request) {
+    public static JSONObject getIdentityLetters(HttpServletRequest request) {  
         JSONObject ret = new JSONObject();
-        try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
             String lang = request.getParameter("lang");
             if (lang == null) {
@@ -387,7 +388,9 @@ public class IndexSearcher {
             NamedList<Object> resp = solr.request(jrequest, "hiko");
             String jsonResponse = (String) resp.get("response");
             ret = new JSONObject(jsonResponse);
-
+            jrequest = null;  
+            resp = null; 
+            solr.close();
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             ret.put("error", ex);
@@ -397,7 +400,7 @@ public class IndexSearcher {
 
     public static JSONObject getProfessions(HttpServletRequest request) {
         JSONObject ret = new JSONObject();
-        try (SolrClient solr = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             String lang = request.getParameter("lang");
             if (lang == null) {
                 lang = "cs";

@@ -21,8 +21,8 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.apache.solr.client.solrj.impl.Http2SolrClient;
-import org.json.JSONArray;
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
+import org.json.JSONArray;  
 
 /**
  *
@@ -84,7 +84,7 @@ public class HikoDbIndexer {
         JSONObject ret = new JSONObject();
         Integer success = 0;
         LOGGER.log(Level.INFO, "Indexing HIKO letters");
-        try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+        try (SolrClient client = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             //List<String> tenants = getTenants();
             List<String> tenants = getTenantsFromIndex();
             for (String tenant : tenants) {

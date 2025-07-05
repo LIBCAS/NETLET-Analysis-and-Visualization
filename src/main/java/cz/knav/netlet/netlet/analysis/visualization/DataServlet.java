@@ -133,7 +133,7 @@ public class DataServlet extends HttpServlet {
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
                 if (request.getParameter("tenant") != null) { 
-                    ret = IndexSearcher.getIdentityLetters(request);
+                    ret = IndexSearcher.getIdentityLetters(request);  
                 }
                 return ret;
             }
