@@ -19,18 +19,18 @@
     </mat-menu>
 
     <button mat-button [matMenuTriggerFor]="tenants">{{'tenants' | translate}}</button>
-    <!-- <mat-menu #tenants="matMenu">
+    <mat-menu #tenants="matMenu">
       @for (t of state.tenants; track t) {
       <a [disabled]="!t.available" mat-menu-item (click)="changeTenant(t)"><mat-icon *ngIf="state.tenant()?.val === t.val">check</mat-icon>{{ t.val | translate}}</a>
       }
-    </mat-menu> -->
-    <mat-menu #tenants="matMenu">
+    </mat-menu>
+    <!-- <mat-menu #tenants="matMenu">
       @for (t of state.tenants; track t) {
         <div mat-menu-item>
       <mat-checkbox (change)="selectTenant(t)" [(ngModel)]="t.selected" >{{ t.val | translate}}</mat-checkbox>
         </div>
       }
-    </mat-menu>
+    </mat-menu> -->
 
     <button mat-button [matMenuTriggerFor]="menu">{{ translator.currentLang | translate}}</button>
     <mat-menu #menu="matMenu">

@@ -37,6 +37,7 @@ export class NavbarComponent {
   }
 
   changeTenant(t: Tenant) {
+    this.state.changeMainTenant(t);
     this.router.navigate([], {queryParams: {tenant:t.val}});
     //this.state.tenant.set(t);
   }

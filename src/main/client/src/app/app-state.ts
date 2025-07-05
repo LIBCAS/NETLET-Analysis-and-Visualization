@@ -66,6 +66,13 @@ export interface Tenant {
   ];
   currentView: {header: string, text: string, route: string};
 
+  changeMainTenant(t: Tenant) {
+    this.tenants.forEach(te => te.selected = false);
+    t.selected = true;
+    this.tenant.set(t);
+    this.setSelectedTenants();
+  }
+
   setSelectedTenants() {
     this.selectedTenants.set(this.tenants.filter(t => t.selected));
   }
