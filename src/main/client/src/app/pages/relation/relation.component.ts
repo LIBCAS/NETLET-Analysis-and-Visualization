@@ -134,10 +134,8 @@ export class RelationComponent {
       }
     })
 
-  }
-
-
-
+  } 
+  
   changeTenant() {
     this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
     //this.selectedKeywords = [];

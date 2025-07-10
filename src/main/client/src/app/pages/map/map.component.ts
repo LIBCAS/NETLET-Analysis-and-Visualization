@@ -37,6 +37,7 @@ import { GraphChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, TitleComponent, TitleComponentOption } from 'echarts/components';
 import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 
 type ECOption = ComposeOption<
@@ -53,7 +54,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Titl
 @Component({
   selector: 'app-map',
   imports: [TranslateModule, FormsModule, CommonModule,
-    LeafletModule, MatCardModule, MatExpansionModule,
+    LeafletModule, MatCardModule, MatExpansionModule, MatCheckboxModule,
     MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule,
     MatIconModule, MatProgressBarModule, YearsChartComponent, LettersInfoComponent],
   templateUrl: './map.component.html',
@@ -121,6 +122,11 @@ export class MapComponent {
         this.getData(true);
       }, 10)
     }
+  }
+
+  clickTenant(t: Tenant) {
+    this.state.setSelectedTenants();
+    this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
   }
 
   changeTenant() {

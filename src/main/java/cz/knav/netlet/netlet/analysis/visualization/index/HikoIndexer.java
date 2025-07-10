@@ -133,8 +133,8 @@ public class HikoIndexer {
             t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
         }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
-                .replace("{tenant}", t)
-                + "/letters?page=1";
+                .replace("{tenant}", t) 
+                + "/letters?page=1&include=identities,identities.localProfessions,identities.localProfessions.profession_category,identities.globalProfessions,identities.globalProfessions.profession_category,places,keywords,globalKeywords";
 //        HttpClient httpclient = HttpClient
 //                .newBuilder()
 //                .build();
@@ -191,7 +191,7 @@ public class HikoIndexer {
                 }
                 ret.put(tenant, indexed++);
                 url = resp.optString("next_page_url", null);
-                Thread.sleep(500);
+                Thread.sleep(1000);
             }
             // httpclient.close();
         } catch (Exception e) {

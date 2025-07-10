@@ -137,6 +137,11 @@ export class KeywordsComponent {
 
   }
 
+  clickTenant(t: Tenant) {
+    this.state.setSelectedTenants();
+    this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
+  }
+
   changeTenant() {
     this.limits = this.state.getTenantsRange();
     this.selectedKeywords = [];

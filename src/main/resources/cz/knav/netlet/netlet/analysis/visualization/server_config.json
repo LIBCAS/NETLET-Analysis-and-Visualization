@@ -2,8 +2,9 @@
     "solr": "http://localhost:8983/solr",
     "hiko": {
         "api": "https://{tenant}.historicka-korespondence.cz/api/v2",
-        "bearer": "5|jx7gYoWVA6D2Vgot5cX4xN1LxeOdKdtHiomOdr4B10b9a7f1"
+        "bearer": ""
     },
+    "isTest": true,
     "test_mappings": {
         "brezina": "hiko-test",
         "deml": "hiko-test2",

@@ -5,7 +5,7 @@
     <div>
         <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
             <mat-expansion-panel-header>
-                <mat-panel-title> {{ 'field.relation_tenants' | translate}} </mat-panel-title>
+                <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
             </mat-expansion-panel-header>
             <mat-list>
                 @for(k of state.tenants; track $index; let idx = $index;){
