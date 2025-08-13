@@ -1,4 +1,4 @@
-<mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+<div class="app-loading">@if(loading && !running){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
 <mat-card *ngIf="invalidTenant" appearance="outlined" class="app-invalidTenant">
   <mat-card-header>
     <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
@@ -76,7 +76,7 @@
     <div class="app-content app-fill-w app-fill-h">
     <div class="app-years">
       <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
-        (onChangeLimits)="changeLimits($event)"></app-years-chart>
+        (onChangeLimits)="changeLimits($event)" [withAnimation]="true" (onChangeRunning)="changeRunning($event)"></app-years-chart>
     </div>
     <div style="height: 100%; width: 100%;" id="echarts-lmap" class="app-fxFlex"></div>
     <!-- <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"

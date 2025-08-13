@@ -48,6 +48,7 @@ export class CentralityComponent {
 
 
   loading: boolean;
+  running: boolean;
   solrResponse: any;
   limits: [number, number];
   tenants: Tenant[] = [];
@@ -144,6 +145,15 @@ export class CentralityComponent {
   changeLimits(limits: [number, number]) {
     this.limits = limits;
     this.getData(false);
+  }
+
+  changeRunning(r: boolean) {
+    this.running = r;
+    this.graphChart.setOption({series: [
+            {
+              animation: !this.running
+            }
+          ]});
   }
 
   clickRecipient(k: JSONFacet) {

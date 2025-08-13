@@ -140,7 +140,7 @@ public class IndexSearcher {
                 lang = "cs";
             }
 
-            final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_" + lang)
+            final TermsFacetMap keywords_autorFacet = new TermsFacetMap("keywords_" + lang)
                     .setLimit(1000)
                     .setMinCount(1);
                     
@@ -148,21 +148,26 @@ public class IndexSearcher {
                 final TermsFacetMap identity_authorFacet = new TermsFacetMap("identity_author")
                         .setLimit(1000)
                         .setMinCount(1);
-                keywords_csFacet.withSubFacet("identities", identity_authorFacet);
+                keywords_autorFacet.withSubFacet("identities", identity_authorFacet);
             }
+
+            final TermsFacetMap keywords_destFacet = new TermsFacetMap("keywords_" + lang)
+                    .setLimit(1000)
+                    .setMinCount(1);
                     
             if (Boolean.parseBoolean(request.getParameter("includeRecipients"))) {
                 final TermsFacetMap identity_authorFacet = new TermsFacetMap("identity_recipient")
                         .setLimit(1000)
                         .setMinCount(1);
-                keywords_csFacet.withSubFacet("identities", identity_authorFacet);
+                keywords_destFacet.withSubFacet("identities", identity_authorFacet);
             }
 
             final TermsFacetMap categoriesFacet = new TermsFacetMap("keywords_category_" + lang)
                     .setLimit(1000)
                     .setMinCount(1)
                     //.setSort("index")
-                    .withSubFacet("keywords", keywords_csFacet);
+                    .withSubFacet("keywords_autor", keywords_autorFacet)
+                    .withSubFacet("keywords_recipient", keywords_destFacet);
 
             String tenant_date_range = request.getParameter("tenant_date_range");
             if (tenant_date_range == null || tenant_date_range.isBlank()) {

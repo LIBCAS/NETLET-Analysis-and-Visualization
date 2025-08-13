@@ -1,3 +1,10 @@
+<div>
+  @if (withAnimation()){
+  <button mat-icon-button (click)="run()"><mat-icon svgIcon="expand-icon"></mat-icon></button>
+  <button mat-icon-button (click)="move()"><mat-icon svgIcon="move-icon">trending_flat</mat-icon></button>
+  <button mat-icon-button (click)="stop()"><mat-icon>pause</mat-icon></button>
+  }
 <div echarts style="height: 100%; width: 100%;" [options]="chartOptionsRok" (chartInit)="onChartRokInit($event)"
         (chartBrushEnd)="onSetYears($event)" >
-      </div>
+</div>
+</div>

@@ -64,6 +64,7 @@ export class MapComponent {
 
 
   loading: boolean;
+  running: boolean;
   invalidTenant: boolean;
   map: Map;
   options = {
@@ -126,7 +127,7 @@ export class MapComponent {
 
   clickTenant(t: Tenant) {
     this.state.setSelectedTenants();
-    this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
+    this.router.navigate([], { queryParams: { tenant: this.state.tenants.filter(t => t.selected).map(t => t.val).toString() } });
   }
 
   changeTenant() {
@@ -170,7 +171,10 @@ export class MapComponent {
       if (resp.stats?.stats_fields.latitude) {
         const lat = resp.stats.stats_fields.latitude;
         const lon = resp.stats.stats_fields.longitude;
-        this.map.fitBounds(L.latLngBounds([lat.max, lon.min], [lat.min, lon.max]))
+        if (!this.running) {
+          this.map.fitBounds(L.latLngBounds([lat.max, lon.min], [lat.min, lon.max]))
+        }
+
       }
       this.authors = resp.facets.identity_recipient ? resp.facets.identity_author.buckets : [];
       this.recipients = resp.facets.identity_recipient ? resp.facets.identity_recipient.buckets : [];
@@ -179,9 +183,30 @@ export class MapComponent {
         this.solrResponse = resp;
         // this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);
       }
-      this.setMap();
+
+      this.setGraphData();
+      if (withMap) {
+        this.setMap();
+      } else {
+        this.graphChart.setOption({series: [
+            {
+              data: this.graphData.nodes,
+              links: this.graphData.links,
+            }
+          ]});
+      }
+
       this.loading = false;
     });
+  }
+
+  changeRunning(r: boolean) {
+    this.running = r;
+    this.graphChart.setOption({series: [
+            {
+              animation: !this.running
+            }
+          ]});
   }
 
   changeLimits(limits: [number, number]) {
@@ -208,7 +233,7 @@ export class MapComponent {
     }[]
   }
 
-  
+
 
   hideNode() {
     this.graphChart.dispatchAction({
@@ -249,7 +274,7 @@ export class MapComponent {
     return n >= this.limits[0] && n <= this.limits[1];
   }
 
-  setMap() {
+  setGraphData() {
 
     this.nodes = {};
     const nodes: any = [];
@@ -284,7 +309,7 @@ export class MapComponent {
               source: letter.origin + '',
               target: letter.destination + '',
               label: place_origin.name + ' > ' + place_destination.name,
-              count: 1
+              count: this.links[linkId].count
             });
           }
         }
@@ -296,14 +321,16 @@ export class MapComponent {
       // this.linkNodes(link.node1, link.node2, link.count, link.letters);
     });
 
-    // this.map.addLayer(this.linkLayer);
-    // this.map.addLayer(this.nodeLayer);
-
     this.graphData = {
       links,
       nodes
     };
 
+  }
+
+  setMap() {
+    // this.map.addLayer(this.linkLayer);
+    // this.map.addLayer(this.nodeLayer);
     this.graphOptions = {
       lmap: {
         // See https://leafletjs.com/reference.html#map-option for details
@@ -334,8 +361,8 @@ export class MapComponent {
           // use `lmap` as the coordinate system
           coordinateSystem: 'lmap',
           // data items [[lng, lat, value], [lng, lat, value], ...]
-          data: nodes,
-          links: links,
+          data: this.graphData.nodes,
+          links: this.graphData.links,
 
           edgeSymbol: ['circle', 'arrow'],
           edgeSymbolSize: [2, 6],

@@ -24,13 +24,22 @@
         </mat-expansion-panel>
     </div>
 }
-    <div *ngIf="keywords_cs">
+    <div>
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'Identities to include' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+          <mat-checkbox [(ngModel)]="includeAuthors" (change)="getData(true)">{{ 'field.authors' | translate}}</mat-checkbox>
+          <mat-checkbox [(ngModel)]="includeRecipients" (change)="getData(true)">{{ 'field.recipients' | translate}}</mat-checkbox>
+      </mat-expansion-panel>
+    </div>
+    <div *ngIf="keyword_categories">
       <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
         <mat-expansion-panel-header>
           <mat-panel-title> {{ 'field.keywords' | translate}} </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-list>
-          @for(k of keywords_cs; track $index; let idx = $index){
+          @for(k of keyword_categories; track $index; let idx = $index){
           <mat-list-item (click)="clickKeyword(k)">
             <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
           </mat-list-item>
@@ -38,15 +47,6 @@
         </mat-list>
       </mat-expansion-panel>
 
-    </div>
-    <div>
-      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title> {{ 'Identities to include' | translate}} </mat-panel-title>
-        </mat-expansion-panel-header>
-          <mat-checkbox [disabled]="includeAuthors && !includeRecipients" [(ngModel)]="includeAuthors" (change)="getData(true)">{{ 'field.authors' | translate}}</mat-checkbox>
-          <mat-checkbox [disabled]="!includeAuthors && includeRecipients" [(ngModel)]="includeRecipients" (change)="getData(true)">{{ 'field.recipients' | translate}}</mat-checkbox>
-      </mat-expansion-panel>
     </div>
     <div *ngIf="authors">
       <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
@@ -83,19 +83,38 @@
         (onChangeLimits)="changeLimits($event)"></app-years-chart>
     </div>
 
-    <div class="app-fxFlex">
-      <div style="overflow: auto; height:100%; ">
-        <div echarts style="width: 100%;" [options]="treeMapOptions" (chartInit)="onTreeMapChartInit($event)">
-        </div>
-      </div>
+    <div class="app-fill-w" style="overflow: auto; ">
+      
+            <mat-card appearance="outlined">
+                <mat-card-content>
+                    <div style="overflow: auto; height:350px; ">
+                        <div echarts style="width: 100%; height:100%;" [options]="pieOptions"
+                            (chartInit)="onPieChartInit($event)">
+                        </div>
+                    </div>
+                </mat-card-content>
+              </mat-card>
+              @if (this.includeAuthors) {
+            <mat-card appearance="outlined">
+                <mat-card-content>
+                    <div style="overflow: auto; height:500px; ">
+                        <div echarts style="width: 100%;" [options]="treeMapOptions" (chartInit)="onTreeMapChartAutorsInit($event)">
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+          }
+          @if (this.includeRecipients) {
+            <mat-card appearance="outlined">
+                <mat-card-content>
+                    <div style="overflow: auto; height:500px; ">
+                        <div echarts style="width: 100%;" [options]="treeMapOptions" (chartInit)="onTreeMapChartRecipientsInit($event)">
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+          }
     </div>
 
-    <!-- <div class="app-fxFlex">
-      <div style="overflow: auto; height: 800px">
-        <div *ngIf="chartType === 0" echarts style="width: 100%;" [style.height]="(mentioned.length * 32) + 'px'"
-          [options]="identitiesChartOptions" (chartInit)="onChartInit($event)">
-        </div>
-      </div>
-    </div> -->
   </div>
 </div>

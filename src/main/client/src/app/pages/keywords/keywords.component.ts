@@ -15,7 +15,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
-import { EChartsOption, ECharts } from 'echarts';
+import { EChartsOption, ECharts, color } from 'echarts';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { BarChart } from 'echarts/charts';
 import { TreemapChart, TreeChart } from 'echarts/charts';
@@ -52,16 +52,20 @@ export class KeywordsComponent {
   authors: JSONFacet[];
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
-  keywords_cs: JSONFacet[];
+  keyword_categories: JSONFacet[];
   selectedKeywords: string[] = [];
 
+
+  pieOptions: EChartsOption = {};
+  pieChart: ECharts;
 
   identitiesChartOptions: EChartsOption = {};
   identitiesChart: ECharts;
   barColor: string;
 
   treeMapOptions: EChartsOption = {};
-  treeMapChart: ECharts;
+  treeMapChartAutors: ECharts;
+  treeMapChartRecipients: ECharts;
   colors = [
     '#3531c2',
     '#c23531',
@@ -82,7 +86,7 @@ export class KeywordsComponent {
   chartHeight: number = 400;
   totalBuckets = 0;
 
-  tenants: Tenant[]=[];
+  tenants: Tenant[] = [];
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -100,9 +104,9 @@ export class KeywordsComponent {
   }
 
   ngOnInit(): void {
-    
+
     this.translation.onLangChange.subscribe(() => { this.getData(true) });
-    this.state.tenants.forEach(t => {t.available = true});
+    this.state.tenants.forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'keywords');
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     if (this.tenants.length > 0) {
@@ -123,23 +127,22 @@ export class KeywordsComponent {
     this.identitiesChart = e;
   }
 
-  onTreeMapChartInit(e: any) {
-    this.treeMapChart = e;
+  onTreeMapChartAutorsInit(e: any) {
+    this.treeMapChartAutors = e;
   }
 
-  onChangeChartType() {
-    this.loading = true;
-    this.identitiesChartOptions = {};
-    setTimeout(() => {
-      this.setTreeMapChart();
-      this.loading = false;
-    }, 1000);
 
+  onTreeMapChartRecipientsInit(e: any) {
+    this.treeMapChartRecipients = e;
+  }
+
+  onPieChartInit(e: any) {
+    this.pieChart = e;
   }
 
   clickTenant(t: Tenant) {
     this.state.setSelectedTenants();
-    this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
+    this.router.navigate([], { queryParams: { tenant: this.state.tenants.filter(t => t.selected).map(t => t.val).toString() } });
   }
 
   changeTenant() {
@@ -172,25 +175,26 @@ export class KeywordsComponent {
         this.solrResponse = resp;
         const ts: JSONFacet[] = resp.facets.tenants.buckets;
         this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
-        // if (!this.tenant.available) {
-        //   // this.state.tenant.set(null);
-        //   this.loading = false;
-        //   this.invalidTenant = true;
-        //   return;
-        // }
       }
       this.authors = resp.facets.identity_author.buckets;
       this.recipients = this.solrResponse.facets.identity_recipient.buckets;
       // this.mentioned = resp.facets.identity_mentioned.buckets;
-      this.keywords_cs = resp.facets.keywords_categories.buckets;
+      this.keyword_categories = resp.facets.keywords_categories.buckets;
 
-      this.keywords_cs.forEach(k => {
+      this.keyword_categories.forEach(k => {
         k.selected = this.selectedKeywords.includes(k.val);
       });
 
-        const ops = this.setTreeMapChart();
-        // this.treeMapOptions = this.setTreeMapChart();
-        this.treeMapChart.setOption(ops);
+      
+    this.setPieChart();
+
+      //const ops = this.setTreeMapChart();
+      if (this.includeAuthors) {
+        this.treeMapChartAutors.setOption(this.setTreeMapChart('authors'));
+      }
+      if (this.includeRecipients) {
+        this.treeMapChartRecipients.setOption(this.setTreeMapChart('recipients'));
+      }
 
       this.loading = false;
     });
@@ -198,7 +202,7 @@ export class KeywordsComponent {
 
   clickKeyword(k: JSONFacet) {
     k.selected = !k.selected;
-    this.selectedKeywords = this.keywords_cs.filter(k => k.selected).map(k => k.val);
+    this.selectedKeywords = this.keyword_categories.filter(k => k.selected).map(k => k.val);
     this.getData(true);
   }
 
@@ -211,13 +215,62 @@ export class KeywordsComponent {
     }
   }
 
-  setTreeMapChart(): EChartsOption {
+  setPieChart() {
+    const data: any[] = [];
+    this.keyword_categories.forEach((p: JSONFacet) => {
+      let i = 0;
+      data.push({
+        id: p.val,
+        name: p.val,
+        value: p.count
+      })
+    });
+
+    this.pieOptions = {
+      title: {
+        show: true,
+        text: 'Keywords categories',
+        left: 'center'
+      },
+      legend: {
+        type: data.length > 15 ? 'scroll' : 'plain',
+        orient: 'vertical',
+        right: 10,
+        data: data.map(a => a.name),
+        formatter: name => {
+          var series: any = this.pieChart.getOption()['series'];
+          var value = series[0].data.filter((row: any) => row.name === name)[0].value
+          return name + ' - ' + value;
+        },
+      },
+      tooltip: {
+        // formatter: (params: any) => {
+        //   return params.dataType === 'edge' ?
+        //     `${params.data.label} (${params.data.count})` :
+        //     params.name
+        // }
+      },
+      series: [
+        {
+          color: this.colors,
+          type: 'pie',
+          radius: '55%',
+          center: ['30%', '50%'],
+          selectedMode: 'single',
+          data: data
+        }
+      ]
+    }
+  }
+
+  setTreeMapChart(role: string): EChartsOption {
     const formatUtil = echarts.format;
     const data: any = [];
     this.totalBuckets = 0;
-    this.keywords_cs.forEach((cat: any) => {
+    this.keyword_categories.forEach((cat: any) => {
       const ks: any = [];
-      cat.keywords.buckets.forEach((k: any) => {
+      const buckets = role === 'authors' ? cat.keywords_autor.buckets : cat.keywords_recipient.buckets;
+      buckets.forEach((k: any) => {
         const ids: any = [];
         this.totalBuckets += k.identities.buckets.length;
         k.identities.buckets.forEach((i: any) => {
@@ -243,7 +296,7 @@ export class KeywordsComponent {
     this.chartHeight = 500;
     return {
       title: {
-        text: 'Zmiňované osoby ve vztahu ke specifickým tématům či debatám',
+        text: this.translation.instant('field.' + role) + ' ve vztahu ke specifickým tématům či debatám',
         left: 'center'
       },
       tooltip: {
@@ -264,9 +317,12 @@ export class KeywordsComponent {
       },
       series: [
         {
-          name: 'Categories',
+          roam: 'move',
+          name: 'Keywords by categories',
           type: 'treemap',
           colorMappingBy: 'id',
+          leafDepth: 2,
+          drillDownIcon: '',
           visibleMin: 300,
           label: {
             show: true,
@@ -276,6 +332,10 @@ export class KeywordsComponent {
             borderColor: '#fff'
           },
           levels: this.getLevelOption(),
+          upperLabel: {
+            show: true,
+            height: 30
+          },
           data: data
         }
       ]
@@ -288,20 +348,27 @@ export class KeywordsComponent {
     return [
       {
         color: this.colors,
-        // colorMappingBy: 'id',
         itemStyle: {
           borderWidth: 0,
           gapWidth: 5
+        },
+        upperLabel: {
+          show: false
         }
       },
       {
-        //colorMappingBy: 'id',
         itemStyle: {
+          borderColor: '#ddd',
+          borderWidth: 5,
           gapWidth: 1
+        },
+        emphasis: {
+          itemStyle: {
+            borderColor: '#ddd'
+          }
         }
       },
       {
-        //colorMappingBy: 'id',
         colorSaturation: [0.35, 0.5],
         itemStyle: {
           gapWidth: 1,
