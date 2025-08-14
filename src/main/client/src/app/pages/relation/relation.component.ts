@@ -1,4 +1,4 @@
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
 import { Component, effect, Inject, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -30,10 +30,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Grid
 
 @Component({
   selector: 'app-relation',
-  imports: [TranslateModule, FormsModule, CommonModule,
-    NgxEchartsDirective, MatProgressBarModule, MatExpansionModule,
-    MatFormFieldModule, MatSelectModule, MatListModule,
-    MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent],
   providers: [
     provideEchartsCore({ echarts }),
   ],

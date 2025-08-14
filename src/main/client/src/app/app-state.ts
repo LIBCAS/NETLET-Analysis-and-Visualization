@@ -6,6 +6,10 @@ export interface Tenant {
     count: number,
     date_year_max: number,
     date_year_min: number,
+    date_computed_max_s: string,
+    date_computed_min_s: string,
+    date_computed_max: Date,
+    date_computed_min: Date,
     available: boolean,
     selected: boolean,
   }
@@ -62,6 +66,11 @@ export interface Tenant {
       header: '',
       text: 'Schémata zobrazující tematická propojení dopisů a korespondenčních celků',
       route: ''
+    },
+    {
+      header: '',
+      text: 'Zobrazení dopisů v chronologickém pořadí na časové ose',
+      route: 'timeline'
     },
   ];
   currentView: {header: string, text: string, route: string};

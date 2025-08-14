@@ -1,7 +1,7 @@
 import { Component, effect, Inject, NgZone } from '@angular/core';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -53,10 +53,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Titl
 
 @Component({
   selector: 'app-map',
-  imports: [TranslateModule, FormsModule, CommonModule,
-    LeafletModule, MatCardModule, MatExpansionModule, MatCheckboxModule,
-    MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule,
-    MatIconModule, MatProgressBarModule, YearsChartComponent, LettersInfoComponent],
+  imports: [TranslateModule, FormsModule, LeafletModule, MatCardModule, MatExpansionModule, MatCheckboxModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule, MatIconModule, MatProgressBarModule, YearsChartComponent, LettersInfoComponent],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss'
 })

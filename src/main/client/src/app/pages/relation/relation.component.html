@@ -1,86 +1,96 @@
-<mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+@if (loading) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
-    <div style="flex: 1 30%;" class="app-filters">
+  <div style="flex: 1 30%;" class="app-filters">
 
-        <div *ngIf="tenant">
-            <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-                <mat-expansion-panel-header>
-                    <mat-panel-title> {{ 'field.relation_tenants' | translate}} </mat-panel-title>
-                </mat-expansion-panel-header>
-                <mat-list>
-                    @for(k of state.tenants; track $index; let idx = $index;){
-                    @let is = intersection(k);
-                    <mat-list-item (click)="clickTenant(k)">
-                        <mat-checkbox [disabled]="k.val === tenant.val || is.start === 0"
-                            [checked]="k.selected || k.val === tenant.val">{{ k.val}} {{k.date_year_min}} -
-                            {{k.date_year_max}} ({{k.count}}) </mat-checkbox>
-                    </mat-list-item>
-                    }
-                </mat-list>
-            </mat-expansion-panel>
-        </div>
+    @if (tenant) {
+      <div>
+        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'field.relation_tenants' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list>
+            @for(k of state.tenants; track $index; let idx = $index;){
+              @let is = intersection(k);
+              <mat-list-item (click)="clickTenant(k)">
+                <mat-checkbox [disabled]="k.val === tenant.val || is.start === 0"
+                  [checked]="k.selected || k.val === tenant.val">{{ k.val}} {{k.date_year_min}} -
+                {{k.date_year_max}} ({{k.count}}) </mat-checkbox>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+      </div>
+    }
 
-        <!-- <div *ngIf="authors">
-            <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0">
-                <mat-expansion-panel-header>
-                    <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
-                </mat-expansion-panel-header>
-                <mat-list>
-                @for(k of authors; track $index; let idx = $index){
-                <mat-list-item (mouseover)="showNode(k, 'author')" (mouseout)="hideNode()">
-                    {{ k.val}} ({{k.count}})
-                </mat-list-item>
-                }
-            </mat-list>
-            </mat-expansion-panel>    
-        </div> -->
-        <div *ngIf="recipients">
-            <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0">
-                <mat-expansion-panel-header>
-                    <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
-                </mat-expansion-panel-header>
-                <mat-list>
-                @for(k of recipients; track $index; let idx = $index){
-                <mat-list-item (mouseover)="showNode(k, 'recipient')" (mouseout)="hideNode()">
-                    {{ k.val}} ({{k.count}})
-                </mat-list-item>
-                }
-            </mat-list>
-            </mat-expansion-panel>  
-        </div>
-
-        <!-- <div *ngIf="mentioned">
-            <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0">
-                <mat-expansion-panel-header>
-                    <mat-panel-title> {{ 'field.mentioned' | translate}} ({{mentioned.length}})</mat-panel-title>
-                </mat-expansion-panel-header>
-                <mat-list>
-                    @for(k of mentioned; track $index; let idx = $index){
-                    <mat-list-item (mouseover)="showNode(k, 'mentioned')" (mouseout)="hideNode()">
-                        {{ k.val}} ({{k.count}})
-                    </mat-list-item>
-                    }
-                </mat-list>
-            </mat-expansion-panel>
-        </div> -->
-
+    <!-- <div *ngIf="authors">
+    <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0">
+      <mat-expansion-panel-header>
+        <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-list>
+        @for(k of authors; track $index; let idx = $index){
+          <mat-list-item (mouseover)="showNode(k, 'author')" (mouseout)="hideNode()">
+            {{ k.val}} ({{k.count}})
+          </mat-list-item>
+        }
+      </mat-list>
+    </mat-expansion-panel>
+  </div> -->
+  @if (recipients) {
+    <div>
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          @for(k of recipients; track $index; let idx = $index){
+            <mat-list-item (mouseover)="showNode(k, 'recipient')" (mouseout)="hideNode()">
+              {{ k.val}} ({{k.count}})
+            </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
     </div>
-    <div class="app-content app-fill-w app-fill-h">
-        <div class="app-years">
-            <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
-                (onChangeLimits)="changeLimits($event)"></app-years-chart>
-        </div>
+  }
 
-        <div class="app-fxFlex">
-            <div style="overflow: auto; height:100%; ">
-                <div echarts style="width: 100%; height:100%;" [options]="graphOptions"
-                    (chartInit)="onGraphChartInit($event)">
-                </div>
-            </div>
+  <!-- <div *ngIf="mentioned">
+  <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0">
+    <mat-expansion-panel-header>
+      <mat-panel-title> {{ 'field.mentioned' | translate}} ({{mentioned.length}})</mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-list>
+      @for(k of mentioned; track $index; let idx = $index){
+        <mat-list-item (mouseover)="showNode(k, 'mentioned')" (mouseout)="hideNode()">
+          {{ k.val}} ({{k.count}})
+        </mat-list-item>
+      }
+    </mat-list>
+  </mat-expansion-panel>
+</div> -->
 
-        </div>
-        <div class="app-letters-info" *ngIf="infoHeader">
-            <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
-        </div>
+</div>
+<div class="app-content app-fill-w app-fill-h">
+  <div class="app-years">
+    @if (solrResponse?.facets.date_year) {
+      <app-years-chart [dateYearFacet]="solrResponse.facets.date_year"
+      (onChangeLimits)="changeLimits($event)"></app-years-chart>
+    }
+  </div>
+
+  <div class="app-fxFlex">
+    <div style="overflow: auto; height:100%; ">
+      <div echarts style="width: 100%; height:100%;" [options]="graphOptions"
+        (chartInit)="onGraphChartInit($event)">
+      </div>
     </div>
+
+  </div>
+  @if (infoHeader) {
+    <div class="app-letters-info">
+      <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
+    </div>
+  }
+</div>
 </div>

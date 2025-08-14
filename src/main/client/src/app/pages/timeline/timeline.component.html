@@ -1,0 +1,75 @@
+<div class="app-loading">@if(loading){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
+<div class="app-fxLayout app-row app-fill" style="position: relative;">
+  <div style="flex: 1 30%;" class="app-filters">
+
+    @if (authors) {
+      <div>
+        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list>
+            @for(k of authors; track $index; let idx = $index){
+              <mat-list-item>
+                {{ k.val}} ({{k.count}})
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+      </div>
+    }
+    @if (recipients) {
+      <div>
+        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list>
+            @for(k of recipients; track $index; let idx = $index){
+              <mat-list-item>
+                {{ k.val}} ({{k.count}})
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+      </div>
+    }
+    @if (mentioned) {
+      <div>
+        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'field.mentioned' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list>
+            @for(k of mentioned; track $index; let idx = $index){
+              <mat-list-item>
+                <span>{{ k.val}} ({{k.count}}) </span>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+      </div>
+    }
+
+  </div>
+  <div class="app-content app-fill-w app-fill-h">
+    <div class="app-timeline">
+      <div echarts style="height: 100%; width: 100%;" [options]="chartOptions" (chartInit)="onChartInit($event)"
+        (chartBrushEnd)="onBrushChanged($event)" >
+      </div>
+<div style="overflow: auto; height:100%; ">
+        
+            Počet dopisů : {{ letters().length }}
+              <div class="app-info-row">
+            @for(letter of letters(); track $index; let idx = $index){
+              <div>
+                <span>{{letter.identity_author}} -> {{letter.identity_recipient}} {{ letterPlaces(letter) }} {{ letter.date_computed | date : 'dd.MM.yyyy'}}</span>
+                <button class="app-hiko" mat-icon-button (click)="viewLetterInHIKO(letter.letter_id, letter.tenant)"
+              [matTooltip]="'action.view_in_hiko' | translate"><mat-icon>arrow_outward</mat-icon></button>     
+              </div>
+            } 
+              </div>
+      </div>
+
+    </div>
+  </div>

@@ -84,4 +84,8 @@ export class AppService {
   getProfessions(params: HttpParams): Observable<any> {
     return this.get('data/professions', params)
   }
+
+  getTimeline(params: HttpParams): Observable<any> {
+    return this.get('data/timeline', params)
+  }
 }

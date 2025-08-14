@@ -29,6 +29,18 @@ import { Configuration } from './shared/config';
         return this.config.colors;
     }
 
+    public get hikoUrl() {
+        return this.config.hikoUrl;
+    }
+
+    public get isTest() {
+        return this.config.isTest;
+    }
+
+    public get test_mappings() {
+        return this.config.test_mappings;
+    }
+
     constructor(
         private http: HttpClient,
         public state: AppState) { }
@@ -43,7 +55,11 @@ import { Configuration } from './shared/config';
                 this.config = cfg as Configuration;
                 return this.http.get('api/data/get_tenants').pipe(tap((res: any) => {
                     this.state.tenants = res.buckets;
-                    this.state.tenants.forEach(t => {t.available = true});
+                    this.state.tenants.forEach(t => {
+                        t.date_computed_max = new Date(t.date_computed_max_s);
+                        t.date_computed_min = new Date(t.date_computed_min_s);
+                        t.available = true
+                    });
                 }));
             }),
             catchError((err) => {

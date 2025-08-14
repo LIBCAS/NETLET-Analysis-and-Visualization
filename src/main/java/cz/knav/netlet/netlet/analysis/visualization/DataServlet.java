@@ -69,6 +69,7 @@ public class DataServlet extends HttpServlet {
         GET_TENANTS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                
                 JSONObject ret = IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant");
                 return ret;
             }
@@ -164,6 +165,16 @@ public class DataServlet extends HttpServlet {
                 JSONObject ret = new JSONObject();
                 if (request.getParameter("tenant") != null) {
                     ret = IndexSearcher.getProfessions(request);
+                }
+                return ret;
+            }
+        },
+        TIMELINE {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                JSONObject ret = new JSONObject();
+                if (request.getParameter("tenant") != null) {
+                    ret = IndexSearcher.getTimeLine(request);
                 }
                 return ret;
             }

@@ -1,87 +1,95 @@
 <div class="app-loading">@if(loading && !running){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
   <div style="flex: 1 30%;" class="app-filters">
-@if (state.tenant()) {
-    <div>
+    @if (state.tenant()) {
+      <div>
         <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-            <mat-expansion-panel-header>
-                <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
-            </mat-expansion-panel-header>
-            <mat-list>
-                @for(k of state.tenants; track $index; let idx = $index;){
-                <mat-list-item (click)="clickTenant(k)">
-                    <mat-checkbox [disabled]="k.val === state.tenant().val"
-                        [(ngModel)]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
-                </mat-list-item>
-                }
-            </mat-list>
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list>
+            @for(k of state.tenants; track $index; let idx = $index;){
+              <mat-list-item (click)="clickTenant(k)">
+                <mat-checkbox [disabled]="k.val === state.tenant().val"
+                [(ngModel)]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
+              </mat-list-item>
+            }
+          </mat-list>
         </mat-expansion-panel>
-    </div>
-}
-    <div *ngIf="authors">
-      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-list>
-          @for(k of authors; track $index; let idx = $index){
-          <mat-list-item (mouseover)="showNode(k, 'author')" (mouseout)="hideNode()">
-            {{ k.val}} ({{k.count}})
-          </mat-list-item>
-          }
-        </mat-list>
-      </mat-expansion-panel>
-    </div>
-    <div *ngIf="recipients">
-      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-list>
-          @for(k of recipients; track $index; let idx = $index){
-          <mat-list-item (mouseover)="showNode(k, 'recipient')" (mouseout)="hideNode()">
-            {{ k.val}} ({{k.count}})
-          </mat-list-item>
-          }
-        </mat-list>
-      </mat-expansion-panel>
-    </div>
-    <div *ngIf="mentioned">
-      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title> {{ 'field.mentioned' | translate}} </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-list>
-          @for(k of mentioned; track $index; let idx = $index){
-          <mat-list-item (mouseover)="showNode(k, 'mentioned')" (mouseout)="hideNode()">
-            <span [style.color]="colors[idx % colors.length]">{{ k.val}} ({{k.count}}) </span>
-          </mat-list-item>
-          }
-        </mat-list>
-      </mat-expansion-panel>
-    </div>
+      </div>
+    }
+    @if (authors) {
+      <div>
+        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list>
+            @for(k of authors; track $index; let idx = $index){
+              <mat-list-item (mouseover)="showNode(k, 'author')" (mouseout)="hideNode()">
+                {{ k.val}} ({{k.count}})
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+      </div>
+    }
+    @if (recipients) {
+      <div>
+        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list>
+            @for(k of recipients; track $index; let idx = $index){
+              <mat-list-item (mouseover)="showNode(k, 'recipient')" (mouseout)="hideNode()">
+                {{ k.val}} ({{k.count}})
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+      </div>
+    }
+    @if (mentioned) {
+      <div>
+        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'field.mentioned' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list>
+            @for(k of mentioned; track $index; let idx = $index){
+              <mat-list-item (mouseover)="showNode(k, 'mentioned')" (mouseout)="hideNode()">
+                <span [style.color]="colors[idx % colors.length]">{{ k.val}} ({{k.count}}) </span>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+      </div>
+    }
 
     @if (keywords) {
-      
+
       <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
         <mat-expansion-panel-header>
           <mat-panel-title> {{ 'field.keywords' | translate}} </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-list>
           @for(k of keywords; track $index; let idx = $index){
-          <mat-list-item (click)="addFilter('keyword', k.val)">
-            <span [style.color]="colors[idx % colors.length]">{{ k.val}} ({{k.count}}) </span>
-          </mat-list-item>
+            <mat-list-item (click)="addFilter('keyword', k.val)">
+              <span [style.color]="colors[idx % colors.length]">{{ k.val}} ({{k.count}}) </span>
+            </mat-list-item>
           }
         </mat-list>
       </mat-expansion-panel>
     }
 
   </div>
-    <div class="app-content app-fill-w app-fill-h">
+  <div class="app-content app-fill-w app-fill-h">
     <div class="app-years">
-      <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
+      @if (solrResponse?.facets.date_year) {
+        <app-years-chart [dateYearFacet]="solrResponse.facets.date_year"
         (onChangeLimits)="changeLimits($event)"  [withAnimation]="false" (onChangeRunning)="changeRunning($event)"></app-years-chart>
+      }
     </div>
 
     <div class="app-fxFlex">
@@ -91,10 +99,12 @@
       </div>
     </div>
 
-    
-    <div class="app-letters-info" *ngIf="infoHeader">
-      <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
-    </div>
+
+    @if (infoHeader) {
+      <div class="app-letters-info">
+        <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
+      </div>
+    }
 
   </div>
 </div>

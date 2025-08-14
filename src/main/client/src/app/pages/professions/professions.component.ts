@@ -1,4 +1,4 @@
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
 import { Component, effect, Inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -30,11 +30,7 @@ echarts.use([CanvasRenderer, PieChart, GraphChart, LegendComponent, TooltipCompo
 
 @Component({
   selector: 'app-professions',
-  imports: [TranslateModule, FormsModule, CommonModule,
-    NgxEchartsDirective, MatProgressBarModule, MatCardModule,
-    MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule,
-    MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent
-  ],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent],
   providers: [
     provideEchartsCore({ echarts }),
   ],

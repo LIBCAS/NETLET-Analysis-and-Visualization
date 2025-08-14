@@ -15,7 +15,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Facet, JSONFacet } from '../../shared/facet';
 import { HttpParams } from '@angular/common/http';
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { Letter, Place } from '../../shared/letter';
 import { MatIconModule } from '@angular/material/icon';
 import { AppState, Tenant } from '../../app-state';
@@ -26,10 +26,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
   selector: 'app-map-view',
-  imports: [TranslateModule, FormsModule, CommonModule,
-    LeafletModule, MatCardModule, MatExpansionModule,
-    MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule,
-    MatIconModule, MatProgressBarModule, YearsChartComponent, LettersInfoComponent],
+  imports: [TranslateModule, FormsModule, LeafletModule, MatCardModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule, MatIconModule, MatProgressBarModule, YearsChartComponent, LettersInfoComponent],
   templateUrl: './map-view.component.html',
   styleUrl: './map-view.component.scss'
 })

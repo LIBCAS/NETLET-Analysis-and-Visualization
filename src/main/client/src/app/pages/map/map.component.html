@@ -1,90 +1,104 @@
 <div class="app-loading">@if(loading && !running){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
-<mat-card *ngIf="invalidTenant" appearance="outlined" class="app-invalidTenant">
-  <mat-card-header>
-    <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
-  </mat-card-header>
-</mat-card>
+@if (invalidTenant) {
+  <mat-card appearance="outlined" class="app-invalidTenant">
+    <mat-card-header>
+      <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
+    </mat-card-header>
+  </mat-card>
+}
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
   <div style="flex: 1 30%;" class="app-filters">
-    
-@if (state.tenant()) {
-    <div>
-        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-            <mat-expansion-panel-header>
-                <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
-            </mat-expansion-panel-header>
-            <mat-list>
-                @for(k of state.tenants; track $index; let idx = $index;){
-                <mat-list-item (click)="clickTenant(k)">
-                    <mat-checkbox [disabled]="k.val === state.tenant().val"
-                        [(ngModel)]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
-                </mat-list-item>
-                }
-            </mat-list>
-        </mat-expansion-panel>
-    </div>
-}
 
-    <div *ngIf="authors">
-      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-list>
-          @for(identity of authors; track $index; let idx = $index){
-          <mat-list-item (click)="clickRecipient(identity)">
-            <span [class.app-selected]="identity === activeIdentity"><mat-icon *ngIf="identity === activeIdentity"
-                class="app-va-tb">check</mat-icon>
+    @if (state.tenant()) {
+      <div>
+        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list>
+            @for(k of state.tenants; track $index; let idx = $index;){
+              <mat-list-item (click)="clickTenant(k)">
+                <mat-checkbox [disabled]="k.val === state.tenant().val"
+                [(ngModel)]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+      </div>
+    }
+
+    @if (authors) {
+      <div>
+        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list>
+            @for(identity of authors; track $index; let idx = $index){
+              <mat-list-item (click)="clickRecipient(identity)">
+                <span [class.app-selected]="identity === activeIdentity">@if (identity === activeIdentity) {
+                  <mat-icon
+                  class="app-va-tb">check</mat-icon>
+                }
               {{ identity.val}} ({{identity.count}})</span>
-          </mat-list-item>
+            </mat-list-item>
           }
         </mat-list>
       </mat-expansion-panel>
     </div>
-    <div *ngIf="recipients">
+  }
+  @if (recipients) {
+    <div>
       <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
         <mat-expansion-panel-header>
           <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-list>
           @for(identity of recipients; track $index; let idx = $index){
-          <mat-list-item (click)="clickRecipient(identity)">
-            <span [class.app-selected]="identity === activeIdentity"><mat-icon *ngIf="identity === activeIdentity"
+            <mat-list-item (click)="clickRecipient(identity)">
+              <span [class.app-selected]="identity === activeIdentity">@if (identity === activeIdentity) {
+                <mat-icon
                 class="app-va-tb">check</mat-icon>
-              {{ identity.val}} ({{identity.count}})</span>
+              }
+            {{ identity.val}} ({{identity.count}})</span>
           </mat-list-item>
-          }
-        </mat-list>
-      </mat-expansion-panel>
-    </div>
-    <!-- <div *ngIf="mentioned">
-      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title> {{ 'field.mentioned' | translate}} </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-list>
-          @for(identity of mentioned; track $index; let idx = $index){
-        <mat-list-item (mouseout)="clearHighlight()" (click)="highlightLinks(identity)">
-          {{ identity.val}} ({{identity.count}})
-        </mat-list-item>
         }
-        </mat-list>
-      </mat-expansion-panel>
-      
-    </div> -->
+      </mat-list>
+    </mat-expansion-panel>
   </div>
-    <div class="app-content app-fill-w app-fill-h">
-    <div class="app-years">
-      <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
-        (onChangeLimits)="changeLimits($event)" [withAnimation]="true" (onChangeRunning)="changeRunning($event)"></app-years-chart>
-    </div>
-    <div style="height: 100%; width: 100%;" id="echarts-lmap" class="app-fxFlex"></div>
-    <!-- <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"
-      (leafletMapReady)="onMapReady($event)">
-    </div> -->
-    <div class="app-letters-info" *ngIf="infoHeader">
-      <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
-    </div>
+}
+<!-- <div *ngIf="mentioned">
+<mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+  <mat-expansion-panel-header>
+    <mat-panel-title> {{ 'field.mentioned' | translate}} </mat-panel-title>
+  </mat-expansion-panel-header>
+  <mat-list>
+    @for(identity of mentioned; track $index; let idx = $index){
+      <mat-list-item (mouseout)="clearHighlight()" (click)="highlightLinks(identity)">
+        {{ identity.val}} ({{identity.count}})
+      </mat-list-item>
+    }
+  </mat-list>
+</mat-expansion-panel>
+
+</div> -->
+</div>
+<div class="app-content app-fill-w app-fill-h">
+  <div class="app-years">
+    @if (solrResponse?.facets.date_year) {
+      <app-years-chart [dateYearFacet]="solrResponse.facets.date_year"
+      (onChangeLimits)="changeLimits($event)" [withAnimation]="true" (onChangeRunning)="changeRunning($event)"></app-years-chart>
+    }
   </div>
+  <div style="height: 100%; width: 100%;" id="echarts-lmap" class="app-fxFlex"></div>
+  <!-- <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"
+  (leafletMapReady)="onMapReady($event)">
+</div> -->
+@if (infoHeader) {
+  <div class="app-letters-info">
+    <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
+  </div>
+}
+</div>
 
 </div>

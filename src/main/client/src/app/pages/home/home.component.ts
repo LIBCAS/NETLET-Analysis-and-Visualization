@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -8,8 +8,7 @@ import { AppState } from '../../app-state';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, RouterModule, TranslateModule,
-    MatCardModule, MatButtonModule],
+  imports: [RouterModule, TranslateModule, MatCardModule, MatButtonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

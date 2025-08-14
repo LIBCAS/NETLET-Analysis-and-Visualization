@@ -1,82 +1,91 @@
-<mat-progress-bar *ngIf="loading" mode="indeterminate" class="app-loading"></mat-progress-bar>
-<mat-card *ngIf="invalidTenant" appearance="outlined" class="app-invalidTenant">
+@if (loading) {
+  <mat-progress-bar mode="indeterminate" class="app-loading"></mat-progress-bar>
+}
+@if (invalidTenant) {
+  <mat-card appearance="outlined" class="app-invalidTenant">
     <mat-card-header>
-        <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
+      <mat-card-title> {{ 'invalidTenant' | translate}} </mat-card-title>
     </mat-card-header>
-</mat-card>
-<div class="app-fxLayout app-row app-fill" style="position: relative;" *ngIf="!invalidTenant">
+  </mat-card>
+}
+@if (!invalidTenant) {
+  <div class="app-fxLayout app-row app-fill" style="position: relative;">
     <div style="flex: 1 30%;" class="app-filters">
-        
-@if (state.tenant()) {
-    <div>
-        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+      @if (state.tenant()) {
+        <div>
+          <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
             <mat-expansion-panel-header>
-                <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
+              <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
             </mat-expansion-panel-header>
             <mat-list>
-                @for(k of state.tenants; track $index; let idx = $index;){
+              @for(k of state.tenants; track $index; let idx = $index;){
                 <mat-list-item (click)="clickTenant(k)">
-                    <mat-checkbox [disabled]="k.val === state.tenant().val"
-                        [(ngModel)]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
+                  <mat-checkbox [disabled]="k.val === state.tenant().val"
+                  [(ngModel)]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
                 </mat-list-item>
-                }
+              }
             </mat-list>
-        </mat-expansion-panel>
-    </div>
-}
-
-        <div *ngIf="professions_author">
-            <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-                <mat-expansion-panel-header>
-                    <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
-                </mat-expansion-panel-header>
-                <mat-list>
-                    @for(k of professions_author; track $index; let idx = $index){
-                    <mat-list-item (mouseover)="showNode(k, 'author')" (mouseout)="hideNode()">
-                        {{ k.val}} ({{k.count}})
-                    </mat-list-item>
-                    }
-                </mat-list>
-            </mat-expansion-panel>
+          </mat-expansion-panel>
         </div>
-        <div *ngIf="professions_recipient">
-            <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-                <mat-expansion-panel-header>
-                    <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
-                </mat-expansion-panel-header>
-                <mat-list>
-                    @for(k of professions_recipient; track $index; let idx = $index){
-                    <mat-list-item (mouseover)="showNode(k, 'recipient')" (mouseout)="hideNode()">
-                        {{ k.val}} ({{k.count}})
-                    </mat-list-item>
-                    }
-                </mat-list>
-            </mat-expansion-panel>
+      }
+      @if (professions_author) {
+        <div>
+          <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-list>
+              @for(k of professions_author; track $index; let idx = $index){
+                <mat-list-item (mouseover)="showNode(k, 'author')" (mouseout)="hideNode()">
+                  {{ k.val}} ({{k.count}})
+                </mat-list-item>
+              }
+            </mat-list>
+          </mat-expansion-panel>
         </div>
+      }
+      @if (professions_recipient) {
+        <div>
+          <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-list>
+              @for(k of professions_recipient; track $index; let idx = $index){
+                <mat-list-item (mouseover)="showNode(k, 'recipient')" (mouseout)="hideNode()">
+                  {{ k.val}} ({{k.count}})
+                </mat-list-item>
+              }
+            </mat-list>
+          </mat-expansion-panel>
+        </div>
+      }
     </div>
     <div class="app-fill-w" style="overflow: auto; ">
-        <div class="app-years">
-            <app-years-chart *ngIf="solrResponse?.facets.date_year" [dateYearFacet]="solrResponse.facets.date_year"
-                (onChangeLimits)="changeLimits($event)"></app-years-chart>
+      <div class="app-years">
+        @if (solrResponse?.facets.date_year) {
+          <app-years-chart [dateYearFacet]="solrResponse.facets.date_year"
+          (onChangeLimits)="changeLimits($event)"></app-years-chart>
+        }
+      </div>
+      <div class="app-fxFlex">
+        <mat-card appearance="outlined">
+          <mat-card-content>
+            <div style="overflow: auto; height:400px; ">
+              <div echarts style="width: 100%; height:100%;" [options]="pieOptions"
+                (chartInit)="onPieChartInit($event)">
+              </div>
+            </div>
+          </mat-card-content></mat-card>
+          <mat-card appearance="outlined">
+            <mat-card-content>
+              <div style="overflow: auto; height:500px; ">
+                <div echarts style="width: 100%; height:100%;" [options]="graphOptions"
+                  (chartInit)="onGraphChartInit($event)">
+                </div>
+              </div>
+            </mat-card-content></mat-card>
+          </div>
         </div>
-
-        <div class="app-fxFlex">
-            <mat-card appearance="outlined">
-                <mat-card-content>
-                    <div style="overflow: auto; height:400px; ">
-                        <div echarts style="width: 100%; height:100%;" [options]="pieOptions"
-                            (chartInit)="onPieChartInit($event)">
-                        </div>
-                    </div>
-                </mat-card-content></mat-card>
-            <mat-card appearance="outlined">
-                <mat-card-content>
-                    <div style="overflow: auto; height:500px; ">
-                        <div echarts style="width: 100%; height:100%;" [options]="graphOptions"
-                            (chartInit)="onGraphChartInit($event)">
-                        </div>
-                    </div>
-                </mat-card-content></mat-card>
-        </div>
-    </div>
-</div>
+      </div>
+    }

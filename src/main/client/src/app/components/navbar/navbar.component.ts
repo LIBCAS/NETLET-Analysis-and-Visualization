@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -13,9 +13,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule, MatToolbarModule, MatButtonModule, MatIconModule, MatDialogModule,
-    MatCheckboxModule, FormsModule,
-    RouterModule, TranslateModule, MatMenuModule],
+  imports: [MatToolbarModule, MatButtonModule, MatIconModule, MatDialogModule, MatCheckboxModule, FormsModule, RouterModule, TranslateModule, MatMenuModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })

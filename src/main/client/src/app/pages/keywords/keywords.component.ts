@@ -1,5 +1,5 @@
 import { Component, effect, Inject, input } from '@angular/core';
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -30,11 +30,7 @@ echarts.use([BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent,
 
 @Component({
   selector: 'app-keywords',
-  imports: [TranslateModule, FormsModule, CommonModule,
-    NgxEchartsDirective, MatProgressBarModule, MatCardModule,
-    MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule,
-    MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent
-  ],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent],
   templateUrl: './keywords.component.html',
   styleUrl: './keywords.component.scss',
   providers: [

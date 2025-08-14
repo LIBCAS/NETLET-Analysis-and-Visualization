@@ -10,7 +10,8 @@ export interface Letter {
     keywords_category_cs: string[],
     identity_author: string[],
     identity_recipient: string[],
-    identity_mentioned: string[]
+    identity_mentioned: string[],
+    date_computed: string
 }
 
 export interface Place {
