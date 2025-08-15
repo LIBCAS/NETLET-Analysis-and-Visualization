@@ -269,6 +269,12 @@ fieldset {
   background-color: #ddd;
 }
 
+
+
+.mdc-data-table__content>tr:nth-child(even) {
+  background-color: #fff;
+}
+
 .app-info-content {
   max-height: 400px;
   overflow: auto;
@@ -297,11 +303,6 @@ fieldset {
   width: 100%;
 }
 
-.app-timeline {
-  height: 350px; 
-  width: 100%;
-}
-
 .app-invalidTenant {
     top: 100px;
     height: 120px;
@@ -325,4 +326,8 @@ fieldset {
 .app-loading {
   position: absolute;
   width: 100%;
+}
+
+.app-hiko {
+  color: var(--app-hiko-color) !important;
 }

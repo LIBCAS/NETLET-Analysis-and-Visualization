@@ -501,12 +501,18 @@ public class IndexSearcher {
             }
             String[] years = tenant_date_range.split(",");
             RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1MONTH")
+                            .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
                     .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
 
             String rowsP = request.getParameter("rows");
             int rows = 0;
             if (rowsP != null && !rowsP.isBlank()) {
                 rows = Integer.valueOf(rowsP);
+            }
+            String offsetP = request.getParameter("offset");
+            int offset = 0;
+            if (offsetP != null && !offsetP.isBlank()) {
+                offset = Integer.valueOf(offsetP);
             }
             
             final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_" + lang)
@@ -524,6 +530,7 @@ public class IndexSearcher {
                     .setQuery("*:*")
                     //.withFilter("status:publish")
                     .setLimit(rows)
+                    .setOffset(offset)
                     .withFilter("identity_recipient:*")
                     .withFilter("identity_author:*")
                     .setSort("date_computed asc")
@@ -533,6 +540,7 @@ public class IndexSearcher {
                     .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned")
                             .setLimit(1000)
                             .setSort("index")
+                            .withDomain(new DomainMap().withTagsToExclude("ffmentioned"))
                             .setMinCount(1))
                     .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
                             .setLimit(1000)
@@ -542,6 +550,7 @@ public class IndexSearcher {
                     .withFacet("identity_author", new TermsFacetMap("identity_author")
                             .setLimit(1000)
                             .setSort("index")
+                            .withDomain(new DomainMap().withTagsToExclude("ffauthors"))
                             .setMinCount(1));
             String[] tenants = request.getParameterValues("tenant");
             if (tenants.length > 0) {
@@ -552,12 +561,20 @@ public class IndexSearcher {
                 jrequest = jrequest.withFilter("{!tag=ffdate_range}date_computed_range:[" + date_range.replaceAll(",", " TO ") + "]");
             }
 
+            if (request.getParameter("author") != null) {
+                jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(\"" + String.join("\" OR \"", request.getParameterValues("author")) + "\")");
+            }
+
             if (request.getParameter("recipient") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(+\"" + String.join("\" OR \"", request.getParameterValues("recipient")) + "\")");
+                jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(\"" + String.join("\" OR \"", request.getParameterValues("recipient")) + "\")");
+            }
+
+            if (request.getParameter("mentioned") != null) {
+                jrequest = jrequest.withFilter("{!tag=ffmentioned}identity_mentioned:(\"" + String.join("\" OR \"", request.getParameterValues("mentioned")) + "\")");
             }
             
             if (request.getParameter("keyword") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(+\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
+                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
             }
             
 //            QueryResponse queryResponse = jrequest.process(solr, "hiko");

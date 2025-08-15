@@ -4,12 +4,21 @@
   "view": "Zobrazení",
   "views": "Typy zobrazení",
   "clearSelection": "Zrušit výběr",
+  "usedFilters": "Vybrané filtry",
   "field": {
-    "authors": "Autor",
-    "recipients": "Adresát",
+    "author": "Autor",
+    "authors": "Autors",
+    "recipient": "Adresát",
+    "recipients": "Adresáti",
     "mentioned": "Zmíněné osoby",
+    "origin": "Místo odeslání",
+    "destination": "Místo určení",
     "keywords": "Klíčová slova",
-    "relation_tenants": "Katalogy pro porovnani"
+    "relation_tenants": "Katalogy pro porovnani",
+    "date": "Datum"
+  },
+  "action": {
+    "view_in_hiko": "Zobrazit v HIKO"
   },
   "invalidTenant": "Nejsou k dispozice data pro tento Katalog"
 }
