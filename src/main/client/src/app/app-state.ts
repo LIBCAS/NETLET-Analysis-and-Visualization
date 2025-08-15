@@ -4,8 +4,8 @@ import { Injectable, signal } from "@angular/core";
 export interface Tenant {
     val: string,
     count: number,
-    date_year_max: number,
-    date_year_min: number,
+    //date_year_max: number,
+    //date_year_min: number,
     date_computed_max_s: string,
     date_computed_min_s: string,
     date_computed_max: Date,
@@ -91,8 +91,10 @@ export interface Tenant {
     let max = 0; 
     this.tenants.forEach(t => {
       if (t.selected) {
-        min = Math.min(min, t.date_year_min);
-        max = Math.max(max, t.date_year_max);
+        // min = Math.min(min, t.date_computed_min.getFullYear());
+        // max = Math.max(max, t.date_computed_max.getFullYear());
+        min = Math.min(min, t.date_computed_min.getFullYear());
+        max = Math.max(max, t.date_computed_max.getFullYear());
       }
     });
     return [min,max];

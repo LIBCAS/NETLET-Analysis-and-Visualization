@@ -15,8 +15,8 @@
               @let is = intersection(k);
               <mat-list-item (click)="clickTenant(k)">
                 <mat-checkbox [disabled]="k.val === tenant.val || is.start === 0"
-                  [checked]="k.selected || k.val === tenant.val">{{ k.val}} {{k.date_year_min}} -
-                {{k.date_year_max}} ({{k.count}}) </mat-checkbox>
+                  [checked]="k.selected || k.val === tenant.val">{{ k.val}} {{k.date_computed_min.getFullYear()}} -
+                {{k.date_computed_max.getFullYear()}} ({{k.count}}) </mat-checkbox>
               </mat-list-item>
             }
           </mat-list>

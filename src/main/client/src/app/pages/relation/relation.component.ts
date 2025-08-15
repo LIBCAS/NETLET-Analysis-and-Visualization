@@ -84,7 +84,7 @@ export class RelationComponent {
     this.state.tenants.forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'relation');
     if (this.tenant) {
-      this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+      this.limits = [this.tenant.date_computed_min.getFullYear(), this.tenant.date_computed_max.getFullYear()];
       this.getData(true);
     }
   }
@@ -134,7 +134,7 @@ export class RelationComponent {
   } 
   
   changeTenant() {
-    this.limits = [this.tenant.date_year_min, this.tenant.date_year_max];
+    this.limits = [this.tenant.date_computed_min.getFullYear(), this.tenant.date_computed_max.getFullYear()];
     //this.selectedKeywords = [];
     this.getData(true);
   }
@@ -184,7 +184,7 @@ export class RelationComponent {
     p.tenant = this.tenant.val;
     p.other_tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
     p.date_range = this.limits.toString();
-    p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
+    p.tenant_date_range = this.tenant.date_computed_min.getFullYear() + ',' + this.tenant.date_computed_max.getFullYear();
     if (!setResponse) {
       p.rows = 0;
     } else {
@@ -211,7 +211,7 @@ export class RelationComponent {
 
 
   isDisabled(t: Tenant): boolean {
-    return t.date_year_min > this.tenant.date_year_min;
+    return t.date_computed_min.getFullYear() > this.tenant.date_computed_min.getFullYear();
   }
 
   setPosition(h: number, w: number, count: number, maxCount: number, zone: number): { x: number, y: number, radius: number } {
@@ -235,15 +235,15 @@ export class RelationComponent {
 
 
     //get the range with the smaller starting point (min) and greater start (max)
-    let min = (t.date_year_min < this.tenant.date_year_min ? t : this.tenant)
+    let min = (t.date_computed_min.getFullYear() < this.tenant.date_computed_min.getFullYear() ? t : this.tenant)
     let max = (min === t ? this.tenant : t)
 
     //min ends before max starts -> no intersection
-    if (min.date_year_max < max.date_year_min) {
+    if (min.date_computed_max.getFullYear() < max.date_computed_min.getFullYear()) {
       return { start: 0, end: 0 }; //the ranges don't intersect
     }
 
-    return { start: max.date_year_min, end: (min.date_year_max < max.date_year_max ? min.date_year_max : max.date_year_max) }
+    return { start: max.date_computed_min.getFullYear(), end: (min.date_computed_max.getFullYear() < max.date_computed_max.getFullYear() ? min.date_computed_max.getFullYear() : max.date_computed_max.getFullYear()) }
   }
 
   processResponse() {

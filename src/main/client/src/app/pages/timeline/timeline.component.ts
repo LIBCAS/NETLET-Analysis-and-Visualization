@@ -39,6 +39,7 @@ echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipCompon
 
 //@ts-ignore
 import langCZ from 'echarts/lib/i18n/langCS.js';
+import { throttle } from 'rxjs';
 
 echarts.registerLocale("CZ", langCZ)
 

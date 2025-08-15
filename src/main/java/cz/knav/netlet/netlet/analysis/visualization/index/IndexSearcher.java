@@ -515,14 +515,14 @@ public class IndexSearcher {
                 offset = Integer.valueOf(offsetP);
             }
             
-            final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_" + lang)
-                    .setLimit(1000)
-                    .setMinCount(1);
+//            final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_" + lang)
+//                    .setLimit(1000)
+//                    .setMinCount(1);
             final TermsFacetMap categoriesFacet = new TermsFacetMap("keywords_category_" + lang)
                     .setLimit(1000)
-                    .setMinCount(1)
-                    //.setSort("index")
-                    .withSubFacet("keywords", keywords_csFacet);
+                    .withDomain(new DomainMap().withTagsToExclude("ffkeywords"))
+//                    .withSubFacet("keywords", keywords_csFacet)
+                    .setMinCount(1);
 
             NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
             rawJsonResponseParser.setWriterType("json");
@@ -536,7 +536,12 @@ public class IndexSearcher {
                     .setSort("date_computed asc")
                     .returnFields("letter_id,tenant,date_computed,date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_computed_range", rangeFacet)
-                    .withFacet("keywords_categories", categoriesFacet)
+                    // .withFacet("keywords_categories", categoriesFacet)
+                    .withFacet("keywords_categories", new TermsFacetMap("keywords_category_" + lang)
+                            .setLimit(1000)
+                            .setSort("index")
+                            .withDomain(new DomainMap().withTagsToExclude("ffkeywords"))
+                            .setMinCount(1))
                     .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned")
                             .setLimit(1000)
                             .setSort("index")

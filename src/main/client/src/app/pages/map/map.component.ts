@@ -145,7 +145,7 @@ export class MapComponent {
     p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
     p.tenant_date_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits.toString();
-    // p.tenant_date_range = this.tenant.date_year_min + ',' + this.tenant.date_year_max;
+    // p.tenant_date_range = this.tenant.date_computed_min.getFullYear() + ',' + this.tenant.date_computed_max.getFullYear();
     if (!withMap) {
       p.rows = 0;
     } else {
