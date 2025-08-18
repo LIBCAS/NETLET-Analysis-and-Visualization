@@ -191,8 +191,37 @@ export class IdentitiesComponent {
     return this.positions[id];
   }
 
+  getNodeSymbol(dist: number) {
+    if (dist > .8) {
+      return 'image://assets/img/pie8515.png';
+    } else if (dist > .7) {
+      return 'image://assets/img/pie7525.png';
+    } else if (dist > .4) {
+      return 'image://assets/img/pie5050.png';
+    } else if (dist > .2) {
+      return 'image://assets/img/pie2575.png';
+    } else {
+      return 'image://assets/img/pie1585.png';
+    }
+    
+  }
+
   processResponse() {
-    const categories = [{ name: 'author' }, { name: 'recipient' }, { name: 'mentioned' }];
+    const categories = [{
+      name: 'authors', itemStyle: {
+        color: this.config.colors['author']
+      }
+    }, {
+      name: 'recipients', itemStyle: {
+        color: this.config.colors['recipient']
+      }
+    } 
+    // {
+    //   name: 'mentioned', itemStyle: {
+    //     color: this.config.colors['mentioned']
+    //   }
+    // }
+  ];
     const links: any[] = [];
     const nodes: any[] = [];
     const maxSize = 60;
@@ -209,11 +238,12 @@ export class IdentitiesComponent {
         // id: identity.val + '_author',
         name: identity.val,
         value: identity.count,
-        category: 'author',
+        authorCount: identity.count,
+        label: identity.val + '<br/>author: ' + identity.count,
+        category: 'authors',
         symbolSize: maxSize * identity.count / maxCount + minSize,
         x: pos.x,
         y: pos.y,
-
         itemStyle: {
           color: this.config.colors['author']
         }
@@ -225,22 +255,26 @@ export class IdentitiesComponent {
       if (node) {
         //  const green = identity.count / (node.value + identity.count) * 255;
         const dist = node.value / (node.value + identity.count);
-        const red = dist * (255 - 6) + 6;
-        const green = dist * 40 + 120;
-        const blue = 0;
-        node.itemStyle.color = `rgb(${red},${green},${blue})`;
+        // const red = dist * (255 - 6) + 6;
+        // const green = dist * 40 + 120;
+        // const blue = 0;
+       //node.itemStyle.color = `rgb(${red},${green},${blue})`;
         node.symbolSize = maxSize * (node.value + identity.count) / maxCount + minSize;
+        node.symbol = this.getNodeSymbol(dist);
+        node.recipientCount = identity.count;
+        node.label = node.label + '<br/>recipient: ' + identity.count;
       } else {
         nodes.push({
           id: identity.val + '',
           // id: identity.val + '_recipient',
           name: identity.val,
           value: identity.count,
+          recipientCount: identity.count,
+          label: identity.val + '<br/>recipient: ' + identity.count,
           category: 'recipient',
           symbolSize: maxSize * identity.count / maxCount + minSize,
           x: pos.x,
           y: pos.y,
-
           itemStyle: {
             color: this.config.colors['recipient']
           }
@@ -300,13 +334,13 @@ export class IdentitiesComponent {
         formatter: (params: any) => {
           return params.dataType === 'edge' ?
             `${params.data.label} (${params.data.count})` :
-            params.name
+            params.data.label
         }
       },
       legend: [
         {
-          show: false,
-          // selectedMode: 'single',
+          show: true,
+          bottom: 5,
           data: this.graphData.categories.map(function (a) {
             return a.name;
           })
