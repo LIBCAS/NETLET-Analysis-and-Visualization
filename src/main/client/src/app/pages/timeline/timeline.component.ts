@@ -133,6 +133,20 @@ export class TimelineComponent {
       this.getData(false);
     });
 
+    this.chart.on('click', (params: any) => {
+      if (params.componentType === 'xAxis') {
+        
+      console.log(params)
+        const year = parseInt(params.value.split('-')[0]);
+        this.getData(false);
+        this.chart.dispatchAction({
+          type: 'dataZoom',
+          startValue: new Date(year +'-01-01').getTime(),
+          endValue: new Date(year +'-12-31').getTime()
+        });
+      }
+    })
+
     this.getData(true);
   }
 
@@ -265,11 +279,11 @@ export class TimelineComponent {
         left: 'center',
         text: 'Zobrazení dopisů v chronologickém pořadí'
       },
-  grid: {
-    left: 30,
-    right: 30,
-    top: 30
-  },
+      grid: {
+        left: 30,
+        right: 30,
+        top: 30
+      },
       toolbox: {
         orient: 'vertical',
         left: 'right',
@@ -283,7 +297,8 @@ export class TimelineComponent {
       },
       xAxis: {
         type: 'time',
-        boundaryGap: false
+        boundaryGap: false,
+        triggerEvent: true
       },
       yAxis: {
         type: 'value',
@@ -303,6 +318,7 @@ export class TimelineComponent {
         {
           name: 'Počet dopisů',
           type: 'line',
+          //triggerLineEvent: true,
           smooth: true,
           symbol: 'none',
           areaStyle: {},
