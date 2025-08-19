@@ -7,6 +7,7 @@ export class Configuration {
   defaultLang: string;
   excluded_identities: {[tenant: string]: string[]};
   colors: {[key: string]: string};
+  tenant_colors: {[tenant: string]: string};
   
   hikoUrl: string;
   isTest: boolean;

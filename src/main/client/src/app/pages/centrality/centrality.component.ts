@@ -121,8 +121,14 @@ export class CentralityComponent {
     this.graphChart = e;
 
     this.graphChart.on('click', (params: any) => {
-      if (params.dataType === 'node' && params.data.category === 'mentioned') {
-        this.mentionedLabel(params.data.name);
+      if (params.dataType === 'node'){
+        if (params.data.category === 'mentioned') {
+          this.mentionedLabel(params.data.name);
+        } else if (params.data.category === 'authors') {
+          this.authorLabel(params.data.name);
+        } else if (params.data.category === 'recipients') {
+          this.recipientLabel(params.data.name);
+        } 
       }
     })
   }
@@ -248,6 +254,56 @@ export class CentralityComponent {
     return { x, y, radius, angle }
   }
 
+  authorLabel(identity: string) {
+    this._ngZone.run(() => {
+      const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
+
+      let popup = '';
+      letters.forEach((letter: Letter) => {
+        popup += `<div>- ${letter.identity_recipient}. ${letter.date_year}`;
+        if (letter.keywords_category_cs?.length > 0) {
+          popup += ` (${letter.keywords_category_cs.join(', ')})`;
+        } else if (letter.keywords_cs?.length > 0) {
+          popup += ` (${letter.keywords_cs.join(', ')})`;
+        } else {
+          
+        }
+
+        const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
+        const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
+        popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
+
+        this.infoHeader = `${identity} wrote letters to:`;
+        this.infoContent = popup;
+      });
+    });
+  }
+
+  recipientLabel(identity: string) {
+    this._ngZone.run(() => {
+      const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
+
+      let popup = '';
+      letters.forEach((letter: Letter) => {
+        popup += `<div>- ${letter.identity_author}. ${letter.date_year}`;
+        if (letter.keywords_category_cs?.length > 0) {
+          popup += ` (${letter.keywords_category_cs.join(', ')})`;
+        } else if (letter.keywords_cs?.length > 0) {
+          popup += ` (${letter.keywords_cs.join(', ')})`;
+        } else {
+          
+        }
+
+        const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
+        const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
+        popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
+
+        this.infoHeader = `${identity} received letters from:`;
+        this.infoContent = popup;
+      });
+    });
+  }
+
   mentionedLabel(identity: string) {
     this._ngZone.run(() => {
       const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
@@ -256,12 +312,16 @@ export class CentralityComponent {
       letters.forEach((letter: Letter) => {
         popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
         if (letter.keywords_category_cs?.length > 0) {
-          popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+          popup += ` (${letter.keywords_category_cs.join(', ')})`;
         } else if (letter.keywords_cs?.length > 0) {
-          popup += ` (${letter.keywords_cs.join(', ')})</div>`;
+          popup += ` (${letter.keywords_cs.join(', ')})`;
         } else {
-          popup += `</div>`;
+          //popup += `</div>`;
         }
+
+        const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
+        const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
+        popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
 
         this.infoHeader = `${identity} is mentioned in:`;
         this.infoContent = popup;

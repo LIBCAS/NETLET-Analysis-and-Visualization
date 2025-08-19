@@ -29,7 +29,7 @@ import {
 
 import L, { latLng, Map, tileLayer as LtileLayer, MapOptions } from "leaflet";
 
-import { EChartsOption, ECharts, EffectScatterSeriesOption, ScatterSeriesOption, VisualMapComponentOption, GraphSeriesOption } from 'echarts';
+import { EChartsOption, ECharts, EffectScatterSeriesOption, ScatterSeriesOption, VisualMapComponentOption, GraphSeriesOption, color } from 'echarts';
 import { use, init, EChartsType, ComposeOption } from "echarts/core";
 
 import * as echarts from 'echarts/core';
@@ -38,6 +38,7 @@ import { LegendComponent, TooltipComponent, TitleComponent, TitleComponentOption
 import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { AppConfiguration } from '../../app-configuration';
 
 
 type ECOption = ComposeOption<
@@ -80,7 +81,7 @@ export class MapComponent {
   graphOptions: ECOption = {};
   graphChart: EChartsType;
 
-  nodes: { [id: number]: { coords: [number, number], name: string } } = {};
+  nodes: { [id: string]: { coords: [number, number], name: string } } = {};
   links: { [id: string]: { node1: [number, number], node2: [number, number], count: number, letters: Letter[] } } = {};
   limits: [number, number];
 
@@ -94,12 +95,12 @@ export class MapComponent {
     private _ngZone: NgZone,
     private router: Router,
     private translation: TranslateService,
+    public config: AppConfiguration,
     public state: AppState,
     private service: AppService
   ) {
     effect(() => {
       this.tenants = this.state.selectedTenants();
-      console.log(this.tenants)
       if (this.tenants.length > 0) {
         this.changeTenant();
       }
@@ -169,7 +170,7 @@ export class MapComponent {
         const lat = resp.stats.stats_fields.latitude;
         const lon = resp.stats.stats_fields.longitude;
         if (!this.running) {
-          this.map.fitBounds(L.latLngBounds([lat.max, lon.min], [lat.min, lon.max]))
+          // this.map.fitBounds(L.latLngBounds([lat.max, lon.min], [lat.min, lon.max]))
         }
 
       }
@@ -280,13 +281,13 @@ export class MapComponent {
     this.solrResponse.response.docs.forEach((letter: Letter) => {
       if (this.inLimits(letter.date_year) && letter.places && letter.origin) {
         letter.places.forEach((place: Place) => {
-          if (place.latitude && !this.nodes[place.id]) {
-            this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name };
-            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1] });
+          if (place.latitude && !this.nodes[place.name]) {
+            this.nodes[place.name] = { coords: [place.latitude, place.longitude], name: place.name };
+            nodes.push({ id: place.name, name: place.name, value: [place.longitude, place.latitude, 1] });
           }
         });
 
-        const linkId = letter.origin + '_' + letter.destination;
+        const linkId = letter.origin_name+ '_' + letter.destination_name;
         const place_origin = letter.places.find(p => p.role === 'origin');
         const place_destination = letter.places.find(p => p.role === 'destination');
 
@@ -303,10 +304,13 @@ export class MapComponent {
             this.links[linkId].letters.push(letter);
             links.push({
               id: linkId,
-              source: letter.origin + '',
-              target: letter.destination + '',
+              source: letter.origin_name + '',
+              target: letter.destination_name + '',
               label: place_origin.name + ' > ' + place_destination.name,
-              count: this.links[linkId].count
+              count: this.links[linkId].count,
+              lineStyle: {
+                color: this.config.tenant_colors[letter.tenant]
+              }
             });
           }
         }
@@ -393,8 +397,10 @@ export class MapComponent {
     }
 
     const d = document.getElementById("echarts-lmap");
-    this.graphChart = init(d);
-
+    if (!this.graphChart) {
+      this.graphChart = init(d);
+    }
+    
     this.graphChart.setOption(this.graphOptions);
 
     this.graphChart.on('click', (params: any) => {

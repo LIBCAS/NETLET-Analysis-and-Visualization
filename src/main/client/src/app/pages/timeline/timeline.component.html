@@ -13,6 +13,36 @@
           <mat-list-item (click)="unfilter(authors, k)" >
             {{ 'field.author' | translate}}: {{ k }}
           </mat-list-item>
+        }
+          @for(k of selectedRecipients; track $index; let idx = $index){
+          <mat-list-item (click)="unfilter(recipients, k)" >
+            {{ 'field.recipient' | translate}}: {{ k }}
+          </mat-list-item>
+          }
+          @for(k of selectedMentioned; track $index; let idx = $index){
+          <mat-list-item (click)="unfilter(mentioned, k)" >
+            {{ 'field.mentioned' | translate}}: {{ k }}
+          </mat-list-item>
+          }
+          @for(k of selectedKeywords; track $index; let idx = $index){
+          <mat-list-item (click)="unfilter(keyword_categories, k)" >
+            {{ 'field.keyword' | translate}}: {{ k }}
+          </mat-list-item>
+          }
+          @for(k of selectedProfessions; track $index; let idx = $index){
+          <mat-list-item (click)="unfilter(professions, k)" >
+            {{ 'field.profession' | translate}}: {{ k }}
+          </mat-list-item>
+          }
+          @for(k of selectedOrigins; track $index; let idx = $index){
+          <mat-list-item (click)="unfilter(origins, k)" >
+            {{ 'field.origin' | translate}}: {{ k }}
+          </mat-list-item>
+          }
+          @for(k of selectedDestinations; track $index; let idx = $index){
+          <mat-list-item (click)="unfilter(destinations, k)" >
+            {{ 'field.destination' | translate}}: {{ k }}
+          </mat-list-item>
           }
         </mat-list>
       </mat-expansion-panel>

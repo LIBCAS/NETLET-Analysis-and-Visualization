@@ -259,7 +259,13 @@ export class TimelineComponent {
       const letters = this.solrResponse.response.docs;
       this.letters.set(letters);
       this.showLetters.set(true);
-      this.hasFacets.set(this.selectedAuthors.length + this.selectedRecipients.length + this.selectedMentioned.length + this.selectedKeywords.length > 0);
+      this.hasFacets.set(this.selectedAuthors.length + 
+        this.selectedRecipients.length + 
+        this.selectedMentioned.length + 
+        this.selectedKeywords.length + 
+        this.selectedProfessions.length + 
+        this.selectedOrigins.length + 
+        this.selectedDestinations.length > 0);
       if (setGraph) {
         this.processResponse();
       }

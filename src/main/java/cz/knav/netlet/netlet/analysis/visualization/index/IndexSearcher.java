@@ -277,7 +277,7 @@ public class IndexSearcher {
                     .setLimit(rows)
                     .withFilter("origin:*")
                     .withFilter("destination:*")
-                    .returnFields("letter_id,date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
+                    .returnFields("letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,origin,destination,origin_name,destination_name,places:[json],identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_year", rangeFacet)
                     .withFacet("keywords_cs", keywords_csFacet)
                     .withFacet("keywords_categories", categories_csFacet)
@@ -297,7 +297,8 @@ public class IndexSearcher {
                             .setMinCount(1));
             String[] tenants = request.getParameterValues("tenant");
             if (tenants.length > 0) {
-                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
+                // jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
+                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(\"" + String.join("\" OR \"", request.getParameterValues("tenant")) + "\")");
             }
             String date_range = request.getParameter("date_range");
             if (date_range != null && !date_range.isBlank()) {
@@ -362,7 +363,7 @@ public class IndexSearcher {
                     .setLimit(rows)
                     .withFilter("identity_recipient:*")
                     .withFilter("identity_author:*")
-                    .returnFields("tenant,date_year,identity_name,identity_recipient,identity_author,identity_mentioned,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
+                    .returnFields("letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,identity_mentioned,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_year", rangeFacet)
                     .withFacet("keywords_categories", categoriesFacet)
                     .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned")

@@ -18,8 +18,8 @@
           <mat-list>
             @for(k of state.tenants; track $index; let idx = $index;){
               <mat-list-item (click)="clickTenant(k)">
-                <mat-checkbox [disabled]="k.val === state.tenant().val"
-                [(ngModel)]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
+                <mat-checkbox [disabled]="k.val === state.tenant().val" 
+                [(ngModel)]="k.selected"><span [style.color]="config.tenant_colors[k.val]">{{ k.val}} ({{k.count}}) </span></mat-checkbox>
               </mat-list-item>
             }
           </mat-list>

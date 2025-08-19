@@ -41,6 +41,10 @@ import { Configuration } from './shared/config';
         return this.config.test_mappings;
     }
 
+    public get tenant_colors() {
+        return this.config.tenant_colors;
+    }
+
     constructor(
         private http: HttpClient,
         public state: AppState) { }

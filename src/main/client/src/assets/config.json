@@ -45,6 +45,23 @@
         "recipient": "rgb(255,160, 10)",
         "mentioned": "rgb(152, 156, 223)"
     },
+  "tenant_colors": {
+    "brezina": "#3531c2",
+    "deml": "#c23531",
+    "blekastad": "#c2c231",
+    "kalivoda": "rgb(234, 124, 204)",
+    "komensky": "#314656",
+    "marci": "#61a018",
+    "musil": "rgb(154, 96, 180)",
+    "neumann": "#dd8668",
+    "pamatky": "#91c7ae",
+    "patocka": "#6e7074",
+    "polanus": "#11a0a8",
+    "sachs": "#bd493a",
+    "studenti": "#44d25d",
+    "tgm": "#242c33",
+    "ucenci": "#246c33"
+  },
 
   "hikoUrl": "https://{tenant}.historicka-korespondence.cz/letters/{id}/edit",
   "isTest": true,
