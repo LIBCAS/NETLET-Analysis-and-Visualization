@@ -4,12 +4,24 @@
   "view": "View",
   "views": "Views",
   "clearSelection": "Clear selection",
+  "usedFilters": "Used filters",
   "field": {
+    "author": "Autor",
     "authors": "Authors",
+    "recipient": "Recipient",
     "recipients": "Recipients",
     "mentioned": "Mentioned",
+    "origin": "Place of origin",
+    "origins": "Places of origin",
+    "destination": "Place of destination",
+    "destinations": "Places of destination",
+    "professions": "Profese",
     "keywords": "Keywords",
-    "relation_tenants": "Catalogs for comparition"
+    "relation_tenants": "Catalogs for comparition",
+    "date": "Date"
+  },
+  "action": {
+    "view_in_hiko": "View in HIKO DB"
   },
   "invalidTenant": "There is no available data for this Catalog"
 }

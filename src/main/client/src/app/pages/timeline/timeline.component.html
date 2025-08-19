@@ -1,15 +1,16 @@
 <div class="app-loading">@if(loading){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
-<div class="app-fxLayout app-row app-fill" style="position: relative;">
-  <div style="flex: 1 30%;" class="app-filters">
+<as-split direction="horizontal" [unit]="'pixel'">
+    <as-split-area [size]="320" >
+      <div style="flex: 1 30%;" class="app-filters">
     @if(hasFacets()) {
     <div>
       <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
         <mat-expansion-panel-header>
           <mat-panel-title> {{ 'usedFilters' | translate}} </mat-panel-title>
         </mat-expansion-panel-header>
-        <mat-list>
+        <mat-list class="app-facet">
           @for(k of selectedAuthors; track $index; let idx = $index){
-          <mat-list-item (click)="unfilter(authors, k)">
+          <mat-list-item (click)="unfilter(authors, k)" >
             {{ 'field.author' | translate}}: {{ k }}
           </mat-list-item>
           }
@@ -23,9 +24,9 @@
         <mat-expansion-panel-header>
           <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
         </mat-expansion-panel-header>
-        <mat-list>
+        <mat-list class="app-facet">
           @for(k of authors; track $index; let idx = $index){
-          <mat-list-item (click)="filter(k)">
+          <mat-list-item (click)="filter(k)" matTooltip="{{ k.val}} ({{k.count}})">
             <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
           </mat-list-item>
           }
@@ -39,9 +40,9 @@
         <mat-expansion-panel-header>
           <mat-panel-title> {{ 'field.recipients' | translate}} </mat-panel-title>
         </mat-expansion-panel-header>
-        <mat-list>
+        <mat-list class="app-facet">
           @for(k of recipients; track $index; let idx = $index){
-          <mat-list-item (click)="filter(k)">
+          <mat-list-item (click)="filter(k)" title="{{ k.val}} ({{k.count}})">
             <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
           </mat-list-item>
           }
@@ -55,9 +56,9 @@
         <mat-expansion-panel-header>
           <mat-panel-title> {{ 'field.mentioned' | translate}} </mat-panel-title>
         </mat-expansion-panel-header>
-        <mat-list>
+        <mat-list class="app-facet">
           @for(k of mentioned; track $index; let idx = $index){
-          <mat-list-item (click)="filter(k)">
+          <mat-list-item (click)="filter(k)" title="{{ k.val}} ({{k.count}})">
             <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
           </mat-list-item>
           }
@@ -65,15 +66,63 @@
       </mat-expansion-panel>
     </div>
     }
-    @if (keyword_categories) {
+    @if (keyword_categories?.length > 0) {
     <div>
       <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
         <mat-expansion-panel-header>
           <mat-panel-title> {{ 'field.keywords' | translate}} </mat-panel-title>
         </mat-expansion-panel-header>
-        <mat-list>
+        <mat-list class="app-facet">
           @for(k of keyword_categories; track $index; let idx = $index){
-          <mat-list-item (click)="filter(k)">
+          <mat-list-item (click)="filter(k)" title="{{ k.val}} ({{k.count}})">
+            <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
+    </div>
+    }
+    @if (professions?.length > 0) {
+    <div>
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.professions' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list class="app-facet">
+          @for(k of professions; track $index; let idx = $index){
+          <mat-list-item (click)="filter(k)" title="{{ k.val}} ({{k.count}})">
+            <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
+    </div>
+    }
+    @if (origins?.length > 0) {
+    <div>
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.origins' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list class="app-facet">
+          @for(k of origins; track $index; let idx = $index){
+          <mat-list-item (click)="filter(k)" title="{{ k.val}} ({{k.count}})">
+            <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
+    </div>
+    }
+    @if (destinations?.length > 0) {
+    <div>
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.destinations' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list class="app-facet">
+          @for(k of destinations; track $index; let idx = $index){
+          <mat-list-item (click)="filter(k)" title="{{ k.val}} ({{k.count}})">
             <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
           </mat-list-item>
           }
@@ -83,7 +132,9 @@
     }
 
   </div>
-  <div class="app-content app-fill-w app-fill-h">
+    </as-split-area>
+    <as-split-area >
+      <div class="app-content app-fill-w app-fill-h">
     <div class="app-timeline">
       <div echarts style="height: 100%; width: 100%;" [initOpts]="{ locale: 'CZ' }" [options]="chartOptions" (chartInit)="onChartInit($event)"
         (chartBrushEnd)="onBrushChanged($event)">
@@ -143,7 +194,7 @@
           <ng-container matColumnDef="action" stickyEnd>
             <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
             <td mat-cell *matCellDef="let element">
-              <button class="app-hiko" mat-icon-button (click)="viewLetterInHIKO(element.letter_id, element.tenant)"
+              <button class="app-hiko app-small-icon-button" mat-icon-button (click)="viewLetterInHIKO(element.letter_id, element.tenant)"
                 [matTooltip]="'action.view_in_hiko' | translate"><mat-icon>arrow_outward</mat-icon></button>
             </td>
           </ng-container>
@@ -156,3 +207,7 @@
 
     </div>
   </div>
+    </as-split-area>
+  </as-split>
+  
+  

@@ -3,19 +3,15 @@ package cz.knav.netlet.netlet.analysis.visualization.index;
 import cz.knav.netlet.netlet.analysis.visualization.Options;
 import jakarta.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.solr.client.solrj.ResponseParser;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.json.DomainMap;
-import org.apache.solr.client.solrj.request.json.JsonFacetMap;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.request.json.RangeFacetMap;
 import org.apache.solr.client.solrj.request.json.TermsFacetMap;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONObject;
 
@@ -537,6 +533,21 @@ public class IndexSearcher {
                     .returnFields("letter_id,tenant,date_computed,date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_computed_range", rangeFacet)
                     // .withFacet("keywords_categories", categoriesFacet)
+                    .withFacet("origins", new TermsFacetMap("origin_name")
+                            .setLimit(1000)
+                            .setSort("index")
+                            .withDomain(new DomainMap().withTagsToExclude("fforigin"))
+                            .setMinCount(1)) 
+                    .withFacet("destinations", new TermsFacetMap("destination_name")
+                            .setLimit(1000)
+                            .setSort("index")
+                            .withDomain(new DomainMap().withTagsToExclude("ffdestination"))
+                            .setMinCount(1)) 
+                    .withFacet("professions", new TermsFacetMap("professions_" + lang)
+                            .setLimit(1000)
+                            .setSort("index")
+                            .withDomain(new DomainMap().withTagsToExclude("ffprofession"))
+                            .setMinCount(1)) 
                     .withFacet("keywords_categories", new TermsFacetMap("keywords_category_" + lang)
                             .setLimit(1000)
                             .setSort("index")
@@ -579,7 +590,19 @@ public class IndexSearcher {
             }
             
             if (request.getParameter("keyword") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
+                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword")) + "\")");
+            }
+            
+            if (request.getParameter("profession") != null) {
+                jrequest = jrequest.withFilter("{!tag=ffprofession}professions_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("profession")) + "\")");
+            }
+            
+            if (request.getParameter("origin") != null) {
+                jrequest = jrequest.withFilter("{!tag=fforigin}origin_name" + ":(\"" + String.join("\" OR \"", request.getParameterValues("origin")) + "\")");
+            }
+            
+            if (request.getParameter("destination") != null) {
+                jrequest = jrequest.withFilter("{!tag=ffdestination}destination_name" + ":(\"" + String.join("\" OR \"", request.getParameterValues("destination")) + "\")");
             }
             
 //            QueryResponse queryResponse = jrequest.process(solr, "hiko");

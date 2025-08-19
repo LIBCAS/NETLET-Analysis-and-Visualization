@@ -34,6 +34,7 @@ import { AppConfiguration } from '../../app-configuration';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
+import { AngularSplitModule } from 'angular-split';
 echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent,
   GridComponent, TitleComponent, BrushComponent, ToolboxComponent, DataZoomComponent]);
 
@@ -46,7 +47,7 @@ echarts.registerLocale("CZ", langCZ)
 @Component({
   selector: 'app-timeline',
   imports: [TranslateModule, FormsModule, NgxEchartsDirective, DatePipe,
-    NgxEchartsModule,
+    NgxEchartsModule, AngularSplitModule,
     MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, 
     MatButtonModule, MatTableModule, MatPaginatorModule,
     MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, MatTooltipModule],
@@ -77,6 +78,12 @@ export class TimelineComponent {
   selectedMentioned: string[] = [];
   keyword_categories: JSONFacet[] = [];
   selectedKeywords: string[] = [];
+  professions: JSONFacet[] = [];
+  selectedProfessions: string[] = [];
+  origins: JSONFacet[] = [];
+  selectedOrigins: string[] = [];
+  destinations: JSONFacet[] = [];
+  selectedDestinations: string[] = [];
 
   date_facet: { buckets: JSONFacet[], after: { count: number } };
 
@@ -186,6 +193,12 @@ export class TimelineComponent {
     p.mentioned = this.selectedMentioned;
     this.selectedKeywords = this.keyword_categories.filter(k => k.selected).map(k => k.val);
     p.keyword = this.selectedKeywords;
+    this.selectedProfessions = this.professions.filter(k => k.selected).map(k => k.val);
+    p.profession = this.selectedProfessions;
+    this.selectedOrigins = this.origins.filter(k => k.selected).map(k => k.val);
+    p.origin = this.selectedOrigins;
+    this.selectedDestinations = this.destinations.filter(k => k.selected).map(k => k.val);
+    p.destination = this.selectedDestinations;
 
     this.service.getTimeline(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
@@ -212,6 +225,21 @@ export class TimelineComponent {
       this.keyword_categories = resp.facets.keywords_categories.buckets;
       this.keyword_categories.forEach(k => {
         k.selected = this.selectedKeywords.includes(k.val);
+      });
+
+      this.professions = resp.facets.professions.buckets;
+      this.professions.forEach(k => {
+        k.selected = this.selectedProfessions.includes(k.val);
+      });
+
+      this.origins = resp.facets.origins.buckets;
+      this.origins.forEach(k => {
+        k.selected = this.selectedOrigins.includes(k.val);
+      });
+
+      this.destinations = resp.facets.destinations.buckets;
+      this.destinations.forEach(k => {
+        k.selected = this.selectedDestinations.includes(k.val);
       });
 
       const letters = this.solrResponse.response.docs;

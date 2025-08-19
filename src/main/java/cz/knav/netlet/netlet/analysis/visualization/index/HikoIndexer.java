@@ -239,9 +239,11 @@ public class HikoIndexer {
             }
             if ("origin".equals(role)) {
                 doc.setField("origin", rs.getInt("id"));
+                doc.setField("origin_name", rs.optString("name"));
             }
             if ("destination".equals(role)) {
                 doc.setField("destination", rs.getInt("id"));
+                doc.setField("destination_name", rs.optString("name"));
             }
             rs.put("role", role);
             doc.addField("places", rs.toString());

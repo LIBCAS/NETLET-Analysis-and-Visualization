@@ -12,7 +12,10 @@
     "recipients": "Adresáti",
     "mentioned": "Zmíněné osoby",
     "origin": "Místo odeslání",
+    "origins": "Místa odeslání",
     "destination": "Místo určení",
+    "destinations": "Místa určení",
+    "professions": "Profese",
     "keywords": "Klíčová slova",
     "relation_tenants": "Katalogy pro porovnani",
     "date": "Datum"
