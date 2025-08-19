@@ -24,6 +24,7 @@
     "@joakimono/echarts-extension-leaflet": "^1.0.3",
     "@ngx-translate/core": "^16.0.4",
     "@ngx-translate/http-loader": "^16.0.1",
+    "angular-split": "^20.0.0",
     "echarts": "^5.6.0",
     "leaflet": "^1.9.4",
     "ngx-echarts": "^19.0.0",
