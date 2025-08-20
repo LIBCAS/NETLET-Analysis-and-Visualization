@@ -40,7 +40,7 @@ echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipCompon
 
 //@ts-ignore
 import langCZ from 'echarts/lib/i18n/langCS.js';
-import { throttle } from 'rxjs';
+import { debounceTime, Subject } from 'rxjs';
 import { FacetsComponent } from "../../components/facets/facets.component";
 
 echarts.registerLocale("CZ", langCZ)
@@ -94,6 +94,8 @@ export class TimelineComponent {
   pageIndex = 0;
   pageSizeOptions = [10, 25, 100];
 
+  getTimelineSubject = new Subject<boolean>();
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
@@ -114,6 +116,9 @@ export class TimelineComponent {
   ngOnInit(): void {
     this.state.tenants.forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'timeline');
+    this.getTimelineSubject.pipe(debounceTime(300)).subscribe(setGraph => {
+      this.getData2(setGraph)
+    });
     if (this.tenant && this.chart) {
       this.limits = [this.tenant.date_computed_min, this.tenant.date_computed_max];
       this.getData(true);
@@ -188,6 +193,10 @@ export class TimelineComponent {
   }
 
   getData(setGraph: boolean) {
+    this.getTimelineSubject.next(setGraph);
+  }
+
+  getData2(setGraph: boolean) {
     this.loading = true;
     this.letters.set([]);
     this.showLetters.set(false);

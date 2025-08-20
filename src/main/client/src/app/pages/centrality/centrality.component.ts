@@ -29,12 +29,13 @@ import { identity } from 'rxjs';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { AppConfiguration } from '../../app-configuration';
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
+import { FacetsComponent } from "../../components/facets/facets.component";
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-centrality',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -170,8 +171,17 @@ export class CentralityComponent {
     this.getData(true);
   }
 
-  showNode(identity: JSONFacet, category: string) {
-    const idx = this.graphData.nodes.findIndex(n => n.id === identity.val + '_' + category);
+  usedFacets: {field: string, value: string}[] = [];
+  onFiltersChanged(usedFacets: {field: string, value: string}[]) {
+    this.usedFacets = usedFacets;
+    this.getData(true);
+  }
+
+  showNode(e: {field: string, value: string}) {
+    if (!this.graphData.categories.find(c => c.name === e.field)) {
+      return;
+    }
+    const idx = this.graphData.nodes.findIndex(n => n.id === e.value + '_' + e.field);
     // currentIndex = (currentIndex + 1) % dataLen;
     this.graphChart.dispatchAction({
       type: 'showTip',
@@ -203,9 +213,7 @@ export class CentralityComponent {
     p.tenant_date_range = this.state.getTenantsRangeISO().toString();
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     p.recipient = this.selectedRecipients;
-    this.filters.forEach(f => {
-      p[f.field] = f.value;
-    })
+    this.state.addFilters(p, this.usedFacets);
     if (!setResponse) {
       p.rows = 0;
     } else {
@@ -378,7 +386,7 @@ export class CentralityComponent {
         const pos = this.setPosition(h, w, identity.count, maxCount);
         nodes.push({
           // id: identity.id + '',
-          id: identity.val + '_recipient',
+          id: identity.val + '_recipients',
           name: identity.val,
           value: identity.count,
           category: 'recipients',
@@ -399,7 +407,7 @@ export class CentralityComponent {
         const pos = this.setPosition(h, w, identity.count, maxCount);
         nodes.push({
           // id: identity.id + '',
-          id: identity.val + '_author',
+          id: identity.val + '_authors',
           name: identity.val,
           value: identity.count,
           category: 'authors',

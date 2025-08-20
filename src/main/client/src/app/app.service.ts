@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, map, finalize, catchError, of } from 'rxjs';
+import { Observable, map, finalize, catchError, of, debounceTime, throttleTime, Subject, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -86,6 +86,8 @@ export class AppService {
   }
 
   getTimeline(params: HttpParams): Observable<any> {
-    return this.get('data/timeline', params)
+    return this.get('data/timeline', params);
   }
+
+  
 }

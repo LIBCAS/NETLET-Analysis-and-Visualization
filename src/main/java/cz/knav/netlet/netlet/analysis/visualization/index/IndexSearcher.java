@@ -113,26 +113,14 @@ public class IndexSearcher {
                             //                            .setSort("index")
                             //                            .setMinCount(1))
                             .setLimit(rows);
-            String tenant = request.getParameter("tenant");
-            if (tenant != null && !tenant.isBlank()) {
-                String other_tenant = request.getParameter("other_tenant");
-                if (other_tenant != null && !other_tenant.isBlank()) {
-                    tenant += " OR tenant:" + other_tenant;
-                }
-                jrequest = jrequest.withFilter("tenant:" + tenant);
-            }
             
-            String date_range = request.getParameter("date_range");
-            if (date_range != null && !date_range.isBlank()) {
-                jrequest = jrequest.withFilter("{!tag=ffdate_range}date_computed_range:[" + date_range.replaceAll(",", " TO ") + "]");
+            String lang = request.getParameter("lang"); 
+            if (lang == null) {
+                lang = "cs";
             }
-
-            if (request.getParameter("recipient") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(+\"" + String.join("\" OR \"", request.getParameterValues("recipient")) + "\")");
-            }
+            jrequest = addFilters(request, jrequest, lang);
             
-//            QueryResponse queryResponse = jrequest.process(solr, "hiko"); 
-//            ret = new JSONObject(queryResponse.jsonStr()); 
+            
 
             jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "hiko");
@@ -217,20 +205,7 @@ public class IndexSearcher {
                             .setLimit(1000)
                             .setMinCount(1));
             
-            String[] tenants = request.getParameterValues("tenant");
-            if (tenants.length > 0) {
-                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
-            }
-            String date_range = request.getParameter("date_range");
-            if (date_range != null && !date_range.isBlank()) {
-                jrequest = jrequest.withFilter("{!tag=ffdate_range}date_computed_range:[" + date_range.replaceAll(",", " TO ") + "]");
-            }
-
-            if (request.getParameter("keyword") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(+\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
-            }
-//            QueryResponse queryResponse = jrequest.process(solr, "hiko");
-//            ret = new JSONObject(queryResponse.jsonStr());
+            jrequest = addFilters(request, jrequest, lang);
 
             jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "hiko");
@@ -248,6 +223,10 @@ public class IndexSearcher {
         JSONObject ret = new JSONObject();
         try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
+            String lang = request.getParameter("lang");
+            if (lang == null) {
+                lang = "cs";
+            }
             final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_cs")
                     .setLimit(1000)     
                     .setMinCount(1);
@@ -302,22 +281,8 @@ public class IndexSearcher {
                     .withFacet("identity_author", new TermsFacetMap("identity_author")
                             .setLimit(1000)
                             .setMinCount(1));
-            String[] tenants = request.getParameterValues("tenant");
-            if (tenants.length > 0) {
-                // jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
-                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(\"" + String.join("\" OR \"", request.getParameterValues("tenant")) + "\")");
-            }
             
-            String date_range = request.getParameter("date_range");
-            if (date_range != null && !date_range.isBlank()) {
-                jrequest = jrequest.withFilter("{!tag=ffdate_range}date_computed_range:[" + date_range.replaceAll(",", " TO ") + "]");
-            }
-
-            if (request.getParameter("keyword") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_cs:(+\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
-            }
-//            QueryResponse queryResponse = jrequest.process(solr, "hiko");
-//            ret = new JSONObject(queryResponse.jsonStr());
+            jrequest = addFilters(request, jrequest, lang);
 
             jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "hiko");
@@ -389,7 +354,7 @@ public class IndexSearcher {
                             .setSort("index")
                             .setMinCount(1));
             
-            addFacets(request, jrequest, lang);
+            jrequest = addFilters(request, jrequest, lang);
 
             jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "hiko");
@@ -453,15 +418,7 @@ public class IndexSearcher {
                     .withFacet("professions_mentioned", new TermsFacetMap("professions_mentioned_" + lang)
                             .setLimit(1000)
                             .setMinCount(1));
-            String[] tenants = request.getParameterValues("tenant");
-            if (tenants.length > 0) {
-                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
-            }
-            
-            String date_range = request.getParameter("date_range");
-            if (date_range != null && !date_range.isBlank()) {
-                jrequest = jrequest.withFilter("{!tag=ffdate_range}date_computed_range:[" + date_range.replaceAll(",", " TO ") + "]");
-            }
+            jrequest = addFilters(request, jrequest, lang);
 
             jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "hiko");
@@ -518,6 +475,7 @@ public class IndexSearcher {
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     //.withFilter("status:publish")
+                    .withFilter("-date_year:0")
                     .setLimit(rows)
                     .setOffset(offset)
                     .withFilter("identity_recipient:*")
@@ -562,7 +520,7 @@ public class IndexSearcher {
                             .withDomain(new DomainMap().withTagsToExclude("ffauthors"))
                             .setMinCount(1));
             
-            addFacets(request, jrequest, lang);
+            jrequest = addFilters(request, jrequest, lang);
 //            QueryResponse queryResponse = jrequest.process(solr, "hiko");
 //            ret = new JSONObject(queryResponse.jsonStr());
 
@@ -580,11 +538,23 @@ public class IndexSearcher {
         return ret;
     }
     
-    public static void addFacets(HttpServletRequest request, JsonQueryRequest jrequest, String lang) {
-        String[] tenants = request.getParameterValues("tenant");
+    public static JsonQueryRequest addFilters(HttpServletRequest request, JsonQueryRequest jrequest, String lang) {
+        String other_tenant = request.getParameter("other_tenant");
+        if (other_tenant != null) {
+            String tenant = request.getParameter("tenant");
+            if (tenant != null && !tenant.isBlank()) {
+                if (!other_tenant.isBlank()) {
+                    tenant += " OR tenant:" + other_tenant;
+                }
+                jrequest = jrequest.withFilter("tenant:" + tenant);
+            }
+        } else {
+            String[] tenants = request.getParameterValues("tenant");
             if (tenants.length > 0) {
                 jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
             }
+        }    
+            
             String date_range = request.getParameter("date_range");
             if (date_range != null && !date_range.isBlank()) {
                 jrequest = jrequest.withFilter("{!tag=ffdate_range}date_computed_range:[" + date_range.replaceAll(",", " TO ") + "]");
@@ -617,6 +587,7 @@ public class IndexSearcher {
             if (request.getParameter("destination") != null) {
                 jrequest = jrequest.withFilter("{!tag=ffdestination}destination_name" + ":(\"" + String.join("\" OR \"", request.getParameterValues("destination")) + "\")");
             }
+            return jrequest;
     }
 
 }
