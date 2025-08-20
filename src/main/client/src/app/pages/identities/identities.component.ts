@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
-import { Component, effect, Inject } from '@angular/core';
+import { Component, effect, Inject, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -27,12 +27,14 @@ import { JSONFacet } from '../../shared/facet';
 import { LabelLayout } from "echarts/features";
 import { MatExpansionModule } from '@angular/material/expansion';
 import { AppConfiguration } from '../../app-configuration';
+import { FacetsComponent } from "../../components/facets/facets.component";
+import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-identities',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, LettersInfoComponent],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -73,6 +75,7 @@ export class IdentitiesComponent {
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
+    private _ngZone: NgZone,
     private router: Router,
     private translation: TranslateService,
     private config: AppConfiguration,
@@ -99,6 +102,53 @@ export class IdentitiesComponent {
 
   onGraphChartInit(e: any) {
     this.graphChart = e;
+
+    this.graphChart.on('click', (params: any) => {
+      if (params.dataType === 'node'){
+        if (params.data.category === 'mentioned') {
+          this.mentionedLabel(params.data.name);
+        } else if (params.data.category === 'authors') {
+          this.authorLabel(params.data.name);
+        } else if (params.data.category === 'recipients') {
+          this.recipientLabel(params.data.name);
+        } 
+      }
+    })
+  }
+
+  
+  infoContent: string;
+  infoHeader: string;
+  infoData: any[];
+  infoFields: string[];
+
+  closeInfo() {
+    this.infoContent = null;
+    this.infoHeader = null;
+  }
+
+  authorLabel(identity: string) {
+    this._ngZone.run(() => {
+      this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
+      this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
+      this.infoHeader = `${identity} wrote letters to:`;
+    });
+  }
+
+  recipientLabel(identity: string) {
+    this._ngZone.run(() => {
+      this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
+      this.infoFields = ['letter_id', 'identity_author', 'date_year', 'action'];
+      this.infoHeader = `${identity} received letters from:`;
+    });
+  }
+
+  mentionedLabel(identity: string) {
+    this._ngZone.run(() => {
+      this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
+      this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'action'];
+      this.infoHeader = `${identity} is mentioned in:`;
+    });
   }
 
   clickTenant(t: Tenant) {
@@ -109,6 +159,12 @@ export class IdentitiesComponent {
   changeTenant() {
     this.limits = this.state.getTenantsRange();
     //this.selectedKeywords = [];
+    this.getData(true);
+  }
+
+  usedFacets: {field: string, value: string}[] = [];
+  onFiltersChanged(usedFacets: {field: string, value: string}[]) {
+    this.usedFacets = usedFacets;
     this.getData(true);
   }
 
@@ -126,10 +182,11 @@ export class IdentitiesComponent {
           ]});
   }
 
-  showNode(identity: JSONFacet, category: string) {
-    //const idx = this.graphData.nodes.findIndex(n => n.id === identity.val + '_' + category);
-    const idx = this.graphData.nodes.findIndex(n => n.id === identity.val);
-    // currentIndex = (currentIndex + 1) % dataLen;
+  showNode(e: {field: string, value: string}) {
+    if (e.field === 'mentioned') {
+      return;
+    }
+    const idx = this.graphData.nodes.findIndex(n => n.id === e.value);
     this.graphChart.dispatchAction({
       type: 'showTip',
       seriesIndex: 0,
@@ -163,6 +220,7 @@ export class IdentitiesComponent {
     } else {
       p.rows = 10000;
     }
+    this.state.addFilters(p, this.usedFacets);
     this.service.getIdentities(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
@@ -170,9 +228,9 @@ export class IdentitiesComponent {
       if (setResponse) {
         this.solrResponse = resp;
       }
-      this.authors = resp.facets.identity_author.buckets;
-      this.recipients = resp.facets.identity_recipient.buckets;
-      this.mentioned = resp.facets.identity_mentioned.buckets;
+      this.authors = resp.facets.authors.buckets;
+      this.recipients = resp.facets.recipients.buckets;
+      this.mentioned = resp.facets.mentioned.buckets;
       this.processResponse();
       this.loading = false;
     });
@@ -228,9 +286,7 @@ export class IdentitiesComponent {
     const minSize = 10;
     let maxCount = Math.max(...this.authors.map(r => r.count), ...this.recipients.map(r => r.count));
 
-    // const maxCount: number = Math.max(
-    //   this.authors[0].count,
-    //   this.recipients[0].count);
+
     this.authors.forEach((identity: JSONFacet) => {
       const pos = this.setPosition(identity.val);
       nodes.push({
@@ -271,7 +327,7 @@ export class IdentitiesComponent {
           value: identity.count,
           recipientCount: identity.count,
           label: identity.val + '<br/>recipient: ' + identity.count,
-          category: 'recipient',
+          category: 'recipients',
           symbolSize: maxSize * identity.count / maxCount + minSize,
           x: pos.x,
           y: pos.y,
@@ -281,18 +337,6 @@ export class IdentitiesComponent {
         })
       }
     });
-    // this.mentioned.forEach((identity: JSONFacet) => {
-    //   nodes.push({
-    //     // id: identity.id + '',
-    //     id: identity.val + '_mentioned',
-    //     name: identity.val,
-    //     value: identity.count,
-    //     category: 'mentioned',
-    //     symbolSize: maxSize * identity.count / maxCount + minSize,
-    //     x: Math.random() * w,
-    //     y: Math.random() * h
-    //   })
-    // });
 
     this.solrResponse.response.docs.forEach((letter: Letter) => {
       if (this.inLimits(letter.date_year) && letter.identities) {

@@ -21,6 +21,8 @@ export class FacetsComponent {
   fields = input<string[]>([]);
   
   onFiltersChanged = output<{field: string, value: string}[]>();
+  onMouserOver = output<{field: string, value: string}>();
+  onMouseOut = output<{field: string, value: string}>();
 
   hasUsedFacets: boolean;
   usedFacets: {field: string, value: string}[] = [];
@@ -44,6 +46,15 @@ export class FacetsComponent {
 
   unfilter(field: string, value: string) {
     this.usedFacets = this.usedFacets.filter(f => !(f.field === field && f.value === value));
+    this.hasUsedFacets = this.usedFacets.length > 0;
     this.onFiltersChanged.emit(this.usedFacets);
+  }
+
+  fireMouserOver(field: string, value: string) {
+    this.onMouserOver.emit({field, value});
+  }
+
+  fireMouseOut(field: string, value: string) {
+    this.onMouseOut.emit({field, value});
   }
 }

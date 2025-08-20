@@ -91,7 +91,7 @@ public class IndexSearcher {
                     .withFilter("identity_mentioned:*")
                     .returnFields("tenant,date_year,date_computed,identity_name,identity_recipient,identity_author,identity_mentioned,places:[json],identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_year", rangeFacet)
-                    .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned")
+                    .withFacet("mentioned", new TermsFacetMap("identity_mentioned")
                             .setLimit(1000)
                             .setSort("index")
                             .setMinCount(1)
@@ -99,7 +99,7 @@ public class IndexSearcher {
                                 .setLimit(100)
                                 .setMinCount(1))
                             )
-                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
+                    .withFacet("recipients", new TermsFacetMap("identity_recipient")
                             .setLimit(-1)
                             .setSort("index")
                             .withDomain(new DomainMap().withTagsToExclude("ffrecipients"))
@@ -208,12 +208,12 @@ public class IndexSearcher {
                             //.withTagsToExclude("fftenant")
                             )
                             .setMinCount(1))
-                    .withFacet("keywords_categories", categoriesFacet)
+                    .withFacet("keywords", categoriesFacet)
                     // .withFacet("identity_mentioned", identity_mentionedFacet)
-                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
+                    .withFacet("recipients", new TermsFacetMap("identity_recipient")
                             .setLimit(1000)
                             .setMinCount(1))
-                    .withFacet("identity_author", new TermsFacetMap("identity_author")
+                    .withFacet("authors", new TermsFacetMap("identity_author")
                             .setLimit(1000)
                             .setMinCount(1));
             
@@ -374,40 +374,22 @@ public class IndexSearcher {
                     .withFilter("identity_author:*")
                     .returnFields("letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,identity_mentioned,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_year", rangeFacet)
-                    .withFacet("keywords_categories", categoriesFacet)
-                    .withFacet("identity_mentioned", new TermsFacetMap("identity_mentioned")
+                    .withFacet("keywords", categoriesFacet)
+                    .withFacet("mentioned", new TermsFacetMap("identity_mentioned")
                             .setLimit(1000)
                             .setSort("index")
                             .setMinCount(1))
-                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
+                    .withFacet("recipients", new TermsFacetMap("identity_recipient")
                             .setLimit(1000)
                             .setSort("index")
                             .withDomain(new DomainMap().withTagsToExclude("ffrecipients"))
                             .setMinCount(1))
-                    .withFacet("identity_author", new TermsFacetMap("identity_author")
+                    .withFacet("authors", new TermsFacetMap("identity_author")
                             .setLimit(1000)
                             .setSort("index")
                             .setMinCount(1));
-            String[] tenants = request.getParameterValues("tenant");
-            if (tenants.length > 0) {
-                jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
-            }
             
-            String date_range = request.getParameter("date_range");
-            if (date_range != null && !date_range.isBlank()) {
-                jrequest = jrequest.withFilter("{!tag=ffdate_range}date_computed_range:[" + date_range.replaceAll(",", " TO ") + "]");
-            }
-
-            if (request.getParameter("recipient") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(+\"" + String.join("\" OR \"", request.getParameterValues("recipient")) + "\")");
-            }
-            
-            if (request.getParameter("keyword") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(+\"" + String.join("\" +\"", request.getParameterValues("keyword")) + "\")");
-            }
-            
-//            QueryResponse queryResponse = jrequest.process(solr, "hiko");
-//            ret = new JSONObject(queryResponse.jsonStr());
+            addFacets(request, jrequest, lang);
 
             jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "hiko");
@@ -579,7 +561,27 @@ public class IndexSearcher {
                             .setSort("index")
                             .withDomain(new DomainMap().withTagsToExclude("ffauthors"))
                             .setMinCount(1));
-            String[] tenants = request.getParameterValues("tenant");
+            
+            addFacets(request, jrequest, lang);
+//            QueryResponse queryResponse = jrequest.process(solr, "hiko");
+//            ret = new JSONObject(queryResponse.jsonStr());
+
+            jrequest.setResponseParser(rawJsonResponseParser);
+            NamedList<Object> resp = solr.request(jrequest, "hiko");
+            String jsonResponse = (String) resp.get("response");
+            ret = new JSONObject(jsonResponse);
+            jrequest = null;  
+            resp = null; 
+            solr.close();
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        return ret;
+    }
+    
+    public static void addFacets(HttpServletRequest request, JsonQueryRequest jrequest, String lang) {
+        String[] tenants = request.getParameterValues("tenant");
             if (tenants.length > 0) {
                 jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
             }
@@ -615,22 +617,6 @@ public class IndexSearcher {
             if (request.getParameter("destination") != null) {
                 jrequest = jrequest.withFilter("{!tag=ffdestination}destination_name" + ":(\"" + String.join("\" OR \"", request.getParameterValues("destination")) + "\")");
             }
-            
-//            QueryResponse queryResponse = jrequest.process(solr, "hiko");
-//            ret = new JSONObject(queryResponse.jsonStr());
-
-            jrequest.setResponseParser(rawJsonResponseParser);
-            NamedList<Object> resp = solr.request(jrequest, "hiko");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
-            jrequest = null;  
-            resp = null; 
-            solr.close();
-        } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            ret.put("error", ex);
-        }
-        return ret;
     }
 
 }

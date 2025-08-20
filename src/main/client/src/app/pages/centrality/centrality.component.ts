@@ -219,16 +219,16 @@ export class CentralityComponent {
         this.solrResponse = resp;
       }
 
-      this.authors = resp.facets.identity_author.buckets;
-      this.recipients = resp.facets.identity_recipient.buckets;
+      this.authors = resp.facets.authors.buckets;
+      this.recipients = resp.facets.recipients.buckets;
 
       this.recipients.forEach(k => {
         k.selected = this.selectedRecipients.includes(k.val);
       });
 
-      this.mentioned = resp.facets.identity_mentioned.buckets;
+      this.mentioned = resp.facets.mentioned.buckets;
 
-      this.keywords = resp.facets.keywords_categories.buckets;
+      this.keywords = resp.facets.keywords.buckets;
 
       this.processResponse();
       this.loading = false;

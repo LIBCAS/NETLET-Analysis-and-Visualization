@@ -7,8 +7,10 @@
   "usedFilters": "Used filters",
   "field": {
     "author": "Autor",
+    "identity_author": "Autor",
     "authors": "Authors",
     "recipient": "Recipient",
+    "identity_recipient": "Recipient",
     "recipients": "Recipients",
     "mentioned": "Mentioned",
     "origin": "Place of origin",
@@ -18,7 +20,8 @@
     "professions": "Profese",
     "keywords": "Keywords",
     "relation_tenants": "Catalogs for comparition",
-    "date": "Date"
+    "date": "Date",
+    "date_year": "Year"
   },
   "action": {
     "view_in_hiko": "View in HIKO DB"

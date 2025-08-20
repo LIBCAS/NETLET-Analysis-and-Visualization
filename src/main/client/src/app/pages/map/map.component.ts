@@ -174,9 +174,9 @@ export class MapComponent {
         }
 
       }
-      this.authors = resp.facets.identity_recipient ? resp.facets.identity_author.buckets : [];
-      this.recipients = resp.facets.identity_recipient ? resp.facets.identity_recipient.buckets : [];
-      this.mentioned = resp.facets.identity_mentioned ? resp.facets.identity_mentioned.buckets : [];
+      this.authors = resp.facets.recipients ? resp.facets.authors.buckets : [];
+      this.recipients = resp.facets.recipients ? resp.facets.recipients.buckets : [];
+      this.mentioned = resp.facets.mentioned ? resp.facets.mentioned.buckets : [];
       if (withMap) {
         this.solrResponse = resp;
         // this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);

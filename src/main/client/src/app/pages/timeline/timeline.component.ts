@@ -203,15 +203,7 @@ export class TimelineComponent {
       p.rows = this.rows;
 
     p.offset = this.pageIndex * p.rows;
-
-
-    p.author = this.usedFacets.filter(k => k.field === 'authors').map(k => k.value);
-    p.recipient = this.usedFacets.filter(k => k.field === 'recipients').map(k => k.value);
-    p.mentioned = this.usedFacets.filter(k => k.field === 'mentioned').map(k => k.value);
-    p.keyword = this.usedFacets.filter(k => k.field === 'keywords').map(k => k.value);
-    p.profession = this.usedFacets.filter(k => k.field === 'professions').map(k => k.value);
-    p.origin = this.usedFacets.filter(k => k.field === 'origins').map(k => k.value);
-    p.destination = this.usedFacets.filter(k => k.field === 'destinations').map(k => k.value);
+    this.state.addFilters(p, this.usedFacets);
 
 
     this.service.getTimeline(p as HttpParams).subscribe((resp: any) => {

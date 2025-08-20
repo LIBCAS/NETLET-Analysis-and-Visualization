@@ -173,10 +173,10 @@ export class KeywordsComponent {
         const ts: JSONFacet[] = resp.facets.tenants.buckets;
         this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
       }
-      this.authors = resp.facets.identity_author.buckets;
-      this.recipients = this.solrResponse.facets.identity_recipient.buckets;
-      // this.mentioned = resp.facets.identity_mentioned.buckets;
-      this.keyword_categories = resp.facets.keywords_categories.buckets;
+      this.authors = resp.facets.authors.buckets;
+      this.recipients = this.solrResponse.facets.recipients.buckets;
+      // this.mentioned = resp.facets.mentioned.buckets;
+      this.keyword_categories = resp.facets.keywords.buckets;
 
       this.keyword_categories.forEach(k => {
         k.selected = this.selectedKeywords.includes(k.val);

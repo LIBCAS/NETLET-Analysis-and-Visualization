@@ -3,7 +3,33 @@
         <mat-card-title>{{ header() }}</mat-card-title>
     </mat-card-header>
     <mat-card-content class="app-info-content">
-            <div [innerHtml]="content()" class="app-info-row"></div>
+        <div [innerHtml]="content()" class="app-info-row"></div>
+
+
+        <table mat-table [dataSource]="data()">
+            @for (f of fields(); track $index; let idx = $index) {
+            @if(f ==='action') {
+            <ng-container matColumnDef="action" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+                <td mat-cell *matCellDef="let element">
+                    <button class="app-hiko app-small-icon-button" mat-icon-button
+                        (click)="viewLetterInHIKO(element.letter_id, element.tenant)"
+                        [matTooltip]="'action.view_in_hiko' | translate"><mat-icon>arrow_outward</mat-icon></button>
+                </td>
+            </ng-container>
+            } @else {
+            <ng-container [matColumnDef]="f">
+                <th mat-header-cell *matHeaderCellDef> {{ 'field.' + f | translate}} </th>
+                <td mat-cell *matCellDef="let element"> {{element[f]}} </td>
+            </ng-container>
+            }
+            }
+
+            <tr mat-header-row *matHeaderRowDef="fields() sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: fields();"></tr>
+        </table>
+
+
     </mat-card-content>
     <mat-card-actions align="end" class="app-mat-card-actions">
         <button mat-raised-button (click)="close()">{{ 'Close' }}</button>

@@ -136,8 +136,8 @@ export class MapViewComponent implements OnInit {
         const lon = resp.stats.stats_fields.longitude;
         this.map.fitBounds(L.latLngBounds([lat.max, lon.min], [lat.min, lon.max]))
       }
-      this.recipients = resp.facets.identity_recipient ? resp.facets.identity_recipient.buckets : [];
-      this.mentioned = resp.facets.identity_mentioned ? resp.facets.identity_mentioned.buckets : [];
+      this.recipients = resp.facets.recipients ? resp.facets.recipients.buckets : [];
+      this.mentioned = resp.facets.mentioned ? resp.facets.mentioned.buckets : [];
       if (withMap) {
         this.solrResponse = resp;
         // this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);

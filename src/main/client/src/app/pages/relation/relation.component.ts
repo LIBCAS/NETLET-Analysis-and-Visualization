@@ -197,9 +197,9 @@ export class RelationComponent {
       if (setResponse) {
         this.solrResponse = resp;
       }
-      //this.authors = resp.facets.identity_author.buckets;
-      this.recipients = resp.facets.identity_recipient.buckets;
-      this.mentioned = resp.facets.identity_mentioned.buckets;
+      //this.authors = resp.facets.authors.buckets;
+      this.recipients = resp.facets.recipients.buckets;
+      this.mentioned = resp.facets.mentioned.buckets;
       this.processResponse();
       this.loading = false;
     });

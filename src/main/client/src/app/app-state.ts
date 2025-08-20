@@ -113,4 +113,14 @@ export interface Tenant {
     });
     return [min.toISOString(),max.toISOString()];
   }
+
+  addFilters(p: any, usedFacets: {field: string, value: string}[]) {
+    p.author = usedFacets.filter(k => k.field === 'authors').map(k => k.value);
+    p.recipient = usedFacets.filter(k => k.field === 'recipients').map(k => k.value);
+    p.mentioned = usedFacets.filter(k => k.field === 'mentioned').map(k => k.value);
+    p.keyword = usedFacets.filter(k => k.field === 'keywords').map(k => k.value);
+    p.profession = usedFacets.filter(k => k.field === 'professions').map(k => k.value);
+    p.origin = usedFacets.filter(k => k.field === 'origins').map(k => k.value);
+    p.destination = usedFacets.filter(k => k.field === 'destinations').map(k => k.value);
+  }
 }

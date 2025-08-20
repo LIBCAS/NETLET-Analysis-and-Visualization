@@ -2,23 +2,27 @@
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
   <div style="flex: 1 30%;" class="app-filters">
     @if (state.tenant()) {
-      <div>
-        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-          <mat-expansion-panel-header>
-            <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
-          </mat-expansion-panel-header>
-          <mat-list>
-            @for(k of state.tenants; track $index; let idx = $index;){
-              <mat-list-item (click)="clickTenant(k)">
-                <mat-checkbox [disabled]="k.val === state.tenant().val"
-                [(ngModel)]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
-              </mat-list-item>
-            }
-          </mat-list>
-        </mat-expansion-panel>
-      </div>
+    <div>
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list>
+          @for(k of state.tenants; track $index; let idx = $index;){
+          <mat-list-item (click)="clickTenant(k)">
+            <mat-checkbox [disabled]="k.val === state.tenant().val" [(ngModel)]="k.selected">{{ k.val}} ({{k.count}})
+            </mat-checkbox>
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
+    </div>
     }
-    @if (authors) {
+    @if(solrResponse?.facets) {
+    <app-facets [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'prefessions', 'origins', 'destinations']"
+      [facets]="solrResponse.facets" (onFiltersChanged)="onFiltersChanged($event)" (onMouserOver)="showNode($event)"
+      (onMouseOut)="hideNode()"></app-facets> }
+    <!-- @if (authors) {
       <div>
         <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0">
           <mat-expansion-panel-header>
@@ -49,14 +53,14 @@
           </mat-list>
         </mat-expansion-panel>
       </div>
-    }
+    } -->
 
   </div>
   <div class="app-content app-fill-w app-fill-h">
     <div class="app-years">
       @if (solrResponse?.facets.date_year) {
-        <app-years-chart [dateYearFacet]="solrResponse.facets.date_year"
-        (onChangeLimits)="changeLimits($event)" [withAnimation]="false" (onChangeRunning)="changeRunning($event)"></app-years-chart>
+      <app-years-chart [dateYearFacet]="solrResponse.facets.date_year" (onChangeLimits)="changeLimits($event)"
+        [withAnimation]="false" (onChangeRunning)="changeRunning($event)"></app-years-chart>
       }
     </div>
 
@@ -66,5 +70,12 @@
         </div>
       </div>
     </div>
+
+    @if (infoHeader) {
+    <div class="app-letters-info">
+      <app-letters-info [header]="infoHeader" [fields]="infoFields" [data]="infoData" (onClose)="closeInfo()"></app-letters-info>
+    </div>
+    }
   </div>
+
 </div>
