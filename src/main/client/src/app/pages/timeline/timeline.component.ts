@@ -41,6 +41,7 @@ echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipCompon
 //@ts-ignore
 import langCZ from 'echarts/lib/i18n/langCS.js';
 import { throttle } from 'rxjs';
+import { FacetsComponent } from "../../components/facets/facets.component";
 
 echarts.registerLocale("CZ", langCZ)
 
@@ -48,9 +49,9 @@ echarts.registerLocale("CZ", langCZ)
   selector: 'app-timeline',
   imports: [TranslateModule, FormsModule, NgxEchartsDirective, DatePipe,
     NgxEchartsModule, AngularSplitModule,
-    MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, 
+    MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule,
     MatButtonModule, MatTableModule, MatPaginatorModule,
-    MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, MatTooltipModule],
+    MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, MatTooltipModule, FacetsComponent],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -70,20 +71,20 @@ export class TimelineComponent {
   chartOptions: EChartsOption | any;
   chart: ECharts;
 
-  authors: JSONFacet[] = [];
-  selectedAuthors: string[] = [];
-  recipients: JSONFacet[] = [];
-  selectedRecipients: string[] = [];
-  mentioned: JSONFacet[] = [];
-  selectedMentioned: string[] = [];
-  keyword_categories: JSONFacet[] = [];
-  selectedKeywords: string[] = [];
-  professions: JSONFacet[] = [];
-  selectedProfessions: string[] = [];
-  origins: JSONFacet[] = [];
-  selectedOrigins: string[] = [];
-  destinations: JSONFacet[] = [];
-  selectedDestinations: string[] = [];
+  // authors: JSONFacet[] = [];
+  // selectedAuthors: string[] = [];
+  // recipients: JSONFacet[] = [];
+  // selectedRecipients: string[] = [];
+  // mentioned: JSONFacet[] = [];
+  // selectedMentioned: string[] = [];
+  // keyword_categories: JSONFacet[] = [];
+  // selectedKeywords: string[] = [];
+  // professions: JSONFacet[] = [];
+  // selectedProfessions: string[] = [];
+  // origins: JSONFacet[] = [];
+  // selectedOrigins: string[] = [];
+  // destinations: JSONFacet[] = [];
+  // selectedDestinations: string[] = [];
 
   date_facet: { buckets: JSONFacet[], after: { count: number } };
 
@@ -113,7 +114,7 @@ export class TimelineComponent {
   ngOnInit(): void {
     this.state.tenants.forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'timeline');
-    if (this.tenant) {
+    if (this.tenant && this.chart) {
       this.limits = [this.tenant.date_computed_min, this.tenant.date_computed_max];
       this.getData(true);
     }
@@ -135,8 +136,6 @@ export class TimelineComponent {
 
     this.chart.on('click', (params: any) => {
       if (params.componentType === 'xAxis') {
-        
-      console.log(params)
         const year = parseInt(params.value.split('-')[0]);
         this.getData(false);
         this.chart.dispatchAction({
@@ -163,6 +162,12 @@ export class TimelineComponent {
     this.limits = [this.tenant.date_computed_min, this.tenant.date_computed_max];
     this.getData(true);
 
+  }
+
+  usedFacets: {field: string, value: string}[] = [];
+  onFiltersChanged(usedFacets: {field: string, value: string}[]) {
+    this.usedFacets = usedFacets;
+    this.getData(true);
   }
 
   filter(k: JSONFacet) {
@@ -199,73 +204,27 @@ export class TimelineComponent {
 
     p.offset = this.pageIndex * p.rows;
 
-    this.selectedAuthors = this.authors.filter(k => k.selected).map(k => k.val);
-    p.author = this.selectedAuthors;
-    this.selectedRecipients = this.recipients.filter(k => k.selected).map(k => k.val);
-    p.recipient = this.selectedRecipients;
-    this.selectedMentioned = this.mentioned.filter(k => k.selected).map(k => k.val);
-    p.mentioned = this.selectedMentioned;
-    this.selectedKeywords = this.keyword_categories.filter(k => k.selected).map(k => k.val);
-    p.keyword = this.selectedKeywords;
-    this.selectedProfessions = this.professions.filter(k => k.selected).map(k => k.val);
-    p.profession = this.selectedProfessions;
-    this.selectedOrigins = this.origins.filter(k => k.selected).map(k => k.val);
-    p.origin = this.selectedOrigins;
-    this.selectedDestinations = this.destinations.filter(k => k.selected).map(k => k.val);
-    p.destination = this.selectedDestinations;
+
+    p.author = this.usedFacets.filter(k => k.field === 'authors').map(k => k.value);
+    p.recipient = this.usedFacets.filter(k => k.field === 'recipients').map(k => k.value);
+    p.mentioned = this.usedFacets.filter(k => k.field === 'mentioned').map(k => k.value);
+    p.keyword = this.usedFacets.filter(k => k.field === 'keywords').map(k => k.value);
+    p.profession = this.usedFacets.filter(k => k.field === 'professions').map(k => k.value);
+    p.origin = this.usedFacets.filter(k => k.field === 'origins').map(k => k.value);
+    p.destination = this.usedFacets.filter(k => k.field === 'destinations').map(k => k.value);
+
 
     this.service.getTimeline(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
       }
       
-        this.solrResponse = resp;
-        this.numFound = this.solrResponse.response.numFound;
-      this.authors = resp.facets.identity_author.buckets;
-      this.authors.forEach(k => {
-        k.selected = this.selectedAuthors.includes(k.val);
-      });
-
-      this.recipients = resp.facets.identity_recipient.buckets;
-      this.recipients.forEach(k => {
-        k.selected = this.selectedRecipients.includes(k.val);
-      });
-
-      this.mentioned = resp.facets.identity_mentioned.buckets;
-      this.mentioned.forEach(k => {
-        k.selected = this.selectedMentioned.includes(k.val);
-      });
-
-      this.keyword_categories = resp.facets.keywords_categories.buckets;
-      this.keyword_categories.forEach(k => {
-        k.selected = this.selectedKeywords.includes(k.val);
-      });
-
-      this.professions = resp.facets.professions.buckets;
-      this.professions.forEach(k => {
-        k.selected = this.selectedProfessions.includes(k.val);
-      });
-
-      this.origins = resp.facets.origins.buckets;
-      this.origins.forEach(k => {
-        k.selected = this.selectedOrigins.includes(k.val);
-      });
-
-      this.destinations = resp.facets.destinations.buckets;
-      this.destinations.forEach(k => {
-        k.selected = this.selectedDestinations.includes(k.val);
-      });
+      this.solrResponse = resp;
+      this.numFound = this.solrResponse.response.numFound;
 
       const letters = this.solrResponse.response.docs;
       this.letters.set(letters);
       this.showLetters.set(true);
-      this.hasFacets.set(this.selectedAuthors.length + 
-        this.selectedRecipients.length + 
-        this.selectedMentioned.length + 
-        this.selectedKeywords.length + 
-        this.selectedProfessions.length + 
-        this.selectedOrigins.length + 
-        this.selectedDestinations.length > 0);
       if (setGraph) {
         this.processResponse();
       }

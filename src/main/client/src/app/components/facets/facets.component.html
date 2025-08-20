@@ -1,33 +1,34 @@
-<!-- @if(hasFacets()) {
+@if(hasUsedFacets) {
     <div>
       <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
         <mat-expansion-panel-header>
           <mat-panel-title> {{ 'usedFilters' | translate}} </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-list class="app-facet">
-          @for(k of selectedAuthors; track $index; let idx = $index){
-          <mat-list-item (click)="unfilter(authors, k)" >
-            {{ 'field.author' | translate}}: {{ k }}
+          @for(k of usedFacets; track $index; let idx = $index){
+          <mat-list-item (click)="unfilter(k.field, k.value)" >
+            <mat-icon>delete_forever</mat-icon> {{ 'field.' + k.field | translate}}: {{ k.value }}
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
+    </div>
+}
+@for(f of fields(); track $index; let idx = $index){
+    @if (facets()[f]?.buckets.length > 0) {
+    <div>
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{ 'field.' + f | translate}} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-list class="app-facet">
+          @for(k of facets()[f].buckets; track $index; let idx = $index){
+          <mat-list-item (click)="filter(f, k.val)" matTooltip="{{ k.val}} ({{k.count}})">
+            <mat-checkbox [checked]="isUsed(f, k.val)">{{ k.val}} ({{k.count}}) </mat-checkbox>
           </mat-list-item>
           }
         </mat-list>
       </mat-expansion-panel>
     </div>
     }
-
-    @if (authors) {
-    <div>
-      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title> {{ 'field.authors' | translate}} </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-list class="app-facet">
-          @for(k of authors; track $index; let idx = $index){
-          <mat-list-item (click)="filter(k)" matTooltip="{{ k.val}} ({{k.count}})">
-            <mat-checkbox [checked]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
-          </mat-list-item>
-          }
-        </mat-list>
-      </mat-expansion-panel>
-    </div>
-    } -->
+}
