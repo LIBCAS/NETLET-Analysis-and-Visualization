@@ -86,17 +86,31 @@ export interface Tenant {
     this.selectedTenants.set(this.tenants.filter(t => t.selected));
   }
 
-  getTenantsRange(): [number, number] {
-    let min =new Date().getFullYear();
-    let max = 0; 
+  getTenantsRange(): [Date, Date] {
+    let min = new Date();
+    let max = new Date('1000-01-01');
     this.tenants.forEach(t => {
       if (t.selected) {
         // min = Math.min(min, t.date_computed_min.getFullYear());
         // max = Math.max(max, t.date_computed_max.getFullYear());
-        min = Math.min(min, t.date_computed_min.getFullYear());
-        max = Math.max(max, t.date_computed_max.getFullYear());
+        min = min > t.date_computed_min ? t.date_computed_min : min;
+        max = max > t.date_computed_max ? max : t.date_computed_max;
       }
     });
     return [min,max];
+  }
+
+  getTenantsRangeISO(): [string, string] {
+    let min = new Date();
+    let max = new Date('1000-01-01');
+    this.tenants.forEach(t => {
+      if (t.selected) {
+        // min = Math.min(min, t.date_computed_min.getFullYear());
+        // max = Math.max(max, t.date_computed_max.getFullYear());
+        min = min > t.date_computed_min ? t.date_computed_min : min;
+        max = max > t.date_computed_max ? max : t.date_computed_max;
+      }
+    });
+    return [min.toISOString(),max.toISOString()];
   }
 }

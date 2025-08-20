@@ -45,7 +45,7 @@ export class IdentitiesComponent {
   loading: boolean;
   running: boolean;
   solrResponse: any;
-  limits: [number, number];
+  limits: [Date, Date];
   tenants: Tenant[] = [];
   graphOptions: EChartsOption = {};
   graphChart: ECharts;
@@ -112,7 +112,7 @@ export class IdentitiesComponent {
     this.getData(true);
   }
 
-  changeLimits(limits: [number, number]) {
+  changeLimits(limits: [Date, Date]) {
     this.limits = limits;
     this.getData(false);
   }
@@ -156,8 +156,8 @@ export class IdentitiesComponent {
     this.loading = true;
     const p: any = {};
     p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
-    p.tenant_date_range = this.state.getTenantsRange().toString();
-    p.date_range = this.limits.toString();
+    p.tenant_date_range = this.state.getTenantsRangeISO().toString();
+    p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     if (!setResponse) {
       p.rows = 0;
     } else {
@@ -179,7 +179,7 @@ export class IdentitiesComponent {
   }
 
   inLimits(n: number): boolean {
-    return n >= this.limits[0] && n <= this.limits[1];
+    return n >= this.limits[0].getFullYear() && n <= this.limits[1].getFullYear();
   }
 
   setPosition(id: string) {

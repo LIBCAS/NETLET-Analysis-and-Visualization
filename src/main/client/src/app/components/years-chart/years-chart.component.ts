@@ -78,7 +78,7 @@ const MOVE_ICON =
 export class YearsChartComponent {
 
   dateYearFacet = input<any>();
-  onChangeLimits = output<[number, number]>();
+  onChangeLimits = output<[Date, Date]>();
 
   withAnimation = input<boolean>(false);
   onChangeRunning = output<boolean>();
@@ -110,7 +110,8 @@ export class YearsChartComponent {
     iconRegistry.addSvgIconLiteral('move-icon', sanitizer.bypassSecurityTrustHtml(MOVE_ICON));
     effect(() => {
       const facet = this.dateYearFacet();
-      this.limits = this.state.getTenantsRange();
+      const l = this.state.getTenantsRange();
+      this.limits = [l[0].getFullYear(), l[1].getFullYear(),];
       if (this.chartRok) {
         this.setYearsChart(facet);
       }
@@ -126,19 +127,25 @@ export class YearsChartComponent {
     this.setYearsChart(this.dateYearFacet());
   }
 
+  fireChangeLimits() {
+    this.onChangeLimits.emit([new Date(this.limits[0]+'-01-01'), new Date(this.limits[1]+'-12-31')]);
+  }
+
   onSetYears(e: any) {
     if (!e.areas || e.areas.length === 0) {
       return;
     }
     this.limits = [parseInt(this.rokAxis[e.areas[0].coordRange[0]]), parseInt(this.rokAxis[e.areas[0].coordRange[1]])];
-    this.onChangeLimits.emit(this.limits);
+    this.fireChangeLimits();
     this.setChartTitle();
   }
 
   onClearSelection(e: any) {
     if (e.batch[0].areas.length === 0) {
-      this.limits = this.state.getTenantsRange();
-      this.onChangeLimits.emit(this.limits);
+      
+      const l = this.state.getTenantsRange();
+      this.limits = [l[0].getFullYear(), l[1].getFullYear(),];
+      this.fireChangeLimits();
       this.setChartTitle();
     }
   }
@@ -169,10 +176,10 @@ export class YearsChartComponent {
 
     this.rokSeries = facet.buckets.map(c => c.count);
     this.rokSeries.push(facet.after.count);
-    this.rokAxis = facet.buckets.map(c => c.val);
+    this.rokAxis = facet.buckets.map(c => new Date(c.val).getFullYear() +'');
     this.rokAxis.push(this.limits[1] + '');
 
-    let minRokWithValue = '1100';
+    let minRokWithValue = '1000';
     let maxRokWithValue = '2025';
 
     minRokWithValue = this.limits[0] + '';
@@ -258,7 +265,7 @@ export class YearsChartComponent {
       this.setChartTitle();
 
       this._ngZone.run(() => {
-        this.onChangeLimits.emit(this.limits);
+        this.fireChangeLimits();
       });
     })
 
@@ -301,12 +308,12 @@ this.chartRok.dispatchAction({
   }
 
   run() {
-    const startRok = this.state.getTenantsRange()[0];
+    const startRok = this.state.getTenantsRange()[0].getFullYear();
     let endRok = startRok;
-    const maxRok = this.state.getTenantsRange()[1];
+    const maxRok = this.state.getTenantsRange()[1].getFullYear();
     this.animation = setInterval(() => {
       this.limits = [startRok, endRok++];
-      this.onChangeLimits.emit(this.limits);
+      this.fireChangeLimits();
       this.onChangeRunning.emit(true);
       this.setChartTitle();
 
@@ -331,10 +338,10 @@ this.chartRok.dispatchAction({
   move() {
     let startRok = this.limits[0];
     let endRok = this.limits[1];
-    const maxRok = this.state.getTenantsRange()[1];
+    const maxRok = this.state.getTenantsRange()[1].getFullYear();
     this.animation = setInterval(() => {
       this.limits = [startRok++, endRok++];
-      this.onChangeLimits.emit(this.limits);
+      this.fireChangeLimits();
         this.running = true;
         this.onChangeRunning.emit(this.running);
       this.setChartTitle();

@@ -41,7 +41,7 @@ export class ProfessionsComponent {
   loading: boolean;
   invalidTenant: boolean;
   solrResponse: any;
-  limits: [number, number];
+  limits: [Date, Date];
   tenants: Tenant[] = [];
   graphOptions: EChartsOption = {};
   graphChart: ECharts;
@@ -111,7 +111,7 @@ export class ProfessionsComponent {
     this.getData(true);
   }
 
-  changeLimits(limits: [number, number]) {
+  changeLimits(limits: [Date, Date]) {
     this.limits = limits;
     this.getData(false);
   }
@@ -146,8 +146,8 @@ export class ProfessionsComponent {
     this.invalidTenant = false;
     const p: any = {};
     p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
-    p.tenant_date_range = this.state.getTenantsRange().toString();
-    p.date_range = this.limits.toString();
+    p.tenant_date_range = this.state.getTenantsRangeISO().toString();
+    p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     p.lang = this.translation.currentLang;
     if (!setResponse) {
       p.rows = 0;
@@ -183,7 +183,7 @@ export class ProfessionsComponent {
   }
 
   inLimits(n: number): boolean {
-    return n >= this.limits[0] && n <= this.limits[1];
+    return n >= this.limits[0].getFullYear() && n <= this.limits[1].getFullYear();
   }
 
   setPieChart() {

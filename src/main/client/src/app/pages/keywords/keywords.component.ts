@@ -41,7 +41,7 @@ export class KeywordsComponent {
   loading: boolean;
   invalidTenant: boolean;
   solrResponse: any;
-  limits: [number, number];
+  limits: [Date, Date];
 
   includeAuthors: boolean = true;
   includeRecipients: boolean = false;
@@ -105,7 +105,7 @@ export class KeywordsComponent {
     this.state.tenants.forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'keywords');
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
-    if (this.tenants.length > 0) {
+    if (this.tenants.length > 0 && this.identitiesChart) {
       this.limits = this.state.getTenantsRange();
       this.getData(true);
     }
@@ -147,7 +147,7 @@ export class KeywordsComponent {
     this.getData(true);
   }
 
-  changeLimits(limits: [number, number]) {
+  changeLimits(limits: [Date, Date]) {
     this.limits = limits;
     this.getData(false);
   }
@@ -157,8 +157,9 @@ export class KeywordsComponent {
     this.invalidTenant = false;
     const p: any = {};
     p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
-    p.tenant_date_range = this.state.getTenantsRange().toString();
-    p.date_range = this.limits.toString();
+    p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
+    p.tenant_date_range = this.state.getTenantsRangeISO().toString();
+
     p.keyword = this.selectedKeywords;
     p.lang = this.translation.currentLang;
     p.includeAuthors = this.includeAuthors;

@@ -40,7 +40,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Grid
 export class RelationComponent {
   loading: boolean;
   solrResponse: any;
-  limits: [number, number];
+  limits: [Date, Date];
   tenant: Tenant;
   graphOptions: EChartsOption = {};
   graphChart: ECharts;
@@ -84,7 +84,7 @@ export class RelationComponent {
     this.state.tenants.forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'relation');
     if (this.tenant) {
-      this.limits = [this.tenant.date_computed_min.getFullYear(), this.tenant.date_computed_max.getFullYear()];
+      this.limits = [this.tenant.date_computed_min, this.tenant.date_computed_max];
       this.getData(true);
     }
   }
@@ -134,12 +134,12 @@ export class RelationComponent {
   } 
   
   changeTenant() {
-    this.limits = [this.tenant.date_computed_min.getFullYear(), this.tenant.date_computed_max.getFullYear()];
+    this.limits = [this.tenant.date_computed_min, this.tenant.date_computed_max];
     //this.selectedKeywords = [];
     this.getData(true);
   }
 
-  changeLimits(limits: [number, number]) {
+  changeLimits(limits: [Date, Date]) {
     this.limits = limits;
     this.getData(false);
   }
@@ -183,8 +183,8 @@ export class RelationComponent {
     const p: any = {};
     p.tenant = this.tenant.val;
     p.other_tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
-    p.date_range = this.limits.toString();
-    p.tenant_date_range = this.tenant.date_computed_min.getFullYear() + ',' + this.tenant.date_computed_max.getFullYear();
+    p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
+    p.tenant_date_range = this.state.getTenantsRangeISO().toString();
     if (!setResponse) {
       p.rows = 0;
     } else {
@@ -206,7 +206,7 @@ export class RelationComponent {
   }
 
   inLimits(n: number): boolean {
-    return n >= this.limits[0] && n <= this.limits[1];
+    return n >= this.limits[0].getFullYear() && n <= this.limits[1].getFullYear();
   }
 
 

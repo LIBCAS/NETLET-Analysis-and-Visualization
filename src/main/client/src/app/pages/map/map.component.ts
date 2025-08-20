@@ -83,7 +83,7 @@ export class MapComponent {
 
   nodes: { [id: string]: { coords: [number, number], name: string } } = {};
   links: { [id: string]: { node1: [number, number], node2: [number, number], count: number, letters: Letter[] } } = {};
-  limits: [number, number];
+  limits: [Date, Date];
 
   infoContent: string;
   infoHeader: string;
@@ -144,8 +144,8 @@ export class MapComponent {
     const p: any = {};
     // p.tenant = this.tenant.val;
     p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
-    p.tenant_date_range = this.state.getTenantsRange().toString();
-    p.date_range = this.limits.toString();
+    p.tenant_date_range = this.state.getTenantsRangeISO().toString();
+    p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     // p.tenant_date_range = this.tenant.date_computed_min.getFullYear() + ',' + this.tenant.date_computed_max.getFullYear();
     if (!withMap) {
       p.rows = 0;
@@ -207,7 +207,7 @@ export class MapComponent {
           ]});
   }
 
-  changeLimits(limits: [number, number]) {
+  changeLimits(limits: [Date, Date]) {
     this.limits = limits;
     this.getData(false);
   }
@@ -269,7 +269,7 @@ export class MapComponent {
   }
 
   inLimits(n: number): boolean {
-    return n >= this.limits[0] && n <= this.limits[1];
+    return n >= this.limits[0].getFullYear() && n <= this.limits[1].getFullYear();
   }
 
   setGraphData() {
