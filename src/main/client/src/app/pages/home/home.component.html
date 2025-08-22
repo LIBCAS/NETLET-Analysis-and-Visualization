@@ -1,3 +1,8 @@
+@if (!state.tenant()) {
+    <div class="app-home-tenant app-fxLayout app-row">
+        <h3>Vyberte katalog</h3>
+    </div>
+}
 <div class="app-home-layout app-fxLayout app-row app-fill">
     @for(card of state.views; track $index){
     <mat-card appearance="outlined" >
@@ -10,7 +15,7 @@
             </p>
         </mat-card-content>
         <mat-card-actions align="end" class="app-mat-card-actions">
-            <a [routerLink]="[card.route]" queryParamsHandling="preserve" [disabled]="card.route === ''"
+            <a [routerLink]="['/'+card.route]" queryParamsHandling="preserve" [disabled]="card.route === '' || !state.tenant()"
                 mat-raised-button>{{ 'View' | translate }}</a>
         </mat-card-actions>
     </mat-card>

@@ -15,7 +15,7 @@
         }
       </span>
     }
-    <button mat-button [matMenuTriggerFor]="views">{{'views' | translate}}</button>
+    <button mat-button [matMenuTriggerFor]="views" [disabled]="!state.tenant()">{{'views' | translate}}</button>
     <mat-menu #views="matMenu">
       @for (t of state.views; track t) {
         @if (t.route) {

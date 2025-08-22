@@ -110,6 +110,9 @@ export class CentralityComponent {
   }
 
   ngOnInit(): void {
+    if (!this.state.tenant()) {
+      this.router.navigate(['/home']);
+    }
     this.state.tenants.forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'centrality');
     if (this.tenants.length > 0) {

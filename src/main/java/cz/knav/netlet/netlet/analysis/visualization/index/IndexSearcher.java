@@ -88,7 +88,7 @@ public class IndexSearcher {
                     .setQuery("*:*")
                     .setSort("date_computed asc")
                     //.withFilter("status:publish")
-                    .withFilter("identity_mentioned:*")
+                    //.withFilter("identity_mentioned:*")
                     .returnFields("tenant,date_year,date_computed,identity_name,identity_recipient,identity_author,identity_mentioned,places:[json],identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_year", rangeFacet)
                     .withFacet("mentioned", new TermsFacetMap("identity_mentioned")

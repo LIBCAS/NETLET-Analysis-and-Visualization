@@ -1,7 +1,9 @@
+
+
 <div class="app-loading">@if(loading && !running){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
   <div style="flex: 1 30%;" class="app-filters">
-    @if (state.tenant()) {
+    
       <div>
         <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
           <mat-expansion-panel-header>
@@ -17,7 +19,7 @@
           </mat-list>
         </mat-expansion-panel>
       </div>
-    }
+      
      @if(solrResponse?.facets) {
     <app-facets [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'prefessions', 'origins', 'destinations']"
       [facets]="solrResponse.facets" (onFiltersChanged)="onFiltersChanged($event)" (onMouserOver)="showNode($event)"
@@ -47,4 +49,4 @@
     }
 
   </div>
-</div>
+</div>  

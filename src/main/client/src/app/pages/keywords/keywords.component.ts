@@ -173,6 +173,10 @@ export class KeywordsComponent {
         const ts: JSONFacet[] = resp.facets.tenants.buckets;
         this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
       }
+      if (resp.response.numFound === 0) {
+        this.loading = false;
+        return;
+      }
       this.authors = resp.facets.authors.buckets;
       this.recipients = this.solrResponse.facets.recipients.buckets;
       // this.mentioned = resp.facets.mentioned.buckets;
@@ -182,8 +186,8 @@ export class KeywordsComponent {
         k.selected = this.selectedKeywords.includes(k.val);
       });
 
-      
-    this.setPieChart();
+
+      this.setPieChart();
 
       //const ops = this.setTreeMapChart();
       if (this.includeAuthors) {

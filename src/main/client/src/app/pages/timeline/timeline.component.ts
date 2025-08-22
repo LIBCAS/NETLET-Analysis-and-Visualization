@@ -119,9 +119,9 @@ export class TimelineComponent {
     this.getTimelineSubject.pipe(debounceTime(300)).subscribe(setGraph => {
       this.getData2(setGraph)
     });
-    if (this.tenant && this.chart) {
+    if (this.tenant) {
       this.limits = [this.tenant.date_computed_min, this.tenant.date_computed_max];
-      this.getData(true);
+      //this.getData(true);
     }
   }
 
@@ -150,23 +150,12 @@ export class TimelineComponent {
         });
       }
     })
-
-    this.getData(true);
-  }
-
-  onBrushChanged(e: any) {
-    if (!e.areas || e.areas.length === 0) {
-      return;
-    }
-    // this.limits = [parseInt(this.rokAxis[e.areas[0].coordRange[0]]), parseInt(this.rokAxis[e.areas[0].coordRange[1]])];
-    // this.onChangeLimits.emit(this.limits);
-    // this.setChartTitle();
+    //this.getData(true);
   }
 
   changeTenant() {
-    this.limits = [this.tenant.date_computed_min, this.tenant.date_computed_max];
     this.getData(true);
-
+    this.limits = [this.tenant.date_computed_min, this.tenant.date_computed_max];
   }
 
   usedFacets: {field: string, value: string}[] = [];
