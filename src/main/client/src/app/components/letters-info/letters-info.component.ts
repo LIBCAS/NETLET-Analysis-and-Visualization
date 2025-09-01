@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, effect, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
@@ -6,6 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AppConfiguration } from '../../app-configuration';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
+import { AppState } from '../../app-state';
 
 
 @Component({
@@ -22,7 +23,16 @@ export class LettersInfoComponent {
   data = input<any[]>([]);
   onClose = output<boolean>();
 
-  constructor(public config: AppConfiguration){}
+  constructor(public config: AppConfiguration,
+    public state: AppState
+  ){
+    effect(() => {
+      const show = this.state.showInfo();
+      if (!show) {
+        this.onClose.emit(true)
+      }
+    })
+  }
 
   close() {
     this.onClose.emit(true)

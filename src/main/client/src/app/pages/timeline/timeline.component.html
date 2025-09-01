@@ -14,7 +14,7 @@
       </div>
       <div class="app-fxLayout app-row">
         <div style="flex: 1 30%;">
-          <h3>Počet dopisů : {{ numFound }}</h3>
+          <h4>Počet dopisů ({{ this.limits[0] | date : 'dd.MM.YYYY'}} -  {{ this.limits[1] | date : 'dd.MM.YYYY'}}): {{ numFound }} </h4>
         </div>
 
         <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="numFound"

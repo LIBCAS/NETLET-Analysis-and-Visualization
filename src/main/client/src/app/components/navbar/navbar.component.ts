@@ -13,7 +13,8 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-navbar',
-  imports: [MatToolbarModule, MatButtonModule, MatIconModule, MatDialogModule, MatCheckboxModule, FormsModule, RouterModule, TranslateModule, MatMenuModule],
+  imports: [MatToolbarModule, MatButtonModule, MatIconModule, MatDialogModule, 
+    MatCheckboxModule, FormsModule, RouterModule, TranslateModule, MatMenuModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
@@ -48,5 +49,9 @@ export class NavbarComponent {
 
   formatTenants() {
     return this.state.selectedTenants().map(t => t.val)
+  }
+
+  op() {
+    this.state.showInfo.set(false);
   }
 }

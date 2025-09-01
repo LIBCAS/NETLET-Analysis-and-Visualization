@@ -132,6 +132,7 @@ export class IdentitiesComponent {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
       this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
       this.infoHeader = `${identity} wrote letters to:`;
+      this.state.showInfo.set(true);
     });
   }
 
@@ -140,6 +141,7 @@ export class IdentitiesComponent {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
       this.infoFields = ['letter_id', 'identity_author', 'date_year', 'action'];
       this.infoHeader = `${identity} received letters from:`;
+      this.state.showInfo.set(true);
     });
   }
 
@@ -148,6 +150,7 @@ export class IdentitiesComponent {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
       this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'action'];
       this.infoHeader = `${identity} is mentioned in:`;
+      this.state.showInfo.set(true);
     });
   }
 

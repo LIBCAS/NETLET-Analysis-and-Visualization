@@ -87,6 +87,8 @@ export class MapComponent {
 
   infoContent: string;
   infoHeader: string;
+  infoData: any[];
+  infoFields: string[];
 
   tenants: Tenant[] = [];
 
@@ -404,38 +406,41 @@ export class MapComponent {
     this.graphChart.setOption(this.graphOptions);
 
     this.graphChart.on('click', (params: any) => {
-      console.log(params)
       if (params.dataType === 'node') {
         this._ngZone.run(() => {
-          const place = params.data.id;
-          let lettersFrom: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => { return letter.origin === place });
-          let lettersTo: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => { return letter.destination === place });
-          // lettersFrom += layer.options.letters.filter((l: Letter) => l.origin === place.place_id).length;
-          // lettersTo += layer.options.letters.filter((l: Letter) => l.destination === place.place_id).length;
+          const place = params.data.name;
+          // let lettersFrom: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => { return letter.origin === place });
+          // let lettersTo: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => { return letter.destination === place });
+          // this.infoContent = `<div>From: ${lettersFrom.length}</div><div>To: ${lettersTo.length}</div>`;
 
+
+          this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => { return (letter.origin_name +'' === place) || (letter.destination_name +'' === place)});
+          this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'action'];
           this.infoHeader = `Letters from/to ${params.data.name}`;
-          this.infoContent = `<div>From: ${lettersFrom.length}</div><div>To: ${lettersTo.length}</div>`;
+          this.state.showInfo.set(true);
         });
       } else if (params.dataType === 'edge') {
 
         this._ngZone.run(() => {
-          let popup = '';
-          // let letters: Letter[] = [...this.solrResponse.response.docs.filter((letter: Letter) => letter.origin + '' === params.data.source),
-          // ... this.solrResponse.response.docs.filter((letter: Letter) => letter.destination + '' === params.data.target)];
-          let letters: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin + '' === params.data.source && letter.destination + '' === params.data.target);
-          letters.forEach((letter: Letter) => {
-            popup += `<div>${letter.letter_id}.- ${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
-            if (letter.keywords_category_cs?.length > 0) {
-              popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
-            } else if (letter.keywords_cs?.length > 0) {
-              popup += ` (${letter.keywords_cs.join(', ')})</div>`;
-            } else {
-              popup += `</div>`;
-            }
-          });
+          // let popup = '';
+          // let letters: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin_name + '' === params.data.source && letter.destination_name + '' === params.data.target);
+          // letters.forEach((letter: Letter) => {
+          //   popup += `<div>${letter.letter_id}.- ${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
+          //   if (letter.keywords_category_cs?.length > 0) {
+          //     popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+          //   } else if (letter.keywords_cs?.length > 0) {
+          //     popup += ` (${letter.keywords_cs.join(', ')})</div>`;
+          //   } else {
+          //     popup += `</div>`;
+          //   }
+          // });
+          // this.infoContent = popup;
 
-          this.infoContent = popup;
-          this.infoHeader = `Letters from ${params.data.label} (${letters.length})`;
+          this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin_name + '' === params.data.source && letter.destination_name + '' === params.data.target);
+          this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'action'];
+          this.infoHeader = `Letters from ${params.data.label} (${this.infoData.length})`;
+          
+          this.state.showInfo.set(true);
         });
 
       }

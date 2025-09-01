@@ -18,6 +18,7 @@ export interface Tenant {
     providedIn: 'root'
 }) export class AppState {
 
+    public showInfo = signal<boolean>(false);
     public tenants: Tenant[] = [];
     public tenant = signal<Tenant>(null);
     public selectedTenants = signal<Tenant[]>([]);

@@ -91,6 +91,8 @@ export class CentralityComponent {
   ];
   infoContent: string;
   infoHeader: string;
+  infoData: any[];
+  infoFields: string[];
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -267,76 +269,89 @@ export class CentralityComponent {
 
   authorLabel(identity: string) {
     this._ngZone.run(() => {
-      const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
+      // const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
 
-      let popup = '';
-      letters.forEach((letter: Letter) => {
-        popup += `<div>- ${letter.identity_recipient}. ${letter.date_year}`;
-        if (letter.keywords_category_cs?.length > 0) {
-          popup += ` (${letter.keywords_category_cs.join(', ')})`;
-        } else if (letter.keywords_cs?.length > 0) {
-          popup += ` (${letter.keywords_cs.join(', ')})`;
-        } else {
+      // let popup = '';
+      // letters.forEach((letter: Letter) => {
+      //   popup += `<div>- ${letter.identity_recipient}. ${letter.date_year}`;
+      //   if (letter.keywords_category_cs?.length > 0) {
+      //     popup += ` (${letter.keywords_category_cs.join(', ')})`;
+      //   } else if (letter.keywords_cs?.length > 0) {
+      //     popup += ` (${letter.keywords_cs.join(', ')})`;
+      //   } else {
           
-        }
+      //   }
 
-        const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
-        const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
-        popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
+      //   const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
+      //   const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
+      //   popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
+      //   this.infoContent = popup;
+
+      // });
+      
+      this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
+      this.infoFields = ['letter_id', 'identity_recipient', 'keywords_category_cs', 'date_year', 'action'];
 
         this.infoHeader = `${identity} wrote letters to:`;
-        this.infoContent = popup;
-      });
+        this.state.showInfo.set(true);
     });
   }
 
   recipientLabel(identity: string) {
     this._ngZone.run(() => {
-      const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
+      // const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
 
-      let popup = '';
-      letters.forEach((letter: Letter) => {
-        popup += `<div>- ${letter.identity_author}. ${letter.date_year}`;
-        if (letter.keywords_category_cs?.length > 0) {
-          popup += ` (${letter.keywords_category_cs.join(', ')})`;
-        } else if (letter.keywords_cs?.length > 0) {
-          popup += ` (${letter.keywords_cs.join(', ')})`;
-        } else {
+      // let popup = '';
+      // letters.forEach((letter: Letter) => {
+      //   popup += `<div>- ${letter.identity_author}. ${letter.date_year}`;
+      //   if (letter.keywords_category_cs?.length > 0) {
+      //     popup += ` (${letter.keywords_category_cs.join(', ')})`;
+      //   } else if (letter.keywords_cs?.length > 0) {
+      //     popup += ` (${letter.keywords_cs.join(', ')})`;
+      //   } else {
           
-        }
+      //   }
 
-        const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
-        const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
-        popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
+      //   const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
+      //   const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
+      //   popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
 
-        this.infoHeader = `${identity} received letters from:`;
-        this.infoContent = popup;
-      });
+      //   this.infoContent = popup;
+      // });
+      
+      this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
+      this.infoFields = ['letter_id', 'identity_recipient', 'keywords_category_cs', 'date_year', 'action'];
+      this.infoHeader = `${identity} received letters from:`;
+      this.state.showInfo.set(true);
     });
   }
 
   mentionedLabel(identity: string) {
     this._ngZone.run(() => {
-      const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
+      // const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
 
-      let popup = '';
-      letters.forEach((letter: Letter) => {
-        popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
-        if (letter.keywords_category_cs?.length > 0) {
-          popup += ` (${letter.keywords_category_cs.join(', ')})`;
-        } else if (letter.keywords_cs?.length > 0) {
-          popup += ` (${letter.keywords_cs.join(', ')})`;
-        } else {
-          //popup += `</div>`;
-        }
+      // let popup = '';
+      // letters.forEach((letter: Letter) => {
+      //   popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
+      //   if (letter.keywords_category_cs?.length > 0) {
+      //     popup += ` (${letter.keywords_category_cs.join(', ')})`;
+      //   } else if (letter.keywords_cs?.length > 0) {
+      //     popup += ` (${letter.keywords_cs.join(', ')})`;
+      //   } else {
+      //     //popup += `</div>`;
+      //   }
 
-        const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
-        const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
-        popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
+      //   const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
+      //   const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
+      //   popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
 
+      //   this.infoContent = popup;
+      // });
+      
         this.infoHeader = `${identity} is mentioned in:`;
-        this.infoContent = popup;
-      });
+      this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
+      this.infoFields = ['letter_id', 'identity_recipient', 'keywords_category_cs', 'date_year', 'action'];
+        this.state.showInfo.set(true);
     });
   }
 

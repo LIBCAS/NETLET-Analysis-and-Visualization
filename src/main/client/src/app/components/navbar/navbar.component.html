@@ -15,7 +15,7 @@
         }
       </span>
     }
-    <button mat-button [matMenuTriggerFor]="views" [disabled]="!state.tenant()">{{'views' | translate}}</button>
+    <button mat-button [matMenuTriggerFor]="views" [disabled]="!state.tenant()" (menuOpened)="op()">{{'views' | translate}}</button>
     <mat-menu #views="matMenu">
       @for (t of state.views; track t) {
         @if (t.route) {
@@ -24,7 +24,7 @@
       }
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="tenants">{{'tenants' | translate}}</button>
+    <button mat-button [matMenuTriggerFor]="tenants" (menuOpened)="op()">{{'tenants' | translate}}</button>
     <mat-menu #tenants="matMenu">
       @for (t of state.tenants; track t) {
         <a [disabled]="!t.available" mat-menu-item (click)="changeTenant(t)">@if (state.tenant()?.val === t.val) {
@@ -40,7 +40,7 @@
     }
   </mat-menu> -->
 
-  <button mat-button [matMenuTriggerFor]="menu">{{ translator.currentLang | translate}}</button>
+  <button mat-button [matMenuTriggerFor]="menu" (menuOpened)="op()">{{ translator.currentLang | translate}}</button>
   <mat-menu #menu="matMenu">
     <button mat-menu-item (click)="onLanguageChanged('cs')">Český</button>
     <button mat-menu-item (click)="onLanguageChanged('en')">English</button>

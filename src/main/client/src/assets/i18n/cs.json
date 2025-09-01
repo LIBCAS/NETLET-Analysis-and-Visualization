@@ -6,6 +6,7 @@
   "clearSelection": "Zrušit výběr",
   "usedFilters": "Vybrané filtry",
   "field": {
+    "letter_id": "Id.",
     "author": "Autor",
     "identity_author": "Autor",
     "authors": "Autori",
@@ -21,7 +22,8 @@
     "keywords": "Klíčová slova",
     "relation_tenants": "Katalogy pro porovnani",
     "date": "Datum",
-    "date_year": "Rok"
+    "date_year": "Rok",
+    "keywords_category_cs": "Klíčová slova"
   },
   "action": {
     "view_in_hiko": "Zobrazit v HIKO"

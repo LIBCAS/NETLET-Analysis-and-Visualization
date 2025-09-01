@@ -44,8 +44,9 @@ public class HikoIndexer {
         LOGGER.log(Level.INFO, "Indexing HIKO letters");
         try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             //List<String> tenants = getTenants();
-            getGlobalKeywordCategories();
-            getGlobalProfessionCategories();
+            
+            getGlobalKeywordCategories("sachs");
+            getGlobalProfessionCategories("sachs");
             Set<String> tenants = Options.getInstance().getJSONObject("test_mappings").keySet();
             for (String tenant : tenants) {
                 getLetters(client, ret, tenant);
@@ -67,7 +68,7 @@ public class HikoIndexer {
         LOGGER.log(Level.INFO, "Indexing HIKO letters");
         try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             //List<String> tenants = getTenants();
-            getGlobalKeywordCategories();
+            getGlobalKeywordCategories(tenant);
             getLetters(client, ret, tenant);
             client.commit("hiko");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
@@ -80,9 +81,13 @@ public class HikoIndexer {
         return ret;
     }
     
-    private void getGlobalProfessionCategories() throws URISyntaxException, IOException, InterruptedException {
+    private void getGlobalProfessionCategories(String tenant) throws URISyntaxException, IOException, InterruptedException {
+        String t = tenant;
+        if (Options.getInstance().getBoolean("isVaTest", true)) { 
+            t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
+        }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
-                .replace("{tenant}", "hiko-test10")
+                .replace("{tenant}", t)
                 + "/global-profession-categories?per_page=100";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(url))
@@ -102,9 +107,13 @@ public class HikoIndexer {
         }
     }
 
-    private void getGlobalKeywordCategories() throws URISyntaxException, IOException, InterruptedException {
+    private void getGlobalKeywordCategories(String tenant) throws URISyntaxException, IOException, InterruptedException {
+        String t = tenant;
+        if (Options.getInstance().getBoolean("isVaTest", true)) { 
+            t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
+        }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
-                .replace("{tenant}", "hiko-test10")
+                .replace("{tenant}", t)
                 + "/global-keyword-categories?per_page=100";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(url))
@@ -127,7 +136,7 @@ public class HikoIndexer {
     private void getLetters(SolrClient client, JSONObject ret, String tenant) throws URISyntaxException, IOException, InterruptedException {
         LOGGER.log(Level.INFO, "Indexing tenant: {0}.", tenant);
         String t = tenant;
-        if (Options.getInstance().getBoolean("isTest", true)) {
+        if (Options.getInstance().getBoolean("isVaTest", true)) { 
             t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
         }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")

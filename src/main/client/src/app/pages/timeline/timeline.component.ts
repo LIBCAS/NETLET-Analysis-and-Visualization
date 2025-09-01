@@ -71,21 +71,6 @@ export class TimelineComponent {
   chartOptions: EChartsOption | any;
   chart: ECharts;
 
-  // authors: JSONFacet[] = [];
-  // selectedAuthors: string[] = [];
-  // recipients: JSONFacet[] = [];
-  // selectedRecipients: string[] = [];
-  // mentioned: JSONFacet[] = [];
-  // selectedMentioned: string[] = [];
-  // keyword_categories: JSONFacet[] = [];
-  // selectedKeywords: string[] = [];
-  // professions: JSONFacet[] = [];
-  // selectedProfessions: string[] = [];
-  // origins: JSONFacet[] = [];
-  // selectedOrigins: string[] = [];
-  // destinations: JSONFacet[] = [];
-  // selectedDestinations: string[] = [];
-
   date_facet: { buckets: JSONFacet[], after: { count: number } };
 
   displayedColumns = ['id', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
@@ -252,8 +237,8 @@ export class TimelineComponent {
       },
       xAxis: {
         type: 'time',
-        boundaryGap: false,
-        triggerEvent: true
+        //boundaryGap: ['5%', '5%'],
+        triggerEvent: true,
       },
       yAxis: {
         type: 'value',

@@ -126,6 +126,7 @@ export class RelationComponent {
             // }
 
           });
+          this.state.showInfo.set(true);
         });
 
       }

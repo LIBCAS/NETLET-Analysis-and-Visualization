@@ -64,7 +64,7 @@
   },
 
   "hikoUrl": "https://{tenant}.historicka-korespondence.cz/letters/{id}/edit",
-  "isTest": true,
+  "isTest": false,
   "test_mappings": {
     "brezina": "hiko-test",
     "deml": "hiko-test2",

@@ -6,6 +6,7 @@
   "clearSelection": "Clear selection",
   "usedFilters": "Used filters",
   "field": {
+    "letter_id": "Id",
     "author": "Autor",
     "identity_author": "Autor",
     "authors": "Authors",
