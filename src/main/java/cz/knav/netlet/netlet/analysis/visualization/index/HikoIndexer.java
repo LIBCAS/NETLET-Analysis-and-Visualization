@@ -10,11 +10,13 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Set;
-import java.util.logging.Level;
+import java.util.logging.Level; 
 import java.util.logging.Logger;
 import javax.naming.NamingException;
 import org.apache.solr.client.solrj.SolrClient;
@@ -37,6 +39,36 @@ public class HikoIndexer {
 
     JSONObject globalKeywordCategories = new JSONObject();
     JSONObject globalProfessionCategories = new JSONObject();
+    
+    public JSONObject update(int value, String unit) {
+        Date start = new Date();
+        JSONObject ret = new JSONObject();
+        
+//--data-urlencode "filter[updated_at_after]=2025-05-18 09:19:02" \
+//--data-urlencode "filter[updated_at_before]=2025-05-18 09:19:39" \
+
+        String from = Instant.now().minus(value, ChronoUnit.valueOf(unit)).toString();
+        LOGGER.log(Level.INFO, "Updating HIKO letters from {0}", from);  
+        try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+            //List<String> tenants = getTenants();
+            
+            getGlobalKeywordCategories("sachs");
+            getGlobalProfessionCategories("sachs");
+            Set<String> tenants = Options.getInstance().getJSONObject("test_mappings").keySet();
+            for (String tenant : tenants) {
+                getLetters(client, ret, tenant, from);
+            }
+            client.commit("hiko");
+        } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        
+        Date end = new Date();
+        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        LOGGER.log(Level.INFO, "Update HIKO finished. {0} letters indexed");
+        return ret;
+    }
 
     public JSONObject full() {
         Date start = new Date();
@@ -49,7 +81,7 @@ public class HikoIndexer {
             getGlobalProfessionCategories("sachs");
             Set<String> tenants = Options.getInstance().getJSONObject("test_mappings").keySet();
             for (String tenant : tenants) {
-                getLetters(client, ret, tenant);
+                getLetters(client, ret, tenant, null);
             }
             client.commit("hiko");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
@@ -69,7 +101,7 @@ public class HikoIndexer {
         try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             //List<String> tenants = getTenants();
             getGlobalKeywordCategories(tenant);
-            getLetters(client, ret, tenant);
+            getLetters(client, ret, tenant, null);
             client.commit("hiko");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -133,7 +165,7 @@ public class HikoIndexer {
         }
     }
 
-    private void getLetters(SolrClient client, JSONObject ret, String tenant) throws URISyntaxException, IOException, InterruptedException {
+    private void getLetters(SolrClient client, JSONObject ret, String tenant, String from) throws URISyntaxException, IOException, InterruptedException {
         LOGGER.log(Level.INFO, "Indexing tenant: {0}.", tenant);
         String t = tenant;
         if (Options.getInstance().getBoolean("isVaTest", true)) { 
@@ -142,6 +174,9 @@ public class HikoIndexer {
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
                 .replace("{tenant}", t) 
                 + "/letters?page=1&include=identities,identities.localProfessions,identities.localProfessions.profession_category,identities.globalProfessions,identities.globalProfessions.profession_category,places,keywords,globalKeywords";
+        if (from != null) {
+            url += "&filter[updated_at_after]=" + from;
+        }
 //        HttpClient httpclient = HttpClient
 //                .newBuilder()
 //                .build();
@@ -203,7 +238,7 @@ public class HikoIndexer {
             // httpclient.close();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error indexing {0}", url);
-            LOGGER.log(Level.SEVERE, "Response is {0}", r);
+            // LOGGER.log(Level.SEVERE, "Response is {0}", r);
             LOGGER.log(Level.SEVERE, null, e);
             ret.put("error" + tenant, e);
         }

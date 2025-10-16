@@ -461,15 +461,17 @@ public class IndexSearcher {
                 offset = Integer.valueOf(offsetP);
             }
             
-//            final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_" + lang)
-//                    .setLimit(1000)
-//                    .setMinCount(1);
-            final TermsFacetMap categoriesFacet = new TermsFacetMap("keywords_category_" + lang)
+            final TermsFacetMap keywordsFacet = new TermsFacetMap("keywords_" + lang)
+                    .setSort("index")
                     .setLimit(1000)
-                    .withDomain(new DomainMap().withTagsToExclude("ffkeywords"))
-//                    .withSubFacet("keywords", keywords_csFacet)
                     .setMinCount(1);
 
+            final TermsFacetMap keywordsCategoriesFacet = new TermsFacetMap("keywords_category_" + lang)
+                    .setLimit(1000)
+                    .withDomain(new DomainMap().withTagsToExclude("ffkeywords"))
+                    .withSubFacet("keywords", keywordsFacet)
+                    .setMinCount(1); 
+                    
             NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
             rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
@@ -499,11 +501,7 @@ public class IndexSearcher {
                             .setSort("index")
                             .withDomain(new DomainMap().withTagsToExclude("ffprofession"))
                             .setMinCount(1)) 
-                    .withFacet("keywords", new TermsFacetMap("keywords_category_" + lang)
-                            .setLimit(1000)
-                            .setSort("index")
-                            .withDomain(new DomainMap().withTagsToExclude("ffkeywords"))
-                            .setMinCount(1))
+                    .withFacet("keyword_categories", keywordsCategoriesFacet) 
                     .withFacet("mentioned", new TermsFacetMap("identity_mentioned")
                             .setLimit(1000)
                             .setSort("index")
@@ -573,7 +571,12 @@ public class IndexSearcher {
             }
             
             if (request.getParameter("keyword") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword")) + "\")");
+                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword")) + "\")");
+            }
+            
+            
+            if (request.getParameter("keywords_category") != null) {
+                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keywords_category")) + "\")");
             }
             
             if (request.getParameter("profession") != null) {

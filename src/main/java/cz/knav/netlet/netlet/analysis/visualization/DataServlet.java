@@ -5,7 +5,7 @@ import cz.knav.netlet.netlet.analysis.visualization.index.HikoIndexer;
 import cz.knav.netlet.netlet.analysis.visualization.index.IndexSearcher;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.Logger; 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -82,6 +82,21 @@ public class DataServlet extends HttpServlet {
                 try {
                     HikoIndexer hi = new HikoIndexer();
                     json = hi.full();
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE, null, ex);
+                    json.put("error", ex.toString());
+                }
+                return json;
+            }
+        },
+        UPDATE_HIKO {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+                JSONObject json = new JSONObject();
+                try {
+                    HikoIndexer hi = new HikoIndexer(); 
+                    json = hi.update(Integer.parseInt(req.getParameter("value")), req.getParameter("unit"));
                 } catch (Exception ex) {
                     LOGGER.log(Level.SEVERE, null, ex);
                     json.put("error", ex.toString());
