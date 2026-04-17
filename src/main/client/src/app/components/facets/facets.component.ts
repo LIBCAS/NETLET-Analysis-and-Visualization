@@ -19,6 +19,7 @@ export class FacetsComponent {
 
   facets = input<FacetFields>();
   fields = input<string[]>([]);
+  sub_fields = input<{[key:string]: string}>({});
   
   onFiltersChanged = output<{field: string, value: string}[]>();
   onMouserOver = output<{field: string, value: string}>();
@@ -56,5 +57,10 @@ export class FacetsComponent {
 
   fireMouseOut(field: string, value: string) {
     this.onMouseOut.emit({field, value});
+  }
+
+  clickHeader(e: any, field: string, value: string) {
+    e.stopPropagation();
+    this.filter(field, value);
   }
 }

@@ -119,6 +119,7 @@ export interface Tenant {
     p.author = usedFacets.filter(k => k.field === 'authors').map(k => k.value);
     p.recipient = usedFacets.filter(k => k.field === 'recipients').map(k => k.value);
     p.mentioned = usedFacets.filter(k => k.field === 'mentioned').map(k => k.value);
+    p.keywords_category = usedFacets.filter(k => k.field === 'keywords_categories').map(k => k.value);
     p.keyword = usedFacets.filter(k => k.field === 'keywords').map(k => k.value);
     p.profession = usedFacets.filter(k => k.field === 'professions').map(k => k.value);
     p.origin = usedFacets.filter(k => k.field === 'origins').map(k => k.value);

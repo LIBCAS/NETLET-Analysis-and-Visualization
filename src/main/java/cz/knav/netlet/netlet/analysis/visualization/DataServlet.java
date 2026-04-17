@@ -98,7 +98,7 @@ public class DataServlet extends HttpServlet {
                     HikoIndexer hi = new HikoIndexer(); 
                     json = hi.update(Integer.parseInt(req.getParameter("value")), req.getParameter("unit"));
                 } catch (Exception ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
+                    LOGGER.log(Level.SEVERE, "Error", ex);
                     json.put("error", ex.toString());
                 }
                 return json;
@@ -113,7 +113,7 @@ public class DataServlet extends HttpServlet {
                     HikoIndexer hi = new HikoIndexer();
                     json = hi.indexTenant(req.getParameter("tenant"));
                 } catch (Exception ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
+                    LOGGER.log(Level.SEVERE, "Error", ex);
                     json.put("error", ex.toString());
                 }
                 return json;
@@ -128,7 +128,7 @@ public class DataServlet extends HttpServlet {
                     HikoDbIndexer hi = new HikoDbIndexer();
                     json.put("keywords", hi.full());
                 } catch (Exception ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
+                    LOGGER.log(Level.SEVERE, "Error", ex);
                     json.put("error", ex.toString());
                 }
                 return json;

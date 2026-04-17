@@ -20,6 +20,7 @@
     "destinations": "Places of destination",
     "professions": "Profese",
     "keywords": "Keywords",
+    "keyword_categories": "Keywords",
     "relation_tenants": "Catalogs for comparition",
     "date": "Date",
     "date_year": "Year"

@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -104,7 +105,7 @@ public class HikoIndexer {
             getLetters(client, ret, tenant, null);
             client.commit("hiko");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error indexing tenant", ex);
             ret.put("error", ex);
         }
         Date end = new Date();
@@ -210,9 +211,13 @@ public class HikoIndexer {
                     doc.addField("letter_id", rs.getInt("id"));
                     doc.addField("status", rs.optString("status"));
 
-                    LocalDate date = LocalDate.parse(rs.optString("date_computed"), dformatter);
+                    //LocalDate date = LocalDate.parse(rs.optString("date_computed"), dformatter);
+                    int date_year = rs.optInt("date_year");
+                    int date_month = rs.optInt("date_month");
+                    int date_day = rs.optInt("date_day");
+                    LocalDate date = LocalDate.of(date_year, date_month, date_day);
                     doc.addField("date_computed", date.atStartOfDay().format(dtformatter));
-                    doc.addField("date_year", rs.optInt("date_year"));
+                    doc.addField("date_year", date_year);
 
                     addPlaces(rs.getJSONArray("places"), doc);
                     addIdentities(rs.getJSONArray("identities"), doc);
@@ -239,7 +244,7 @@ public class HikoIndexer {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error indexing {0}", url);
             // LOGGER.log(Level.SEVERE, "Response is {0}", r);
-            LOGGER.log(Level.SEVERE, null, e);
+            LOGGER.log(Level.SEVERE, "", e);
             ret.put("error" + tenant, e);
         }
     }

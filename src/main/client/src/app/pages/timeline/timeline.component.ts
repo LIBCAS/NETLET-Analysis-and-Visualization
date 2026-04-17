@@ -70,6 +70,7 @@ export class TimelineComponent {
   tenant: Tenant;
   chartOptions: EChartsOption | any;
   chart: ECharts;
+  chartType: string = 'bar';
 
   date_facet: { buckets: JSONFacet[], after: { count: number } };
 
@@ -257,7 +258,7 @@ export class TimelineComponent {
       series: [
         {
           name: 'Počet dopisů',
-          type: 'line',
+          type: this.chartType + '',
           //triggerLineEvent: true,
           smooth: true,
           symbol: 'none',
@@ -267,6 +268,17 @@ export class TimelineComponent {
       ]
 
     };
+  }
+
+  changeChartType() {
+    this.loading = true;
+    this.chart.clear();
+    setTimeout(()=>{
+      const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
+      this.setOptions(data);
+      this.loading = false;
+
+    }, 100);
   }
 
   processResponse() {

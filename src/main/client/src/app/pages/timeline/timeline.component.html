@@ -1,80 +1,89 @@
 <div class="app-loading">@if(loading){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
 <as-split direction="horizontal" [unit]="'pixel'">
-    <as-split-area [size]="320" >
-      <div style="flex: 1 30%;" class="app-filters">
-        @if(solrResponse?.facets) { 
-          <app-facets [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'prefessions', 'origins', 'destinations']" 
-          [facets]="solrResponse.facets" (onFiltersChanged)="onFiltersChanged($event)"></app-facets> }
-  </div>
-    </as-split-area>
-    <as-split-area >
-      <div class="app-content app-fill-w app-fill-h">
-    <div class="app-timeline">
-      <div echarts style="height: 100%; width: 100%;" [initOpts]="{ locale: 'CZ' }" [options]="chartOptions" (chartInit)="onChartInit($event)">
-      </div>
-      <div class="app-fxLayout app-row">
-        <div style="flex: 1 30%;">
-          <h4>Počet dopisů ({{ this.limits[0] | date : 'dd.MM.YYYY'}} -  {{ this.limits[1] | date : 'dd.MM.YYYY'}}): {{ numFound }} </h4>
+  <as-split-area [size]="320">
+    <div style="flex: 1 30%;" class="app-filters">
+      @if(solrResponse?.facets) {
+      <app-facets
+        [fields]="['authors', 'recipients', 'mentioned','keyword_categories',  'professions', 'origins', 'destinations']"
+        [sub_fields]="{'keyword_categories': 'keywords'}"
+        [facets]="solrResponse.facets" (onFiltersChanged)="onFiltersChanged($event)"></app-facets> }
+    </div>
+  </as-split-area>
+  <as-split-area>
+    <div class="app-content app-fill-w app-fill-h">
+      <div class="app-timeline">
+        <div>
+          <mat-radio-group [(ngModel)]="chartType" (change)="changeChartType()">
+            <mat-radio-button value="line">{{ 'line' | translate}}</mat-radio-button>
+            <mat-radio-button value="bar">{{ 'bar' | translate}}</mat-radio-button>
+          </mat-radio-group>
+        </div>
+        <div echarts style="height: 100%; width: 100%;" [initOpts]="{ locale: 'CZ' }" [options]="chartOptions"
+          (chartInit)="onChartInit($event)">
+        </div>
+        <div class="app-fxLayout app-row">
+          <div style="flex: 1 30%;">
+            <h4>Počet dopisů ({{ this.limits[0] | date : 'dd.MM.YYYY'}} - {{ this.limits[1] | date : 'dd.MM.YYYY'}}): {{
+              numFound }} </h4>
+          </div>
+
+          <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="numFound"
+            [pageSize]="rows" [showFirstLastButtons]="false" [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageIndex"
+            aria-label="Select page">
+          </mat-paginator>
+
+
+        </div>
+        <div style="height: 400px; max-width: 100%;  overflow: auto;">
+          @if (showLetters()){
+          <table mat-table [dataSource]="letters()">
+
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef> Id </th>
+              <td mat-cell *matCellDef="let element"> {{element.letter_id}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="author">
+              <th mat-header-cell *matHeaderCellDef> {{ 'field.author' | translate}} </th>
+              <td mat-cell *matCellDef="let element"> {{element.identity_author}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="recipient">
+              <th mat-header-cell *matHeaderCellDef> {{ 'field.recipient' | translate}} </th>
+              <td mat-cell *matCellDef="let element"> {{element.identity_recipient}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="origin">
+              <th mat-header-cell *matHeaderCellDef> {{ 'field.origin' | translate}} </th>
+              <td mat-cell *matCellDef="let element"> {{letterPlaces(element, 'origin')}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="destination">
+              <th mat-header-cell *matHeaderCellDef> {{ 'field.destination' | translate}} </th>
+              <td mat-cell *matCellDef="let element"> {{letterPlaces(element, 'destination')}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef> {{ 'field.date' | translate}} </th>
+              <td mat-cell *matCellDef="let element"> {{ element.date_computed | date : 'dd.MM.yyyy'}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action" stickyEnd>
+              <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+              <td mat-cell *matCellDef="let element">
+                <button class="app-hiko app-small-icon-button" mat-icon-button
+                  (click)="viewLetterInHIKO(element.letter_id, element.tenant)"
+                  [matTooltip]="'action.view_in_hiko' | translate"><mat-icon>arrow_outward</mat-icon></button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+          }
         </div>
 
-        <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="numFound"
-          [pageSize]="rows" [showFirstLastButtons]="false" [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageIndex"
-          aria-label="Select page">
-        </mat-paginator>
-
-
       </div>
-      <div style="height: 400px; max-width: 100%;  overflow: auto;">
-        @if (showLetters()){
-        <table mat-table [dataSource]="letters()">
-          
-          <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef> Id </th>
-            <td mat-cell *matCellDef="let element"> {{element.letter_id}} </td>
-          </ng-container>
-
-          <ng-container matColumnDef="author">
-            <th mat-header-cell *matHeaderCellDef> {{ 'field.author' | translate}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.identity_author}} </td>
-          </ng-container>
-
-          <ng-container matColumnDef="recipient">
-            <th mat-header-cell *matHeaderCellDef> {{ 'field.recipient' | translate}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.identity_recipient}} </td>
-          </ng-container>
-
-          <ng-container matColumnDef="origin">
-            <th mat-header-cell *matHeaderCellDef> {{ 'field.origin' | translate}} </th>
-            <td mat-cell *matCellDef="let element"> {{letterPlaces(element, 'origin')}} </td>
-          </ng-container>
-
-          <ng-container matColumnDef="destination">
-            <th mat-header-cell *matHeaderCellDef> {{ 'field.destination' | translate}} </th>
-            <td mat-cell *matCellDef="let element"> {{letterPlaces(element, 'destination')}} </td>
-          </ng-container>
-
-          <ng-container matColumnDef="date">
-            <th mat-header-cell *matHeaderCellDef> {{ 'field.date' | translate}} </th>
-            <td mat-cell *matCellDef="let element"> {{ element.date_computed | date : 'dd.MM.yyyy'}} </td>
-          </ng-container>
-
-          <ng-container matColumnDef="action" stickyEnd>
-            <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
-            <td mat-cell *matCellDef="let element">
-              <button class="app-hiko app-small-icon-button" mat-icon-button (click)="viewLetterInHIKO(element.letter_id, element.tenant)"
-                [matTooltip]="'action.view_in_hiko' | translate"><mat-icon>arrow_outward</mat-icon></button>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns sticky: true"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-        }
-      </div>
-
     </div>
-  </div>
-    </as-split-area>
-  </as-split>
-  
-  
+  </as-split-area>
+</as-split>

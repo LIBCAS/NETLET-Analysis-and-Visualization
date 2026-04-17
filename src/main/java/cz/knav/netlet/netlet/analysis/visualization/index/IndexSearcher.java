@@ -59,6 +59,59 @@ public class IndexSearcher {
         }
         return ret;
     }
+    
+    public static JSONObject getKeywordsCore(HttpServletRequest request, String lang) {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) { 
+
+            final TermsFacetMap categories = new TermsFacetMap("category_" + lang)
+                    .setLimit(1000)
+                    .setMinCount(1);
+                    
+                final TermsFacetMap keyword = new TermsFacetMap("name_" + lang)
+                        .setLimit(1000)
+                        .setMinCount(1);
+                categories.withSubFacet("keywords", keyword);
+            
+            JsonQueryRequest jrequest = new JsonQueryRequest()
+                    .setQuery("*:*")
+                    //.withFilter("status:publish")
+                    .returnFields("")
+                    .setLimit(0)
+                    .withFacet("categories", categories);
+            
+            String other_tenant = request.getParameter("other_tenant");
+            if (other_tenant != null) {
+                String tenant = request.getParameter("tenant");
+                if (tenant != null && !tenant.isBlank()) {
+                    if (!other_tenant.isBlank()) {
+                        tenant += " OR tenant:" + other_tenant;
+                    }
+                    jrequest = jrequest.withFilter("tenant:" + tenant);
+                }
+            } else {
+                String[] tenants = request.getParameterValues("tenant");
+                if (tenants.length > 0) {
+                    jrequest = jrequest.withFilter("tenant:(global " + String.join(" ", tenants) + ")");
+                }
+            }    
+
+            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
+            rawJsonResponseParser.setWriterType("json");
+            jrequest.setResponseParser(rawJsonResponseParser); 
+            NamedList<Object> resp = solr.request(jrequest, "keywords");
+            String jsonResponse = (String) resp.get("response");
+            ret = new JSONObject(jsonResponse);
+            
+//            QueryResponse queryResponse = request.process(solr, "hiko");
+//            ret = new JSONObject(queryResponse.jsonStr());
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        return ret;
+    }
 
     public static JSONObject relation(HttpServletRequest request) {
         JSONObject ret = new JSONObject();
@@ -211,6 +264,8 @@ public class IndexSearcher {
             NamedList<Object> resp = solr.request(jrequest, "hiko");
             String jsonResponse = (String) resp.get("response");
             ret = new JSONObject(jsonResponse);
+            
+            ret.put("k", getKeywordsCore(request, lang));
 
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -218,6 +273,7 @@ public class IndexSearcher {
         }
         return ret;
     }
+    
 
     public static JSONObject getMapLetters(HttpServletRequest request) {
         JSONObject ret = new JSONObject();

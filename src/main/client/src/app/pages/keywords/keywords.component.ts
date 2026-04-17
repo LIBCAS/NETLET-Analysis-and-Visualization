@@ -51,6 +51,8 @@ export class KeywordsComponent {
   keyword_categories: JSONFacet[];
   selectedKeywords: string[] = [];
 
+  
+  keyword_categories_tree: {[category: string]: string[]};
 
   pieOptions: EChartsOption = {};
   pieChart: ECharts;
@@ -186,6 +188,10 @@ export class KeywordsComponent {
         k.selected = this.selectedKeywords.includes(k.val);
       });
 
+      this.keyword_categories_tree = {};
+      resp.k.facets.categories.buckets.forEach((b: JSONFacet) => {
+        this.keyword_categories_tree[b.val] = b['keywords'].buckets.map((k: JSONFacet) => k.val);
+      });
 
       this.setPieChart();
 
@@ -272,19 +278,21 @@ export class KeywordsComponent {
       const ks: any = [];
       const buckets = role === 'authors' ? cat.keywords_autor.buckets : cat.keywords_recipient.buckets;
       buckets.forEach((k: any) => {
-        const ids: any = [];
-        this.totalBuckets += k.identities.buckets.length;
-        k.identities.buckets.forEach((i: any) => {
-          ids.push({
-            value: i.count,
-            name: i.val
+        if (this.keyword_categories_tree[cat.val]?.includes(k.val)) {
+          const ids: any = [];
+          this.totalBuckets += k.identities.buckets.length;
+          k.identities.buckets.forEach((i: any) => {
+            ids.push({
+              value: i.count,
+              name: i.val
+            })
+          });
+          ks.push({
+            value: k.count,
+            children: ids,
+            name: k.val
           })
-        });
-        ks.push({
-          value: k.count,
-          children: ids,
-          name: k.val
-        })
+        }
       });
       data.push({
         value: cat.count,

@@ -27,17 +27,17 @@ hr {
 }
 
 fieldset {
-  border: 1px solid var(--app-gray-4);
+  border: 1px solid var(--app-color-gray-4);
   border-radius: var(--mdc-shape-small, 4px);
   min-inline-size: auto;
 
   &:hover {
-    border-color: var(--app-gray-6);
+    border-color: var(--app-color-gray-6);
   }
 
   legend {
     font-size: 12px;
-    color: var(--app-gray-6);
+    color: var(--app-color-gray-6);
   }
 }
 
@@ -103,7 +103,7 @@ fieldset {
 // common
 .app-pipe {
   @extend .app-ml-2, .app-mr-2 !optional;
-  border-left: 1px solid var(--app-gray-4);
+  border-left: 1px solid var(--app-color-gray-4);
 
   &:not(.app-in-element) {
     &:last-child {
@@ -184,7 +184,7 @@ fieldset {
   min-height: var(--app-controlbar-height);
   background-color: var(--app-controlbar-bg-color);
   border-bottom: 1px solid var(--app-controlbar-border-color);
-  color: var(--app-gray-9);
+  color: var(--app-color-gray-9);
 
   .mat-mdc-icon-button {
     @extend .app-clean-radius;
