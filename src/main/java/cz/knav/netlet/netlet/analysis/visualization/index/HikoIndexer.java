@@ -285,8 +285,13 @@ public class HikoIndexer {
                     int date_year = rs.optInt("date_year");
                     int date_month = rs.optInt("date_month");
                     int date_day = rs.optInt("date_day");
-                    LocalDate date = LocalDate.of(date_year, date_month, date_day);
-                    doc.addField("date_computed", date.atStartOfDay().format(dtformatter));
+                    try {
+                                            LocalDate date = LocalDate.of(date_year, date_month, date_day); 
+                                            doc.addField("date_computed", date.atStartOfDay().format(dtformatter));
+                    } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE, "Error parsing date for {0}. {1}-{2}-{3}", new Object[]{id,date_year, date_month, date_day});
+                    }
+                    
                     doc.addField("date_year", date_year);
 
                     addPlaces(rs.getJSONArray("origins"), "origins", doc, tenant);
