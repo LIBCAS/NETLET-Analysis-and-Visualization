@@ -2,16 +2,18 @@ package cz.knav.netlet.netlet.analysis.visualization.index;
 
 import cz.knav.netlet.netlet.analysis.visualization.Options;
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
-import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.json.DomainMap;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.request.json.RangeFacetMap;
 import org.apache.solr.client.solrj.request.json.TermsFacetMap;
+import org.apache.solr.client.solrj.response.InputStreamResponseParser;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONObject;
 
@@ -36,19 +38,18 @@ public class IndexSearcher {
                     .withStatSubFacet("date_computed_min_s", "min(date_computed)")
                     .withStatSubFacet("date_computed_max_s", "max(date_computed)");
 
-            final JsonQueryRequest request = new JsonQueryRequest()
+            final JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     //.withFilter("status:publish")
                     .withFilter("-date_year:0")
                     .setLimit(0)
                     .withFacet("tenant", tenantFacet);
 
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
-            request.setResponseParser(rawJsonResponseParser); 
-            NamedList<Object> resp = solr.request(request, "hiko");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
+
+            NamedList<Object> resp = solr.request(jrequest, "hiko");
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
             
 //            QueryResponse queryResponse = request.process(solr, "hiko");
 //            ret = new JSONObject(queryResponse.jsonStr());
@@ -96,12 +97,10 @@ public class IndexSearcher {
                 }
             }    
 
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
-            jrequest.setResponseParser(rawJsonResponseParser); 
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
             NamedList<Object> resp = solr.request(jrequest, "keywords");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
             
 //            QueryResponse queryResponse = request.process(solr, "hiko");
 //            ret = new JSONObject(queryResponse.jsonStr());
@@ -135,8 +134,6 @@ public class IndexSearcher {
                 rows = Integer.valueOf(rowsP);
             }
 
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     .setSort("date_computed asc")
@@ -173,12 +170,11 @@ public class IndexSearcher {
             }
             jrequest = addFilters(request, jrequest, lang);
             
-            
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
 
-            jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "hiko");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
 
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -233,8 +229,6 @@ public class IndexSearcher {
                             .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
                     .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
 
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     .withFilter("keywords_category_" + lang + ":*")
@@ -260,10 +254,10 @@ public class IndexSearcher {
             
             jrequest = addFilters(request, jrequest, lang);
 
-            jrequest.setResponseParser(rawJsonResponseParser);
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
             NamedList<Object> resp = solr.request(jrequest, "hiko");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
             
             ret.put("k", getKeywordsCore(request, lang));
 
@@ -311,8 +305,6 @@ public class IndexSearcher {
                 rows = Integer.valueOf(rowsP);
             }
 
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     //.withFilter("status:publish")
@@ -340,10 +332,10 @@ public class IndexSearcher {
             
             jrequest = addFilters(request, jrequest, lang);
 
-            jrequest.setResponseParser(rawJsonResponseParser);
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
             NamedList<Object> resp = solr.request(jrequest, "hiko");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
 
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -385,8 +377,6 @@ public class IndexSearcher {
                     //.setSort("index")
                     .withSubFacet("keywords", keywords_csFacet);
 
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     //.withFilter("status:publish")
@@ -412,10 +402,10 @@ public class IndexSearcher {
             
             jrequest = addFilters(request, jrequest, lang);
 
-            jrequest.setResponseParser(rawJsonResponseParser);
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
             NamedList<Object> resp = solr.request(jrequest, "hiko");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
             jrequest = null;  
             resp = null; 
             solr.close();
@@ -448,8 +438,6 @@ public class IndexSearcher {
                 rows = Integer.valueOf(rowsP);
             }
 
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     //.withFilter("status:publish")
@@ -476,10 +464,10 @@ public class IndexSearcher {
                             .setMinCount(1));
             jrequest = addFilters(request, jrequest, lang);
 
-            jrequest.setResponseParser(rawJsonResponseParser);
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
             NamedList<Object> resp = solr.request(jrequest, "hiko");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
 
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -528,8 +516,6 @@ public class IndexSearcher {
                     .withSubFacet("keywords", keywordsFacet)
                     .setMinCount(1); 
                     
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     //.withFilter("status:publish")
@@ -578,10 +564,10 @@ public class IndexSearcher {
 //            QueryResponse queryResponse = jrequest.process(solr, "hiko");
 //            ret = new JSONObject(queryResponse.jsonStr());
 
-            jrequest.setResponseParser(rawJsonResponseParser);
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
             NamedList<Object> resp = solr.request(jrequest, "hiko");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
             jrequest = null;  
             resp = null; 
             solr.close();

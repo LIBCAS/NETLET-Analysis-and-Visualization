@@ -2,6 +2,7 @@ package cz.knav.netlet.netlet.analysis.visualization.index;
 
 import cz.knav.netlet.netlet.analysis.visualization.Options;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -19,15 +20,16 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
+import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.Http2SolrClient;
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
-import org.apache.solr.client.solrj.impl.NoOpResponseParser;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
+import org.apache.solr.client.solrj.response.InputStreamResponseParser;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 
@@ -54,13 +56,19 @@ public class HikoIndexer {
                     .withFilter("id:" + identityId)
                     .returnFields("professions:[json]")
                     .setLimit(1);
+            
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
 
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
-            jrequest.setResponseParser(rawJsonResponseParser);
             NamedList<Object> resp = solr.request(jrequest, "identities");
-            String jsonResponse = (String) resp.get("response");
-            JSONObject ret = new JSONObject(jsonResponse);
+            InputStream is = (InputStream) resp.get("stream");
+            JSONObject ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+
+//            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
+//            rawJsonResponseParser.setWriterType("json");
+//            jrequest.setResponseParser(rawJsonResponseParser);
+//            NamedList<Object> resp = solr.request(jrequest, "identities");
+//            String jsonResponse = (String) resp.get("response");
+//            JSONObject ret = new JSONObject(jsonResponse);
 
             JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
             if (docs.length() > 0) {
@@ -84,12 +92,12 @@ public class HikoIndexer {
                     .returnFields("id,category_cs,category_cs")
                     .setLimit(10000);
 
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
-            jrequest.setResponseParser(rawJsonResponseParser);
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
+
             NamedList<Object> resp = solr.request(jrequest, "keywords");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+            
 
             JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
             for (int i = 0; i < docs.length(); i++) {
@@ -113,12 +121,12 @@ public class HikoIndexer {
                     .setQuery("*:*")
                     .setLimit(10000);
 
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
-            jrequest.setResponseParser(rawJsonResponseParser);
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
+
             NamedList<Object> resp = solr.request(jrequest, "professions");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+            
 
             JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
             for (int i = 0; i < docs.length(); i++) {
@@ -142,12 +150,11 @@ public class HikoIndexer {
                     .setQuery("*:*")
                     .setLimit(10000);
 
-            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-            rawJsonResponseParser.setWriterType("json");
-            jrequest.setResponseParser(rawJsonResponseParser);
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
+
             NamedList<Object> resp = solr.request(jrequest, "places");
-            String jsonResponse = (String) resp.get("response");
-            ret = new JSONObject(jsonResponse);
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
 
             JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
             for (int i = 0; i < docs.length(); i++) {
@@ -170,7 +177,7 @@ public class HikoIndexer {
 //--data-urlencode "filter[updated_at_before]=2025-05-18 09:19:39" \
         String from = Instant.now().minus(value, ChronoUnit.valueOf(unit)).toString();
         LOGGER.log(Level.INFO, "Updating HIKO letters from {0}", from);
-        try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+        try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             //List<String> tenants = getTenants();
 
             initKeywords();
@@ -196,7 +203,7 @@ public class HikoIndexer {
         Date start = new Date();
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO letters");
-        try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+        try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             initKeywords();
             initPlaces();
             initProfessions();
@@ -219,7 +226,7 @@ public class HikoIndexer {
         Date start = new Date();
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO letters");
-        try (SolrClient client = new Http2SolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+        try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             //List<String> tenants = getTenants();
             initKeywords();
             initPlaces();
@@ -244,7 +251,8 @@ public class HikoIndexer {
         }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
                 .replace("{tenant}", t)
-                + "/letters?page=1&include=identities,identities.localProfessions,identities.localProfessions.profession_category,identities.globalProfessions,identities.globalProfessions.profession_category,places,keywords,globalKeywords";
+                //+ "/letters?page=1&include=identities,identities.localProfessions,identities.localProfessions.profession_category,identities.globalProfessions,identities.globalProfessions.profession_category,places,keywords,globalKeywords";
+                + "/letters?page=1&per_page=100";
         if (from != null) {
             url += "&filter[updated_at_after]=" + from;
         }
@@ -257,17 +265,17 @@ public class HikoIndexer {
                 .newBuilder()
                 .build()) {
             while (url != null) {
-                // LOGGER.log(Level.INFO, "Requesting: {0}.", url);
+                LOGGER.log(Level.INFO, "Requesting: {0}.", url);
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI(url))
-                        .timeout(Duration.ofSeconds(10))
+                        .timeout(Duration.ofSeconds(40))
                         .header("Authorization", Options.getInstance().getJSONObject("hiko").getString("bearer"))
                         .header("Accept", "application/json")
                         .GET()
                         .build();
                 HttpResponse<String> response = httpclient.send(request, BodyHandlers.ofString());
-                r = response.body();
-                JSONObject resp = new JSONObject(r);
+                //r = response.body();
+                JSONObject resp = new JSONObject(response.body());
                 JSONArray docs = resp.getJSONArray("data");
                 for (int i = 0; i < docs.length(); i++) {
                     JSONObject rs = docs.getJSONObject(i);
@@ -286,24 +294,20 @@ public class HikoIndexer {
                     int date_month = rs.optInt("date_month");
                     int date_day = rs.optInt("date_day");
                     try {
-                                            LocalDate date = LocalDate.of(date_year, date_month, date_day); 
-                                            doc.addField("date_computed", date.atStartOfDay().format(dtformatter));
+                        LocalDate date = LocalDate.of(date_year, date_month, date_day); 
+                        doc.addField("date_computed", date.atStartOfDay().format(dtformatter));
                     } catch (Exception ex) {
-                    LOGGER.log(Level.SEVERE, "Error parsing date for {0}. {1}-{2}-{3}", new Object[]{id,date_year, date_month, date_day});
+                        LOGGER.log(Level.WARNING, "Error parsing date for {0}. {1}-{2}-{3}", new Object[]{id,date_year, date_month, date_day});
                     }
                     
                     doc.addField("date_year", date_year);
 
-                    addPlaces(rs.getJSONArray("origins"), "origins", doc, tenant);
-                    addPlaces(rs.getJSONArray("destinations"), "destinations", doc, tenant);
+                    addPlaces(rs.getJSONArray("origins"), "origin", doc, tenant);
+                    addPlaces(rs.getJSONArray("destinations"), "destination", doc, tenant);
                     addIdentities(rs.getJSONArray("authors"), "author", doc, tenant);
                     addIdentities(rs.getJSONArray("recipients"), "recipient", doc, tenant);
                     addIdentities(rs.getJSONArray("mentioned"), "mentioned", doc, tenant);
                     addKeywords(rs.optJSONArray("keywords"), doc, tenant);
-//                int k = addGlobalKeywords(tenant, rs.getInt("L.id"), doc);
-//                if (k == 0) {
-//                    addKeywords(tenant, rs.getInt("L.id"), doc);
-//                }
 
                     client.add("hiko", doc);
                     indexed++;
@@ -314,7 +318,8 @@ public class HikoIndexer {
 
                 }
                 ret.put(tenant, indexed++);
-                url = resp.optString("next_page_url", null);
+                // url = resp.optString("next_page_url", null);
+                url = resp.getJSONObject("links").optString("next", null);
                 Thread.sleep(1000);
             }
             // httpclient.close();
@@ -370,7 +375,7 @@ public class HikoIndexer {
         }
     }
 
-    private void addPlaces(JSONArray lplaces, String type, SolrInputDocument doc, String tenant) throws SQLException, NamingException {
+    private void addPlaces(JSONArray lplaces, String role, SolrInputDocument doc, String tenant) throws SQLException, NamingException {
 
         /**
          *
@@ -391,18 +396,19 @@ public class HikoIndexer {
             doc.addField("longitude", pl.optFloat("longitude"));
             doc.addField("geoname_id", pl.optInt("geoname_id"));
             doc.addField("division", pl.optString("division"));
+            pl.put("role", role);
             if (!Float.isNaN(pl.optFloat("latitude"))) {
                 doc.addField("coords", pl.optFloat("latitude") + "," + pl.optFloat("longitude"));
             }
-            if ("origins".equals(type)) {
+            if ("origin".equals(role)) {
                 doc.setField("origin", rs.getInt("id"));
                 doc.setField("origin_name", pl.optString("name"));
             }
-            if ("destinations".equals(type)) {
+            if ("destination".equals(role)) {
                 doc.setField("destination", rs.getInt("id"));
                 doc.setField("destination_name", pl.optString("name"));
             }
-            doc.addField("places", rs.toString());
+            doc.addField("places", pl.toString());
 
         }
     }

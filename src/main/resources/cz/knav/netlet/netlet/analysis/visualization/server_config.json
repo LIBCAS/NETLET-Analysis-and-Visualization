@@ -4,7 +4,7 @@
         "api": "https://{tenant}.historicka-korespondence.cz/api/v2",
         "bearer": ""
     },
-    "isVaTest": false, 
+    "isVaTest": true, 
     "test_mappings": {
         "brezina": "hiko-test",
         "deml": "hiko-test2",

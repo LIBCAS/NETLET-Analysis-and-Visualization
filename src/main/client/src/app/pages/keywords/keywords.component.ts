@@ -236,7 +236,7 @@ export class KeywordsComponent {
     this.pieOptions = {
       title: {
         show: true,
-        text: 'Keywords categories',
+        text: this.translation.instant('field.keyword_categories'),
         left: 'center'
       },
       legend: {
