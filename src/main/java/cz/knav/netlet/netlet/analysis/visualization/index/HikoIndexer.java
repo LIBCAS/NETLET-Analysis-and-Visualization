@@ -185,7 +185,7 @@ public class HikoIndexer {
             initProfessions();
             Set<String> tenants = Options.getInstance().getJSONObject("test_mappings").keySet();
             for (String tenant : tenants) {
-                getLetters(client, ret, tenant, from);
+                indexLetters(client, ret, tenant, from);
             }
             client.commit("hiko");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
@@ -209,7 +209,7 @@ public class HikoIndexer {
             initProfessions();
             Set<String> tenants = Options.getInstance().getJSONObject("test_mappings").keySet();
             for (String tenant : tenants) {
-                getLetters(client, ret, tenant, null);
+                indexLetters(client, ret, tenant, null);
             }
             client.commit("hiko");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
@@ -226,12 +226,16 @@ public class HikoIndexer {
         Date start = new Date();
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO letters");
-        try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+        try (SolrClient client = new HttpJettySolrClient
+                .Builder(Options.getInstance().getString("solr"))
+                //.useHttp1_1(true)
+                .build() 
+                ) {
             //List<String> tenants = getTenants();
             initKeywords();
             initPlaces();
             initProfessions();
-            getLetters(client, ret, tenant, null);
+            indexLetters(client, ret, tenant, null);
             client.commit("hiko");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
             LOGGER.log(Level.SEVERE, "Error indexing tenant", ex);
@@ -243,7 +247,7 @@ public class HikoIndexer {
         return ret;
     }
 
-    private void getLetters(SolrClient client, JSONObject ret, String tenant, String from) throws URISyntaxException, IOException, InterruptedException {
+    private void indexLetters(SolrClient client, JSONObject ret, String tenant, String from) throws URISyntaxException, IOException, InterruptedException {
         LOGGER.log(Level.INFO, "Indexing tenant: {0}.", tenant);
         String t = tenant;
         if (Options.getInstance().getBoolean("isVaTest", true)) {
@@ -264,14 +268,17 @@ public class HikoIndexer {
         try (HttpClient httpclient = HttpClient
                 .newBuilder()
                 .build()) {
-            while (url != null) {
-                LOGGER.log(Level.INFO, "Requesting: {0}.", url);
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI(url))
+                HttpRequest.Builder requestB = HttpRequest.newBuilder()
+                        //.uri(new URI(url))
                         .timeout(Duration.ofSeconds(40))
                         .header("Authorization", Options.getInstance().getJSONObject("hiko").getString("bearer"))
                         .header("Accept", "application/json")
-                        .GET()
+                        .GET();
+            while (url != null) {
+                LOGGER.log(Level.INFO, "Requesting: {0}.", url);
+                HttpRequest request = requestB
+                        .copy()
+                        .uri(new URI(url))
                         .build();
                 HttpResponse<String> response = httpclient.send(request, BodyHandlers.ofString());
                 //r = response.body();

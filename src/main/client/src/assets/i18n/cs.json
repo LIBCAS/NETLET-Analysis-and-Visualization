@@ -5,6 +5,48 @@
   "views": "Typy zobrazení",
   "clearSelection": "Zrušit výběr",
   "usedFilters": "Vybrané filtry",
+  "home": {
+    "centrality": {
+      "header": "Centralita",
+      "text": "Centralita aktérů korespondence v dané korespondenční síti"
+    },
+    "relation": {
+      "header": "Vztah mezi dvěma a více sítěmi",
+      "text": "Míra jejich zprostředkovatelské pozice mezi dvěma a více sítěmi"
+    },
+    "keywords": {
+      "header": "Klíčová slova",
+      "text": "Kocitační sítě mapující v dopisech zmiňované osoby ve vztahu ke specifickým tématům či debatám."
+    },
+    "map": {
+      "header": "Mapa",
+      "text": "Digitální vizualizace zaměřené na geografický horizont jednotlivých osobních korespondenčních souborů."
+    },
+    "map3": {
+      "header": "",
+      "text": "Komparativně pojatá mapová zobrazení v rámci tří hlavních období"
+    },
+    "map_dynamika": {
+      "header": "",
+      "text": "Statisticky pojaté grafy a časové osy porovnávající dynamiku vývoje jednotlivých korespondenčních celků v časové dimenzi"
+    },
+    "identities": {
+      "header": "Vztahy mezi osoby",
+      "text": "Schémata zobrazující vztahy mezi jednotlivými pisateli a příjemci dopisů"
+    },
+    "professions": {
+      "header": "Profese",
+      "text": "Schémata zobrazující korespondenční vztahy mezi různými profesními skupinami"
+    },
+    "themes": {
+      "header": "Temata",
+      "text": "Schémata zobrazující tematická propojení dopisů a korespondenčních celků"
+    },
+    "timeline": {
+      "header": "Časová osa",
+      "text": "Zobrazení dopisů v chronologickém pořadí na časové ose"
+    }
+  },
   "field": {
     "letter_id": "Id.",
     "author": "Autor",

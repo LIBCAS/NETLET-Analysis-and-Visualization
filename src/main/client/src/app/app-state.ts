@@ -24,52 +24,52 @@ export interface Tenant {
     public selectedTenants = signal<Tenant[]>([]);
     views = [
     {
-      header: '',
+      header: 'centrality',
       text: 'Centralita aktérů korespondence v dané korespondenční síti',
       route: 'centrality'
     },
     {
-      header: '',
+      header: 'relation',
       text: 'Míra jejich zprostředkovatelské pozice mezi dvěma a více sítěmi',
       route: 'relation'
     },
     {
-      header: 'Keywords',
+      header: 'keywords',
       text: 'Kocitační sítě mapující v dopisech zmiňované osoby ve vztahu ke specifickým tématům či debatám.',
       route: 'keywords'
     },
     {
-      header: 'Map',
+      header: 'map',
       text: 'Digitální vizualizace zaměřené na geografický horizont jednotlivých osobních korespondenčních souborů.',
       route: 'map'
     },
     {
-      header: '',
+      header: 'map3',
       text: 'Komparativně pojatá mapová zobrazení v rámci tří hlavních období',
       route: ''
     },
     {
-      header: '',
+      header: 'map_dynamika',
       text: 'Statisticky pojaté grafy a časové osy porovnávající dynamiku vývoje jednotlivých korespondenčních celků v časové dimenzi',
       route: ''
     },
     {
-      header: '',
+      header: 'identities',
       text: 'Schémata zobrazující vztahy mezi jednotlivými pisateli a příjemci dopisů',
       route: 'identities'
     },
     {
-      header: '',
+      header: 'professions',
       text: 'Schémata zobrazující korespondenční vztahy mezi různými profesními skupinami',
       route: 'professions'
     },
     {
-      header: '',
+      header: 'themes',
       text: 'Schémata zobrazující tematická propojení dopisů a korespondenčních celků',
       route: ''
     },
     {
-      header: '',
+      header: 'timeline',
       text: 'Zobrazení dopisů v chronologickém pořadí na časové ose',
       route: 'timeline'
     },

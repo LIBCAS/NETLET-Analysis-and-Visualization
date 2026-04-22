@@ -7,11 +7,11 @@
     @for(card of state.views; track $index){
     <mat-card appearance="outlined" >
         <mat-card-header>
-            <mat-card-title> {{ card.route | translate}} </mat-card-title>
+            <mat-card-title> {{ 'home.' + card.header + '.header' | translate }} </mat-card-title>
         </mat-card-header>
         <mat-card-content>
             <p>
-                {{ card.text }}
+                {{ 'home.' + card.header + '.text' | translate }}
             </p>
         </mat-card-content>
         <mat-card-actions align="end" class="app-mat-card-actions">

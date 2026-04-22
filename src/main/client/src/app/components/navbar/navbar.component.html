@@ -19,7 +19,7 @@
     <mat-menu #views="matMenu">
       @for (t of state.views; track t) {
         @if (t.route) {
-          <a matButton  mat-menu-item [routerLink]="[t.route]" queryParamsHandling="preserve" [title]="t.text" (click)="state.currentView = t">{{ t.route | translate}}</a>
+          <a matButton  mat-menu-item [routerLink]="[t.route]" queryParamsHandling="preserve" [title]="t.text" (click)="state.currentView = t">{{ 'home.' + t.header + '.header' | translate}}</a>
         }
       }
     </mat-menu>

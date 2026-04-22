@@ -283,13 +283,13 @@ export class MapComponent {
     this.solrResponse.response.docs.forEach((letter: Letter) => {
       if (this.inLimits(letter.date_year) && letter.places && letter.origin) {
         letter.places.forEach((place: Place) => {
-          if (place.latitude && !this.nodes[place.name]) {
-            this.nodes[place.name] = { coords: [place.latitude, place.longitude], name: place.name };
-            nodes.push({ id: place.name, name: place.name, value: [place.longitude, place.latitude, 1] });
+          if (place.latitude && !this.nodes[place.id]) {
+            this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name };
+            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1] });
           }
         });
 
-        const linkId = letter.origin_name+ '_' + letter.destination_name;
+        const linkId = letter.origin+ '_' + letter.destination;
         const place_origin = letter.places.find(p => p.role === 'origin');
         const place_destination = letter.places.find(p => p.role === 'destination');
 
@@ -301,28 +301,29 @@ export class MapComponent {
               count: 1,
               letters: [letter]
             };
-          } else {
-            this.links[linkId].count = this.links[linkId].count + 1;
-            this.links[linkId].letters.push(letter);
             links.push({
               id: linkId,
-              source: letter.origin_name + '',
-              target: letter.destination_name + '',
+              source: letter.origin + '',
+              target: letter.destination + '',
               label: place_origin.name + ' > ' + place_destination.name,
               count: this.links[linkId].count,
               lineStyle: {
                 color: this.config.tenant_colors[letter.tenant]
               }
             });
+          } else {
+            this.links[linkId].count = this.links[linkId].count + 1;
+            this.links[linkId].letters.push(letter);
           }
         }
       };
 
     });
-    Object.keys(this.links).forEach(key => {
-      const link = this.links[key];
-      // this.linkNodes(link.node1, link.node2, link.count, link.letters);
-    });
+    console.log(links)
+    // Object.keys(this.links).forEach(key => {
+    //   const link = this.links[key];
+    //   // this.linkNodes(link.node1, link.node2, link.count, link.letters);
+    // });
 
     this.graphData = {
       links,
