@@ -311,7 +311,7 @@ public class IndexSearcher {
                     .setLimit(rows)
                     .withFilter("origin:*")
                     .withFilter("destination:*")
-                    .returnFields("letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,origin,destination,origin_name,destination_name,places:[json],identities:[json],keywords_category_cs,keywords_cs")
+                    .returnFields("letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,origin,destination,origin_id,destination_id,origin_name,destination_name,places:[json],identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_year", rangeFacet)
                     .withFacet("keywords_cs", keywords_csFacet)
                     .withFacet("keywords_categories", categories_csFacet)

@@ -45,10 +45,13 @@ public class HikoIndexer {
 
     JSONObject keywordCategories = new JSONObject();
     JSONObject professions = new JSONObject();
+    JSONObject identityProfessions = new JSONObject();
     JSONObject places = new JSONObject();
     
     private JSONArray getIdentityProfessions(String identityId) {
-
+        if (identityProfessions.has(identityId)) {
+            return identityProfessions.getJSONArray(identityId);
+        }
         try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
             JsonQueryRequest jrequest = new JsonQueryRequest()
@@ -72,7 +75,8 @@ public class HikoIndexer {
 
             JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
             if (docs.length() > 0) {
-                return docs.getJSONObject(0).optJSONArray("professions", new JSONArray());
+                identityProfessions.put(identityId, docs.getJSONObject(0).optJSONArray("professions", new JSONArray()));
+                return identityProfessions.getJSONArray(identityId);
             }
 
         } catch (Exception ex) {
@@ -251,7 +255,7 @@ public class HikoIndexer {
         LOGGER.log(Level.INFO, "Indexing tenant: {0}.", tenant);
         String t = tenant;
         if (Options.getInstance().getBoolean("isVaTest", true)) {
-            t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
+            t = Options.getInstance().getJSONObject("test_mappings").getString(tenant); 
         }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
                 .replace("{tenant}", t)
@@ -404,19 +408,20 @@ public class HikoIndexer {
             doc.addField("geoname_id", pl.optInt("geoname_id"));
             doc.addField("division", pl.optString("division"));
             pl.put("role", role);
-            if (!Float.isNaN(pl.optFloat("latitude"))) {
+            if (!Float.isNaN(pl.optFloat("latitude"))) { 
                 doc.addField("coords", pl.optFloat("latitude") + "," + pl.optFloat("longitude"));
             }
             if ("origin".equals(role)) {
                 doc.setField("origin", rs.getInt("id"));
+                doc.setField("origin_id", place_id);
                 doc.setField("origin_name", pl.optString("name"));
             }
             if ("destination".equals(role)) {
                 doc.setField("destination", rs.getInt("id"));
+                doc.setField("destination_id", place_id);
                 doc.setField("destination_name", pl.optString("name"));
             }
             doc.addField("places", pl.toString());
-
         }
     }
 

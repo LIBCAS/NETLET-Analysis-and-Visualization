@@ -54,7 +54,10 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Titl
 
 @Component({
   selector: 'app-map',
-  imports: [TranslateModule, FormsModule, LeafletModule, MatCardModule, MatExpansionModule, MatCheckboxModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule, MatIconModule, MatProgressBarModule, YearsChartComponent, LettersInfoComponent],
+  imports: [TranslateModule, FormsModule, LeafletModule, 
+    MatCardModule, MatExpansionModule, MatCheckboxModule, MatFormFieldModule, 
+    MatSelectModule, MatInputModule, MatListModule, MatIconModule, 
+    MatProgressBarModule, YearsChartComponent, LettersInfoComponent],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss'
 })
@@ -89,6 +92,8 @@ export class MapComponent {
   infoHeader: string;
   infoData: any[];
   infoFields: string[];
+  infoType: string;
+  infoTypeData: string;
 
   tenants: Tenant[] = [];
 
@@ -289,7 +294,7 @@ export class MapComponent {
           }
         });
 
-        const linkId = letter.origin+ '_' + letter.destination;
+        const linkId = letter.origin_id + '_' + letter.destination_id;
         const place_origin = letter.places.find(p => p.role === 'origin');
         const place_destination = letter.places.find(p => p.role === 'destination');
 
@@ -303,8 +308,8 @@ export class MapComponent {
             };
             links.push({
               id: linkId,
-              source: letter.origin + '',
-              target: letter.destination + '',
+              source: letter.origin_id,
+              target: letter.destination_id,
               label: place_origin.name + ' > ' + place_destination.name,
               count: this.links[linkId].count,
               lineStyle: {
@@ -319,7 +324,6 @@ export class MapComponent {
       };
 
     });
-    console.log(links)
     // Object.keys(this.links).forEach(key => {
     //   const link = this.links[key];
     //   // this.linkNodes(link.node1, link.node2, link.count, link.letters);
@@ -329,6 +333,7 @@ export class MapComponent {
       links,
       nodes
     };
+    console.log(this.graphData)
 
   }
 
@@ -416,8 +421,10 @@ export class MapComponent {
 
 
           this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => { return (letter.origin_name +'' === place) || (letter.destination_name +'' === place)});
-          this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'action'];
+          this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
           this.infoHeader = `Letters from/to ${params.data.name}`;
+          this.infoType = 'place';
+          this.infoTypeData = place;
           this.state.showInfo.set(true);
         });
       } else if (params.dataType === 'edge') {
@@ -440,6 +447,7 @@ export class MapComponent {
           this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin_name + '' === params.data.source && letter.destination_name + '' === params.data.target);
           this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'action'];
           this.infoHeader = `Letters from ${params.data.label} (${this.infoData.length})`;
+          this.infoType = 'link';
           
           this.state.showInfo.set(true);
         });

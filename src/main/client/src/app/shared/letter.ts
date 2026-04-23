@@ -3,6 +3,8 @@ export interface Letter {
     tenant: string,
     origin: number,
     destination: number,
+    origin_id: string,
+    destination_id: string,
     origin_name: string,
     destination_name: string,
     date_year: number,
