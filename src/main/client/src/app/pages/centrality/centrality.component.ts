@@ -76,6 +76,7 @@ export class CentralityComponent {
   filters: {field: string, value: string}[] = [];
 
   selectedRecipients: string[] = [];
+  allIncluded = false;
 
   colors = [
     "#d87c7c",
@@ -99,7 +100,7 @@ export class CentralityComponent {
     private _ngZone: NgZone,
     private router: Router,
     private translation: TranslateService,
-    private config: AppConfiguration,
+    public config: AppConfiguration,
     public state: AppState,
     private service: AppService
   ) {
@@ -415,7 +416,14 @@ export class CentralityComponent {
     const w = this.graphChart.getWidth() - 20;
     const maxSize = 60;
     const minSize = 10;
-    let maxCount = Math.max(
+    let maxCount = this.allIncluded ?
+    Math.max(
+      ...this.mentioned.map(r => r.count),
+      ...this.recipients.map(r => r.count),
+      ...this.authors.map(r => r.count)
+    )
+    :
+    Math.max(
       ...this.mentioned.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count),
       ...this.recipients.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count),
       ...this.authors.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count)
@@ -440,7 +448,7 @@ export class CentralityComponent {
       })
     });
     this.recipients.forEach((identity: JSONFacet, index: number) => {
-      if (!this.config.excluded_identities().includes(identity.val)) {
+      if (this.allIncluded || !this.config.excluded_identities().includes(identity.val)) {
         const pos = this.setPosition(h, w, identity.count, maxCount);
         nodes.push({
           // id: identity.id + '',
@@ -461,7 +469,7 @@ export class CentralityComponent {
       }
     });
     this.authors.forEach((identity: JSONFacet, index: number) => {
-      if (!this.config.excluded_identities().includes(identity.val)) {
+      if (this.allIncluded || !this.config.excluded_identities().includes(identity.val)) {
         const pos = this.setPosition(h, w, identity.count, maxCount);
         nodes.push({
           // id: identity.id + '',
