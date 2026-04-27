@@ -93,7 +93,7 @@ export class MapComponent {
   infoData: any[];
   infoFields: string[];
   infoType: string;
-  infoTypeData: string;
+  infoTypeData: any;
 
   tenants: Tenant[] = [];
 
@@ -311,19 +311,23 @@ export class MapComponent {
               source: letter.origin_id,
               target: letter.destination_id,
               label: place_origin.name + ' > ' + place_destination.name,
+              labelReversed: place_destination.name + ' > ' + place_origin.name,
               count: this.links[linkId].count,
               lineStyle: {
                 color: this.config.tenant_colors[letter.tenant]
               }
             });
           } else {
-            this.links[linkId].count = this.links[linkId].count + 1;
+            this.links[linkId].count++;
             this.links[linkId].letters.push(letter);
           }
         }
       };
 
     });
+    links.forEach(link => {
+      link.count = this.links[link.id].count
+    })
     // Object.keys(this.links).forEach(key => {
     //   const link = this.links[key];
     //   // this.linkNodes(link.node1, link.node2, link.count, link.letters);
@@ -333,7 +337,7 @@ export class MapComponent {
       links,
       nodes
     };
-    console.log(this.graphData)
+    //console.log(this.graphData)
 
   }
 
@@ -443,11 +447,17 @@ export class MapComponent {
           //   }
           // });
           // this.infoContent = popup;
-
-          this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin_name + '' === params.data.source && letter.destination_name + '' === params.data.target);
-          this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'action'];
+          this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin_id + '' === params.data.source + ''  && letter.destination_id + '' === params.data.target + '');
+          this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'origin_name', 'destination_name', 'date_year', 'action'];
           this.infoHeader = `Letters from ${params.data.label} (${this.infoData.length})`;
           this.infoType = 'link';
+          const reversed = this.solrResponse.response.docs.filter((letter: Letter) => letter.destination_id + '' === params.data.source + '' && letter.origin_id + '' === params.data.target + '');
+          const header = `Letters from ${params.data.labelReversed} (${reversed.length})`;
+          this.infoTypeData = {
+            header: header,
+            docs: reversed
+          };
+
           
           this.state.showInfo.set(true);
         });

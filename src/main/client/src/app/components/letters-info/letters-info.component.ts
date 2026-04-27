@@ -31,6 +31,7 @@ export class LettersInfoComponent {
   onClose = output<boolean>();
 
   filteredData = signal<Letter[]>([]);
+  computedHeader = signal<string>('');
   showFrom = true;
   showTo = true;
 
@@ -54,14 +55,31 @@ export class LettersInfoComponent {
     const tenant = this.config.isTest ? this.config.test_mappings[t] : t;
     window.open(this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', id + ''), 'hiko');
   }
+  
+  linkSwaped = false;
+  swapLink() {
+    this.linkSwaped = !this.linkSwaped;
+    this.filter();
+  }
 
   filter() {
     if (this.type() === 'place') {
       const f = this.data().filter((letter: Letter) => { return (letter.origin_name +'' === this.typeData() && this.showFrom) || 
         (letter.destination_name +'' === this.typeData() && this.showTo)});
       this.filteredData.set([...f]);
+      this.computedHeader.set(this.header());
+    } else if (this.type() === 'link') {
+      if (this.linkSwaped) {
+        this.filteredData.set([...this.typeData().docs]);
+        this.computedHeader.set(this.typeData().header);
+      } else {
+        this.filteredData.set([...this.data()]);
+        this.computedHeader.set(this.header());
+      }
+      
     } else {
       this.filteredData.set([...this.data()]);
+      this.computedHeader.set(this.header());
     }
     
   }

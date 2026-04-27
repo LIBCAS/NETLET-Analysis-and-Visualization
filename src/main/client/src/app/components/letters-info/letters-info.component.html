@@ -1,8 +1,8 @@
 <mat-card class="mat-mdc-elevation-specific mat-elevation-z3">
     <mat-card-header>
-        <mat-card-title>{{ header() }}</mat-card-title>
+        <mat-card-title>{{ computedHeader() }}</mat-card-title>
         @if(type() ==='link') {
-        <button mat-icon-button (click)="close()"><mat-icon>swap_horiz</mat-icon></button>
+        <button mat-icon-button (click)="swapLink()"><mat-icon>swap_horiz</mat-icon></button>
         }
         @if(type() ==='place') {
         <mat-checkbox [(ngModel)]="showFrom" (click)="filter()">from</mat-checkbox>
