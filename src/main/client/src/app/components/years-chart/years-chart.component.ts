@@ -203,7 +203,10 @@ export class YearsChartComponent {
       brush: {
         toolbox: ['clear'],
         brushType: 'lineX',
+        brushMode: 'single',
+        removeOnClick: true,
         xAxisIndex: 0,
+        z: 1,
         brushLink: 'all',
         outOfBrush: {
           colorAlpha: 0.5
