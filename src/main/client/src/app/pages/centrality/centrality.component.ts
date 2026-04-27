@@ -187,7 +187,6 @@ export class CentralityComponent {
       return;
     }
     const idx = this.graphData.nodes.findIndex(n => n.id === e.value + '_' + e.field);
-    // currentIndex = (currentIndex + 1) % dataLen;
     this.graphChart.dispatchAction({
       type: 'showTip',
       seriesIndex: 0,
@@ -198,6 +197,43 @@ export class CentralityComponent {
       seriesIndex: 0,
       dataIndex: idx
     });
+    this.graphChart.dispatchAction({
+      type: 'select',
+      seriesIndex: 0,
+      dataIndex: idx
+    });
+  }
+
+  showNodes(idxs: number[]) {
+    // this.graphChart.dispatchAction({
+    //   type: 'showTip',
+    //   seriesIndex: 0,
+    //   dataIndex: idxs
+    // });
+    this.graphChart.dispatchAction({
+      type: 'highlight',
+      seriesIndex: 0,
+      dataIndex: idxs
+    });
+    this.graphChart.dispatchAction({
+      type: 'select',
+      seriesIndex: 0,
+      dataIndex: idxs
+    });
+  }
+
+  selected: number[] = [];
+  showNodeExt(e: {field: string, value: string}) {
+    this.selected = [];
+    this.selected.push(this.graphData.nodes.findIndex(n => n.id === e.value + '_authors'));
+    this.selected.push(this.graphData.nodes.findIndex(n => n.id === e.value + '_recipients'));
+    this.selected.push(this.graphData.nodes.findIndex(n => n.id === e.value + '_mentioned'));
+
+    this.showNodes(this.selected);
+
+    // this.showNode({field: 'authors', value: e.value});
+    // this.showNode({field: 'recipients', value: e.value});
+    // this.showNode({field: 'mentioned', value: e.value});
   }
 
   hideNode() {
@@ -206,6 +242,10 @@ export class CentralityComponent {
     });
     this.graphChart.dispatchAction({
       type: 'downplay'
+    });
+    this.graphChart.dispatchAction({
+      type: 'unselect',
+      dataIndex: this.selected,
     });
 
   }
@@ -507,6 +547,20 @@ export class CentralityComponent {
             lineStyle: {
               width: 10
             }
+          },
+          selectedMode: true,
+          select: {
+            itemStyle: {
+              borderColor: '#666',
+              shadowColor: 'rgba(0, 0, 0, 0.8)',
+              shadowBlur: 10
+            }
+          },
+          blur: {
+            itemStyle: {
+              opacity: .5
+            }
+            
           }
 
         }
