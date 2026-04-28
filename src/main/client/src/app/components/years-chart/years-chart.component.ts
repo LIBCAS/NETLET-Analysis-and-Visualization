@@ -88,7 +88,7 @@ export class YearsChartComponent {
   chartRok: ECharts;
   barColor: string;
   rokAxis: string[] = [];
-  rokSeries: number[] = [];
+  rokSeries: {value:number, itemStyle: {color: string} }[] = [];
 
   
   animation: ReturnType<typeof setInterval>;
@@ -173,9 +173,13 @@ export class YearsChartComponent {
   }
 
   setYearsChart(facet: { buckets: JSONFacet[], after: { count: number } }) {
-
-    this.rokSeries = facet.buckets.map(c => c.count);
-    this.rokSeries.push(facet.after.count);
+    this.rokSeries = facet.buckets.map(c => { 
+      const color = c.val<'1918' ? '#155605' : (c.val<'1946' ? 'rgb(68, 110, 136)' : '#00c');
+      return {
+        value: c.count, itemStyle: {color: color}
+      }
+    });
+    this.rokSeries.push({value: facet.after.count, itemStyle:{color: '#00c'}});
     this.rokAxis = facet.buckets.map(c => new Date(c.val).getFullYear() +'');
     this.rokAxis.push(this.limits[1] + '');
 

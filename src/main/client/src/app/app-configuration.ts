@@ -45,6 +45,10 @@ import { Configuration } from './shared/config';
         return this.config.tenant_colors;
     }
 
+    public get obdobi() {
+        return this.config.obdobi;
+    }
+
     constructor(
         private http: HttpClient,
         public state: AppState) { }
