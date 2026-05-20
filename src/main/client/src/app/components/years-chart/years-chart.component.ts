@@ -5,7 +5,7 @@ import * as echarts from 'echarts/core';
 import { EChartsOption, ECharts } from 'echarts';
 import { BarChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
-import { LegendComponent } from 'echarts/components';
+import { LegendComponent, MarkAreaComponent, VisualMapComponent } from 'echarts/components';
 import { TooltipComponent } from 'echarts/components';
 import { GridComponent } from 'echarts/components';
 import { TitleComponent } from 'echarts/components';
@@ -19,7 +19,9 @@ import { AppState, Tenant } from '../../app-state';
 import { TranslateService } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { DomSanitizer } from '@angular/platform-browser';
-echarts.use([BarChart, CanvasRenderer, LegendComponent, TooltipComponent, GridComponent, TitleComponent, BrushComponent, ToolboxComponent]);
+echarts.use([BarChart, CanvasRenderer, LegendComponent, 
+  TooltipComponent, GridComponent, TitleComponent, BrushComponent, 
+  ToolboxComponent, VisualMapComponent, MarkAreaComponent]);
 
 const EXPAND_ICON =
   `
@@ -88,9 +90,9 @@ export class YearsChartComponent {
   chartRok: ECharts;
   barColor: string;
   rokAxis: string[] = [];
-  rokSeries: {value:number, itemStyle: {color: string} }[] = [];
+  rokSeries: { value: number, itemStyle?: { color: string } }[] = [];
 
-  
+
   animation: ReturnType<typeof setInterval>;
   running: boolean = false;
 
@@ -128,7 +130,7 @@ export class YearsChartComponent {
   }
 
   fireChangeLimits() {
-    this.onChangeLimits.emit([new Date(this.limits[0]+'-01-01'), new Date(this.limits[1]+'-12-31')]);
+    this.onChangeLimits.emit([new Date(this.limits[0] + '-01-01'), new Date(this.limits[1] + '-12-31')]);
   }
 
   onSetYears(e: any) {
@@ -142,7 +144,7 @@ export class YearsChartComponent {
 
   onClearSelection(e: any) {
     if (e.batch[0].areas.length === 0) {
-      
+
       const l = this.state.getTenantsRange();
       this.limits = [l[0].getFullYear(), l[1].getFullYear(),];
       this.fireChangeLimits();
@@ -173,14 +175,16 @@ export class YearsChartComponent {
   }
 
   setYearsChart(facet: { buckets: JSONFacet[], after: { count: number } }) {
-    this.rokSeries = facet.buckets.map(c => { 
-      const color = c.val<'1918' ? '#155605' : (c.val<'1946' ? 'rgb(68, 110, 136)' : '#00c');
+    this.rokSeries = facet.buckets.map(c => {
+      const color = c.val < '1670' ? '#155605' : (c.val < '1939' ? 'rgb(68, 110, 136)' : '#00c');
       return {
-        value: c.count, itemStyle: {color: color}
+        value: c.count, //itemStyle: { color: color }
       }
     });
-    this.rokSeries.push({value: facet.after.count, itemStyle:{color: '#00c'}});
-    this.rokAxis = facet.buckets.map(c => new Date(c.val).getFullYear() +'');
+    this.rokSeries.push({ value: facet.after.count, 
+      //itemStyle: { color: '#00c' } 
+    });
+    this.rokAxis = facet.buckets.map(c => new Date(c.val).getFullYear() + '');
     this.rokAxis.push(this.limits[1] + '');
 
     let minRokWithValue = '1000';
@@ -191,6 +195,7 @@ export class YearsChartComponent {
 
     this.chartOptionsRok = {
       animation: false,
+
       grid: {
         // left: 0,
         // right: 0,
@@ -232,7 +237,8 @@ export class YearsChartComponent {
         }
       },
       yAxis: {
-        show: false
+        show: false,
+        type: 'value',
       },
       series: [{
         name: '',
@@ -240,18 +246,62 @@ export class YearsChartComponent {
         data: this.rokSeries,
         barCategoryGap: 0,
         color: this.barColor,
+
+//const color = c.val < '1670' ? '#155605' : (c.val < '1939' ? 'rgb(68, 110, 136)' : '#00c');
         markArea: {
-          silent: true,
-          itemStyle: {
-            opacity: 0.8,
-            color: '#ccc0'
-          },
+          
+          //silent: true,
           data: [
+            // [
+            //   { xAxis: minRokWithValue },
+            //   { xAxis: maxRokWithValue }
+            // ],
             [
-              { xAxis: minRokWithValue },
-              { xAxis: maxRokWithValue }
+              {
+                xAxis: minRokWithValue,
+                itemStyle: {
+                  color: '#155605',
+                  opacity: 0.4,
+                  // color: '#ccc0'
+                },
+              },
+              {
+                xAxis: '1670'
+              }
+            ],
+            [
+              {
+                itemStyle: {
+                  color: 'rgb(68, 110, 136)',
+                  opacity: 0.4,
+                  // color: '#ccc0'
+                },
+                xAxis: '1670'
+              },
+              {
+                xAxis: '1939'
+              }
+            ],
+            [
+              {
+                itemStyle: {
+                  color: '#00c',
+                  opacity: 0.4,
+                  // color: '#ccc0'
+                },
+                xAxis: '1939'
+              },
+              {
+                xAxis: maxRokWithValue
+              }
             ]
-          ]
+          ],
+          // data: [
+          //   [
+          //     { xAxis: minRokWithValue },
+          //     { xAxis: maxRokWithValue }
+          //   ]
+          // ],
         },
       }]
     }
@@ -302,16 +352,16 @@ export class YearsChartComponent {
 
 
   run2() {
-this.chartRok.dispatchAction({
-        type: 'brush',
-        areas: [
-          {
-            brushType: 'lineX',
-            coordRange: ['1900', '1903'],
-            xAxisIndex: 0
-          }
-        ]
-      });
+    this.chartRok.dispatchAction({
+      type: 'brush',
+      areas: [
+        {
+          brushType: 'lineX',
+          coordRange: ['1900', '1903'],
+          xAxisIndex: 0
+        }
+      ]
+    });
   }
 
   run() {
@@ -329,7 +379,7 @@ this.chartRok.dispatchAction({
         areas: [
           {
             brushType: 'lineX',
-            coordRange: [startRok + '', endRok+''],
+            coordRange: [startRok + '', endRok + ''],
             xAxisIndex: 0
           }
         ]
@@ -349,8 +399,8 @@ this.chartRok.dispatchAction({
     this.animation = setInterval(() => {
       this.limits = [startRok++, endRok++];
       this.fireChangeLimits();
-        this.running = true;
-        this.onChangeRunning.emit(this.running);
+      this.running = true;
+      this.onChangeRunning.emit(this.running);
       this.setChartTitle();
 
       this.chartRok.dispatchAction({
@@ -358,7 +408,7 @@ this.chartRok.dispatchAction({
         areas: [
           {
             brushType: 'lineX',
-            coordRange: [startRok + '', endRok+''],
+            coordRange: [startRok + '', endRok + ''],
             xAxisIndex: 0
           }
         ]
@@ -373,8 +423,8 @@ this.chartRok.dispatchAction({
   }
 
   stop() {
-        this.running = false;
-        this.onChangeRunning.emit(this.running);
+    this.running = false;
+    this.onChangeRunning.emit(this.running);
     clearInterval(this.animation);
   }
 }
