@@ -11,11 +11,10 @@ import { GridComponent } from 'echarts/components';
 import { TitleComponent } from 'echarts/components';
 import { BrushComponent } from 'echarts/components';
 import { ToolboxComponent } from 'echarts/components';
-import { Facet, JSONFacet } from '../../shared/facet';
-import { HttpParams } from '@angular/common/http';
+import { JSONFacet } from '../../shared/facet';
 import { DOCUMENT } from '@angular/common';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
-import { AppState, Tenant } from '../../app-state';
+import { AppState } from '../../app-state';
 import { TranslateService } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -187,11 +186,68 @@ export class YearsChartComponent {
     this.rokAxis = facet.buckets.map(c => new Date(c.val).getFullYear() + '');
     this.rokAxis.push(this.limits[1] + '');
 
+
     let minRokWithValue = '1000';
     let maxRokWithValue = '2025';
 
     minRokWithValue = this.limits[0] + '';
     maxRokWithValue = this.limits[1] + '';
+
+
+    const markAreaData: any = [];
+
+    if (this.limits[0] < 1670) {
+      markAreaData.push([
+              {
+                name: '1. období',
+                xAxis: minRokWithValue,
+                itemStyle: {
+                  color: '#155605',
+                  opacity: 0.5
+                },
+              },
+              {
+                xAxis: Math.min(this.limits[1], 1670) + ''
+              }
+            ]
+          )
+    }
+
+    if (this.limits[0] < 1939 && this.limits[1] > 1670) {
+      markAreaData.push([
+              {
+                name: '2. období',
+                //xAxis: '1670',
+                xAxis: Math.max(this.limits[0], 1670) + '',
+                itemStyle: {
+                  color: 'rgb(68, 110, 136)',
+                  opacity: 0.4
+                }
+              },
+              {
+                xAxis: Math.min(this.limits[1], 1939) + ''
+              }
+            ]
+          )
+    }
+
+    if (this.limits[1] > 1939) {
+      markAreaData.push([
+              {
+                name: '3. období',
+                // xAxis: '1939',
+                xAxis: Math.max(this.limits[0], 1939) + '',
+                itemStyle: {
+                  color: '#00c',
+                  opacity: 0.3
+                }
+              },
+              {
+                xAxis: maxRokWithValue
+              }
+            ]
+          )
+    }
 
     this.chartOptionsRok = {
       animation: false,
@@ -247,55 +303,14 @@ export class YearsChartComponent {
         barCategoryGap: 0,
         color: this.barColor,
 
-//const color = c.val < '1670' ? '#155605' : (c.val < '1939' ? 'rgb(68, 110, 136)' : '#00c');
         markArea: {
           
-          //silent: true,
-          data: [
-            // [
-            //   { xAxis: minRokWithValue },
-            //   { xAxis: maxRokWithValue }
-            // ],
-            [
-              {
-                xAxis: minRokWithValue,
-                itemStyle: {
-                  color: '#155605',
-                  opacity: 0.4,
-                  // color: '#ccc0'
-                },
-              },
-              {
-                xAxis: '1670'
-              }
-            ],
-            [
-              {
-                itemStyle: {
-                  color: 'rgb(68, 110, 136)',
-                  opacity: 0.4,
-                  // color: '#ccc0'
-                },
-                xAxis: '1670'
-              },
-              {
-                xAxis: '1939'
-              }
-            ],
-            [
-              {
-                itemStyle: {
-                  color: '#00c',
-                  opacity: 0.4,
-                  // color: '#ccc0'
-                },
-                xAxis: '1939'
-              },
-              {
-                xAxis: maxRokWithValue
-              }
-            ]
-          ],
+          label: {
+            position: 'insideTop',
+            color: '#000'
+          },
+          silent: true,
+          data: markAreaData,
           // data: [
           //   [
           //     { xAxis: minRokWithValue },

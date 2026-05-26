@@ -312,6 +312,7 @@ public class HikoIndexer {
                     }
                     
                     doc.addField("date_year", date_year);
+                    setPeriod(doc, date_year);
 
                     addPlaces(rs.getJSONArray("origins"), "origin", doc, tenant);
                     addPlaces(rs.getJSONArray("destinations"), "destination", doc, tenant);
@@ -340,6 +341,18 @@ public class HikoIndexer {
             LOGGER.log(Level.SEVERE, "", e);
             ret.put("error" + tenant, e);
         }
+    }
+    
+    private void setPeriod(SolrInputDocument doc, int date_year) {
+        String period = "unknown";
+        if (date_year > 1580 && date_year <= 1670) {
+            period = "1";
+        } else if (date_year > 1670 && date_year <= 1939) {
+            period = "2";
+        } else if (date_year > 1939) {
+            period = "3";
+        }
+        doc.setField("period", period);
     }
 
     private void addKeywords(JSONArray keywords, SolrInputDocument doc, String tenant) throws SQLException, NamingException {

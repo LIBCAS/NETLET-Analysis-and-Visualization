@@ -174,6 +174,16 @@ public class DataServlet extends HttpServlet {
                 return ret;
             }
         },
+        PERIODS {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                JSONObject ret = new JSONObject();
+                if (request.getParameter("tenant") != null) {
+                    ret = IndexSearcher.periods(request);
+                }
+                return ret;
+            }
+        },
         PROFESSIONS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {

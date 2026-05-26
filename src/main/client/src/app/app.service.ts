@@ -77,6 +77,10 @@ export class AppService {
     return this.get('data/keywords', params)
   }
 
+  getPeriods(params: HttpParams): Observable<any> {
+    return this.get('data/periods', params)
+  }
+
   getIdentities(params: HttpParams): Observable<any> {
     return this.get('data/identities', params)
   }

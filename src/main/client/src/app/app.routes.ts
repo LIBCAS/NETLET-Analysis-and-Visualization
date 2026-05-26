@@ -8,6 +8,7 @@ import { CentralityComponent } from './pages/centrality/centrality.component';
 import { RelationComponent } from './pages/relation/relation.component';
 import { MapComponent } from './pages/map/map.component';
 import { TimelineComponent } from './pages/timeline/timeline.component';
+import { PeriodsComponent } from './pages/periods/periods.component';
 
 export const routes: Routes = [
     {path: '', component: HomeComponent},
@@ -17,6 +18,7 @@ export const routes: Routes = [
     {path: 'identities', component: IdentitiesComponent},
     {path: 'map', component: MapComponent},
     {path: 'map-view', component: MapViewComponent},
+    {path: 'periods', component: PeriodsComponent},
     {path: 'professions', component: ProfessionsComponent},
     {path: 'keywords', component: KeywordsComponent},
     {path: 'timeline', component: TimelineComponent}

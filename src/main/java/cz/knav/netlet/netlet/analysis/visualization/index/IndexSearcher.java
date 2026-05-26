@@ -41,7 +41,7 @@ public class IndexSearcher {
             final JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     //.withFilter("status:publish")
-                    .withFilter("-date_year:0")
+                    .withFilter("date_year:[1000 TO *]")
                     .setLimit(0)
                     .withFacet("tenant", tenantFacet);
 
@@ -128,15 +128,12 @@ public class IndexSearcher {
                             .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
                     .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
 
-            String rowsP = request.getParameter("rows");
             int rows = 0;
-            if (rowsP != null && !rowsP.isBlank()) {
-                rows = Integer.valueOf(rowsP);
-            }
 
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     .setSort("date_computed asc")
+                    .withFilter("date_year:[1500 TO *]")
                     //.withFilter("status:publish")
                     //.withFilter("identity_mentioned:*")
                     .returnFields("tenant,date_year,date_computed,identity_name,identity_recipient,identity_author,identity_mentioned,places:[json],identities:[json],keywords_category_cs,keywords_cs")
@@ -381,6 +378,7 @@ public class IndexSearcher {
                     .setQuery("*:*")
                     //.withFilter("status:publish")
                     .setLimit(rows)
+                    .withFilter("date_year:[1500 TO *]")
                     .withFilter("identity_recipient:*")
                     .withFilter("identity_author:*")
                     .returnFields("letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,identity_mentioned,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
@@ -460,6 +458,66 @@ public class IndexSearcher {
                             .setLimit(1000)
                             .setMinCount(1))
                     .withFacet("professions_mentioned", new TermsFacetMap("professions_mentioned_" + lang)
+                            .setLimit(1000)
+                            .setMinCount(1));
+            jrequest = addFilters(request, jrequest, lang);
+
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
+            NamedList<Object> resp = solr.request(jrequest, "hiko");
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        return ret;
+    }
+    
+    public static JSONObject periods(HttpServletRequest request) {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+            String lang = request.getParameter("lang");
+            if (lang == null) {
+                lang = "cs";
+            }
+            String tenant_date_range = request.getParameter("tenant_date_range");
+            if (tenant_date_range == null || tenant_date_range.isBlank()) {
+                tenant_date_range = "1000,2025";
+            }
+            String[] years = tenant_date_range.split(",");
+            RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
+                            .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
+                    .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+            
+            final TermsFacetMap keywords_facet = new TermsFacetMap("keywords_category_" + lang)
+                    .setLimit(1000)
+                    .setMinCount(1);
+            final TermsFacetMap professions_facet = new TermsFacetMap("professions_" + lang)
+                    .setLimit(1000)
+                    .setMinCount(1);
+            final TermsFacetMap periodsFacet = new TermsFacetMap("period" )
+                    .setLimit(1000)
+                    .setMinCount(1)
+                    //.setSort("index")
+                    .withSubFacet("keywords", keywords_facet)
+                    .withSubFacet("professions", professions_facet);
+
+            int rows = 0;
+            JsonQueryRequest jrequest = new JsonQueryRequest()
+                    .setQuery("*:*")
+                    //.withFilter("status:publish")
+                    .setLimit(rows)
+                    .withFacet("periods", periodsFacet)
+                    .withFacet("date_year", rangeFacet)
+                    .withFacet("tenants", new TermsFacetMap("tenant")
+                            .setLimit(1000)
+                            .withDomain(new DomainMap().withTagsToExclude("fftenant").withTagsToExclude("ffdate_year"))
+                            .setMinCount(1))
+                    .withFacet("professions", new TermsFacetMap("professions_" + lang)
+                            .setLimit(1000)
+                            .setMinCount(1))
+                    .withFacet("keywords", new TermsFacetMap("keywords_category_" + lang) 
                             .setLimit(1000)
                             .setMinCount(1));
             jrequest = addFilters(request, jrequest, lang);

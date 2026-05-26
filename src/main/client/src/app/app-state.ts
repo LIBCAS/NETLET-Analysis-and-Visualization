@@ -44,9 +44,9 @@ export interface Tenant {
       route: 'map'
     },
     {
-      header: 'map3',
-      text: 'Komparativně pojatá mapová zobrazení v rámci tří hlavních období',
-      route: ''
+      header: 'periods',
+      text: 'Komparativně pojatá zobrazení v rámci tří hlavních období',
+      route: 'periods'
     },
     {
       header: 'map_dynamika',

@@ -22,9 +22,9 @@
       "header": "Mapa",
       "text": "Digitální vizualizace zaměřené na geografický horizont jednotlivých osobních korespondenčních souborů."
     },
-    "map3": {
-      "header": "",
-      "text": "Komparativně pojatá mapová zobrazení v rámci tří hlavních období"
+    "periods": {
+      "header": "Období",
+      "text": "Komparativně pojatá zobrazení v rámci tří hlavních období"
     },
     "map_dynamika": {
       "header": "",
