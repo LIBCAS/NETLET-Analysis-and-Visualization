@@ -148,7 +148,7 @@ export class PeriodsComponent {
     const p: any = {};
     p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
-    p.tenant_date_range = this.state.getTenantsRangeISO().toString();
+    p.tenant_year_range = this.state.getTenantsRange().toString();
 
     p.keyword = this.selectedKeywords;
     p.lang = this.translation.currentLang;

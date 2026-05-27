@@ -55,7 +55,7 @@ public class IndexSearcher {
 //            ret = new JSONObject(queryResponse.jsonStr());
 
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
         return ret;
@@ -92,7 +92,7 @@ public class IndexSearcher {
                 }
             } else {
                 String[] tenants = request.getParameterValues("tenant");
-                if (tenants.length > 0) {
+                if (tenants != null && tenants.length > 0) {
                     jrequest = jrequest.withFilter("tenant:(global " + String.join(" ", tenants) + ")");
                 }
             }    
@@ -106,7 +106,7 @@ public class IndexSearcher {
 //            ret = new JSONObject(queryResponse.jsonStr());
 
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
         return ret;
@@ -116,11 +116,11 @@ public class IndexSearcher {
         JSONObject ret = new JSONObject();
         try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
-            String tenant_date_range = request.getParameter("tenant_date_range");
-            if (tenant_date_range == null || tenant_date_range.isBlank()) {
-                tenant_date_range = "1000,2025";
+            String date_range = request.getParameter("date_range");
+            if (date_range == null || date_range.isBlank()) {
+                date_range = "1000,2025";
             }
-            String[] years = tenant_date_range.split(",");
+            String[] years = date_range.split(",");
 //            RangeFacetMap rangeFacet = new RangeFacetMap("date_year", Long.parseLong(years[0]), Long.parseLong(years[1]), 1)
 //                    .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
             
@@ -174,7 +174,7 @@ public class IndexSearcher {
             ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
 
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
         return ret;
@@ -217,11 +217,11 @@ public class IndexSearcher {
                     .withSubFacet("keywords_autor", keywords_autorFacet)
                     .withSubFacet("keywords_recipient", keywords_destFacet);
 
-            String tenant_date_range = request.getParameter("tenant_date_range");
-            if (tenant_date_range == null || tenant_date_range.isBlank()) {
-                tenant_date_range = "1000,2025";
+            String date_range = request.getParameter("date_range");
+            if (date_range == null || date_range.isBlank()) {
+                date_range = "1000,2025";
             }
-            String[] years = tenant_date_range.split(",");
+            String[] years = date_range.split(",");
             RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
                             .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
                     .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
@@ -259,7 +259,7 @@ public class IndexSearcher {
             ret.put("k", getKeywordsCore(request, lang));
 
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
         return ret;
@@ -287,11 +287,11 @@ public class IndexSearcher {
                     .setLimit(1000)
                     .setMinCount(1);
 
-            String tenant_date_range = request.getParameter("tenant_date_range");
-            if (tenant_date_range == null || tenant_date_range.isBlank()) {
-                tenant_date_range = "1000,2025";
+            String date_range = request.getParameter("date_range");
+            if (date_range == null || date_range.isBlank()) {
+                date_range = "1000,2025";
             }
-            String[] years = tenant_date_range.split(",");
+            String[] years = date_range.split(",");
             RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
                             .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
                     .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
@@ -335,7 +335,7 @@ public class IndexSearcher {
             ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
 
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
         return ret;
@@ -350,11 +350,11 @@ public class IndexSearcher {
                 lang = "cs";
             }
 
-            String tenant_date_range = request.getParameter("tenant_date_range");
-            if (tenant_date_range == null || tenant_date_range.isBlank()) {
-                tenant_date_range = "1000,2025";
+            String date_range = request.getParameter("date_range");
+            if (date_range == null || date_range.isBlank()) {
+                date_range = "1000,2025";
             }
-            String[] years = tenant_date_range.split(",");
+            String[] years = date_range.split(",");
             RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
                             .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
                     .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
@@ -408,7 +408,7 @@ public class IndexSearcher {
             resp = null; 
             solr.close();
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
         return ret;
@@ -421,11 +421,11 @@ public class IndexSearcher {
             if (lang == null) {
                 lang = "cs";
             }
-            String tenant_date_range = request.getParameter("tenant_date_range");
-            if (tenant_date_range == null || tenant_date_range.isBlank()) {
-                tenant_date_range = "1000,2025";
+            String date_range = request.getParameter("date_range");
+            if (date_range == null || date_range.isBlank()) {
+                date_range = "1000,2025";
             }
-            String[] years = tenant_date_range.split(",");
+            String[] years = date_range.split(",");
             RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
                             .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
                     .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
@@ -468,7 +468,7 @@ public class IndexSearcher {
             ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
 
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
         return ret;
@@ -481,11 +481,11 @@ public class IndexSearcher {
             if (lang == null) {
                 lang = "cs";
             }
-            String tenant_date_range = request.getParameter("tenant_date_range");
-            if (tenant_date_range == null || tenant_date_range.isBlank()) {
-                tenant_date_range = "1000,2025";
+            String date_range = request.getParameter("date_range");
+            if (date_range == null || date_range.isBlank()) {
+                date_range = "1000,2025";
             }
-            String[] years = tenant_date_range.split(",");
+            String[] years = date_range.split(",");
             RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
                             .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
                     .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
@@ -528,7 +528,7 @@ public class IndexSearcher {
             ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
 
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
         return ret;
@@ -543,11 +543,11 @@ public class IndexSearcher {
                 lang = "cs";
             }
 
-            String tenant_date_range = request.getParameter("tenant_date_range");
-            if (tenant_date_range == null || tenant_date_range.isBlank()) {
-                tenant_date_range = "1000,2025";
+            String date_range = request.getParameter("date_range");
+            if (date_range == null || date_range.isBlank()) {
+                date_range = "1000,2025";
             }
-            String[] years = tenant_date_range.split(",");
+            String[] years = date_range.split(",");
             RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1MONTH")
                             .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
                     .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
@@ -630,7 +630,7 @@ public class IndexSearcher {
             resp = null; 
             solr.close();
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
         return ret;
@@ -648,7 +648,7 @@ public class IndexSearcher {
             }
         } else {
             String[] tenants = request.getParameterValues("tenant");
-            if (tenants.length > 0) {
+            if (tenants != null && tenants.length > 0) {
                 jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
             }
         }    

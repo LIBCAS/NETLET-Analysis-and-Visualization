@@ -83,7 +83,7 @@ public class DataServlet extends HttpServlet {
                     HikoIndexer hi = new HikoIndexer();
                     json = hi.full();
                 } catch (Exception ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
+                    LOGGER.log(Level.SEVERE, "Error {0}", ex);
                     json.put("error", ex.toString());
                 }
                 return json;
@@ -138,9 +138,8 @@ public class DataServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
-                if (request.getParameter("tenant") != null) { 
-                    ret = IndexSearcher.getMapLetters(request);
-                }
+                ret = IndexSearcher.getMapLetters(request);
+                
                 return ret;
             }
         },
@@ -148,9 +147,8 @@ public class DataServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
-                if (request.getParameter("tenant") != null) { 
-                    ret = IndexSearcher.getIdentityLetters(request);  
-                }
+                ret = IndexSearcher.getIdentityLetters(request);  
+                
                 return ret;
             }
         },
@@ -158,19 +156,16 @@ public class DataServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
-                if (request.getParameter("tenant") != null) { 
-                    ret = IndexSearcher.relation(request);
-                }
+                ret = IndexSearcher.relation(request);
+                
                 return ret;
             }
         },
         KEYWORDS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = new JSONObject();
-                if (request.getParameter("tenant") != null) {
-                    ret = IndexSearcher.getKeywords(request);
-                }
+                JSONObject ret = IndexSearcher.getKeywords(request);
+                
                 return ret;
             }
         },
@@ -178,9 +173,8 @@ public class DataServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
-                if (request.getParameter("tenant") != null) {
-                    ret = IndexSearcher.periods(request);
-                }
+                ret = IndexSearcher.periods(request);
+                
                 return ret;
             }
         },
@@ -188,9 +182,7 @@ public class DataServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
-                if (request.getParameter("tenant") != null) {
                     ret = IndexSearcher.getProfessions(request);
-                }
                 return ret;
             }
         },
@@ -198,9 +190,7 @@ public class DataServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
-                if (request.getParameter("tenant") != null) {
                     ret = IndexSearcher.getTimeLine(request);
-                }
                 return ret;
             }
         }; 

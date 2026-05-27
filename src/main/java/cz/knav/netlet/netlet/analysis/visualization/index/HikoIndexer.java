@@ -110,7 +110,7 @@ public class HikoIndexer {
             }
 
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
 
@@ -139,7 +139,7 @@ public class HikoIndexer {
             }
 
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
 
@@ -167,7 +167,7 @@ public class HikoIndexer {
             }
 
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
 
@@ -193,7 +193,7 @@ public class HikoIndexer {
             }
             client.commit("hiko");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
 
@@ -217,7 +217,7 @@ public class HikoIndexer {
             }
             client.commit("hiko");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
         Date end = new Date();

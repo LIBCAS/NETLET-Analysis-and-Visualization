@@ -4,8 +4,8 @@ import { Injectable, signal } from "@angular/core";
 export interface Tenant {
     val: string,
     count: number,
-    //date_year_max: number,
-    //date_year_min: number,
+    date_year_max: number,
+    date_year_min: number,
     date_computed_max_s: string,
     date_computed_min_s: string,
     date_computed_max: Date,
@@ -89,11 +89,23 @@ export interface Tenant {
     let min = new Date();
     let max = new Date('1000-01-01');
     this.tenants.forEach(t => {
+      //if (t.selected) {
+        min = min > new Date(t.date_computed_min_s) ? new Date(t.date_computed_min_s) : min;
+        max = max > new Date(t.date_computed_max_s) ? max : new Date(t.date_computed_max_s);
+      //}
+    });
+    return [min,max];
+  }
+
+  getTenantsRangeNumber(): [number, number] {
+    let min = 3000;
+    let max = 1000;
+    this.tenants.forEach(t => {
       if (t.selected) {
         // min = Math.min(min, t.date_computed_min.getFullYear());
         // max = Math.max(max, t.date_computed_max.getFullYear());
-        min = min > t.date_computed_min ? t.date_computed_min : min;
-        max = max > t.date_computed_max ? max : t.date_computed_max;
+        min = min > t.date_year_min ? t.date_year_min : min;
+        max = max > t.date_year_max ? max : t.date_year_max;
       }
     });
     return [min,max];
@@ -106,8 +118,8 @@ export interface Tenant {
       if (t.selected) {
         // min = Math.min(min, t.date_computed_min.getFullYear());
         // max = Math.max(max, t.date_computed_max.getFullYear());
-        min = min > t.date_computed_min ? t.date_computed_min : min;
-        max = max > t.date_computed_max ? max : t.date_computed_max;
+        min = min > new Date(t.date_computed_min_s) ? new Date(t.date_computed_min_s) : min;
+        max = max > new Date(t.date_computed_max_s) ? max : new Date(t.date_computed_max_s);
       }
     });
     return [min.toISOString(),max.toISOString()];

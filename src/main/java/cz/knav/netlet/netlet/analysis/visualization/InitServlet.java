@@ -71,7 +71,7 @@ public class InitServlet extends HttpServlet {
 //      try {
 //          Indexer.closeClient();
 //      } catch (IOException ex) {
-//          LOGGER.log(Level.SEVERE, null, ex);
+//          LOGGER.log(Level.SEVERE, "Error {0}", ex);
 //      }
       
   }

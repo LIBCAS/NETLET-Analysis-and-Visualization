@@ -30,7 +30,7 @@ public class Options {
                 _sharedInstance = new Options();
             }
         } catch (IOException | JSONException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
         }
         return _sharedInstance;
     }

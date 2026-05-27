@@ -66,6 +66,7 @@ export class TimelineComponent {
   letters = signal<Letter[]>([]);
   showLetters = signal<boolean>(false);
   hasFacets = signal<boolean>(false);
+  tenants: Tenant[] = [];
   limits: [Date, Date];
   chartOptions: EChartsOption | any;
   chart: ECharts;
@@ -91,10 +92,10 @@ export class TimelineComponent {
     private config: AppConfiguration
   ) {
     effect(() => {
-      // this.tenant = this.state.selectedTenants()[0];
-      // if (this.tenant) {
-      //   this.changeTenant();
-      // }
+      this.tenants = this.state.selectedTenants();
+      if (this.tenants.length > 0) {
+        this.changeTenant();
+      }
     })
   }
 
@@ -108,6 +109,11 @@ export class TimelineComponent {
     this.limits = this.state.getTenantsRange();
     this.getData(true);
     
+  }
+
+  clickTenant(t: Tenant) {
+    this.state.setSelectedTenants();
+    this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
   }
 
   onChartInit(e: any) {
@@ -178,10 +184,8 @@ export class TimelineComponent {
         this.setOptions([])
       }
     const p: any = {};
-    //p.tenant = this.tenant.val;
-    p.other_tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
-    //p.tenant_date_range = this.tenant.date_computed_min.toISOString() + ',' + this.tenant.date_computed_max.toISOString();
     
       p.rows = this.rows;
 

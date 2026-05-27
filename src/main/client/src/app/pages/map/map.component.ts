@@ -152,7 +152,7 @@ export class MapComponent {
     }
     const p: any = {};
     p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
-    p.tenant_date_range = this.state.getTenantsRangeISO().toString();
+    p.tenant_year_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
 
     this.state.addFilters(p, this.usedFacets);

@@ -55,7 +55,7 @@ public class HikoDbIndexer {
             }
             ps.close();
         } catch (NamingException | SQLException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.add("error");
         }
 
@@ -72,7 +72,7 @@ public class HikoDbIndexer {
             }
             
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.add("error");
         }
 
@@ -91,7 +91,7 @@ public class HikoDbIndexer {
                 getLetters(client, ret, tenant, success);
             }
         } catch (NamingException | SQLException | IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
             ret.put("error", ex);
         }
         Date end = new Date();
@@ -141,7 +141,7 @@ public class HikoDbIndexer {
             }
             rs.close();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
+            LOGGER.log(Level.SEVERE, "Error {0}", e);
             ret.put("error" + t, e);
         }
         ps.close();
@@ -194,7 +194,7 @@ public class HikoDbIndexer {
             }
             rs.close();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
+            LOGGER.log(Level.SEVERE, "Error {0}", e);
         }
         psPlaces.close();
     }
@@ -224,7 +224,7 @@ public class HikoDbIndexer {
             }
             rs.close();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
+            LOGGER.log(Level.SEVERE, "Error {0}", e);
         }
         psIdentity.close();
     }
@@ -264,7 +264,7 @@ public class HikoDbIndexer {
             }
             rs.close();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
+            LOGGER.log(Level.SEVERE, "Error {0}", e);
         }
         ps.close();
     }
@@ -280,7 +280,7 @@ public class HikoDbIndexer {
             }
             rs.close();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
+            LOGGER.log(Level.SEVERE, "Error {0}", e);
         }
         psCat.close();
 
@@ -306,7 +306,7 @@ public class HikoDbIndexer {
             rs.close();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error adding keywords for tenant: {0}", tenant);
-            LOGGER.log(Level.SEVERE, null, e);
+            LOGGER.log(Level.SEVERE, "Error {0}", e);
         }
         ps.close();
     }
@@ -346,7 +346,7 @@ public class HikoDbIndexer {
             }
             rs.close();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
+            LOGGER.log(Level.SEVERE, "Error {0}", e);
         }
         ps.close();
         return ret;
@@ -363,7 +363,7 @@ public class HikoDbIndexer {
             }
             rs.close();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, null, e);
+            LOGGER.log(Level.SEVERE, "Error {0}", e);
         }
         psCat.close();
 
@@ -389,7 +389,7 @@ public class HikoDbIndexer {
             rs.close();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error adding keywords for tenant: {0}", tenant);
-            LOGGER.log(Level.SEVERE, null, e);
+            LOGGER.log(Level.SEVERE, "Error {0}", e);
         }
         ps.close();
         return ret;
