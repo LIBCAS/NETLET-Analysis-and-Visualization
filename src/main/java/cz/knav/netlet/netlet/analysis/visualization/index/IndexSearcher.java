@@ -312,7 +312,7 @@ public class IndexSearcher {
                     .withFacet("date_year", rangeFacet)
                     .withFacet("keywords_cs", keywords_csFacet)
                     .withFacet("keywords_categories", categories_csFacet)
-                    .withFacet("identity_mentioned", identity_mentionedFacet)
+                    .withFacet("mentioned", identity_mentionedFacet)
                     .withFacet("tenants", new TermsFacetMap("tenant")
                             .setLimit(1000)
                             .withDomain(new DomainMap()
@@ -320,10 +320,10 @@ public class IndexSearcher {
                             //.withTagsToExclude("fftenant")
                             )
                             .setMinCount(1))
-                    .withFacet("identity_recipient", new TermsFacetMap("identity_recipient")
+                    .withFacet("recipients", new TermsFacetMap("identity_recipient")
                             .setLimit(1000)
                             .setMinCount(1))
-                    .withFacet("identity_author", new TermsFacetMap("identity_author")
+                    .withFacet("authors", new TermsFacetMap("identity_author")
                             .setLimit(1000)
                             .setMinCount(1));
             

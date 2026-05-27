@@ -28,11 +28,6 @@ export class AppComponent {
       tenant.split(',').forEach(tenant =>  {
         const st = this.state.tenants.find(t => t.val === tenant);
         if (st) {
-          if (!mainTenant) {
-            this.state.tenant.set(st);
-            mainTenant = true;
-          }
-          
           st.selected = true;
         }
       });

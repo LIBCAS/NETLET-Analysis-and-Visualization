@@ -29,7 +29,7 @@ import {
 
 import L, { latLng, Map, tileLayer as LtileLayer, MapOptions } from "leaflet";
 
-import { EChartsOption, ECharts, EffectScatterSeriesOption, ScatterSeriesOption, VisualMapComponentOption, GraphSeriesOption, color } from 'echarts';
+import { VisualMapComponentOption, GraphSeriesOption, color } from 'echarts';
 import { use, init, EChartsType, ComposeOption } from "echarts/core";
 
 import * as echarts from 'echarts/core';
@@ -39,6 +39,7 @@ import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AppConfiguration } from '../../app-configuration';
+import { FacetsComponent } from "../../components/facets/facets.component";
 
 
 type ECOption = ComposeOption<
@@ -54,10 +55,10 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Titl
 
 @Component({
   selector: 'app-map',
-  imports: [TranslateModule, FormsModule, LeafletModule, 
-    MatCardModule, MatExpansionModule, MatCheckboxModule, MatFormFieldModule, 
-    MatSelectModule, MatInputModule, MatListModule, MatIconModule, 
-    MatProgressBarModule, YearsChartComponent, LettersInfoComponent],
+  imports: [TranslateModule, FormsModule, LeafletModule,
+    MatCardModule, MatExpansionModule, MatCheckboxModule, MatFormFieldModule,
+    MatSelectModule, MatInputModule, MatListModule, MatIconModule,
+    MatProgressBarModule, YearsChartComponent, LettersInfoComponent, FacetsComponent],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss'
 })
@@ -85,7 +86,8 @@ export class MapComponent {
   graphChart: EChartsType;
 
   nodes: { [id: string]: { coords: [number, number], name: string } } = {};
-  links: { [id: string]: { node1: [number, number], node2: [number, number], count: number, letters: Letter[] } } = {};
+  links: { [id: string]: { node1: [number, number], node2: [number, number], count: number, 
+    letters: Letter[], authors: string[], recipients: string[] } } = {};
   limits: [Date, Date];
 
   infoContent: string;
@@ -149,11 +151,11 @@ export class MapComponent {
       this.links = {};
     }
     const p: any = {};
-    // p.tenant = this.tenant.val;
     p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
     p.tenant_date_range = this.state.getTenantsRangeISO().toString();
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
-    // p.tenant_date_range = this.tenant.date_computed_min.getFullYear() + ',' + this.tenant.date_computed_max.getFullYear();
+
+    this.state.addFilters(p, this.usedFacets);
     if (!withMap) {
       p.rows = 0;
     } else {
@@ -181,7 +183,7 @@ export class MapComponent {
         }
 
       }
-      this.authors = resp.facets.recipients ? resp.facets.authors.buckets : [];
+      this.authors = resp.facets.authors ? resp.facets.authors.buckets : [];
       this.recipients = resp.facets.recipients ? resp.facets.recipients.buckets : [];
       this.mentioned = resp.facets.mentioned ? resp.facets.mentioned.buckets : [];
       if (withMap) {
@@ -193,12 +195,14 @@ export class MapComponent {
       if (withMap) {
         this.setMap();
       } else {
-        this.graphChart.setOption({series: [
+        this.graphChart.setOption({
+          series: [
             {
               data: this.graphData.nodes,
               links: this.graphData.links,
             }
-          ]});
+          ]
+        });
       }
 
       this.loading = false;
@@ -207,11 +211,13 @@ export class MapComponent {
 
   changeRunning(r: boolean) {
     this.running = r;
-    this.graphChart.setOption({series: [
-            {
-              animation: !this.running
-            }
-          ]});
+    this.graphChart.setOption({
+      series: [
+        {
+          animation: !this.running
+        }
+      ]
+    });
   }
 
   changeLimits(limits: [Date, Date]) {
@@ -224,10 +230,18 @@ export class MapComponent {
 
   }
 
+  usedFacets: { field: string, value: string }[] = [];
+  onFiltersChanged(usedFacets: { field: string, value: string }[]) {
+    this.usedFacets = usedFacets;
+    this.getData(true);
+  }
+
   graphData: {
     links: {
       source: string,
-      target: string
+      target: string,
+      authors: string[],
+      recipients: string[]
     }[],
     nodes: {
       category: number,
@@ -240,11 +254,19 @@ export class MapComponent {
 
 
 
+  showNodeExt(e: any) {
+    this.highlightLinks(e.field, e.value)
+  }
+
   hideNode() {
     this.graphChart.dispatchAction({
       type: 'hideTip'
     });
     this.graphChart.dispatchAction({
+      type: 'downplay'
+    });
+    this.graphChart.dispatchAction({
+      dataType:'edge',
       type: 'downplay'
     });
 
@@ -268,7 +290,22 @@ export class MapComponent {
 
   clearHighlight() { }
 
-  highlightLinks(identity: JSONFacet) { }
+  highlightLinks(field: string, val: string) { 
+    //const idx = this.graphData.links.findIndex(n => n.authors.includes(val));
+    const idxs: number[] = [];
+    this.graphData.links.forEach((n: any, idx: number) => {
+      if (n[field]?.includes(val)) {
+        idxs.push(idx)
+      }
+    });
+    this.graphChart.dispatchAction({
+      type: 'highlight',
+      seriesIndex: 0,
+      dataType:'edge',
+      dataIndex: idxs
+    });
+    
+  }
 
   closeInfo() {
     this.infoHeader = '';
@@ -303,6 +340,8 @@ export class MapComponent {
             this.links[linkId] = {
               node1: [place_origin.latitude, place_origin.longitude],
               node2: [place_destination.latitude, place_destination.longitude],
+              authors: letter.identity_author,
+              recipients: letter.identity_recipient,
               count: 1,
               letters: [letter]
             };
@@ -310,6 +349,8 @@ export class MapComponent {
               id: linkId,
               source: letter.origin_id,
               target: letter.destination_id,
+              authors: letter.identity_author,
+              recipients: letter.identity_recipient,
               label: place_origin.name + ' > ' + place_destination.name,
               labelReversed: place_destination.name + ' > ' + place_origin.name,
               count: this.links[linkId].count,
@@ -320,6 +361,8 @@ export class MapComponent {
           } else {
             this.links[linkId].count++;
             this.links[linkId].letters.push(letter);
+            this.links[linkId].authors.concat(letter.identity_author)
+            this.links[linkId].recipients.concat(letter.identity_recipient)
           }
         }
       };
@@ -337,7 +380,6 @@ export class MapComponent {
       links,
       nodes
     };
-    //console.log(this.graphData)
 
   }
 
@@ -412,7 +454,7 @@ export class MapComponent {
     if (!this.graphChart) {
       this.graphChart = init(d);
     }
-    
+
     this.graphChart.setOption(this.graphOptions);
 
     this.graphChart.on('click', (params: any) => {
@@ -424,7 +466,7 @@ export class MapComponent {
           // this.infoContent = `<div>From: ${lettersFrom.length}</div><div>To: ${lettersTo.length}</div>`;
 
 
-          this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => { return (letter.origin_name +'' === place) || (letter.destination_name +'' === place)});
+          this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => { return (letter.origin_name + '' === place) || (letter.destination_name + '' === place) });
           this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
           this.infoHeader = `Letters from/to ${params.data.name}`;
           this.infoType = 'place';
@@ -447,7 +489,7 @@ export class MapComponent {
           //   }
           // });
           // this.infoContent = popup;
-          this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin_id + '' === params.data.source + ''  && letter.destination_id + '' === params.data.target + '');
+          this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin_id + '' === params.data.source + '' && letter.destination_id + '' === params.data.target + '');
           this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'origin_name', 'destination_name', 'date_year', 'action'];
           this.infoHeader = `Letters from ${params.data.label} (${this.infoData.length})`;
           this.infoType = 'link';
@@ -458,7 +500,7 @@ export class MapComponent {
             docs: reversed
           };
 
-          
+
           this.state.showInfo.set(true);
         });
 

@@ -20,7 +20,6 @@ export interface Tenant {
 
     public showInfo = signal<boolean>(false);
     public tenants: Tenant[] = [];
-    public tenant = signal<Tenant>(null);
     public selectedTenants = signal<Tenant[]>([]);
     views = [
     {
@@ -79,7 +78,6 @@ export interface Tenant {
   changeMainTenant(t: Tenant) {
     this.tenants.forEach(te => te.selected = false);
     t.selected = true;
-    this.tenant.set(t);
     this.setSelectedTenants();
   }
 

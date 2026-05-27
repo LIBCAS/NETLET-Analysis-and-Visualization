@@ -9,7 +9,6 @@
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
   <div style="flex: 1 30%;" class="app-filters">
 
-    @if (state.tenant()) {
       <div>
         <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
           <mat-expansion-panel-header>
@@ -18,16 +17,21 @@
           <mat-list>
             @for(k of state.tenants; track $index; let idx = $index;){
               <mat-list-item (click)="clickTenant(k)">
-                <mat-checkbox [disabled]="k.val === state.tenant().val" 
+                <mat-checkbox
                 [(ngModel)]="k.selected"><span [style.color]="config.tenant_colors[k.val]">{{ k.val}} ({{k.count}}) </span></mat-checkbox>
               </mat-list-item>
             }
           </mat-list>
         </mat-expansion-panel>
       </div>
-    }
+    
 
-    @if (authors) {
+     @if(solrResponse?.facets) {
+    <app-facets [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'professions', 'origins', 'destinations']"
+      [facets]="solrResponse.facets" (onFiltersChanged)="onFiltersChanged($event)" (onMouserOver)="showNodeExt($event)"
+      (onMouseOut)="hideNode()"></app-facets> }
+
+    <!-- @if (authors) {
       <div>
         <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
           <mat-expansion-panel-header>
@@ -67,7 +71,7 @@
     </mat-expansion-panel>
   </div>
 }
-<!-- <div *ngIf="mentioned">
+<div *ngIf="mentioned">
 <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
   <mat-expansion-panel-header>
     <mat-panel-title> {{ 'field.mentioned' | translate}} </mat-panel-title>
