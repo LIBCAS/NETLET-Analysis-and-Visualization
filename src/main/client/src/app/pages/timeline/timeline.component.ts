@@ -74,7 +74,7 @@ export class TimelineComponent {
 
   date_facet: { buckets: JSONFacet[], after: { count: number } };
 
-  displayedColumns = ['id', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
+  displayedColumns = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
   rows = 100;
   numFound: number = 0;
   pageIndex = 0;
