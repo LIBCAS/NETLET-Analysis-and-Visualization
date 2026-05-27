@@ -1,4 +1,4 @@
-import { Component, effect, input, output } from '@angular/core';
+import { Component, effect, inject, input, output } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
 import { TranslateModule } from '@ngx-translate/core';
@@ -6,12 +6,19 @@ import { FacetFields, JSONFacet } from '../../shared/facet';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
+import {FormArray, FormBuilder, FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import { map, Observable, startWith } from 'rxjs';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
   selector: 'app-facets',
   imports: [TranslateModule, MatExpansionModule, MatListModule,
-    MatCheckboxModule, MatTooltipModule, MatIconModule
-  ],
+    MatCheckboxModule, MatTooltipModule, MatIconModule, 
+    MatAutocompleteModule, MatInputModule, MatFormFieldModule,
+    FormsModule, ReactiveFormsModule],
   templateUrl: './facets.component.html',
   styleUrl: './facets.component.scss'
 })
@@ -28,10 +35,52 @@ export class FacetsComponent {
   hasUsedFacets: boolean;
   usedFacets: {field: string, value: string}[] = [];
 
-  constructor() {}
+  //filteredOptions: Observable<string[]>;
+  filteredOptions: string[];
+  controls: {[name: string]: FormControl<string>} = {};
+
+  log(e: any) {
+    console.log(e)
+  }
+
+  constructor() {
+
+    effect(() => {
+      const fs = this.fields();
+      if (fs) {
+        fs.forEach(f => {
+          if (this.facets()[f]) {
+            const c = new FormControl();
+            c.valueChanges.subscribe(v => {
+              this.filteredOptions = this._filter(v, f);
+            });
+            // this.filteredOptions = c.valueChanges.pipe(
+            //   startWith(''),
+            //   map(value => this._filter(value || '', f)),
+            // );
+            this.controls[f] = c;
+          }
+        })
+      }
+    })
+  }
+
+  private _filter(value: string, f: string): string[] {
+    const options = this.facets()[f].buckets.map(b => b.val);
+    const filterValue = value.toLowerCase();
+    return options.filter(option => option.toLowerCase().includes(filterValue));
+  }
 
   isUsed(field: string, value: string) {
     return this.usedFacets.findIndex(f => f.field === field && f.value === value) > -1;
+  }
+
+  clearAuto(f: string) {
+    this.controls[f].setValue('')
+  }
+
+  selectAuto(e: MatAutocompleteSelectedEvent, f: string) {
+    this.filter(f, e.option.value)
   }
   
   filter(field: string, value: string) {
