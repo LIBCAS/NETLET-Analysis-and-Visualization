@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Tenant, AppState } from '../../app-state';
 import { AppService } from '../../app.service';
-import { JSONFacet } from '../../shared/facet';
+import { FacetFields, JSONFacet } from '../../shared/facet';
 
 
 import { EChartsOption, ECharts } from 'echarts';
@@ -33,7 +33,7 @@ import { Letter } from '../../shared/letter';
 import { AppConfiguration } from '../../app-configuration';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
-import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { AngularSplitModule } from 'angular-split';
 echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent,
   GridComponent, TitleComponent, BrushComponent, ToolboxComponent, DataZoomComponent]);
@@ -63,6 +63,7 @@ export class TimelineComponent {
 
   loading: boolean;
   solrResponse: any;
+  facets = signal<FacetFields>(null);
   letters = signal<Letter[]>([]);
   showLetters = signal<boolean>(false);
   hasFacets = signal<boolean>(false);
@@ -81,6 +82,7 @@ export class TimelineComponent {
   pageSizeOptions = [10, 25, 100];
 
   getTimelineSubject = new Subject<boolean>();
+  excludeDate = true;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -105,15 +107,19 @@ export class TimelineComponent {
     this.getTimelineSubject.pipe(debounceTime(300)).subscribe(setGraph => {
       this.getData2(setGraph)
     });
-    
+
     this.limits = this.state.getTenantsRange();
-    this.getData(true);
+    this.tenants = this.state.selectedTenants();
+    if (this.tenants.length > 0) {
+      this.getData(true);
+    }
     
+
   }
 
   clickTenant(t: Tenant) {
     this.state.setSelectedTenants();
-    this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
+    this.router.navigate([], { queryParams: { tenant: this.state.tenants.filter(t => t.selected).map(t => t.val).toString() } });
   }
 
   onChartInit(e: any) {
@@ -123,9 +129,10 @@ export class TimelineComponent {
       // const letters = this.solrResponse.response.docs.filter((doc: Letter) => 
       //   (Date.parse(doc.date_computed) >= option.dataZoom[0].startValue) && (Date.parse(doc.date_computed) <= option.dataZoom[0].endValue));
       // this.letters.set(letters);
-      
+
       // this.showLetters.set(true);
 
+      this.excludeDate = false;
       this.limits = [new Date(option.dataZoom[0].startValue), new Date(option.dataZoom[0].endValue)];
       this.getData(false);
     });
@@ -136,8 +143,8 @@ export class TimelineComponent {
         this.getData(false);
         this.chart.dispatchAction({
           type: 'dataZoom',
-          startValue: new Date(year +'-01-01').getTime(),
-          endValue: new Date(year +'-12-31').getTime()
+          startValue: new Date(year + '-01-01').getTime(),
+          endValue: new Date(year + '-12-31').getTime()
         });
       }
     })
@@ -145,12 +152,13 @@ export class TimelineComponent {
   }
 
   changeTenant() {
+    this.excludeDate = true;
     this.getData(true);
     this.limits = this.state.getTenantsRange();
   }
 
-  usedFacets: {field: string, value: string}[] = [];
-  onFiltersChanged(usedFacets: {field: string, value: string}[]) {
+  usedFacets: { field: string, value: string }[] = [];
+  onFiltersChanged(usedFacets: { field: string, value: string }[]) {
     this.usedFacets = usedFacets;
     this.getData(true);
   }
@@ -177,17 +185,21 @@ export class TimelineComponent {
   }
 
   getData2(setGraph: boolean) {
+    console.log(setGraph)
     this.loading = true;
     this.letters.set([]);
+    this.facets.set(null);
     this.showLetters.set(false);
-      if (setGraph) {
-        this.setOptions([])
-      }
+    if (setGraph) {
+      this.setOptions([])
+    }
     const p: any = {};
     p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
-    
-      p.rows = this.rows;
+
+    p.rows = this.rows;
+
+    p.excludeDate = this.excludeDate;
 
     p.offset = this.pageIndex * p.rows;
     this.state.addFilters(p, this.usedFacets);
@@ -197,8 +209,9 @@ export class TimelineComponent {
       if (!resp) {
         return;
       }
-      
+
       this.solrResponse = resp;
+      this.facets.set(resp.facets)
       this.numFound = this.solrResponse.response.numFound;
 
       const letters = this.solrResponse.response.docs;
@@ -276,7 +289,7 @@ export class TimelineComponent {
   changeChartType() {
     this.loading = true;
     this.chart.clear();
-    setTimeout(()=>{
+    setTimeout(() => {
       const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
       this.setOptions(data);
       this.loading = false;

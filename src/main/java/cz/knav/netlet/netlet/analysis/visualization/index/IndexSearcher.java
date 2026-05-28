@@ -11,6 +11,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.client.solrj.request.json.DomainMap;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
+import org.apache.solr.client.solrj.request.json.QueryFacetMap;
 import org.apache.solr.client.solrj.request.json.RangeFacetMap;
 import org.apache.solr.client.solrj.request.json.TermsFacetMap;
 import org.apache.solr.client.solrj.response.InputStreamResponseParser;
@@ -551,6 +552,7 @@ public class IndexSearcher {
             RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1MONTH")
                             .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
                     .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+            QueryFacetMap qfm = new QueryFacetMap("date_year:[1000 TO 2000]").withSubFacet("date_computed_range", rangeFacet);
 
             String rowsP = request.getParameter("rows");
             int rows = 0;
@@ -577,15 +579,15 @@ public class IndexSearcher {
             JsonQueryRequest jrequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     //.withFilter("status:publish")
-                    .withFilter("-date_year:0")
+                    //.withFilter("-date_year:0")
                     .setLimit(rows)
                     .setOffset(offset)
-                    .withFilter("identity_recipient:*")
-                    .withFilter("identity_author:*")
-                    .setSort("date_computed asc")
+//                    .withFilter("identity_recipient:*")
+//                    .withFilter("identity_author:*")
+                    .setSort("date_year asc,date_computed asc")
                     .returnFields("letter_id,tenant,date_computed,date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_computed_range", rangeFacet)
-                    // .withFacet("keywords_categories", categoriesFacet)
+                    //.withFacet("qfm", qfm)
                     .withFacet("origins", new TermsFacetMap("origin_name")
                             .setLimit(1000)
                             .setSort("index")
@@ -618,9 +620,7 @@ public class IndexSearcher {
                             .withDomain(new DomainMap().withTagsToExclude("ffauthors"))
                             .setMinCount(1));
             
-            jrequest = addFilters(request, jrequest, lang);
-//            QueryResponse queryResponse = jrequest.process(solr, "hiko");
-//            ret = new JSONObject(queryResponse.jsonStr());
+            jrequest = addFilters(request, jrequest, lang,  Boolean.parseBoolean(request.getParameter("excludeDate")));
 
             jrequest.setResponseParser(new InputStreamResponseParser("json"));
             NamedList<Object> resp = solr.request(jrequest, "hiko");
@@ -637,6 +637,10 @@ public class IndexSearcher {
     }
     
     public static JsonQueryRequest addFilters(HttpServletRequest request, JsonQueryRequest jrequest, String lang) {
+        return addFilters(request, jrequest, lang, false);
+    }
+    
+    public static JsonQueryRequest addFilters(HttpServletRequest request, JsonQueryRequest jrequest, String lang, boolean excludeDateRange) {
         String other_tenant = request.getParameter("other_tenant");
         if (other_tenant != null) {
             String tenant = request.getParameter("tenant");
@@ -651,13 +655,15 @@ public class IndexSearcher {
             if (tenants != null && tenants.length > 0) {
                 jrequest = jrequest.withFilter("{!tag=fftenant}tenant:(" + String.join(" ", tenants) + ")");
             }
-        }    
+        }   
+        
+        if (!excludeDateRange) {
             
             String date_range = request.getParameter("date_range");
             if (date_range != null && !date_range.isBlank()) {
                 jrequest = jrequest.withFilter("{!tag=ffdate_range}date_computed_range:[" + date_range.replaceAll(",", " TO ") + "]");
             }
-
+        }
             if (request.getParameter("author") != null) {
                 jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(\"" + String.join("\" OR \"", request.getParameterValues("author")) + "\")");
             }

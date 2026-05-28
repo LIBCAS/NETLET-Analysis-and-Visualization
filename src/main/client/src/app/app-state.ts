@@ -88,11 +88,12 @@ export interface Tenant {
   getTenantsRange(): [Date, Date] {
     let min = new Date();
     let max = new Date('1000-01-01');
+    const hasSelected = this.selectedTenants().length > 0;
     this.tenants.forEach(t => {
-      //if (t.selected) {
+      if (!hasSelected || t.selected) {
         min = min > new Date(t.date_computed_min_s) ? new Date(t.date_computed_min_s) : min;
         max = max > new Date(t.date_computed_max_s) ? max : new Date(t.date_computed_max_s);
-      //}
+      }
     });
     return [min,max];
   }

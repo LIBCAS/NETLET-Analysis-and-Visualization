@@ -19,11 +19,11 @@
           </mat-expansion-panel>
         </div>
 
-      @if(solrResponse?.facets) {
+      @if(facets()) {
       <app-facets
         [fields]="['authors', 'recipients', 'mentioned','keyword_categories',  'professions', 'origins', 'destinations']"
         [sub_fields]="{'keyword_categories': 'keywords'}"
-        [facets]="solrResponse.facets" (onFiltersChanged)="onFiltersChanged($event)"></app-facets> }
+        [facets]="facets()" (onFiltersChanged)="onFiltersChanged($event)"></app-facets> }
     </div>
   </as-split-area>
   <as-split-area>
@@ -52,7 +52,8 @@
 
         </div>
         <div style="height: 400px; max-width: 100%;  overflow: auto;">
-          @if (showLetters()){
+          @if (letters().length > 0){
+          }
           <table mat-table [dataSource]="letters()">
 
             <ng-container matColumnDef="id">
@@ -102,7 +103,6 @@
             <tr mat-header-row *matHeaderRowDef="displayedColumns sticky: true"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
           </table>
-          }
         </div>
 
       </div>
