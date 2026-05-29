@@ -70,6 +70,12 @@ export class MapViewComponent implements OnInit {
     private service: AppService
   ) {
     effect(() => {
+      effect(() => {
+      const sc = this.state.stateChanged();
+      if (sc > 0 && this.tenants.length > 0) {
+        this.getData(true);
+      }
+    })
       this.tenants = this.state.selectedTenants();
       if (this.tenants.length > 0) {
         this.changeTenant();

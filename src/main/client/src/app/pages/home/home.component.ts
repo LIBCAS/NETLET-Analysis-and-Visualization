@@ -10,10 +10,11 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatIconModule } from "@angular/material/icon";
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
+import {form, FormField} from '@angular/forms/signals';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterModule, TranslateModule, FormsModule,
+  imports: [RouterModule, TranslateModule, FormsModule, FormField,
     MatCardModule, MatButtonModule, MatFormFieldModule,  MatInputModule,
     MatSelectModule, MatIconModule],
   templateUrl: './home.component.html',
@@ -21,18 +22,14 @@ import { MatInputModule } from '@angular/material/input';
 })
 export class HomeComponent {
 
-  // searchModel = signal({
-  //   tenants: [],
-  //   identities: '',
-  //   places: '',
-  //   keywords: '',
-  // });
+  searchModel = signal({
+    tenants: [],
+    identities: '',
+    places: '',
+    keywords: '',
+  });
 
-  // searchForm = form(this.searchModel);
-
-  identities: string;
-  places: string;
-  keywords: string;
+  searchForm = form(this.searchModel);
 
   constructor(public state: AppState){}
 
@@ -49,10 +46,11 @@ export class HomeComponent {
 
     // this.state.usedFacets.update(f => [...this.usedFacets]);
     // this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
+    console.log(this.searchModel())
   }
 
   search() {
-
+    this.setFilters();
   }
 
 }

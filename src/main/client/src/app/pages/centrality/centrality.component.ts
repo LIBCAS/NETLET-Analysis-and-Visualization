@@ -1,6 +1,6 @@
 
 import { HttpParams } from '@angular/common/http';
-import { Component, effect, Inject, NgZone, DOCUMENT } from '@angular/core';
+import { Component, effect, Inject, NgZone, DOCUMENT, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -23,7 +23,7 @@ import { GraphChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { Letter } from '../../shared/letter';
-import { JSONFacet } from '../../shared/facet';
+import { FacetFields, JSONFacet } from '../../shared/facet';
 import { LabelLayout } from "echarts/features";
 import { identity } from 'rxjs';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -48,6 +48,7 @@ export class CentralityComponent {
   loading: boolean;
   running: boolean;
   solrResponse: any;
+  facets = signal<FacetFields>({});
   limits: [Date, Date];
   tenants: Tenant[] = [];
   graphOptions: EChartsOption = {};
@@ -104,12 +105,16 @@ export class CentralityComponent {
     public state: AppState,
     private service: AppService
   ) {
+
     effect(() => {
       this.tenants = this.state.selectedTenants();
       if (this.tenants.length > 0) {
         this.changeTenant();
+      } else {
+        this.loading = false;
+        this.facets.set({});
       }
-    })
+    });
   }
 
   ngOnInit(): void {
@@ -134,13 +139,22 @@ export class CentralityComponent {
           this.recipientLabel(params.data.name);
         } 
       }
-    })
+    });
+
+    this.graphChart.on('mouseover', {seriesIndex: 0}, (params: any) => {
+      this.showNodeExt({field: params.data.category, value: params.data.name})
+    });
+
+    this.graphChart.on('mouseout', {seriesIndex: 0}, (params: any) => {
+      this.hideNode()
+    });
+
+    
   }
 
   clickTenant(t: Tenant) {
     this.state.setSelectedTenants();
     this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
-    //this.state.tenant.set(t);
   }
 
   changeTenant() {
@@ -228,10 +242,6 @@ export class CentralityComponent {
     this.selected.push(this.graphData.nodes.findIndex(n => n.id === e.value + '_mentioned'));
 
     this.showNodes(this.selected);
-
-    // this.showNode({field: 'authors', value: e.value});
-    // this.showNode({field: 'recipients', value: e.value});
-    // this.showNode({field: 'mentioned', value: e.value});
   }
 
   hideNode() {
@@ -257,6 +267,7 @@ export class CentralityComponent {
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     p.recipient = this.selectedRecipients;
     this.state.addFilters(p);
+    this.facets.set({})
     if (!setResponse) {
       p.rows = 0;
     } else {
@@ -269,6 +280,7 @@ export class CentralityComponent {
       if (setResponse) {
         this.solrResponse = resp;
       }
+      this.facets.set(resp.facets);
 
       this.authors = resp.facets.authors.buckets;
       this.recipients = resp.facets.recipients.buckets;

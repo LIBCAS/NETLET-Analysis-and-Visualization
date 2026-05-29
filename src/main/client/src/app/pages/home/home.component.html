@@ -2,7 +2,7 @@
     <mat-card appearance="outlined" class=" app-fill-w">
         <mat-form-field appearance="outline" >
             <mat-label>{{ 'tenants' | translate}}</mat-label>
-            <mat-select multiple="true">
+            <mat-select multiple="true" [formField]="searchForm.tenants">
                 @for (t of state.tenants; track t) {
                 <mat-option [value]="t">{{ t.val | translate}}</mat-option>
                 }
@@ -11,17 +11,17 @@
 
         <mat-form-field appearance="outline" >
             <mat-label>{{ 'identities' | translate}}</mat-label>
-            <input [(ngModel)]="identities" matInput />
+            <input [formField]="searchForm.identities" matInput />
         </mat-form-field>
 
         <mat-form-field appearance="outline" >
             <mat-label>{{ 'places' | translate}}</mat-label>
-            <input [(ngModel)]="places" matInput />
+            <input [formField]="searchForm.places" matInput />
         </mat-form-field>
 
         <mat-form-field appearance="outline" >
             <mat-label>{{ 'keywords' | translate}}</mat-label>
-            <input [(ngModel)]="keywords" matInput />
+            <input [formField]="searchForm.keywords" matInput />
         </mat-form-field>
         <button matIconButton [title]="'search' | translate" (click)="search()"><mat-icon>search</mat-icon></button>
     </mat-card>

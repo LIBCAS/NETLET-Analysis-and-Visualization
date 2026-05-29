@@ -109,6 +109,12 @@ export class MapComponent {
     private service: AppService
   ) {
     effect(() => {
+      const sc = this.state.stateChanged();
+      if (sc > 0 && this.tenants.length > 0) {
+        this.getData(true);
+      }
+    })
+    effect(() => {
       this.tenants = this.state.selectedTenants();
       if (this.tenants.length > 0) {
         this.changeTenant();
