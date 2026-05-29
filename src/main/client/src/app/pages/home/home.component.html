@@ -1,11 +1,37 @@
+<div class="app-home-form">
+    <mat-card appearance="outlined" class=" app-fill-w">
+        <mat-form-field appearance="outline" >
+            <mat-label>{{ 'tenants' | translate}}</mat-label>
+            <mat-select multiple="true">
+                @for (t of state.tenants; track t) {
+                <mat-option [value]="t">{{ t.val | translate}}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
 
-    <div class="app-home-tenant app-fxLayout app-row">
-        <h3>Vyberte katalog</h3>
-    </div>
+        <mat-form-field appearance="outline" >
+            <mat-label>{{ 'identities' | translate}}</mat-label>
+            <input [(ngModel)]="identities" matInput />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" >
+            <mat-label>{{ 'places' | translate}}</mat-label>
+            <input [(ngModel)]="places" matInput />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" >
+            <mat-label>{{ 'keywords' | translate}}</mat-label>
+            <input [(ngModel)]="keywords" matInput />
+        </mat-form-field>
+        <button matIconButton [title]="'search' | translate" (click)="search()"><mat-icon>search</mat-icon></button>
+    </mat-card>
+</div>
 
 <div class="app-home-layout app-fxLayout app-row app-fill">
+
+
     @for(card of state.views; track $index){
-    <mat-card appearance="outlined" >
+    <mat-card appearance="outlined">
         <mat-card-header>
             <mat-card-title> {{ 'home.' + card.header + '.header' | translate }} </mat-card-title>
         </mat-card-header>

@@ -2,28 +2,10 @@
 <as-split direction="horizontal" [unit]="'pixel'">
   <as-split-area [size]="320">
     <div style="flex: 1 30%;" class="app-filters">
-
-      <div>
-          <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-            <mat-expansion-panel-header>
-              <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
-            </mat-expansion-panel-header>
-            <mat-list>
-              @for(k of state.tenants; track $index; let idx = $index;){
-                <mat-list-item (click)="clickTenant(k)">
-                  <mat-checkbox 
-                  [(ngModel)]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
-                </mat-list-item>
-              }
-            </mat-list>
-          </mat-expansion-panel>
-        </div>
-
-      @if(facets()) {
       <app-facets
         [fields]="['authors', 'recipients', 'mentioned','keyword_categories',  'professions', 'origins', 'destinations']"
         [sub_fields]="{'keyword_categories': 'keywords'}"
-        [facets]="facets()" (onFiltersChanged)="onFiltersChanged($event)"></app-facets> }
+        [facets]="facets()" (onFiltersChanged)="onFiltersChanged($event)"></app-facets>
     </div>
   </as-split-area>
   <as-split-area>

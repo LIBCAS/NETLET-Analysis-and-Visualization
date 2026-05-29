@@ -223,7 +223,7 @@ export class IdentitiesComponent {
     } else {
       p.rows = 10000;
     }
-    this.state.addFilters(p, this.usedFacets);
+    this.state.addFilters(p);
     this.service.getIdentities(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;

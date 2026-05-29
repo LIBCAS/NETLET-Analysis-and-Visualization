@@ -155,7 +155,7 @@ export class MapComponent {
     p.tenant_year_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
 
-    this.state.addFilters(p, this.usedFacets);
+    this.state.addFilters(p);
     if (!withMap) {
       p.rows = 0;
     } else {

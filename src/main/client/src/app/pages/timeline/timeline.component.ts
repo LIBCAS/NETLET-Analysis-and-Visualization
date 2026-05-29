@@ -63,7 +63,7 @@ export class TimelineComponent {
 
   loading: boolean;
   solrResponse: any;
-  facets = signal<FacetFields>(null);
+  facets = signal<FacetFields>({});
   letters = signal<Letter[]>([]);
   showLetters = signal<boolean>(false);
   hasFacets = signal<boolean>(false);
@@ -94,9 +94,20 @@ export class TimelineComponent {
     private config: AppConfiguration
   ) {
     effect(() => {
+      const sc = this.state.stateChanged();
+      if (sc > 0 && this.tenants.length > 0) {
+        this.getData(true);
+      }
+    })
+    effect(() => {
       this.tenants = this.state.selectedTenants();
       if (this.tenants.length > 0) {
         this.changeTenant();
+      } else {
+        this.loading = false;
+        this.letters.set([]);
+        this.facets.set({});
+        this.setOptions([]);
       }
     })
   }
@@ -110,16 +121,16 @@ export class TimelineComponent {
 
     this.limits = this.state.getTenantsRange();
     this.tenants = this.state.selectedTenants();
-    if (this.tenants.length > 0) {
+    if (this.tenants.length > 0 || this.state.usedFacets().length > 0) {
       this.getData(true);
     }
-    
 
   }
 
   clickTenant(t: Tenant) {
     this.state.setSelectedTenants();
-    this.router.navigate([], { queryParams: { tenant: this.state.tenants.filter(t => t.selected).map(t => t.val).toString() } });
+    this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
+    //this.router.navigate([], { queryParams: { tenant: this.state.tenants.filter(t => t.selected).map(t => t.val).toString() } });
   }
 
   onChartInit(e: any) {
@@ -157,9 +168,9 @@ export class TimelineComponent {
     this.limits = this.state.getTenantsRange();
   }
 
-  usedFacets: { field: string, value: string }[] = [];
+  //usedFacets: { field: string, value: string }[] = [];
   onFiltersChanged(usedFacets: { field: string, value: string }[]) {
-    this.usedFacets = usedFacets;
+    //this.usedFacets = usedFacets;
     this.getData(true);
   }
 
@@ -185,10 +196,9 @@ export class TimelineComponent {
   }
 
   getData2(setGraph: boolean) {
-    console.log(setGraph)
     this.loading = true;
     this.letters.set([]);
-    this.facets.set(null);
+    this.facets.set({});
     this.showLetters.set(false);
     if (setGraph) {
       this.setOptions([])
@@ -202,7 +212,7 @@ export class TimelineComponent {
     p.excludeDate = this.excludeDate;
 
     p.offset = this.pageIndex * p.rows;
-    this.state.addFilters(p, this.usedFacets);
+    this.state.addFilters(p);
 
 
     this.service.getTimeline(p as HttpParams).subscribe((resp: any) => {

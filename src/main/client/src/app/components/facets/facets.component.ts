@@ -12,6 +12,8 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { map, Observable, startWith } from 'rxjs';
 import {AsyncPipe} from '@angular/common';
+import { AppState, Tenant } from '../../app-state';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-facets',
@@ -23,6 +25,8 @@ import {AsyncPipe} from '@angular/common';
   styleUrl: './facets.component.scss'
 })
 export class FacetsComponent {
+
+  readonly router = inject(Router);
 
   facets = input<FacetFields>();
   fields = input<string[]>([]);
@@ -43,11 +47,16 @@ export class FacetsComponent {
     console.log(e)
   }
 
-  constructor() {
+  constructor(public state: AppState) {
+
+    effect(() => {
+      this.usedFacets = this.state.usedFacets();
+      this.hasUsedFacets = this.usedFacets.length > 0;
+    })
 
     effect(() => {
       const fs = this.fields();
-      if (fs) {
+      if (fs && this.facets()) {
         fs.forEach(f => {
           if (this.facets()[f]) {
             const c = new FormControl();
@@ -71,6 +80,11 @@ export class FacetsComponent {
     return options.filter(option => option.toLowerCase().includes(filterValue));
   }
 
+  clickTenant(t: Tenant) {
+    this.state.setSelectedTenants();
+    this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
+  }
+
   isUsed(field: string, value: string) {
     return this.usedFacets.findIndex(f => f.field === field && f.value === value) > -1;
   }
@@ -91,13 +105,22 @@ export class FacetsComponent {
       this.usedFacets.push({field, value});
     }
     this.hasUsedFacets = this.usedFacets.length > 0;
-    this.onFiltersChanged.emit(this.usedFacets);
+
+    this.state.usedFacets.update(f => [...this.usedFacets]);
+    this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
+
+    // this.onFiltersChanged.emit(this.usedFacets);
   }
 
   unfilter(field: string, value: string) {
     this.usedFacets = this.usedFacets.filter(f => !(f.field === field && f.value === value));
     this.hasUsedFacets = this.usedFacets.length > 0;
-    this.onFiltersChanged.emit(this.usedFacets);
+
+    this.state.usedFacets.update(f => [...this.usedFacets]);
+    this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
+
+
+    // this.onFiltersChanged.emit(this.usedFacets);
   }
 
   fireMouserOver(field: string, value: string) {

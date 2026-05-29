@@ -2,26 +2,32 @@ import { Injectable, signal } from "@angular/core";
 
 
 export interface Tenant {
-    val: string,
-    count: number,
-    date_year_max: number,
-    date_year_min: number,
-    date_computed_max_s: string,
-    date_computed_min_s: string,
-    date_computed_max: Date,
-    date_computed_min: Date,
-    available: boolean,
-    selected: boolean,
-  }
+  val: string,
+  count: number,
+  date_year_max: number,
+  date_year_min: number,
+  date_computed_max_s: string,
+  date_computed_min_s: string,
+  date_computed_max: Date,
+  date_computed_min: Date,
+  available: boolean,
+  selected: boolean,
+}
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 }) export class AppState {
 
-    public showInfo = signal<boolean>(false);
-    public tenants: Tenant[] = [];
-    public selectedTenants = signal<Tenant[]>([]);
-    views = [
+  public showInfo = signal<boolean>(false);
+  public tenants: Tenant[] = [];
+  public selectedTenants = signal<Tenant[]>([]);
+
+  stateChanged = signal<number>(0);
+
+  public q: string = '';
+  public usedFacets = signal<{ field: string, value: string }[]>([]);
+
+  views = [
     {
       header: 'centrality',
       text: 'Centralita aktérů korespondence v dané korespondenční síti',
@@ -73,7 +79,7 @@ export interface Tenant {
       route: 'timeline'
     },
   ];
-  currentView: {header: string, text: string, route: string};
+  currentView: { header: string, text: string, route: string };
 
   changeMainTenant(t: Tenant) {
     this.tenants.forEach(te => te.selected = false);
@@ -95,7 +101,7 @@ export interface Tenant {
         max = max > new Date(t.date_computed_max_s) ? max : new Date(t.date_computed_max_s);
       }
     });
-    return [min,max];
+    return [min, max];
   }
 
   getTenantsRangeNumber(): [number, number] {
@@ -109,7 +115,7 @@ export interface Tenant {
         max = max > t.date_year_max ? max : t.date_year_max;
       }
     });
-    return [min,max];
+    return [min, max];
   }
 
   getTenantsRangeISO(): [string, string] {
@@ -123,17 +129,47 @@ export interface Tenant {
         max = max > new Date(t.date_computed_max_s) ? max : new Date(t.date_computed_max_s);
       }
     });
-    return [min.toISOString(),max.toISOString()];
+    return [min.toISOString(), max.toISOString()];
   }
 
-  addFilters(p: any, usedFacets: {field: string, value: string}[]) {
-    p.author = usedFacets.filter(k => k.field === 'authors').map(k => k.value);
-    p.recipient = usedFacets.filter(k => k.field === 'recipients').map(k => k.value);
-    p.mentioned = usedFacets.filter(k => k.field === 'mentioned').map(k => k.value);
-    p.keywords_category = usedFacets.filter(k => k.field === 'keywords_categories').map(k => k.value);
-    p.keyword = usedFacets.filter(k => k.field === 'keywords').map(k => k.value);
-    p.profession = usedFacets.filter(k => k.field === 'professions').map(k => k.value);
-    p.origin = usedFacets.filter(k => k.field === 'origins').map(k => k.value);
-    p.destination = usedFacets.filter(k => k.field === 'destinations').map(k => k.value);
+  addFilters(p: any) {
+    p.author = this.usedFacets().filter(k => k.field === 'authors').map(k => k.value);
+    p.recipient = this.usedFacets().filter(k => k.field === 'recipients').map(k => k.value);
+    p.mentioned = this.usedFacets().filter(k => k.field === 'mentioned').map(k => k.value);
+    p.keywords_category = this.usedFacets().filter(k => k.field === 'keywords_categories').map(k => k.value);
+    p.keyword = this.usedFacets().filter(k => k.field === 'keywords').map(k => k.value);
+    p.profession = this.usedFacets().filter(k => k.field === 'professions').map(k => k.value);
+    p.origin = this.usedFacets().filter(k => k.field === 'origins').map(k => k.value);
+    p.destination = this.usedFacets().filter(k => k.field === 'destinations').map(k => k.value);
+  }
+
+  encodeState() {
+    const obj = { q: this.q, f: this.usedFacets(), t: this.selectedTenants().map(t => t.val)};
+    return btoa(encodeURIComponent(JSON.stringify(obj)));
+  }
+
+  decodeState(s: string) {
+    if (s) {
+      const obj = JSON.parse(decodeURIComponent(atob(s)));
+      this.q = obj.q;
+      this.usedFacets.set(obj.f);
+      this.tenants.forEach(t => {t.selected = false});
+      if (obj.t) {
+        obj.t.forEach((tenant: string) =>  {
+          const st = this.tenants.find(t => t.val === tenant);
+          if (st) {
+            st.selected = true;
+          }
+        });
+      } 
+      this.setSelectedTenants();
+
+    } else {
+      this.q = '';
+      this.usedFacets.set([]);
+      this.tenants.forEach(t => {t.selected = false});
+      this.selectedTenants.set([]);
+    }
+    this.stateChanged.update(n => n+1)
   }
 }
