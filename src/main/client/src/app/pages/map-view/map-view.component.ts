@@ -1,4 +1,4 @@
-import { Component, computed, effect, Inject, input, NgZone, OnInit, Signal } from '@angular/core';
+import { Component, computed, effect, Inject, input, NgZone, OnInit, Signal, DOCUMENT } from '@angular/core';
 import { Router } from '@angular/router';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import L, { circle, CircleMarker, LatLng, latLng, LatLngBounds, Layer, LayerGroup, Map, Marker, polygon, tileLayer } from 'leaflet';
@@ -15,7 +15,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Facet, JSONFacet } from '../../shared/facet';
 import { HttpParams } from '@angular/common/http';
-import { DOCUMENT } from '@angular/common';
+
 import { Letter, Place } from '../../shared/letter';
 import { MatIconModule } from '@angular/material/icon';
 import { AppState, Tenant } from '../../app-state';

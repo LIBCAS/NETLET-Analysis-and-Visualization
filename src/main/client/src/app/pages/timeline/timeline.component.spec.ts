@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { testProviders } from '../../testing';
 
 import { TimelineComponent } from './timeline.component';
 
@@ -8,7 +9,8 @@ describe('TimelineComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TimelineComponent]
+      imports: [TimelineComponent],
+      providers: testProviders
     })
     .compileComponents();
 

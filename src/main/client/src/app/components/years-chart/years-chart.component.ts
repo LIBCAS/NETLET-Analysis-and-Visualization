@@ -1,4 +1,4 @@
-import { Component, effect, inject, Inject, input, NgZone, output } from '@angular/core';
+import { Component, effect, inject, Inject, input, NgZone, output, DOCUMENT } from '@angular/core';
 
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
@@ -12,7 +12,7 @@ import { TitleComponent } from 'echarts/components';
 import { BrushComponent } from 'echarts/components';
 import { ToolboxComponent } from 'echarts/components';
 import { JSONFacet } from '../../shared/facet';
-import { DOCUMENT } from '@angular/common';
+
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { AppState } from '../../app-state';
 import { TranslateService } from '@ngx-translate/core';

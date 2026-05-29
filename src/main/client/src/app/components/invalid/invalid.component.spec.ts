@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { testProviders } from '../../testing';
 
 import { InvalidComponent } from './invalid.component';
 
@@ -8,7 +9,8 @@ describe('InvalidComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [InvalidComponent]
+      imports: [InvalidComponent],
+      providers: testProviders
     })
     .compileComponents();
 

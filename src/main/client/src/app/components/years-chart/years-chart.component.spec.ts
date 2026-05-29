@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { testProviders } from '../../testing';
 
 import { YearsChartComponent } from './years-chart.component';
 
@@ -8,7 +9,8 @@ describe('YearsChartComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [YearsChartComponent]
+      imports: [YearsChartComponent],
+      providers: testProviders
     })
     .compileComponents();
 

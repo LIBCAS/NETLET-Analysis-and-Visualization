@@ -1,5 +1,5 @@
-import { Component, effect, Inject, input } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { Component, effect, Inject, input, DOCUMENT } from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
 import { HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';

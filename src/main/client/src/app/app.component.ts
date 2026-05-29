@@ -1,9 +1,9 @@
-import { Component, inject, Inject } from '@angular/core';
+import { Component, inject, Inject, DOCUMENT } from '@angular/core';
 import { ActivatedRoute, RouterModule  } from '@angular/router';
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { FooterComponent } from "./components/footer/footer.component";
 import { AppState } from './app-state';
-import { DOCUMENT } from '@angular/common';
+
 import { TranslateModule } from '@ngx-translate/core';
 import { switchMap, of } from 'rxjs';
 

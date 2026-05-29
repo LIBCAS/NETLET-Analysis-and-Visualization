@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { testProviders } from '../../testing';
 
 import { RelationComponent } from './relation.component';
 
@@ -8,7 +9,8 @@ describe('RelationComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RelationComponent]
+      imports: [RelationComponent],
+      providers: testProviders
     })
     .compileComponents();
 
