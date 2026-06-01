@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
+import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.request.json.DomainMap;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.request.json.QueryFacetMap;
@@ -696,7 +698,106 @@ public class IndexSearcher {
             if (request.getParameter("destination") != null) {
                 jrequest = jrequest.withFilter("{!tag=ffdestination}destination_name" + ":(\"" + String.join("\" OR \"", request.getParameterValues("destination")) + "\")");
             }
+            
+            if (request.getParameter("places") != null) {
+                String f = String.join("\" OR \"", request.getParameterValues("places"));
+                jrequest = jrequest.withFilter("origin_name:(\"" + f + "\") OR destination_name:(\"" + f + "\")");
+            }
+            
+            if (request.getParameter("identities") != null) {
+                String f = String.join("\" OR \"", request.getParameterValues("identities"));
+                jrequest = jrequest.withFilter("identity_name:(\"" + f + "\")");
+            }
             return jrequest;
+    }
+    
+    /**
+     * Search identities for autocomplete
+     * @param prefix
+     * @param tenant
+     * @param lang
+     * @return 
+     */
+    public static JSONObject searchIdentities(String prefix, String tenant, String lang) {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+            SolrQuery query = new SolrQuery("name_lower:" + prefix + "*")
+                    .setFields("id,table_id,name,tenant")
+                    .setSort(SolrQuery.SortClause.asc("name_sort"))
+                    .setRows(10);
+            query.set("wt", "json");
+            
+
+            QueryRequest qreq = new QueryRequest(query);qreq.setResponseParser(new InputStreamResponseParser("json"));
+            NamedList<Object> resp = solr.request(qreq, "identities");
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        return ret;
+    }
+    
+    /**
+     * Search keywords for autocomplete
+     * @param prefix
+     * @param tenant
+     * @param lang
+     * @return 
+     */
+    public static JSONObject searchKeywords(String prefix, String tenant, String lang) {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+            SolrQuery query = new SolrQuery("name_"+lang+":" + prefix + "*")
+                    .setFields("id,table_id,name_cs,name_en,tenant")
+                    .setSort(SolrQuery.SortClause.asc("name_sort"))
+                    .setRows(10);
+            query.addFilterQuery("tenant:global OR tenant:"+tenant);
+            query.set("wt", "json");
+            
+
+            QueryRequest qreq = new QueryRequest(query);qreq.setResponseParser(new InputStreamResponseParser("json"));
+            NamedList<Object> resp = solr.request(qreq, "keywords");
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        return ret;
+    }
+    
+    /**
+     * Search places for autocomplete
+     * @param prefix
+     * @param tenant
+     * @param lang
+     * @return 
+     */
+    public static JSONObject searchPlaces(String prefix, String tenant, String lang) {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+            SolrQuery query = new SolrQuery("name_lower:" + prefix + "*")
+                    .setFields("id,table_id,name,tenant")
+                    .setSort(SolrQuery.SortClause.asc("name_sort"))
+                    .setRows(10);
+            query.addFilterQuery("tenant:global OR tenant:"+tenant);
+            query.set("wt", "json");
+            
+
+            QueryRequest qreq = new QueryRequest(query);qreq.setResponseParser(new InputStreamResponseParser("json"));
+            NamedList<Object> resp = solr.request(qreq, "places");
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        return ret;
     }
 
 }

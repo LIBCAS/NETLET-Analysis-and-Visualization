@@ -28,6 +28,7 @@ export class FacetsComponent {
 
   readonly router = inject(Router);
 
+  showTenants = input<boolean>(true);
   facets = input<FacetFields>();
   fields = input<string[]>([]);
   sub_fields = input<{[key:string]: string}>({});

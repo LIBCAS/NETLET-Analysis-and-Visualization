@@ -95,7 +95,8 @@ export class TimelineComponent {
   ) {
     effect(() => {
       const sc = this.state.stateChanged();
-      if (sc > 0 && this.tenants.length > 0) {
+      console.log(sc)
+      if (sc > 0 || this.tenants.length > 0) {
         this.getData(true);
       }
     })

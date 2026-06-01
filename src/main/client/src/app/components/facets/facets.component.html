@@ -1,3 +1,4 @@
+@if (showTenants()) {
 <div>
   <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
     <mat-expansion-panel-header>
@@ -13,7 +14,7 @@
     </mat-list>
   </mat-expansion-panel>
 </div>
-        
+}        
 @if(hasUsedFacets) {
 <div>
   <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">

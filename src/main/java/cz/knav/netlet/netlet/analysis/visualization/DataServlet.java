@@ -169,6 +169,51 @@ public class DataServlet extends HttpServlet {
                 return ret;
             }
         },
+        SEARCH_KEYWORDS {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                JSONObject ret = new JSONObject();
+
+                String lang = request.getParameter("lang");
+                if (lang == null) {
+                    lang = "cs";
+                }
+                ret.put("keywords", IndexSearcher.searchKeywords(request.getParameter("prefix"), 
+                        request.getParameter("tenant"),
+                        lang).getJSONObject("response").getJSONArray("docs"));
+                return ret;
+            }
+        },
+        SEARCH_PLACES {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                JSONObject ret = new JSONObject();
+
+                String lang = request.getParameter("lang");
+                if (lang == null) {
+                    lang = "cs";
+                }
+                ret.put("places", IndexSearcher.searchPlaces(request.getParameter("prefix"), 
+                        request.getParameter("tenant"),
+                        lang).getJSONObject("response").getJSONArray("docs"));
+                return ret;
+            }
+        },
+        SEARCH_IDENTITIES {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                JSONObject ret = new JSONObject();
+
+                String lang = request.getParameter("lang");
+                if (lang == null) {
+                    lang = "cs";
+                }
+                ret.put("identities", IndexSearcher.searchIdentities(request.getParameter("prefix"), 
+                        request.getParameter("tenant"),
+                        lang).getJSONObject("response").getJSONArray("docs"));
+                return ret;
+            }
+        },
         PERIODS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {

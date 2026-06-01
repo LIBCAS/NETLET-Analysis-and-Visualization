@@ -93,5 +93,17 @@ export class AppService {
     return this.get('data/timeline', params);
   }
 
+
+  searchIdentities(params: HttpParams): Observable<any> {
+    return this.get('data/search_identities', params)
+  }
+
+  searchKeywords(params: HttpParams): Observable<any> {
+    return this.get('data/search_keywords', params)
+  }
+
+  searchPlaces(params: HttpParams): Observable<any> {
+    return this.get('data/search_places', params)
+  }
   
 }

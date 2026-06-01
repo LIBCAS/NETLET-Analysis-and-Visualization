@@ -5,6 +5,26 @@
 
 :root {
 
+  // --- form field ---
+  @include mat.form-field-overrides((
+    container-height: 40px,
+    container-vertical-padding: 6px,
+    container-text-size: 14px,
+    container-text-weight: 500,
+
+    outlined-outline-color: var(--app-color-gray-4),
+    outlined-label-text-size: 14px,
+    outlined-label-text-populated-size: 14px,
+
+    hover-state-layer-opacity: 0,
+    focus-state-layer-opacity: 0
+  ));
+  .mat-mdc-form-field {
+    .mat-mdc-form-field-subscript-wrapper {
+      height: 12px;
+    }
+  }
+
   @include mat.toolbar-overrides((
     container-background-color: var(--mat-sys-primary),
     container-text-color: white,
@@ -16,10 +36,6 @@
   @include mat.list-overrides((
     list-item-hover-label-text-color: #{map.get(map.get(my-theme.$primary-palette, error), 50)},
     list-item-one-line-container-height: 32px
-  ));
-
-  @include mat.form-field-overrides((
-    container-height: 48px
   ));
 
   @include mat.progress-bar-overrides((

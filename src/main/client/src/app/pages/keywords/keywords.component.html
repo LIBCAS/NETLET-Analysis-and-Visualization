@@ -11,8 +11,12 @@
 @if (!invalidTenant) {
   <div class="app-fxLayout app-row app-fill" style="position: relative;">
     <div style="flex: 1 30%;" class="app-filters">
+
+      <app-facets
+        [fields]="['keywords', 'authors', 'recipients']"
+        [facets]="facets()"></app-facets>
       
-        <div>
+        <!-- <div>
           <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
             <mat-expansion-panel-header>
               <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
@@ -26,18 +30,10 @@
               }
             </mat-list>
           </mat-expansion-panel>
-        </div>
+        </div> -->
       
-      <div>
-        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-          <mat-expansion-panel-header>
-            <mat-panel-title> {{ 'Identities to include' | translate}} </mat-panel-title>
-          </mat-expansion-panel-header>
-          <mat-checkbox [(ngModel)]="includeAuthors" (change)="getData(true)">{{ 'field.authors' | translate}}</mat-checkbox>
-          <mat-checkbox [(ngModel)]="includeRecipients" (change)="getData(true)">{{ 'field.recipients' | translate}}</mat-checkbox>
-        </mat-expansion-panel>
-      </div>
-      @if (keyword_categories) {
+      
+      <!-- @if (keyword_categories) {
         <div>
           <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
             <mat-expansion-panel-header>
@@ -84,7 +80,7 @@
             </mat-list>
           </mat-expansion-panel>
         </div>
-      }
+      } -->
     </div>
     <div class="app-content app-fill-w app-fill-h">
       <div class="app-years">
@@ -92,6 +88,15 @@
           <app-years-chart [dateYearFacet]="solrResponse.facets.date_year"
           (onChangeLimits)="changeLimits($event)"></app-years-chart>
         }
+      </div>
+      <div>
+        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'Identities to include' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-checkbox [(ngModel)]="includeAuthors" (change)="getData(true)">{{ 'field.authors' | translate}}</mat-checkbox>
+          <mat-checkbox [(ngModel)]="includeRecipients" (change)="getData(true)">{{ 'field.recipients' | translate}}</mat-checkbox>
+        </mat-expansion-panel>
       </div>
       <div class="app-fill-w" style="overflow: auto; ">
         <mat-card appearance="outlined">

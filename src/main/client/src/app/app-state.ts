@@ -141,6 +141,8 @@ export interface Tenant {
     p.profession = this.usedFacets().filter(k => k.field === 'professions').map(k => k.value);
     p.origin = this.usedFacets().filter(k => k.field === 'origins').map(k => k.value);
     p.destination = this.usedFacets().filter(k => k.field === 'destinations').map(k => k.value);
+    p.places = this.usedFacets().filter(k => k.field === 'places').map(k => k.value);
+    p.identities = this.usedFacets().filter(k => k.field === 'identities').map(k => k.value);
   }
 
   encodeState() {
@@ -151,6 +153,7 @@ export interface Tenant {
   decodeState(s: string) {
     if (s) {
       const obj = JSON.parse(decodeURIComponent(atob(s)));
+      console.log(obj)
       this.q = obj.q;
       this.usedFacets.set(obj.f);
       this.tenants.forEach(t => {t.selected = false});
@@ -170,6 +173,6 @@ export interface Tenant {
       this.tenants.forEach(t => {t.selected = false});
       this.selectedTenants.set([]);
     }
-    this.stateChanged.update(n => n+1)
+    this.stateChanged.set(this.usedFacets.length)
   }
 }

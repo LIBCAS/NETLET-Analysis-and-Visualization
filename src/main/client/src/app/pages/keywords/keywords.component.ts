@@ -1,4 +1,4 @@
-import { Component, effect, Inject, input, DOCUMENT } from '@angular/core';
+import { Component, effect, Inject, input, DOCUMENT, signal } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { HttpParams } from '@angular/common/http';
@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../app.service';
 import { AppState, Tenant } from '../../app-state';
-import { Facet, JSONFacet } from '../../shared/facet';
+import { Facet, FacetFields, JSONFacet } from '../../shared/facet';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -25,12 +25,13 @@ import * as echarts from 'echarts/core';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { FacetsComponent } from "../../components/facets/facets.component";
 
 echarts.use([BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
 
 @Component({
   selector: 'app-keywords',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent],
   templateUrl: './keywords.component.html',
   styleUrl: './keywords.component.scss',
   providers: [
@@ -41,6 +42,7 @@ export class KeywordsComponent {
   loading: boolean;
   invalidTenant: boolean;
   solrResponse: any;
+  facets = signal<FacetFields>({});
   limits: [Date, Date];
 
   includeAuthors: boolean = true;
@@ -93,9 +95,21 @@ export class KeywordsComponent {
     public state: AppState,
     private service: AppService
   ) {
+    
+    effect(() => {
+      const sc = this.state.stateChanged();
+      if (sc > 0 && this.tenants.length > 0) {
+        this.getData(true);
+      }
+    })
     effect(() => {
       this.tenants = this.state.selectedTenants();
+      if (this.tenants.length > 0) {
         this.changeTenant();
+      } else {
+        this.loading = false;
+        this.facets.set({});
+      }
     })
   }
 
@@ -164,6 +178,7 @@ export class KeywordsComponent {
     p.lang = this.translation.currentLang;
     p.includeAuthors = this.includeAuthors;
     p.includeRecipients = this.includeRecipients;
+    this.state.addFilters(p);
     this.service.getKeywords(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
@@ -173,6 +188,7 @@ export class KeywordsComponent {
         const ts: JSONFacet[] = resp.facets.tenants.buckets;
         this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
       }
+      this.facets.set(resp.facets)
       if (resp.response.numFound === 0) {
         this.loading = false;
         return;

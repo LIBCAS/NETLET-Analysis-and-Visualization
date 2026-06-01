@@ -1,6 +1,6 @@
 
 import { HttpParams } from '@angular/common/http';
-import { Component, effect, Inject, NgZone, DOCUMENT } from '@angular/core';
+import { Component, effect, Inject, NgZone, DOCUMENT, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,15 +22,16 @@ import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { Tenant, AppState } from '../../app-state';
 import { AppService } from '../../app.service';
 import { YearsChartComponent } from '../../components/years-chart/years-chart.component';
-import { JSONFacet } from '../../shared/facet';
+import { FacetFields, JSONFacet } from '../../shared/facet';
 import { Letter } from '../../shared/letter';
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
+import { FacetsComponent } from "../../components/facets/facets.component";
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-relation',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -40,6 +41,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Grid
 export class RelationComponent {
   loading: boolean;
   solrResponse: any;
+  facets = signal<FacetFields>({});
   limits: [Date, Date];
   tenant: Tenant;
   graphOptions: EChartsOption = {};
@@ -153,10 +155,8 @@ export class RelationComponent {
     this.getData(true);
   }
 
-  showNode(identity: JSONFacet, category: string) {
-    const idx = this.graphData.nodes.findIndex(n => n.id === identity.val);
-    //const idx = this.graphData.nodes.findIndex(n => n.id === identity.val + '_' + category);
-    // currentIndex = (currentIndex + 1) % dataLen;
+  showNode(e: {field: string, value: string}) {
+    const idx = this.graphData.nodes.findIndex(n => n.id === e.value);
     this.graphChart.dispatchAction({
       type: 'showTip',
       seriesIndex: 0,
@@ -180,6 +180,7 @@ export class RelationComponent {
   }
 
   getData(setResponse: boolean) {
+    this.facets.set({})
     this.loading = true;
     const p: any = {};
     p.tenant = this.tenant.val;
@@ -198,6 +199,7 @@ export class RelationComponent {
       if (setResponse) {
         this.solrResponse = resp;
       }
+      this.facets.set(resp.facets)
       //this.authors = resp.facets.authors.buckets;
       this.recipients = resp.facets.recipients.buckets;
       this.mentioned = resp.facets.mentioned.buckets;
@@ -262,34 +264,6 @@ export class RelationComponent {
     const minSize = 10;
     // let maxCount = Math.max(...this.authors.map(r => r.count), ...this.recipients.map(r => r.count));
     let maxCount = Math.max(...this.mentioned.map(r => r.count));
-    // this.authors.forEach((identity: JSONFacet) => {
-    //   const pos = this.setPosition(h, w, identity.count, maxCount, 1);
-    //   nodes.push({
-    //     // id: identity.id + '',
-    //     id: identity.val + '_author',
-    //     name: identity.val + ' ' + identity.count,
-    //     value: identity.count,
-    //     category: 'author',
-    //     symbolSize: maxSize * identity.count / maxCount + minSize,
-    //     angle: pos.angle,
-    //     x: pos.x,
-    //     y: pos.y,
-    //   })
-    // });
-    // this.recipients.forEach((identity: JSONFacet) => {
-    //   const pos = this.setPosition(h, w, identity.count, maxCount, - 1);
-    //   nodes.push({
-    //     // id: identity.id + '',
-    //     id: identity.val + '_recipient',
-    //     name: identity.val + ' ' + identity.count,
-    //     value: identity.count,
-    //     category: 'recipient',
-    //     symbolSize: maxSize * identity.count / maxCount + minSize,
-    //     angle: pos.angle,
-    //     x: pos.x,
-    //     y: pos.y,
-    //   })
-    // });
     this.recipients.forEach((identity: JSONFacet) => {
       let zone = 0;
       let category = null;

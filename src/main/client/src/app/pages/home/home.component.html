@@ -1,5 +1,5 @@
 <div class="app-home-form">
-    <mat-card appearance="outlined" class=" app-fill-w">
+    <mat-card appearance="outlined" class="  app-gap-4">
         <mat-form-field appearance="outline" >
             <mat-label>{{ 'tenants' | translate}}</mat-label>
             <mat-select multiple="true" [formField]="searchForm.tenants">
@@ -9,20 +9,69 @@
             </mat-select>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" >
+        <mat-form-field class="app-fill-w" appearance="outline">
+            <input type="text"
+                placeholder="{{ 'identities' | translate}}"
+                attr.aria-label="{{ 'identities' | translate}}"
+                matInput
+                [formField]="searchForm.identities"
+                [matAutocomplete]="autoIdentities" >
+                
+            <mat-autocomplete #autoIdentities="matAutocomplete">
+            @for (option of identities(); track option) {
+                <mat-option [value]="option.name">{{option.name}}</mat-option>
+            }
+            </mat-autocomplete>
+                    
+        </mat-form-field>
+
+
+        <!-- <mat-form-field appearance="outline" >
             <mat-label>{{ 'identities' | translate}}</mat-label>
             <input [formField]="searchForm.identities" matInput />
+        </mat-form-field> -->
+
+        <mat-form-field class="app-fill-w" appearance="outline">
+            <input type="text"
+                placeholder="{{ 'places' | translate}}"
+                attr.aria-label="{{ 'places' | translate}}"
+                matInput
+                [formField]="searchForm.places"
+                [matAutocomplete]="autoPlaces" >
+                
+            <mat-autocomplete #autoPlaces="matAutocomplete">
+            @for (option of places(); track option) {
+                <mat-option [value]="option.name">{{option.name}}</mat-option>
+            }
+            </mat-autocomplete>
+                    
         </mat-form-field>
 
-        <mat-form-field appearance="outline" >
+        <!-- <mat-form-field appearance="outline" >
             <mat-label>{{ 'places' | translate}}</mat-label>
             <input [formField]="searchForm.places" matInput />
+        </mat-form-field> -->
+
+        <mat-form-field class="app-fill-w" appearance="outline">
+            <input type="text"
+                placeholder="{{ 'keywords' | translate}}"
+                attr.aria-label="{{ 'keywords' | translate}}"
+                matInput
+                [formField]="searchForm.keywords"
+                [matAutocomplete]="auto" >
+                
+            <mat-autocomplete #auto="matAutocomplete">
+            @for (option of keywords(); track option) {
+                <mat-option [value]="option.name_cs">{{option.name_cs}}</mat-option>
+            }
+            </mat-autocomplete>
+                    
         </mat-form-field>
 
-        <mat-form-field appearance="outline" >
+        <!-- <mat-form-field appearance="outline" >
             <mat-label>{{ 'keywords' | translate}}</mat-label>
             <input [formField]="searchForm.keywords" matInput />
-        </mat-form-field>
+        </mat-form-field> -->
         <button matIconButton [title]="'search' | translate" (click)="search()"><mat-icon>search</mat-icon></button>
     </mat-card>
 </div>
