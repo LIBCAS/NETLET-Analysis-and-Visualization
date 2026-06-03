@@ -84,7 +84,7 @@ export class MapViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.state.tenants.forEach(t => { t.available = true });
+    this.state.tenants().forEach(t => { t.available = true });
     this.linkColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     this.activeLinkColor = this.document.body.computedStyleMap().get('--app-color-map-link-active').toString();
   }
@@ -116,7 +116,7 @@ export class MapViewComponent implements OnInit {
       this.linkLayer.clearLayers();
     }
     const p: any = {};
-    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant = this.state.selectedTenants().map(t => t.val);
     p.tenant_year_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     if (!withMap) {
@@ -130,7 +130,7 @@ export class MapViewComponent implements OnInit {
         return;
       }
       const ts: JSONFacet[] = resp.facets.tenants.buckets;
-      this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
+      this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
       // if (!this.state.tenant().available) {
       //   // this.state.tenant.set(null);
       //   this.loading = false;

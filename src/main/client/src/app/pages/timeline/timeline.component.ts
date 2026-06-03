@@ -96,14 +96,8 @@ export class TimelineComponent {
     effect(() => {
       const sc = this.state.stateChanged();
       console.log(sc)
-      if (sc > 0 || this.tenants.length > 0) {
+      if (sc > 0) {
         this.getData(true);
-      }
-    })
-    effect(() => {
-      this.tenants = this.state.selectedTenants();
-      if (this.tenants.length > 0) {
-        this.changeTenant();
       } else {
         this.loading = false;
         this.letters.set([]);
@@ -111,10 +105,21 @@ export class TimelineComponent {
         this.setOptions([]);
       }
     })
+    // effect(() => {
+    //   this.tenants = this.state.selectedTenants(); 
+    //   if (this.tenants.length > 0) {
+    //     this.changeTenant();
+    //   } else {
+    //     this.loading = false;
+    //     this.letters.set([]);
+    //     this.facets.set({});
+    //     this.setOptions([]);
+    //   }
+    // })
   }
 
   ngOnInit(): void {
-    this.state.tenants.forEach(t => { t.available = true });
+    this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'timeline');
     this.getTimelineSubject.pipe(debounceTime(300)).subscribe(setGraph => {
       this.getData2(setGraph)
@@ -129,9 +134,8 @@ export class TimelineComponent {
   }
 
   clickTenant(t: Tenant) {
-    this.state.setSelectedTenants();
     this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
-    //this.router.navigate([], { queryParams: { tenant: this.state.tenants.filter(t => t.selected).map(t => t.val).toString() } });
+    //this.router.navigate([], { queryParams: { tenant: this.state.selectedTenants().map(t => t.val).toString() } });
   }
 
   onChartInit(e: any) {
@@ -205,7 +209,7 @@ export class TimelineComponent {
       this.setOptions([])
     }
     const p: any = {};
-    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant = this.state.selectedTenants().map(t => t.val);
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
 
     p.rows = this.rows;
@@ -222,7 +226,15 @@ export class TimelineComponent {
       }
 
       this.solrResponse = resp;
-      this.facets.set(resp.facets)
+      this.facets.set(resp.facets);
+      
+      if (resp.facets['tenants']?.buckets.length > 0 && this.state.selectedTenants().length === 0) {
+        this.state.tenants.update(ts => {
+          ts.forEach(t => { t.selected = this.facets()['tenants']?.buckets.findIndex(b => b.val === t.val) > -1 });
+          return [...ts]
+        });
+      }
+
       this.numFound = this.solrResponse.response.numFound;
 
       const letters = this.solrResponse.response.docs;

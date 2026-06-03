@@ -5,7 +5,7 @@
       <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
     </mat-expansion-panel-header>
     <mat-list>
-      @for(k of state.tenants; track $index; let idx = $index;){
+      @for(k of state.tenants(); track $index; let idx = $index;){
         <mat-list-item (click)="clickTenant(k)">
           <mat-checkbox 
           [(ngModel)]="k.selected">{{ k.val}} ({{k.count}}) </mat-checkbox>
@@ -58,7 +58,7 @@
           </div>
       </mat-form-field>
     
-
+@if(renderLists()){
     <mat-list class="app-facet">
       @for(k of facets()[f].buckets; track $index; let idx = $index){
       @if (sub_fields()[f]) {
@@ -77,9 +77,6 @@
           }
         </mat-list>
       </mat-expansion-panel>
-
-
-
       } @else {
 
       <mat-list-item (click)="filter(f, k.val)" title="{{ k.val}} ({{k.count}})" (mouseover)="fireMouserOver(f, k.val)"
@@ -89,6 +86,7 @@
       }
       }
     </mat-list>
+}
   </mat-expansion-panel>
 </div>
 }

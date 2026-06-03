@@ -104,7 +104,7 @@ export class PeriodsComponent {
   ngOnInit(): void {
 
     this.translation.onLangChange.subscribe(() => { this.getData(true) });
-    this.state.tenants.forEach(t => { t.available = true });
+    this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'keywords');
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     if (this.tenants.length > 0 && this.identitiesChart) {
@@ -134,8 +134,7 @@ export class PeriodsComponent {
   }
 
   clickTenant(t: Tenant) {
-    this.state.setSelectedTenants();
-    this.router.navigate([], { queryParams: { tenant: this.state.tenants.filter(t => t.selected).map(t => t.val).toString() } });
+    this.router.navigate([], { queryParams: { tenant: this.state.selectedTenants().map(t => t.val).toString() } });
   }
 
   changeTenant() {
@@ -153,7 +152,7 @@ export class PeriodsComponent {
     this.loading = true;
     this.invalidTenant = false;
     const p: any = {};
-    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant = this.state.selectedTenants().map(t => t.val);
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     p.tenant_year_range = this.state.getTenantsRange().toString();
 
@@ -166,7 +165,7 @@ export class PeriodsComponent {
       if (setResponse) {
         this.solrResponse = resp;
         const ts: JSONFacet[] = resp.facets.tenants.buckets;
-        this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
+        this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
       }
       if (resp.response.numFound === 0) {
         this.loading = false;

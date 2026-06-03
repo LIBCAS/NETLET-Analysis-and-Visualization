@@ -1,28 +1,25 @@
 <div class="app-home-form">
     <mat-card appearance="outlined" class="  app-gap-4">
-        <mat-form-field appearance="outline" >
+        <mat-form-field appearance="outline">
             <mat-label>{{ 'tenants' | translate}}</mat-label>
             <mat-select multiple="true" [formField]="searchForm.tenants">
-                @for (t of state.tenants; track t) {
+                @for (t of state.tenants(); track t) {
                 <mat-option [value]="t">{{ t.val | translate}}</mat-option>
                 }
             </mat-select>
         </mat-form-field>
 
         <mat-form-field class="app-fill-w" appearance="outline">
-            <input type="text"
-                placeholder="{{ 'identities' | translate}}"
-                attr.aria-label="{{ 'identities' | translate}}"
-                matInput
-                [formField]="searchForm.identities"
-                [matAutocomplete]="autoIdentities" >
-                
+            <input type="text" placeholder="{{ 'identities' | translate}}"
+                attr.aria-label="{{ 'identities' | translate}}" matInput [formField]="searchForm.identities"
+                [matAutocomplete]="autoIdentities">
+
             <mat-autocomplete #autoIdentities="matAutocomplete">
-            @for (option of identities(); track option) {
+                @for (option of identities(); track option) {
                 <mat-option [value]="option.name">{{option.name}}</mat-option>
-            }
+                }
             </mat-autocomplete>
-                    
+
         </mat-form-field>
 
 
@@ -32,19 +29,15 @@
         </mat-form-field> -->
 
         <mat-form-field class="app-fill-w" appearance="outline">
-            <input type="text"
-                placeholder="{{ 'places' | translate}}"
-                attr.aria-label="{{ 'places' | translate}}"
-                matInput
-                [formField]="searchForm.places"
-                [matAutocomplete]="autoPlaces" >
-                
+            <input type="text" placeholder="{{ 'places' | translate}}" attr.aria-label="{{ 'places' | translate}}"
+                matInput [formField]="searchForm.places" [matAutocomplete]="autoPlaces">
+
             <mat-autocomplete #autoPlaces="matAutocomplete">
-            @for (option of places(); track option) {
+                @for (option of places(); track option) {
                 <mat-option [value]="option.name">{{option.name}}</mat-option>
-            }
+                }
             </mat-autocomplete>
-                    
+
         </mat-form-field>
 
         <!-- <mat-form-field appearance="outline" >
@@ -53,19 +46,23 @@
         </mat-form-field> -->
 
         <mat-form-field class="app-fill-w" appearance="outline">
-            <input type="text"
-                placeholder="{{ 'keywords' | translate}}"
-                attr.aria-label="{{ 'keywords' | translate}}"
-                matInput
-                [formField]="searchForm.keywords"
-                [matAutocomplete]="auto" >
-                
+            <input type="text" placeholder="{{ 'keywords' | translate}}" attr.aria-label="{{ 'keywords' | translate}}"
+                matInput [formField]="searchForm.keywords" [matAutocomplete]="auto">
+
             <mat-autocomplete #auto="matAutocomplete">
-            @for (option of keywords(); track option) {
-                <mat-option [value]="option.name_cs">{{option.name_cs}}</mat-option>
-            }
+                <mat-optgroup [label]="'categories'">
+                    @for (option of categories(); track option) {
+                    <mat-option [value]="option.category_cs">{{option.category_cs}}</mat-option>
+                    }
+                </mat-optgroup>
+                <mat-optgroup [label]="'keywords'">
+                    @for (option of keywords(); track option) {
+                    <mat-option [value]="option.name_cs">{{option.name_cs}}</mat-option>
+                    }
+                </mat-optgroup>
+
             </mat-autocomplete>
-                    
+
         </mat-form-field>
 
         <!-- <mat-form-field appearance="outline" >

@@ -19,8 +19,9 @@ export interface Tenant {
 }) export class AppState {
 
   public showInfo = signal<boolean>(false);
-  public tenants: Tenant[] = [];
-  public selectedTenants = signal<Tenant[]>([]);
+  public tenants = signal<Tenant[]>([]);
+
+  // public selectedTenants = signal<Tenant[]>([]);
 
   stateChanged = signal<number>(0);
 
@@ -81,21 +82,21 @@ export interface Tenant {
   ];
   currentView: { header: string, text: string, route: string };
 
-  changeMainTenant(t: Tenant) {
-    this.tenants.forEach(te => te.selected = false);
-    t.selected = true;
-    this.setSelectedTenants();
-  }
+  // changeMainTenant(t: Tenant) {
+  //   this.tenants.forEach(te => te.selected = false);
+  //   t.selected = true;
+  //   this.setSelectedTenants();
+  // }
 
-  setSelectedTenants() {
-    this.selectedTenants.set(this.tenants.filter(t => t.selected));
-  }
+  // setSelectedTenants() {
+  //   this.selectedTenants.set(this.tenants.filter(t => t.selected));
+  // }
 
   getTenantsRange(): [Date, Date] {
     let min = new Date();
     let max = new Date('1000-01-01');
-    const hasSelected = this.selectedTenants().length > 0;
-    this.tenants.forEach(t => {
+    const hasSelected = this.tenants().filter(t => t.selected).length > 0;
+    this.tenants().forEach(t => {
       if (!hasSelected || t.selected) {
         min = min > new Date(t.date_computed_min_s) ? new Date(t.date_computed_min_s) : min;
         max = max > new Date(t.date_computed_max_s) ? max : new Date(t.date_computed_max_s);
@@ -107,7 +108,7 @@ export interface Tenant {
   getTenantsRangeNumber(): [number, number] {
     let min = 3000;
     let max = 1000;
-    this.tenants.forEach(t => {
+    this.tenants().forEach(t => {
       if (t.selected) {
         // min = Math.min(min, t.date_computed_min.getFullYear());
         // max = Math.max(max, t.date_computed_max.getFullYear());
@@ -121,7 +122,7 @@ export interface Tenant {
   getTenantsRangeISO(): [string, string] {
     let min = new Date();
     let max = new Date('1000-01-01');
-    this.tenants.forEach(t => {
+    this.tenants().forEach(t => {
       if (t.selected) {
         // min = Math.min(min, t.date_computed_min.getFullYear());
         // max = Math.max(max, t.date_computed_max.getFullYear());
@@ -136,7 +137,7 @@ export interface Tenant {
     p.author = this.usedFacets().filter(k => k.field === 'authors').map(k => k.value);
     p.recipient = this.usedFacets().filter(k => k.field === 'recipients').map(k => k.value);
     p.mentioned = this.usedFacets().filter(k => k.field === 'mentioned').map(k => k.value);
-    p.keywords_category = this.usedFacets().filter(k => k.field === 'keywords_categories').map(k => k.value);
+    p.keywords_category = this.usedFacets().filter(k => k.field === 'keyword_categories').map(k => k.value);
     p.keyword = this.usedFacets().filter(k => k.field === 'keywords').map(k => k.value);
     p.profession = this.usedFacets().filter(k => k.field === 'professions').map(k => k.value);
     p.origin = this.usedFacets().filter(k => k.field === 'origins').map(k => k.value);
@@ -145,8 +146,19 @@ export interface Tenant {
     p.identities = this.usedFacets().filter(k => k.field === 'identities').map(k => k.value);
   }
 
+  selectedTenants() {
+    return this.tenants().filter(t => t.selected)
+  }
+
+  unselectTenants() {
+    this.tenants.update(ts => {
+        ts.forEach(t => {t.selected = false});
+        return [...ts]
+      })
+  }
+
   encodeState() {
-    const obj = { q: this.q, f: this.usedFacets(), t: this.selectedTenants().map(t => t.val)};
+    const obj = { q: this.q, f: this.usedFacets(), t: this.tenants().filter(t => t.selected).map(t => t.val)};
     return btoa(encodeURIComponent(JSON.stringify(obj)));
   }
 
@@ -156,23 +168,23 @@ export interface Tenant {
       console.log(obj)
       this.q = obj.q;
       this.usedFacets.set(obj.f);
-      this.tenants.forEach(t => {t.selected = false});
+      //this.tenants().forEach(t => {t.selected = false});
+      this.unselectTenants();
       if (obj.t) {
         obj.t.forEach((tenant: string) =>  {
-          const st = this.tenants.find(t => t.val === tenant);
+          const st = this.tenants().find(t => t.val === tenant);
           if (st) {
             st.selected = true;
           }
         });
       } 
-      this.setSelectedTenants();
+      // this.setSelectedTenants();
 
     } else {
       this.q = '';
       this.usedFacets.set([]);
-      this.tenants.forEach(t => {t.selected = false});
-      this.selectedTenants.set([]);
+      this.unselectTenants();
     }
-    this.stateChanged.set(this.usedFacets.length)
+    this.stateChanged.set(this.usedFacets().length + this.selectedTenants().length)
   }
 }

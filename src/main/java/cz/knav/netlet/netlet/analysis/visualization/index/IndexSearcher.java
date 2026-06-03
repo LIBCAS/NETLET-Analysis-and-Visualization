@@ -190,7 +190,8 @@ public class IndexSearcher {
             if (lang == null) {
                 lang = "cs";
             }
-
+            
+            
             final TermsFacetMap keywords_autorFacet = new TermsFacetMap("keywords_" + lang)
                     .setLimit(1000)
                     .setMinCount(1);
@@ -205,7 +206,8 @@ public class IndexSearcher {
             final TermsFacetMap keywords_destFacet = new TermsFacetMap("keywords_" + lang)
                     .setLimit(1000)
                     .setMinCount(1);
-                    
+            
+            
             if (Boolean.parseBoolean(request.getParameter("includeRecipients"))) {
                 final TermsFacetMap identity_authorFacet = new TermsFacetMap("identity_recipient")
                         .setLimit(1000)
@@ -236,6 +238,7 @@ public class IndexSearcher {
                     .setLimit(0)
                     .returnFields("date_year,date_computed,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_" + lang + ",keywords_" + lang + "")
                     .withFacet("date_year", rangeFacet)
+                    //.withFacet("keyword_categories", keywordsCategoriesFacet) 
                     .withFacet("tenants", new TermsFacetMap("tenant")
                             .setLimit(1000)
                             .withDomain(new DomainMap()
@@ -590,6 +593,9 @@ public class IndexSearcher {
                     .returnFields("letter_id,tenant,date_computed,date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_computed_range", rangeFacet)
                     //.withFacet("qfm", qfm)
+                    .withFacet("tenants", new TermsFacetMap("tenant")
+                            .setLimit(1000)
+                            .setMinCount(1))  
                     .withFacet("origins", new TermsFacetMap("origin_name")
                             .setLimit(1000)
                             .setSort("index")
@@ -678,13 +684,22 @@ public class IndexSearcher {
                 jrequest = jrequest.withFilter("{!tag=ffmentioned}identity_mentioned:(\"" + String.join("\" OR \"", request.getParameterValues("mentioned")) + "\")");
             }
             
+//            if (request.getParameter("keyword") != null) {
+//                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword")) + "\")");
+//            }
+//            
+//            
+//            if (request.getParameter("keywords_category") != null) {
+//                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keywords_category")) + "\")");
+//            }
+            
             if (request.getParameter("keyword") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword")) + "\")");
+                jrequest = jrequest.withFilter("keywords_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword")) + "\")");
             }
             
             
             if (request.getParameter("keywords_category") != null) {
-                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keywords_category")) + "\")");
+                jrequest = jrequest.withFilter("keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keywords_category")) + "\")");
             }
             
             if (request.getParameter("profession") != null) {
@@ -747,16 +762,18 @@ public class IndexSearcher {
      * @param lang
      * @return 
      */
-    public static JSONObject searchKeywords(String prefix, String tenant, String lang) {
+    public static JSONObject searchKeywords(String prefix, String tenant, String lang, String field, boolean collapse) {
         JSONObject ret = new JSONObject();
         try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
-            SolrQuery query = new SolrQuery("name_"+lang+":" + prefix + "*")
-                    .setFields("id,table_id,name_cs,name_en,tenant")
+            SolrQuery query = new SolrQuery(field+":" + prefix + "*")
+                    .setFields("id,table_id,name_cs,name_en,category_cs,category_en,tenant")
                     .setSort(SolrQuery.SortClause.asc("name_sort"))
-                    .setRows(10);
-            query.addFilterQuery("tenant:global OR tenant:"+tenant);
+                    .setRows(20);
             query.set("wt", "json");
             
+            if (collapse) {
+                query.addFilterQuery("{!collapse field=category_cs}");
+            }
 
             QueryRequest qreq = new QueryRequest(query);qreq.setResponseParser(new InputStreamResponseParser("json"));
             NamedList<Object> resp = solr.request(qreq, "keywords");
@@ -784,7 +801,7 @@ public class IndexSearcher {
                     .setFields("id,table_id,name,tenant")
                     .setSort(SolrQuery.SortClause.asc("name_sort"))
                     .setRows(10);
-            query.addFilterQuery("tenant:global OR tenant:"+tenant);
+            //query.addFilterQuery("tenant:global OR tenant:"+tenant);
             query.set("wt", "json");
             
 

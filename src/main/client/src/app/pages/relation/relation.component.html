@@ -11,7 +11,7 @@
             <mat-panel-title> {{ 'field.relation_tenants' | translate}} </mat-panel-title>
           </mat-expansion-panel-header>
           <mat-list>
-            @for(k of state.tenants; track $index; let idx = $index;){
+            @for(k of state.tenants(); track $index; let idx = $index;){
               @let is = intersection(k);
               <mat-list-item (click)="clickTenant(k)">
                 <mat-checkbox [disabled]="k.val === tenant.val || is.start === 0"

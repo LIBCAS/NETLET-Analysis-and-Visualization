@@ -6,19 +6,19 @@ import { FacetFields, JSONFacet } from '../../shared/facet';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
-import {FormArray, FormBuilder, FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import { FormArray, FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { map, Observable, startWith } from 'rxjs';
-import {AsyncPipe} from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { AppState, Tenant } from '../../app-state';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-facets',
   imports: [TranslateModule, MatExpansionModule, MatListModule,
-    MatCheckboxModule, MatTooltipModule, MatIconModule, 
+    MatCheckboxModule, MatTooltipModule, MatIconModule,
     MatAutocompleteModule, MatInputModule, MatFormFieldModule,
     FormsModule, ReactiveFormsModule],
   templateUrl: './facets.component.html',
@@ -29,20 +29,21 @@ export class FacetsComponent {
   readonly router = inject(Router);
 
   showTenants = input<boolean>(true);
+  renderLists = input<boolean>(true);
   facets = input<FacetFields>();
   fields = input<string[]>([]);
-  sub_fields = input<{[key:string]: string}>({});
-  
-  onFiltersChanged = output<{field: string, value: string}[]>();
-  onMouserOver = output<{field: string, value: string}>();
-  onMouseOut = output<{field: string, value: string}>();
+  sub_fields = input<{ [key: string]: string }>({});
+
+  onFiltersChanged = output<{ field: string, value: string }[]>();
+  onMouserOver = output<{ field: string, value: string }>();
+  onMouseOut = output<{ field: string, value: string }>();
 
   hasUsedFacets: boolean;
-  usedFacets: {field: string, value: string}[] = [];
+  usedFacets: { field: string, value: string }[] = [];
 
   //filteredOptions: Observable<string[]>;
   filteredOptions: string[];
-  controls: {[name: string]: FormControl<string>} = {};
+  controls: { [name: string]: FormControl<string> } = {};
 
   log(e: any) {
     console.log(e)
@@ -72,6 +73,12 @@ export class FacetsComponent {
           }
         })
       }
+
+      // this.state.tenants().forEach(t => {
+      //   if (this.facets()['tenants']?.buckets.find(b => b.val === t.val)) {
+      //     t.selected = true;
+      //   }
+      // })
     })
   }
 
@@ -82,7 +89,7 @@ export class FacetsComponent {
   }
 
   clickTenant(t: Tenant) {
-    this.state.setSelectedTenants();
+    // this.state.setSelectedTenants();
     this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
   }
 
@@ -97,13 +104,13 @@ export class FacetsComponent {
   selectAuto(e: MatAutocompleteSelectedEvent, f: string) {
     this.filter(f, e.option.value)
   }
-  
+
   filter(field: string, value: string) {
     const uf = this.usedFacets.find(f => f.field === field && f.value === value);
     if (uf) {
       this.usedFacets = this.usedFacets.filter(f => !(f.field === field && f.value === value));
     } else {
-      this.usedFacets.push({field, value});
+      this.usedFacets.push({ field, value });
     }
     this.hasUsedFacets = this.usedFacets.length > 0;
 
@@ -125,11 +132,11 @@ export class FacetsComponent {
   }
 
   fireMouserOver(field: string, value: string) {
-    this.onMouserOver.emit({field, value});
+    this.onMouserOver.emit({ field, value });
   }
 
   fireMouseOut(field: string, value: string) {
-    this.onMouseOut.emit({field, value});
+    this.onMouseOut.emit({ field, value });
   }
 
   clickHeader(e: any, field: string, value: string) {

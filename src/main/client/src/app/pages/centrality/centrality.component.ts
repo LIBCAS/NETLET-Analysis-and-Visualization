@@ -50,7 +50,6 @@ export class CentralityComponent {
   solrResponse: any;
   facets = signal<FacetFields>({});
   limits: [Date, Date];
-  tenants: Tenant[] = [];
   graphOptions: EChartsOption = {};
   graphChart: ECharts;
 
@@ -67,7 +66,7 @@ export class CentralityComponent {
       symbolSize: number
       value: number
     }[]
-  }
+  };
 
   authors: JSONFacet[];
   recipients: JSONFacet[];
@@ -107,20 +106,23 @@ export class CentralityComponent {
   ) {
 
     effect(() => {
-      this.tenants = this.state.selectedTenants();
-      if (this.tenants.length > 0) {
-        this.changeTenant();
+
+      const sc = this.state.stateChanged();
+      if (sc > 0) {
+        this.limits = this.state.getTenantsRange();
+        this.getData(true);
       } else {
         this.loading = false;
+        this.graphOptions = {};
         this.facets.set({});
       }
     });
   }
 
   ngOnInit(): void {
-    this.state.tenants.forEach(t => { t.available = true });
+    // this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'centrality');
-    if (this.tenants.length > 0) {
+    if (this.state.selectedTenants().length > 0 || this.state.usedFacets().length > 0) {
       this.limits = this.state.getTenantsRange();
       this.getData(true);
     }
@@ -152,10 +154,10 @@ export class CentralityComponent {
     
   }
 
-  clickTenant(t: Tenant) {
-    this.state.setSelectedTenants();
-    this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
-  }
+  // clickTenant(t: Tenant) {
+  //   this.state.setSelectedTenants();
+  //   this.router.navigate([], {queryParams: {tenant:this.state.selectedTenants().map(t => t.val).toString()}});
+  // }
 
   changeTenant() {
     this.limits = this.state.getTenantsRange();
@@ -262,7 +264,7 @@ export class CentralityComponent {
     this.loading = true;
     this.closeInfo();
     const p: any = {};
-    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant = this.state.selectedTenants().map(t => t.val);
     p.tenant_year_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     p.recipient = this.selectedRecipients;
@@ -505,7 +507,6 @@ export class CentralityComponent {
       nodes
     };
 
-    //console.log(this.graphData)
     this.graphOptions = {
       title: {
         show: true,

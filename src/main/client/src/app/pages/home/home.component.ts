@@ -53,6 +53,7 @@ export class HomeComponent {
 
   places = signal<{id: string,table_id: number,name: string,tenant: string}[]>([]);
   keywords = signal<{id: string,table_id: number,name_cs: string,name_en: string,tenant: string}[]>([]);
+  categories = signal<{id: string,table_id: number,category_cs: string,category_en: string,tenant: string}[]>([]);
 
   constructor(public state: AppState, private service: AppService){
 
@@ -74,7 +75,7 @@ export class HomeComponent {
   }
 
   ngOnInit() {
-    this.state.tenants.forEach(t => {t.available = true});
+    this.state.tenants().forEach(t => {t.available = true});
   }
 
   // checkIdentities(val: any) {
@@ -101,6 +102,7 @@ export class HomeComponent {
     p.prefix = val;
     this.service.searchKeywords(p).subscribe((resp: any) => {
       this.keywords.set(resp.keywords);
+      this.categories.set(resp.categories);
     });
   }
 

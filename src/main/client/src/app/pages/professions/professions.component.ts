@@ -102,8 +102,7 @@ export class ProfessionsComponent {
   }
 
   clickTenant(t: Tenant) {
-    this.state.setSelectedTenants();
-    this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
+    this.router.navigate([], {queryParams: {tenant:this.state.selectedTenants().map(t => t.val).toString()}});
   }
 
   changeTenant() {
@@ -145,7 +144,7 @@ export class ProfessionsComponent {
     this.loading = true;
     this.invalidTenant = false;
     const p: any = {};
-    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant = this.state.selectedTenants().map(t => t.val);
     p.tenant_year_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     p.lang = this.translation.currentLang;
@@ -165,7 +164,7 @@ export class ProfessionsComponent {
       }
       if (setResponse) {
         const ts: JSONFacet[] = resp.facets.tenants.buckets;
-        this.state.tenants.forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
+        this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
         // if (!this.state.tenant().available) {
         //   // this.state.tenant.set(null);
         //   this.loading = false;

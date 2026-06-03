@@ -35,21 +35,19 @@ export class NavbarComponent {
     this.onLanguageChanged('cs');
   }
 
-  changeTenant(t: Tenant) {
-    this.state.changeMainTenant(t);
-    this.router.navigate([], {queryParams: {tenant:t.val}});
-    //this.state.tenant.set(t);
-  }
+  // changeTenant(t: Tenant) {
+  //   this.state.changeMainTenant(t);
+  //   this.router.navigate([], {queryParams: {tenant:t.val}});
+  // }
 
-  selectTenant(t: Tenant) {
-    this.state.setSelectedTenants();
-    this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
-    //this.state.tenant.set(t);
-  }
+  // selectTenant(t: Tenant) {
+  //   this.state.setSelectedTenants();
+  //   this.router.navigate([], {queryParams: {tenant:this.state.selectedTenants().map(t => t.val).toString()}});
+  // }
 
-  formatTenants() {
-    return this.state.selectedTenants().map(t => t.val)
-  }
+  // formatTenants() {
+  //   return this.state.selectedTenants().map(t => t.val)
+  // }
 
   op() {
     this.state.showInfo.set(false);

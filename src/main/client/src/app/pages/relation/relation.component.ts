@@ -83,7 +83,7 @@ export class RelationComponent {
   }
 
   ngOnInit(): void {
-    this.state.tenants.forEach(t => { t.available = true });
+    this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'relation');
     if (this.tenant) {
       this.limits = [this.tenant.date_computed_min, this.tenant.date_computed_max];
@@ -149,7 +149,7 @@ export class RelationComponent {
 
   clickTenant(k: Tenant) {
     this.closeInfo();
-    this.state.tenants.forEach(t => t.selected = false);
+    this.state.tenants().forEach(t => t.selected = false);
     // k.selected = !k.selected;
     k.selected = true;
     this.getData(true);
@@ -184,7 +184,7 @@ export class RelationComponent {
     this.loading = true;
     const p: any = {};
     p.tenant = this.tenant.val;
-    p.other_tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.other_tenant = this.state.selectedTenants().map(t => t.val);
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     p.tenant_year_range = this.state.getTenantsRange().toString();
     if (!setResponse) {
@@ -251,7 +251,7 @@ export class RelationComponent {
 
   processResponse() {
     const categories = [{ name: this.tenant.val }];
-    const other = this.state.tenants.find(t => t.selected);
+    const other = this.state.tenants().find(t => t.selected);
     if (other) {
       categories.push({ name: other.val });
     }

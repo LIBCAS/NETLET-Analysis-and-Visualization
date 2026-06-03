@@ -92,7 +92,7 @@ export class IdentitiesComponent {
   }
 
   ngOnInit(): void {
-    this.state.tenants.forEach(t => { t.available = true });
+    this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'identities');
     if (this.tenants.length > 0) {
       this.limits = this.state.getTenantsRange();
@@ -155,8 +155,8 @@ export class IdentitiesComponent {
   }
 
   clickTenant(t: Tenant) {
-    this.state.setSelectedTenants();
-    this.router.navigate([], {queryParams: {tenant:this.state.tenants.filter(t => t.selected).map(t => t.val).toString()}});
+    // this.state.setSelectedTenants();
+    this.router.navigate([], {queryParams: {tenant:this.state.tenants().filter(t => t.selected).map(t => t.val).toString()}});
   }
 
   changeTenant() {
@@ -215,7 +215,7 @@ export class IdentitiesComponent {
   getData(setResponse: boolean) {
     this.loading = true;
     const p: any = {};
-    p.tenant = this.state.tenants.filter(t => t.selected).map(t => t.val);
+    p.tenant = this.state.selectedTenants().map(t => t.val);
     p.tenant_year_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     if (!setResponse) {

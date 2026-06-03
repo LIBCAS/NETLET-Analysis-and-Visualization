@@ -1,5 +1,5 @@
 import { Component, inject, Inject, DOCUMENT } from '@angular/core';
-import { ActivatedRoute, RouterModule  } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule  } from '@angular/router';
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { FooterComponent } from "./components/footer/footer.component";
 import { AppState } from './app-state';
@@ -15,6 +15,8 @@ import { switchMap, of } from 'rxjs';
 })
 export class AppComponent {
   readonly route = inject(ActivatedRoute);
+  private router = inject(Router);
+  
   title = 'netlet-analysis';
 
   constructor(
