@@ -457,13 +457,13 @@ public class IndexSearcher {
                     .withFacet("professions", new TermsFacetMap("professions_" + lang)
                             .setLimit(1000)
                             .setMinCount(1))
-                    .withFacet("professions_author", new TermsFacetMap("professions_author_" + lang)
+                    .withFacet("authors", new TermsFacetMap("professions_author_" + lang)
                             .setLimit(1000)
                             .setMinCount(1))
-                    .withFacet("professions_recipient", new TermsFacetMap("professions_recipient_" + lang)
+                    .withFacet("recipients", new TermsFacetMap("professions_recipient_" + lang)
                             .setLimit(1000)
                             .setMinCount(1))
-                    .withFacet("professions_mentioned", new TermsFacetMap("professions_mentioned_" + lang)
+                    .withFacet("mentioned", new TermsFacetMap("professions_mentioned_" + lang)
                             .setLimit(1000)
                             .setMinCount(1));
             jrequest = addFilters(request, jrequest, lang);

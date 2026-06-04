@@ -1,27 +1,10 @@
 <div class="app-loading">@if(loading && !running){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
   <div style="flex: 1 30%;" class="app-filters">
-
-    <div>
-      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-list>
-          @for(k of state.tenants(); track $index; let idx = $index;){
-          <mat-list-item (click)="clickTenant(k)">
-            <mat-checkbox  [(ngModel)]="k.selected">{{ k.val}} ({{k.count}})
-            </mat-checkbox>
-          </mat-list-item>
-          }
-        </mat-list>
-      </mat-expansion-panel>
-    </div>
     
-    @if(solrResponse?.facets) {
     <app-facets [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'prefessions', 'origins', 'destinations']"
-      [facets]="solrResponse.facets" (onFiltersChanged)="onFiltersChanged($event)" (onMouserOver)="showNode($event)"
-      (onMouseOut)="hideNode()"></app-facets> }
+      [facets]="facets()" (onFiltersChanged)="onFiltersChanged($event)" (onMouserOver)="showNode($event)"
+      (onMouseOut)="hideNode()"></app-facets>
 
   </div>
   <div class="app-content app-fill-w app-fill-h">

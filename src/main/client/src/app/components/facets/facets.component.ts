@@ -31,7 +31,7 @@ export class FacetsComponent {
 
   showTenants = input<boolean>(true);
   renderLists = input<boolean>(true);
-  colored = input<boolean>(true);
+  colored = input<boolean>(false);
   facets = input<FacetFields>();
   fields = input<string[]>([]);
   sub_fields = input<{ [key: string]: string }>({});

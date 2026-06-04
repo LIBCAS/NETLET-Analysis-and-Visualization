@@ -1,6 +1,6 @@
 
 import { HttpParams } from '@angular/common/http';
-import { Component, effect, Inject, NgZone, DOCUMENT } from '@angular/core';
+import { Component, effect, Inject, NgZone, DOCUMENT, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -23,7 +23,7 @@ import { GraphChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { Letter } from '../../shared/letter';
-import { JSONFacet } from '../../shared/facet';
+import { FacetFields, JSONFacet } from '../../shared/facet';
 import { LabelLayout } from "echarts/features";
 import { MatExpansionModule } from '@angular/material/expansion';
 import { AppConfiguration } from '../../app-configuration';
@@ -47,6 +47,7 @@ export class IdentitiesComponent {
   loading: boolean;
   running: boolean;
   solrResponse: any;
+  facets = signal<FacetFields>({});
   limits: [Date, Date];
   tenants: Tenant[] = [];
   graphOptions: EChartsOption = {};
@@ -83,12 +84,16 @@ export class IdentitiesComponent {
     private service: AppService
   ) {
     effect(() => {
-      
-      this.tenants = this.state.selectedTenants();
-      if (this.tenants.length > 0) {
-        this.changeTenant();
+      const sc = this.state.stateChanged();
+      if (sc > 0) {
+        this.limits = this.state.getTenantsRange();
+        this.getData(true);
+      } else {
+        this.loading = false;
+        this.graphOptions = {};
+        this.facets.set({});
       }
-    })
+    });
   }
 
   ngOnInit(): void {
@@ -228,6 +233,7 @@ export class IdentitiesComponent {
       if (!resp) {
         return;
       }
+      this.facets.set(resp.facets);
       if (setResponse) {
         this.solrResponse = resp;
       }

@@ -1,6 +1,6 @@
 
 import { HttpParams } from '@angular/common/http';
-import { Component, effect, Inject, DOCUMENT } from '@angular/core';
+import { Component, effect, Inject, DOCUMENT, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,7 +14,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Tenant, AppState } from '../../app-state';
 import { AppService } from '../../app.service';
 import { YearsChartComponent } from '../../components/years-chart/years-chart.component';
-import { JSONFacet } from '../../shared/facet';
+import { FacetFields, JSONFacet } from '../../shared/facet';
 import { Letter } from '../../shared/letter';
 
 import * as echarts from 'echarts/core';
@@ -25,12 +25,13 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { LabelLayout } from "echarts/features";
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { FacetsComponent } from "../../components/facets/facets.component";
 
 echarts.use([CanvasRenderer, PieChart, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-professions',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -41,6 +42,7 @@ export class ProfessionsComponent {
   loading: boolean;
   invalidTenant: boolean;
   solrResponse: any;
+  facets = signal<FacetFields>({});
   limits: [Date, Date];
   tenants: Tenant[] = [];
   graphOptions: EChartsOption = {};
@@ -77,11 +79,16 @@ export class ProfessionsComponent {
     private service: AppService
   ) {
     effect(() => {
-      this.tenants = this.state.selectedTenants();
-      if (this.tenants.length > 0) {
-        this.changeTenant();
+      const sc = this.state.stateChanged();
+      if (sc > 0) {
+        this.limits = this.state.getTenantsRange();
+        this.getData(true);
+      } else {
+        this.loading = false;
+        this.graphOptions = {};
+        this.facets.set({});
       }
-    })
+    });
   }
 
   ngOnInit(): void {
@@ -115,7 +122,24 @@ export class ProfessionsComponent {
     this.getData(false);
   }
 
-  showNode(identity: JSONFacet, category: string) {
+  showNode(e: {field: string, value: string}) {
+    if (e.field !== 'authors' && e.field !== 'recipients') {
+      return;
+    }
+    const idx = this.graphData.nodes.findIndex(n => n.id === e.value + '_' + e.field);
+    this.graphChart.dispatchAction({
+      type: 'showTip',
+      seriesIndex: 0,
+      dataIndex: idx
+    });
+    this.graphChart.dispatchAction({
+      type: 'highlight',
+      seriesIndex: 0,
+      dataIndex: idx
+    });
+  }
+
+  showNode2(identity: JSONFacet, category: string) {
     const idx = this.graphData.nodes.findIndex(n => n.id === identity.val + '_' + category);
     // currentIndex = (currentIndex + 1) % dataLen;
     this.graphChart.dispatchAction({
@@ -157,6 +181,7 @@ export class ProfessionsComponent {
       if (!resp) {
         return;
       }
+      this.facets.set(resp.facets);
       if (resp.response.numFound === 0) {
         this.invalidTenant = true;
         this.loading = false;
@@ -173,8 +198,8 @@ export class ProfessionsComponent {
         // }
         this.solrResponse = resp;
       }
-      this.professions_author = resp.facets.professions_author ? resp.facets.professions_author.buckets : null;
-      this.professions_recipient = resp.facets.professions_recipient ? resp.facets.professions_recipient.buckets : null;
+      this.professions_author = resp.facets.authors ? resp.facets.authors.buckets : null;
+      this.professions_recipient = resp.facets.recipients ? resp.facets.recipients.buckets : null;
       // this.professions_mentioned = resp.facets.professions_mentioned.buckets;
       this.processResponse();
       this.loading = false;
@@ -237,7 +262,7 @@ export class ProfessionsComponent {
       return;
     }
     this.setPieChart();
-    const categories = [{ name: 'author' }, { name: 'recipient' }];
+    const categories = [{ name: 'authors' }, { name: 'recipients' }];
     const links: any[] = [];
     const nodes: any[] = [];
     const h = this.graphChart.getHeight();
@@ -250,10 +275,10 @@ export class ProfessionsComponent {
     this.professions_author.forEach((identity: JSONFacet) => {
       nodes.push({
         // id: identity.id + '',
-        id: identity.val + '_author',
+        id: identity.val + '_authors',
         name: identity.val,
         value: identity.count,
-        category: 'author',
+        category: 'authors',
         symbolSize: maxSize * identity.count / maxCount + minSize,
         x: Math.random() * w,
         y: Math.random() * h
@@ -262,10 +287,10 @@ export class ProfessionsComponent {
     this.professions_recipient.forEach((identity: JSONFacet) => {
       nodes.push({
         // id: identity.id + '',
-        id: identity.val + '_recipient',
+        id: identity.val + '_recipients',
         name: identity.val,
         value: identity.count,
-        category: 'recipient',
+        category: 'recipients',
         symbolSize: maxSize * identity.count / maxCount + minSize,
         x: Math.random() * w,
         y: Math.random() * h
