@@ -72,7 +72,8 @@
     "keyword_categories_cs": "Klíčová slova"
   },
   "action": {
-    "view_in_hiko": "Zobrazit v HIKO"
+    "view_in_hiko": "Zobrazit v HIKO",
+    "letter_details": "Zobrazit dopis"
   },
   "invalidTenant": "Nejsou k dispozice data pro tento Katalog"
 }

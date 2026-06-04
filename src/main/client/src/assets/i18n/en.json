@@ -29,7 +29,8 @@
     "date_year": "Year"
   },
   "action": {
-    "view_in_hiko": "View in HIKO DB"
+    "view_in_hiko": "View in HIKO DB",
+    "letter_details": "Letter details"
   },
   "invalidTenant": "There is no available data for this Catalog"
 }

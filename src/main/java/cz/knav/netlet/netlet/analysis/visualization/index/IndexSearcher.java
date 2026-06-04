@@ -29,6 +29,30 @@ public class IndexSearcher {
     public static final Logger LOGGER = Logger.getLogger(IndexSearcher.class.getName());
     final static SimpleDateFormat dtformatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
+    
+    public static JSONObject getLetter(String id) {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) { 
+
+            final JsonQueryRequest jrequest = new JsonQueryRequest()
+                    .setQuery("*:*")
+                    .withFilter("id:"+id)
+                    .returnFields("*,places:[json],identities:[json],professions:[json],keywords:[json]")
+                    .setLimit(1);
+
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
+
+            NamedList<Object> resp = solr.request(jrequest, "hiko");
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8")).getJSONObject("response").getJSONArray("docs").getJSONObject(0);
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
+            ret.put("error", ex);
+        }
+        return ret;
+    }
+    
     public static JSONObject getTenants() {
         JSONObject ret = new JSONObject();
         try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) { 
@@ -590,7 +614,7 @@ public class IndexSearcher {
 //                    .withFilter("identity_recipient:*")
 //                    .withFilter("identity_author:*")
                     .setSort("date_year asc,date_computed asc")
-                    .returnFields("letter_id,tenant,date_computed,date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
+                    .returnFields("id,letter_id,tenant,date_computed,date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_computed_range", rangeFacet)
                     //.withFacet("qfm", qfm)
                     .withFacet("tenants", new TermsFacetMap("tenant")

@@ -169,6 +169,14 @@ public class DataServlet extends HttpServlet {
                 return ret;
             }
         },
+        GET_LETTER {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                JSONObject ret = IndexSearcher.getLetter(request.getParameter("id"));
+                
+                return ret;
+            }
+        },
         SEARCH_KEYWORDS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
