@@ -77,6 +77,9 @@
               <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
               <td mat-cell *matCellDef="let element">
                 <button class="app-hiko app-small-icon-button" mat-icon-button
+                  (click)="viewLetter(element.letter_id, element.tenant)"
+                  [matTooltip]="'action.view_in_hiko' | translate"><mat-icon>info</mat-icon></button>
+                <button class="app-hiko app-small-icon-button" mat-icon-button
                   (click)="viewLetterInHIKO(element.letter_id, element.tenant)"
                   [matTooltip]="'action.view_in_hiko' | translate"><mat-icon>arrow_outward</mat-icon></button>
               </td>

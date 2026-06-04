@@ -327,6 +327,10 @@ export class TimelineComponent {
     this.setOptions(data);
   }
 
+  viewLetter(id: number, t: string) {
+    this.router.navigate(['/letter', id])
+  }
+
   viewLetterInHIKO(id: number, t: string) {
     const tenant = this.config.isTest ? this.config.test_mappings[t] : t;
     window.open(this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', id + ''), 'hiko');
