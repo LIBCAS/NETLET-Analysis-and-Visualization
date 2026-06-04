@@ -1,4 +1,4 @@
-import { Component, effect, Inject, NgZone, DOCUMENT } from '@angular/core';
+import { Component, effect, Inject, NgZone, DOCUMENT, signal } from '@angular/core';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 
@@ -17,7 +17,7 @@ import { HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Tenant, AppState } from '../../app-state';
 import { AppService } from '../../app.service';
-import { JSONFacet } from '../../shared/facet';
+import { FacetFields, JSONFacet } from '../../shared/facet';
 import { Letter, Place } from '../../shared/letter';
 
 import {
@@ -78,6 +78,7 @@ export class MapComponent {
   };
 
   solrResponse: any;
+  facets = signal<FacetFields>({});
   authors: JSONFacet[];
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
@@ -86,8 +87,12 @@ export class MapComponent {
   graphChart: EChartsType;
 
   nodes: { [id: string]: { coords: [number, number], name: string } } = {};
-  links: { [id: string]: { node1: [number, number], node2: [number, number], count: number, 
-    letters: Letter[], authors: string[], recipients: string[] } } = {};
+  links: {
+    [id: string]: {
+      node1: [number, number], node2: [number, number], count: number,
+      letters: Letter[], authors: string[], recipients: string[]
+    }
+  } = {};
   limits: [Date, Date];
 
   infoContent: string;
@@ -108,18 +113,18 @@ export class MapComponent {
     public state: AppState,
     private service: AppService
   ) {
+
     effect(() => {
+
       const sc = this.state.stateChanged();
-      if (sc > 0 && this.tenants.length > 0) {
+      if (sc > 0) {
+        this.limits = this.state.getTenantsRange();
         this.getData(true);
+      } else {
+        this.loading = false;
+        this.facets.set({});
       }
-    })
-    effect(() => {
-      this.tenants = this.state.selectedTenants();
-      if (this.tenants.length > 0) {
-        this.changeTenant();
-      }
-    })
+    });
   }
 
   ngOnInit(): void {
@@ -139,7 +144,7 @@ export class MapComponent {
   }
 
   clickTenant(t: Tenant) {
-    
+
     this.router.navigate([], { queryParams: { tenant: this.state.selectedTenants().map(t => t.val).toString() } });
   }
 
@@ -180,7 +185,7 @@ export class MapComponent {
       //   this.invalidTenant = true;
       //   return;
       // }
-
+      this.facets.set(resp.facets);
       if (resp.stats?.stats_fields.latitude) {
         const lat = resp.stats.stats_fields.latitude;
         const lon = resp.stats.stats_fields.longitude;
@@ -272,7 +277,7 @@ export class MapComponent {
       type: 'downplay'
     });
     this.graphChart.dispatchAction({
-      dataType:'edge',
+      dataType: 'edge',
       type: 'downplay'
     });
 
@@ -296,7 +301,7 @@ export class MapComponent {
 
   clearHighlight() { }
 
-  highlightLinks(field: string, val: string) { 
+  highlightLinks(field: string, val: string) {
     //const idx = this.graphData.links.findIndex(n => n.authors.includes(val));
     const idxs: number[] = [];
     this.graphData.links.forEach((n: any, idx: number) => {
@@ -307,10 +312,10 @@ export class MapComponent {
     this.graphChart.dispatchAction({
       type: 'highlight',
       seriesIndex: 0,
-      dataType:'edge',
+      dataType: 'edge',
       dataIndex: idxs
     });
-    
+
   }
 
   closeInfo() {
@@ -361,7 +366,9 @@ export class MapComponent {
               labelReversed: place_destination.name + ' > ' + place_origin.name,
               count: this.links[linkId].count,
               lineStyle: {
-                color: this.config.tenant_colors[letter.tenant]
+                color: this.config.tenant_colors[letter.tenant],
+                width: 1,
+                opacity: 1
               }
             });
           } else {

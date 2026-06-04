@@ -74,12 +74,18 @@ export class RelationComponent {
     public state: AppState,
     private service: AppService
   ) {
+
     effect(() => {
-      this.tenant = this.state.selectedTenants()[0];
-      if (this.tenant) {
-        this.changeTenant();
+
+      const sc = this.state.stateChanged();
+      if (sc > 0) {
+        this.limits = this.state.getTenantsRange();
+        this.getData(true);
+      } else {
+        this.loading = false;
+        this.facets.set({});
       }
-    })
+    });
   }
 
   ngOnInit(): void {

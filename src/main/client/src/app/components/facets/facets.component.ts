@@ -14,6 +14,7 @@ import { map, Observable, startWith } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { AppState, Tenant } from '../../app-state';
 import { Router } from '@angular/router';
+import { AppConfiguration } from '../../app-configuration';
 
 @Component({
   selector: 'app-facets',
@@ -30,6 +31,7 @@ export class FacetsComponent {
 
   showTenants = input<boolean>(true);
   renderLists = input<boolean>(true);
+  colored = input<boolean>(true);
   facets = input<FacetFields>();
   fields = input<string[]>([]);
   sub_fields = input<{ [key: string]: string }>({});
@@ -49,7 +51,7 @@ export class FacetsComponent {
     console.log(e)
   }
 
-  constructor(public state: AppState) {
+  constructor(public config: AppConfiguration, public state: AppState) {
 
     effect(() => {
       this.usedFacets = this.state.usedFacets();

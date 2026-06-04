@@ -1,4 +1,4 @@
-import { Component, computed, effect, Inject, input, NgZone, OnInit, Signal, DOCUMENT } from '@angular/core';
+import { Component, computed, effect, Inject, input, NgZone, OnInit, Signal, DOCUMENT, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import L, { circle, CircleMarker, LatLng, latLng, LatLngBounds, Layer, LayerGroup, Map, Marker, polygon, tileLayer } from 'leaflet';
@@ -13,7 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { Facet, JSONFacet } from '../../shared/facet';
+import { Facet, FacetFields, JSONFacet } from '../../shared/facet';
 import { HttpParams } from '@angular/common/http';
 
 import { Letter, Place } from '../../shared/letter';
@@ -23,10 +23,11 @@ import { YearsChartComponent } from "../../components/years-chart/years-chart.co
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { FacetsComponent } from "../../components/facets/facets.component";
 
 @Component({
   selector: 'app-map-view',
-  imports: [TranslateModule, FormsModule, LeafletModule, MatCardModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule, MatIconModule, MatProgressBarModule, YearsChartComponent, LettersInfoComponent],
+  imports: [TranslateModule, FormsModule, LeafletModule, MatCardModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule, MatIconModule, MatProgressBarModule, YearsChartComponent, LettersInfoComponent, FacetsComponent],
   templateUrl: './map-view.component.html',
   styleUrl: './map-view.component.scss'
 })
@@ -47,6 +48,7 @@ export class MapViewComponent implements OnInit {
   activeLinkColor = '#f00';
 
   solrResponse: any;
+  facets = signal<FacetFields>({});
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
 
@@ -69,18 +71,31 @@ export class MapViewComponent implements OnInit {
     public state: AppState,
     private service: AppService
   ) {
+
     effect(() => {
-      effect(() => {
+
       const sc = this.state.stateChanged();
-      if (sc > 0 && this.tenants.length > 0) {
+      if (sc > 0) {
+        this.limits = this.state.getTenantsRange();
         this.getData(true);
+      } else {
+        this.loading = false;
+        this.facets.set({});
       }
-    })
-      this.tenants = this.state.selectedTenants();
-      if (this.tenants.length > 0) {
-        this.changeTenant();
-      }
-    })
+    });
+
+
+    //   effect(() => {
+    //   const sc = this.state.stateChanged();
+    //   if (sc > 0 && this.tenants.length > 0) {
+    //     this.getData(true);
+    //   }
+    // })
+    //   this.tenants = this.state.selectedTenants();
+    //   if (this.tenants.length > 0) {
+    //     this.changeTenant();
+    //   }
+    // })
   }
 
   ngOnInit(): void {
@@ -131,12 +146,7 @@ export class MapViewComponent implements OnInit {
       }
       const ts: JSONFacet[] = resp.facets.tenants.buckets;
       this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
-      // if (!this.state.tenant().available) {
-      //   // this.state.tenant.set(null);
-      //   this.loading = false;
-      //   this.invalidTenant = true;
-      //   return;
-      // }
+      this.facets.set(resp.facets);
       if (resp.stats?.stats_fields.latitude) {
         const lat = resp.stats.stats_fields.latitude;
         const lon = resp.stats.stats_fields.longitude;

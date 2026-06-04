@@ -1,4 +1,4 @@
-import { Component, effect, Inject, input, DOCUMENT } from '@angular/core';
+import { Component, effect, Inject, input, DOCUMENT, signal } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { HttpParams } from '@angular/common/http';
@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../app.service';
 import { AppState, Tenant } from '../../app-state';
-import { JSONFacet } from '../../shared/facet';
+import { FacetFields, JSONFacet } from '../../shared/facet';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -25,12 +25,13 @@ import * as echarts from 'echarts/core';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { FacetsComponent } from "../../components/facets/facets.component";
 
 echarts.use([BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
 
 @Component({
   selector: 'app-keywords',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent],
   templateUrl: './periods.component.html',
   styleUrl: './periods.component.scss',
   providers: [
@@ -41,6 +42,7 @@ export class PeriodsComponent {
   loading: boolean;
   invalidTenant: boolean;
   solrResponse: any;
+  facets = signal<FacetFields>({});
   limits: [Date, Date];
 
   periods: JSONFacet[];
@@ -86,19 +88,18 @@ export class PeriodsComponent {
     public state: AppState,
     private service: AppService
   ) {
-    
+
     effect(() => {
       const sc = this.state.stateChanged();
-      if (sc > 0 && this.tenants.length > 0) {
+      if (sc > 0) {
+        this.limits = this.state.getTenantsRange();
         this.getData(true);
+      } else {
+        this.loading = false;
+        this.pieOptions = {};
+        this.facets.set({});
       }
-    })
-    effect(() => {
-      this.tenants = this.state.selectedTenants();
-      if (this.tenants.length > 0) {
-        this.changeTenant();
-      }
-    })
+    });
   }
 
   ngOnInit(): void {
@@ -162,6 +163,7 @@ export class PeriodsComponent {
       if (!resp) {
         return;
       }
+      this.facets.set(resp.facets);
       if (setResponse) {
         this.solrResponse = resp;
         const ts: JSONFacet[] = resp.facets.tenants.buckets;

@@ -97,7 +97,6 @@ export class KeywordsComponent {
   ) {
     
     effect(() => {
-
       const sc = this.state.stateChanged();
       if (sc > 0) {
         this.limits = this.state.getTenantsRange();
@@ -107,23 +106,12 @@ export class KeywordsComponent {
         this.pieOptions = {};
         this.facets.set({});
       }
-
-
-    })
-    // effect(() => {
-    //   this.tenants = this.state.selectedTenants();
-    //   if (this.tenants.length > 0) {
-    //     this.changeTenant();
-    //   } else {
-    //     this.loading = false;
-    //     this.facets.set({});
-    //   }
-    // })
+    });
   }
 
   ngOnInit(): void {
 
-    this.translation.onLangChange.subscribe(() => { this.getData(true) });
+    //this.translation.onLangChange.subscribe(() => { this.getData(true) });
     this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'keywords');
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
@@ -188,6 +176,7 @@ export class KeywordsComponent {
     p.includeRecipients = this.includeRecipients;
     this.state.addFilters(p);
     this.service.getKeywords(p as HttpParams).subscribe((resp: any) => {
+      this.translation.onLangChange.subscribe(() => { this.getData(true) });
       if (!resp) {
         return;
       }
@@ -196,7 +185,7 @@ export class KeywordsComponent {
         const ts: JSONFacet[] = resp.facets.tenants.buckets;
         this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
       }
-      this.facets.set(resp.facets)
+      this.facets.set(resp.facets);
       if (resp.response.numFound === 0) {
         this.loading = false;
         return;

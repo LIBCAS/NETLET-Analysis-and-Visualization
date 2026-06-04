@@ -9,6 +9,11 @@
 @if (!invalidTenant) {
   <div class="app-fxLayout app-row app-fill" style="position: relative;">
     <div style="flex: 1 30%;" class="app-filters">
+      <app-facets
+        [colored]="true"
+        [fields]="['recipients','mentioned']"
+        [facets]="facets()"></app-facets>
+
       @if (recipients) {
         <div>
           <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
