@@ -326,8 +326,8 @@ export class CentralityComponent {
       // let popup = '';
       // letters.forEach((letter: Letter) => {
       //   popup += `<div>- ${letter.identity_recipient}. ${letter.date_year}`;
-      //   if (letter.keywords_category_cs?.length > 0) {
-      //     popup += ` (${letter.keywords_category_cs.join(', ')})`;
+      //   if (letter.keyword_categories_cs?.length > 0) {
+      //     popup += ` (${letter.keyword_categories_cs.join(', ')})`;
       //   } else if (letter.keywords_cs?.length > 0) {
       //     popup += ` (${letter.keywords_cs.join(', ')})`;
       //   } else {
@@ -342,7 +342,7 @@ export class CentralityComponent {
       // });
       
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_recipient', 'keywords_category_cs', 'date_year', 'action'];
+      this.infoFields = ['letter_id', 'identity_recipient', 'keyword_categories_cs', 'date_year', 'action'];
 
         this.infoHeader = `${identity} wrote letters to:`;
         this.state.showInfo.set(true);
@@ -356,8 +356,8 @@ export class CentralityComponent {
       // let popup = '';
       // letters.forEach((letter: Letter) => {
       //   popup += `<div>- ${letter.identity_author}. ${letter.date_year}`;
-      //   if (letter.keywords_category_cs?.length > 0) {
-      //     popup += ` (${letter.keywords_category_cs.join(', ')})`;
+      //   if (letter.keyword_categories_cs?.length > 0) {
+      //     popup += ` (${letter.keyword_categories_cs.join(', ')})`;
       //   } else if (letter.keywords_cs?.length > 0) {
       //     popup += ` (${letter.keywords_cs.join(', ')})`;
       //   } else {
@@ -372,7 +372,7 @@ export class CentralityComponent {
       // });
       
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_recipient', 'keywords_category_cs', 'date_year', 'action'];
+      this.infoFields = ['letter_id', 'identity_recipient', 'keyword_categories_cs', 'date_year', 'action'];
       this.infoHeader = `${identity} received letters from:`;
       this.state.showInfo.set(true);
     });
@@ -385,8 +385,8 @@ export class CentralityComponent {
       // let popup = '';
       // letters.forEach((letter: Letter) => {
       //   popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
-      //   if (letter.keywords_category_cs?.length > 0) {
-      //     popup += ` (${letter.keywords_category_cs.join(', ')})`;
+      //   if (letter.keyword_categories_cs?.length > 0) {
+      //     popup += ` (${letter.keyword_categories_cs.join(', ')})`;
       //   } else if (letter.keywords_cs?.length > 0) {
       //     popup += ` (${letter.keywords_cs.join(', ')})`;
       //   } else {
@@ -402,7 +402,7 @@ export class CentralityComponent {
       
         this.infoHeader = `${identity} is mentioned in:`;
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_recipient', 'keywords_category_cs', 'date_year', 'action'];
+      this.infoFields = ['letter_id', 'identity_recipient', 'keyword_categories_cs', 'date_year', 'action'];
         this.state.showInfo.set(true);
     });
   }

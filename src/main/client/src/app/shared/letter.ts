@@ -11,7 +11,7 @@ export interface Letter {
     places: Place[],
     identities: Identity[],
     keywords_cs: string[],
-    keywords_category_cs: string[],
+    keyword_categories_cs: string[],
     identity_author: string[],
     identity_recipient: string[],
     identity_mentioned: string[],

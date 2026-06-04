@@ -486,8 +486,8 @@ export class MapComponent {
           // let letters: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin_name + '' === params.data.source && letter.destination_name + '' === params.data.target);
           // letters.forEach((letter: Letter) => {
           //   popup += `<div>${letter.letter_id}.- ${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
-          //   if (letter.keywords_category_cs?.length > 0) {
-          //     popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+          //   if (letter.keyword_categories_cs?.length > 0) {
+          //     popup += ` (${letter.keyword_categories_cs.join(', ')})</div>`;
           //   } else if (letter.keywords_cs?.length > 0) {
           //     popup += ` (${letter.keywords_cs.join(', ')})</div>`;
           //   } else {

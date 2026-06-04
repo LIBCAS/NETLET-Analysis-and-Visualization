@@ -180,10 +180,12 @@ public class DataServlet extends HttpServlet {
                 }
                 ret.put("keywords", IndexSearcher.searchKeywords(request.getParameter("prefix"), 
                         request.getParameter("tenant"),
-                        lang, "name_lower_"+lang, false).getJSONObject("response").getJSONArray("docs"));
+                        lang, "name_lower_"+lang, "type:[value v=keyword],value:name_" + lang,
+                        false).getJSONObject("response").getJSONArray("docs"));
                 ret.put("categories", IndexSearcher.searchKeywords(request.getParameter("prefix"), 
                         request.getParameter("tenant"),
-                        lang, "category_lower_"+lang, true).getJSONObject("response").getJSONArray("docs"));
+                        lang, "category_lower_"+lang,  "type:[value v=category],value:category_"+lang, 
+                        true).getJSONObject("response").getJSONArray("docs"));
                 return ret;
             }
         },

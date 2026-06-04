@@ -33,11 +33,11 @@ export class HomeComponent {
   searchModel = signal({
     tenants: [],
     identities: '',
-    places: '',
-    keywords: '',
+    places: ''
   });
 
   searchForm = form(this.searchModel);
+  selectedKeyword = {type: '', value: ''};
   
   //identities = signal<{id: string,table_id: number,name: string,tenant: string}[]>([]);
 
@@ -52,20 +52,20 @@ export class HomeComponent {
   identities = computed<any>(() => this.identitiesRes.value() ? this.identitiesRes.value().identities : [] );
 
   places = signal<{id: string,table_id: number,name: string,tenant: string}[]>([]);
-  keywords = signal<{id: string,table_id: number,name_cs: string,name_en: string,tenant: string}[]>([]);
-  categories = signal<{id: string,table_id: number,category_cs: string,category_en: string,tenant: string}[]>([]);
+  keywords = signal<{value: string,type: string}[]>([]);
+  categories = signal<{value: string,type: string}[]>([]);
 
   constructor(public state: AppState, private service: AppService){
 
     // effect(() => {
     //   this.checkIdentities(this.searchForm.identities().value());
-    // });
-    effect(() => {
-      if (this.searchModel().keywords) {
-        this.checkKeywords(this.searchModel().keywords);
-      }
+    // // });
+    // effect(() => {
+    //   if (this.searchModel().keywords) {
+    //     this.checkKeywords(this.searchModel().keywords);
+    //   }
       
-    });
+    // });
     effect(() => {
       if (this.searchModel().places) {
         this.checkPlaces(this.searchModel().places);
@@ -96,22 +96,35 @@ export class HomeComponent {
     });
   }
 
+  displayFn(val: {value: string,type: string}): string {
+    return val && val.value ? val.value : '';
+  }
+
   checkKeywords(val: any) {
-    console.log(val)
     const p: any = {};
-    p.prefix = val;
+    p.prefix = val.target.value;
     this.service.searchKeywords(p).subscribe((resp: any) => {
       this.keywords.set(resp.keywords);
       this.categories.set(resp.categories);
     });
   }
 
+  setKeyword(e: any) {
+    console.log(e)
+    this.selectedKeyword = {type: e.option.value.type, value: e.option.value.value}
+  }
+
   setFilters() {
     console.log(this.searchModel());
     const usedFacets: {field: string, value: string}[] = [];
-    if(this.searchModel().keywords) {
-      usedFacets.push({field: 'keywords', value: this.searchModel().keywords});
+    if (this.selectedKeyword.type === 'category') {
+      usedFacets.push({field: 'keyword_categories', value: this.selectedKeyword.value});
+    } else if(this.selectedKeyword.type === 'keyword') {
+      usedFacets.push({field: 'keywords', value: this.selectedKeyword.value});
     }
+    // if(this.searchModel().keywords) {
+    //   usedFacets.push({field: 'keywords', value: this.searchModel().keywords});
+    // }
     if(this.searchModel().places) {
       usedFacets.push({field: 'places', value: this.searchModel().places});
     }

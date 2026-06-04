@@ -182,8 +182,8 @@ export class MapViewComponent implements OnInit {
                   lettersTo += layer.options.letters.filter((l: Letter) => l.destination === place.id).length;
                   // letters.forEach(letter => {
                   //   popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
-                  //   if (letter.keywords_category_cs?.length > 0) {
-                  //     popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+                  //   if (letter.keyword_categories_cs?.length > 0) {
+                  //     popup += ` (${letter.keyword_categories_cs.join(', ')})</div>`;
                   //   } else if (letter.keywords_cs?.length > 0) {
                   //     popup += ` (${letter.keywords_cs.join(', ')})</div>`;
                   //   } else {
@@ -257,8 +257,8 @@ export class MapViewComponent implements OnInit {
         letters.forEach(letter => {
           this.infoContent += `<div>${this.nodes[letter.origin].name} -> ${this.nodes[letter.destination].name}: ${letter.date_year}`;
 
-          if (letter.keywords_category_cs?.length > 0) {
-            this.infoContent += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+          if (letter.keyword_categories_cs?.length > 0) {
+            this.infoContent += ` (${letter.keyword_categories_cs.join(', ')})</div>`;
           } else if (letter.keywords_cs?.length > 0) {
             this.infoContent += ` (${letter.keywords_cs.join(', ')})</div>`;
           } else {
@@ -348,8 +348,8 @@ export class MapViewComponent implements OnInit {
         let popup = '';
         letters.forEach(letter => {
           popup += `<div>${letter.letter_id}.- ${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
-          if (letter.keywords_category_cs?.length > 0) {
-            popup += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+          if (letter.keyword_categories_cs?.length > 0) {
+            popup += ` (${letter.keyword_categories_cs.join(', ')})</div>`;
           } else if (letter.keywords_cs?.length > 0) {
             popup += ` (${letter.keywords_cs.join(', ')})</div>`;
           } else {

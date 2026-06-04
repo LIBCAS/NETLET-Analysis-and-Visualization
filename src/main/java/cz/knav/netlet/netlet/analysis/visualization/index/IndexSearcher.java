@@ -317,7 +317,7 @@ public class IndexSearcher {
                     .returnFields("letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,origin,destination,origin_id,destination_id,origin_name,destination_name,places:[json],identities:[json],keywords_category_cs,keywords_cs")
                     .withFacet("date_year", rangeFacet)
                     .withFacet("keywords_cs", keywords_csFacet)
-                    .withFacet("keywords_categories", categories_csFacet)
+                    .withFacet("keyword_categories", categories_csFacet)
                     .withFacet("mentioned", identity_mentionedFacet)
                     .withFacet("tenants", new TermsFacetMap("tenant")
                             .setLimit(1000)
@@ -689,8 +689,8 @@ public class IndexSearcher {
 //            }
 //            
 //            
-//            if (request.getParameter("keywords_category") != null) {
-//                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keywords_category")) + "\")");
+//            if (request.getParameter("keyword_categories") != null) {
+//                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword_categories")) + "\")");
 //            }
             
             if (request.getParameter("keyword") != null) {
@@ -698,8 +698,8 @@ public class IndexSearcher {
             }
             
             
-            if (request.getParameter("keywords_category") != null) {
-                jrequest = jrequest.withFilter("keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keywords_category")) + "\")");
+            if (request.getParameter("keyword_categories") != null) {
+                jrequest = jrequest.withFilter("keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword_categories")) + "\")");
             }
             
             if (request.getParameter("profession") != null) {
@@ -762,11 +762,11 @@ public class IndexSearcher {
      * @param lang
      * @return 
      */
-    public static JSONObject searchKeywords(String prefix, String tenant, String lang, String field, boolean collapse) {
+    public static JSONObject searchKeywords(String prefix, String tenant, String lang, String field, String fl, boolean collapse) {
         JSONObject ret = new JSONObject();
         try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             SolrQuery query = new SolrQuery(field+":" + prefix + "*")
-                    .setFields("id,table_id,name_cs,name_en,category_cs,category_en,tenant")
+                    .setFields(fl)
                     .setSort(SolrQuery.SortClause.asc("name_sort"))
                     .setRows(20);
             query.set("wt", "json");

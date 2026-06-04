@@ -47,17 +47,17 @@
 
         <mat-form-field class="app-fill-w" appearance="outline">
             <input type="text" placeholder="{{ 'keywords' | translate}}" attr.aria-label="{{ 'keywords' | translate}}"
-                matInput [formField]="searchForm.keywords" [matAutocomplete]="auto">
+                matInput [matAutocomplete]="auto" (keyup)="checkKeywords($event)">
 
-            <mat-autocomplete #auto="matAutocomplete">
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setKeyword($event)"  [displayWith]="displayFn">
                 <mat-optgroup [label]="'categories'">
                     @for (option of categories(); track option) {
-                    <mat-option [value]="option.category_cs">{{option.category_cs}}</mat-option>
+                    <mat-option [value]="option">{{option.value}}</mat-option>
                     }
                 </mat-optgroup>
                 <mat-optgroup [label]="'keywords'">
                     @for (option of keywords(); track option) {
-                    <mat-option [value]="option.name_cs">{{option.name_cs}}</mat-option>
+                    <mat-option [value]="option">{{option.value}}</mat-option>
                     }
                 </mat-optgroup>
 

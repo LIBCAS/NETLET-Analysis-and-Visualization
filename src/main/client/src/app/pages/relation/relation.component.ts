@@ -119,8 +119,8 @@ export class RelationComponent {
 
             // }
 
-            // if (letter.keywords_category_cs?.length > 0) {
-            //   this.infoContent += ` (${letter.keywords_category_cs.join(', ')})</div>`;
+            // if (letter.keyword_categories_cs?.length > 0) {
+            //   this.infoContent += ` (${letter.keyword_categories_cs.join(', ')})</div>`;
             // } else if (letter.keywords_cs?.length > 0) {
             //   this.infoContent += ` (${letter.keywords_cs.join(', ')})</div>`;
             // } else {

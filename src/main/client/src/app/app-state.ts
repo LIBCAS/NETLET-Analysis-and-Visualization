@@ -137,7 +137,7 @@ export interface Tenant {
     p.author = this.usedFacets().filter(k => k.field === 'authors').map(k => k.value);
     p.recipient = this.usedFacets().filter(k => k.field === 'recipients').map(k => k.value);
     p.mentioned = this.usedFacets().filter(k => k.field === 'mentioned').map(k => k.value);
-    p.keywords_category = this.usedFacets().filter(k => k.field === 'keyword_categories').map(k => k.value);
+    p.keyword_categories = this.usedFacets().filter(k => k.field === 'keyword_categories').map(k => k.value);
     p.keyword = this.usedFacets().filter(k => k.field === 'keywords').map(k => k.value);
     p.profession = this.usedFacets().filter(k => k.field === 'professions').map(k => k.value);
     p.origin = this.usedFacets().filter(k => k.field === 'origins').map(k => k.value);
