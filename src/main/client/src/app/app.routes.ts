@@ -11,6 +11,7 @@ import { TimelineComponent } from './pages/timeline/timeline.component';
 import { PeriodsComponent } from './pages/periods/periods.component';
 import { LetterComponent } from './pages/letter/letter.component';
 import { PlaceComponent } from './pages/place/place.component';
+import { IdentityComponent } from './pages/identity/identity.component';
 
 export const routes: Routes = [
     {path: '', component: HomeComponent},
@@ -25,5 +26,6 @@ export const routes: Routes = [
     {path: 'keywords', component: KeywordsComponent},
     {path: 'timeline', component: TimelineComponent},
     {path: 'letter/:id', component: LetterComponent},
+    {path: 'identity/:id', component: IdentityComponent},
     {path: 'place/:id', component: PlaceComponent}
 ];

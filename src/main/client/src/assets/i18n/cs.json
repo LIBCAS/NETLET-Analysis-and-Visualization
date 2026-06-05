@@ -81,7 +81,7 @@
     "letters_from": "Dopisy odsud",
     "letters_to": "Dopisy sem",
     "places": "Místa",
-    "place_mentioned": "Zmíněné",
+    "stats_mentioned": "Zmíněné",
     "copies": "Repozitáře a verze",
     "Copy": "Repozitáře",
     "type": "Typ dokumentu",
@@ -92,7 +92,12 @@
     "collection": "Sbírka",
     "signature": "Signatura",
     "manifestation_notes": "Poznámka k manifestaci",
-    "location_note": "Poznámka k uložení"
+    "location_note": "Poznámka k uložení",
+    "birth_year": "Rok narozeni",
+    "death_year": "Rok umrti",
+    "identity_type": "Typ",
+    "nationality": "Narodnost",
+    "stats": "Statistiky"
   },
   "action": {
     "view_in_hiko": "Zobrazit v HIKO",

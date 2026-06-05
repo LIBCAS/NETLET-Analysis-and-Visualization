@@ -104,14 +104,13 @@ public class IndexSearcher {
             NamedList<Object> resp = solr.request(jrequest, "places");
             InputStream is = (InputStream) resp.get("stream");
             ret = new JSONObject(IOUtils.toString(is, "UTF-8")).getJSONObject("response").getJSONArray("docs").getJSONObject(0);
-            QueryFacetMap qfm = new QueryFacetMap("destination_id:" + id);
             final JsonQueryRequest srequest = new JsonQueryRequest()
                     .setQuery("*:*")
                     .withFilter("place_id:" + id.split("_")[1])
                     .withFilter("tenant:" + id.split("_")[0])
                     .withFacet("orig", new QueryFacetMap("origin_id:" + id))
                     .withFacet("dest", new QueryFacetMap("destination_id:" + id))
-                    .withFacet("content", new QueryFacetMap("full_text_cs:\"" + ret.optString("name") + "\""))
+                    .withFacet("mentioned", new QueryFacetMap("full_text_cs:\"" + ret.optString("name") + "\""))
                     .setLimit(0);
 
             srequest.setResponseParser(new InputStreamResponseParser("json"));
@@ -121,6 +120,90 @@ public class IndexSearcher {
             ret.put("stats", new JSONObject(IOUtils.toString(is, "UTF-8")).getJSONObject("facets"));
             
             //ret.put("hiko", getLetterFromHIKO(id.split("_")[1], id.split("_")[0]));
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
+            ret.put("error", ex);
+        }
+        return ret;
+    }
+
+    public static JSONObject getIdentity(String id) {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+
+            final JsonQueryRequest jrequest = new JsonQueryRequest()
+                    .setQuery("*:*")
+                    .withFilter("id:" + id)
+                    .returnFields("*,professions:[json]")
+                    .setLimit(1);
+
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
+
+            NamedList<Object> resp = solr.request(jrequest, "identities");
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8")).getJSONObject("response").getJSONArray("docs").getJSONObject(0);
+            
+            JSONObject tr = getTenantRange(id.split("_")[0]);
+            
+            
+            RangeFacetMap rangeFacet = new RangeFacetMap("date_year", 
+                    tr.optInt("date_year_min", 1000), 
+                    tr.optInt("date_year_max", 2000),
+                    1)
+                    .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+            
+            
+            final JsonQueryRequest srequest = new JsonQueryRequest()
+                    .setQuery("*:*")
+                    .withFilter("identity_id:" + id.split("_")[1])
+                    .withFilter("tenant:" + id.split("_")[0])
+                    .withFacet("author", new QueryFacetMap("identity_author:\"" + ret.optString("name") + "\"").withSubFacet("years", rangeFacet))
+                    .withFacet("recipient", new QueryFacetMap("identity_recipient:\"" + ret.optString("name") + "\"").withSubFacet("years", rangeFacet))
+                    .withFacet("mentioned", new QueryFacetMap("identity_mentioned:\"" + ret.optString("name") + "\"").withSubFacet("years", rangeFacet))
+                    //.withFacet("mentioned", new QueryFacetMap("full_text_cs:\"" + ret.optString("name") + "\""))
+                    .setLimit(0);
+
+            srequest.setResponseParser(new InputStreamResponseParser("json"));
+
+            resp = solr.request(srequest, "hiko");
+            is = (InputStream) resp.get("stream");
+            ret.put("stats", new JSONObject(IOUtils.toString(is, "UTF-8")).getJSONObject("facets"));
+            
+            //ret.put("hiko", getLetterFromHIKO(id.split("_")[1], id.split("_")[0]));
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error {0}", ex);
+            ret.put("error", ex);
+        }
+        return ret;
+    }
+    
+    public static JSONObject getTenantRange(String tenant) {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+
+            final TermsFacetMap tenantFacet = new TermsFacetMap("tenant")
+                    .setLimit(100)
+                    .setMinCount(1)
+                    .withStatSubFacet("date_year_min", "min(date_year)")
+                    .withStatSubFacet("date_year_max", "max(date_year)")
+                    .withStatSubFacet("date_computed_min_s", "min(date_computed)")
+                    .withStatSubFacet("date_computed_max_s", "max(date_computed)");
+
+            final JsonQueryRequest jrequest = new JsonQueryRequest()
+                    .setQuery("*:*")
+                    .withFilter("tenant:"+tenant)
+                    .withFilter("date_year:[1000 TO *]")
+                    .setLimit(0)
+                    .withFacet("tenant", tenantFacet);
+
+            jrequest.setResponseParser(new InputStreamResponseParser("json"));
+
+            NamedList<Object> resp = solr.request(jrequest, "hiko");
+            InputStream is = (InputStream) resp.get("stream");
+            ret = new JSONObject(IOUtils.toString(is, "UTF-8")).getJSONObject("facets")
+                    .getJSONObject("tenant").getJSONArray("buckets").getJSONObject(0);
 
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Error {0}", ex);

@@ -1,0 +1,77 @@
+@if (identity()) {
+  
+<div class="app-identity">
+  <h2>{{ identity()?.name }}</h2>
+
+  <fieldset>
+    <legend>{{ 'field.dates' | translate }}</legend>
+
+    <div>
+      <label>{{ 'field.birth_year' | translate }}:</label>
+      <div>{{ identity().birth_year }}</div>
+    </div>
+
+    <div>
+      <label>{{ 'field.death_year' | translate }}:</label>
+      <div>{{ identity().death_year }}</div>
+    </div>
+
+  </fieldset>
+  
+
+  <fieldset>
+    <legend>{{ 'field.detail' | translate }}</legend>
+
+    <div>
+      <label>{{ 'field.identity_type' | translate }}:</label>
+      <div>{{ identity().type }}</div>
+    </div>
+
+    <div>
+      <label>{{ 'field.nationality' | translate }}:</label>
+      <div>{{ identity().nationality }}</div>
+    </div>
+
+    <div>
+      <label>{{ 'field.professions' | translate }}:</label>
+      @for (p of identity().professions; track p) {
+      <div>{{ p.name.cs }}</div>
+      }
+    </div>
+
+  </fieldset>
+
+  
+  <fieldset>
+    <legend>{{ 'field.stats' | translate }}</legend>
+
+    <div>
+        <label>{{ 'field.letters' | translate }}:</label>
+        <div>{{ identity().stats.count }}</div>
+    </div>
+
+    <div>
+        <label>{{ 'field.author' | translate }}:</label>
+        <div>{{ identity().stats.author.count }}</div>
+    </div>
+
+    <div>
+        <label>{{ 'field.recipient' | translate }}:</label>
+        <div>{{ identity().stats.recipient.count }}</div>
+    </div>
+
+    <div>
+        <label>{{ 'field.stats_mentioned' | translate }}:</label>
+        <div>{{ identity().stats.mentioned.count }}</div>
+    </div>
+
+<div style="height: 250px; width: 600px; position: relative;">
+    <div echarts style="height: 100%; width: 100%;" [initOpts]="{ locale: 'CZ' }" [options]="chartOptions"
+      (chartInit)="onChartInit($event)">
+    </div>
+    </div>
+
+  </fieldset>
+
+</div>
+}

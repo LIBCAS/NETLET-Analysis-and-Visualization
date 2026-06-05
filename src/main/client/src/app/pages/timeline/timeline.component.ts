@@ -29,7 +29,7 @@ import { BrushComponent } from 'echarts/components';
 import { ToolboxComponent } from 'echarts/components';
 import * as echarts from 'echarts/core';
 import { HttpParams } from '@angular/common/http';
-import { Letter, Place } from '../../shared/letter';
+import { Identity, Letter, Place } from '../../shared/letter';
 import { AppConfiguration } from '../../app-configuration';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
@@ -334,6 +334,13 @@ export class TimelineComponent {
   viewLetterInHIKO(id: number, t: string) {
     const tenant = this.config.isTest ? this.config.test_mappings[t] : t;
     window.open(this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', id + ''), 'hiko');
+  }
+
+  letterIdentities(letter: Letter, role: string): Identity[] {
+    if (letter.identities) {
+      return letter.identities.filter(p => p.role === role);
+    }
+    return [];
   }
 
   letterPlaces(letter: Letter, role: string): Place[] {

@@ -53,8 +53,8 @@ export class LetterComponent {
   authors = computed<any>(() => this.letter().identities.filter((i: any) => i.role === 'author'));
   recipients = computed<any>(() => this.letter().identities.filter((i: any) => i.role === 'recipient'));
   mentioned = computed<any>(() => this.letter().identities.filter((i: any) => i.role === 'mentioned'));
-  origins = computed<any>(() => this.letter().places.filter((i: any) => i.role === 'origin'));
-  destinations = computed<any>(() => this.letter().places.filter((i: any) => i.role === 'destination'));
+  origins = computed<any>(() => this.letter().places?.filter((i: any) => i.role === 'origin'));
+  destinations = computed<any>(() => this.letter().places?.filter((i: any) => i.role === 'destination'));
 
   map: Map;
   // options = {
@@ -100,7 +100,7 @@ export class LetterComponent {
 
     effect(() => {
       const letter = this.letterRes.value();
-      if (letter) {
+      if (letter?.places) {
         setTimeout(() => {
           this.setGraphData(letter);
           this.setMap();
