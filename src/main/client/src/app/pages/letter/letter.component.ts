@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, resource, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Letter, Place } from '../../shared/letter';
 import { httpResource } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
@@ -31,7 +31,7 @@ echarts.use([CanvasRenderer, GraphChart, TooltipComponent, LeafletComponent]);
 
 @Component({
   selector: 'app-letter',
-  imports: [DatePipe, TranslateModule],
+  imports: [DatePipe, TranslateModule, RouterModule],
   templateUrl: './letter.component.html',
   styleUrl: './letter.component.scss',
 })
@@ -137,7 +137,6 @@ export class LetterComponent {
     const southWest = L.latLng(latMin, lngMin);
     const northEast = L.latLng(latMax, lngMax);
     const bounds = L.latLngBounds(southWest, northEast);
-    console.log(bounds)
 
     const linkId = letter.origin_id + '_' + letter.destination_id;
     const place_origin = letter.places.find(p => p.role === 'origin');
@@ -276,7 +275,7 @@ export class LetterComponent {
     
 
     setTimeout(() => {
-      lmap.fitBounds(this.graphData.bounds, { paddingTopLeft: [10, 10], paddingBottomRight: [10, 10] });
+      lmap.fitBounds(this.graphData.bounds, { paddingTopLeft: [-20, -20], paddingBottomRight: [-20, -20] });
     }, 100)
     
   }

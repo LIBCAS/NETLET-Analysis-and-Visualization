@@ -60,12 +60,18 @@
 
             <ng-container matColumnDef="origin">
               <th mat-header-cell *matHeaderCellDef> {{ 'field.origin' | translate}} </th>
-              <td mat-cell *matCellDef="let element"> {{letterPlaces(element, 'origin')}} </td>
+              <td mat-cell *matCellDef="let element">
+                @for (p of letterPlaces(element, 'origin'); track p) {
+                  <div><a class="app-link" [routerLink]="'/place/'+p.id">{{ p.name }}</a></div>
+                } </td>
             </ng-container>
 
             <ng-container matColumnDef="destination">
               <th mat-header-cell *matHeaderCellDef> {{ 'field.destination' | translate}} </th>
-              <td mat-cell *matCellDef="let element"> {{letterPlaces(element, 'destination')}} </td>
+              <td mat-cell *matCellDef="let element">
+                @for (p of letterPlaces(element, 'destination'); track p) {
+                  <div><a class="app-link" [routerLink]="'/place/'+p.id">{{ p.name }}</a></div>
+                }  </td>
             </ng-container>
 
             <ng-container matColumnDef="date">

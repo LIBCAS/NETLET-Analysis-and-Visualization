@@ -299,6 +299,18 @@ public class HikoIndexer {
                     doc.addField("tenant", tenant);
                     doc.addField("letter_id", rs.getInt("id"));
                     doc.addField("status", rs.optString("status"));
+                    
+                    if (rs.has("abstract")) {
+                        doc.addField("abstract", rs.getJSONObject("abstract").toString());
+                        doc.addField("abstract_cs", rs.getJSONObject("abstract").optString("cs"));
+                        doc.addField("abstract_en", rs.getJSONObject("abstract").optString("en"));
+                    }
+                    doc.addField("incipit", rs.optString("incipit")); 
+                    doc.addField("explicit", rs.optString("explicit"));
+                    if (rs.has("languages")) {
+                        doc.addField("languages", rs.getJSONArray("languages").toList());
+                    }
+                    doc.addField("content", rs.optString("content"));
 
                     //LocalDate date = LocalDate.parse(rs.optString("date_computed"), dformatter);
                     int date_year = rs.optInt("date_year");

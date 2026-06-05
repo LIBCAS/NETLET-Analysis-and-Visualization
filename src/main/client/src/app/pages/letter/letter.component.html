@@ -31,26 +31,65 @@
   <div>
     <label>{{ 'field.origins' | translate }}:</label>
     @for (a of origins(); track a) {
-      <div>{{ a.name }}</div>
+      <div><a class="app-link" [routerLink]="'/place/'+a.id">{{ a.name }}</a></div>
     }
   </div>
   
   <div>
     <label>{{ 'field.destinations' | translate }}:</label>
     @for (a of destinations(); track a) {
-      <div>{{ a.name }}</div>
+      <div><a class="app-link" [routerLink]="'/place/'+a.id">{{ a.name }}</a></div>
     }
   </div>
 
   <div style="height: 350px; width: 600px; position: relative;">
-  <div style="height: 100%; width: 100%;" id="echarts-lmap"></div>
-</div>
+    <div style="height: 100%; width: 100%;" id="echarts-lmap"></div>
+  </div>
   
   <div>
     <label>{{ 'field.keywords' | translate }}:</label>
     @for (a of letter().keywords; track a) {
       <div>{{ a.name_cs }}</div>
     }
+  </div>
+  
+  <div>
+    <label>{{ 'field.languages' | translate }}:</label>
+    @for (a of letter().languages; track a) {
+      <div>{{ a }}</div>
+    }
+  </div>
+  
+  <div>
+    <label>{{ 'field.copies' | translate }}:</label>
+    @for (c of letter().hiko.copies; track c) {
+      <div>{{ c.copy }}</div>
+      <div>{{ c.preservation }}</div>
+      <div>{{ c.signature }}</div>
+      <div>{{ c.archive?.label }}</div>
+      <div>{{ c.repository?.label }}</div>
+      <hr/>
+    }
+  </div>
+
+  <div>
+    <label>{{ 'field.incipit' | translate }}:</label>
+    <div>{{ letter().incipit }}</div>
+  </div>
+
+  <div>
+    <label>{{ 'field.explicit' | translate }}:</label>
+    <div>{{ letter().explicit }}</div>
+  </div>
+
+  <div>
+    <label>{{ 'field.abstract' | translate }}:</label>
+    <div>{{ letter().abstract?.cs }}</div>
+  </div>
+
+  <div>
+    <label>{{ 'field.content' | translate }}:</label>
+    <div [innerHTML]="letter().content"></div>
   </div>
 
 </div>  

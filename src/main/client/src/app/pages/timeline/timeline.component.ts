@@ -10,7 +10,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Tenant, AppState } from '../../app-state';
 import { AppService } from '../../app.service';
@@ -29,7 +29,7 @@ import { BrushComponent } from 'echarts/components';
 import { ToolboxComponent } from 'echarts/components';
 import * as echarts from 'echarts/core';
 import { HttpParams } from '@angular/common/http';
-import { Letter } from '../../shared/letter';
+import { Letter, Place } from '../../shared/letter';
 import { AppConfiguration } from '../../app-configuration';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
@@ -48,7 +48,7 @@ echarts.registerLocale("CZ", langCZ)
 @Component({
   selector: 'app-timeline',
   imports: [TranslateModule, FormsModule, NgxEchartsDirective, DatePipe,
-    NgxEchartsModule, AngularSplitModule,
+    NgxEchartsModule, AngularSplitModule, RouterModule,
     MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule,
     MatButtonModule, MatTableModule, MatPaginatorModule,
     MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, MatTooltipModule, FacetsComponent],
@@ -336,11 +336,10 @@ export class TimelineComponent {
     window.open(this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', id + ''), 'hiko');
   }
 
-  letterPlaces(letter: Letter, role: string) {
+  letterPlaces(letter: Letter, role: string): Place[] {
     if (letter.places) {
-      const place = letter.places.find(p => p.role === role);
-      return place?.name
+      return letter.places.filter(p => p.role === role);
     }
-    return '';
+    return [];
   }
 }

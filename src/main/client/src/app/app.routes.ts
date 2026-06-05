@@ -10,6 +10,7 @@ import { MapComponent } from './pages/map/map.component';
 import { TimelineComponent } from './pages/timeline/timeline.component';
 import { PeriodsComponent } from './pages/periods/periods.component';
 import { LetterComponent } from './pages/letter/letter.component';
+import { PlaceComponent } from './pages/place/place.component';
 
 export const routes: Routes = [
     {path: '', component: HomeComponent},
@@ -23,5 +24,6 @@ export const routes: Routes = [
     {path: 'professions', component: ProfessionsComponent},
     {path: 'keywords', component: KeywordsComponent},
     {path: 'timeline', component: TimelineComponent},
-    {path: 'letter/:id', component: LetterComponent}
+    {path: 'letter/:id', component: LetterComponent},
+    {path: 'place/:id', component: PlaceComponent}
 ];

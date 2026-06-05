@@ -69,7 +69,10 @@
             <mat-label>{{ 'keywords' | translate}}</mat-label>
             <input [formField]="searchForm.keywords" matInput />
         </mat-form-field> -->
-        <button matIconButton [title]="'search' | translate" (click)="search()"><mat-icon>search</mat-icon></button>
+        <div class="app-text-right">
+            <button matIconButton [title]="'search' | translate" (click)="search()"><mat-icon>search</mat-icon></button>
+        </div>
+        
     </mat-card>
 </div>
 

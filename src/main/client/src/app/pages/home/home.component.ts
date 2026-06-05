@@ -115,7 +115,11 @@ export class HomeComponent {
   }
 
   setFilters() {
-    console.log(this.searchModel());
+
+    this.searchModel().tenants.forEach(t => {
+      this.state.tenants().find(st => st.val === t.val).selected = true;
+    });
+
     const usedFacets: {field: string, value: string}[] = [];
     if (this.selectedKeyword.type === 'category') {
       usedFacets.push({field: 'keyword_categories', value: this.selectedKeyword.value});
@@ -132,7 +136,7 @@ export class HomeComponent {
       usedFacets.push({field: 'identities', value: this.searchModel().identities});
     }
 
-    this.state.usedFacets.update(f => [...usedFacets]);
+    this.state.usedFacets.set([...usedFacets]);
   }
 
   search() {
