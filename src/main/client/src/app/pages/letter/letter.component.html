@@ -1,96 +1,111 @@
-
-
 @if (letter()) {
 <div class="app-letter">
   <div>
     <label>{{ 'datum' | translate }}:</label>
     <div>{{ letter().date_computed | date : 'dd.MM.yyyy'}}</div>
   </div>
-  
-  <div>
-    <label>{{ 'field.authors' | translate }}:</label>
-    @for (a of authors(); track a) {
-      <div>{{ a.name }}</div>
-    }
-  </div>
-  
-  <div>
-    <label>{{ 'field.recipients' | translate }}:</label>
-    @for (a of recipients(); track a) {
-      <div>{{ a.name }}</div>
-    }
-  </div>
-  
-  <div>
-    <label>{{ 'field.mentioned' | translate }}:</label>
-    @for (a of mentioned(); track a) {
-      <div>{{ a.name }}</div>
-    }
-  </div>
-  
-  <div>
-    <label>{{ 'field.origins' | translate }}:</label>
-    @for (a of origins(); track a) {
-      <div><a class="app-link" [routerLink]="'/place/'+a.id">{{ a.name }}</a></div>
-    }
-  </div>
-  
-  <div>
-    <label>{{ 'field.destinations' | translate }}:</label>
-    @for (a of destinations(); track a) {
-      <div><a class="app-link" [routerLink]="'/place/'+a.id">{{ a.name }}</a></div>
-    }
-  </div>
 
-  <div style="height: 350px; width: 600px; position: relative;">
-    <div style="height: 100%; width: 100%;" id="echarts-lmap"></div>
-  </div>
-  
-  <div>
-    <label>{{ 'field.keywords' | translate }}:</label>
-    @for (a of letter().keywords; track a) {
+  <fieldset>
+    <legend>{{ 'field.identities' | translate }}</legend>
+
+    <div>
+      <label>{{ 'field.authors' | translate }}:</label>
+      @for (a of authors(); track a) {
+      <div>{{ a.name }}</div>
+      }
+    </div>
+
+    <div>
+      <label>{{ 'field.recipients' | translate }}:</label>
+      @for (a of recipients(); track a) {
+      <div>{{ a.name }}</div>
+      }
+    </div>
+
+    <div>
+      <label>{{ 'field.mentioned' | translate }}:</label>
+      @for (a of mentioned(); track a) {
+      <div>{{ a.name }}</div>
+      }
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>{{ 'field.places' | translate }}</legend>
+    <div>
+      <label>{{ 'field.origins' | translate }}:</label>
+      @for (a of origins(); track a) {
+      <div><a class="app-link" [routerLink]="'/place/'+a.id">{{ a.name }}</a></div>
+      }
+    </div>
+
+    <div>
+      <label>{{ 'field.destinations' | translate }}:</label>
+      @for (a of destinations(); track a) {
+      <div><a class="app-link" [routerLink]="'/place/'+a.id">{{ a.name }}</a></div>
+      }
+    </div>
+
+    <div style="height: 350px; width: 600px; position: relative;">
+      <div style="height: 100%; width: 100%;" id="echarts-lmap"></div>
+    </div>
+
+  </fieldset>
+  <fieldset>
+    <legend>{{ 'field.content' | translate }}</legend>
+    <div>
+      <label>{{ 'field.keywords' | translate }}:</label>
+      @for (a of letter().keywords; track a) {
       <div>{{ a.name_cs }}</div>
-    }
-  </div>
-  
-  <div>
-    <label>{{ 'field.languages' | translate }}:</label>
-    @for (a of letter().languages; track a) {
+      }
+    </div>
+
+    <div>
+      <label>{{ 'field.languages' | translate }}:</label>
+      @for (a of letter().languages; track a) {
       <div>{{ a }}</div>
-    }
-  </div>
-  
-  <div>
-    <label>{{ 'field.copies' | translate }}:</label>
+      }
+    </div>
+
+    <div>
+      <label>{{ 'field.incipit' | translate }}:</label>
+      <div>{{ letter().incipit }}</div>
+    </div>
+
+    <div>
+      <label>{{ 'field.explicit' | translate }}:</label>
+      <div>{{ letter().explicit }}</div>
+    </div>
+
+    <div>
+      <label>{{ 'field.abstract' | translate }}:</label>
+      <div>{{ letter().abstract?.cs }}</div>
+    </div>
+
+    <div>
+      <label>{{ 'field.content' | translate }}:</label>
+      <div [innerHTML]="letter().content"></div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>{{ 'field.copies' | translate }}</legend>
     @for (c of letter().hiko.copies; track c) {
+    <div>
+      <label>{{ 'field.copy' | translate }}:</label>
       <div>{{ c.copy }}</div>
+      <label>{{ 'field.preservation' | translate }}:</label>
       <div>{{ c.preservation }}</div>
+      <label>{{ 'field.signature' | translate }}:</label>
       <div>{{ c.signature }}</div>
+      <label>{{ 'field.archive' | translate }}:</label>
       <div>{{ c.archive?.label }}</div>
+      <label>{{ 'field.repository' | translate }}:</label>
       <div>{{ c.repository?.label }}</div>
-      <hr/>
+      <hr />
+    </div>
     }
-  </div>
+  </fieldset>
 
-  <div>
-    <label>{{ 'field.incipit' | translate }}:</label>
-    <div>{{ letter().incipit }}</div>
-  </div>
-
-  <div>
-    <label>{{ 'field.explicit' | translate }}:</label>
-    <div>{{ letter().explicit }}</div>
-  </div>
-
-  <div>
-    <label>{{ 'field.abstract' | translate }}:</label>
-    <div>{{ letter().abstract?.cs }}</div>
-  </div>
-
-  <div>
-    <label>{{ 'field.content' | translate }}:</label>
-    <div [innerHTML]="letter().content"></div>
-  </div>
-
-</div>  
+</div>
 }

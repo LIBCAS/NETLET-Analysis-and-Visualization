@@ -29,6 +29,8 @@
         <url-pattern>/identities</url-pattern>
         <url-pattern>/professions</url-pattern>
         <url-pattern>/timeline</url-pattern>
+        <url-pattern>/letter/*</url-pattern>
+        <url-pattern>/place/*</url-pattern>
         <url-pattern>/map</url-pattern>
         <url-pattern>/home</url-pattern>
     </servlet-mapping>

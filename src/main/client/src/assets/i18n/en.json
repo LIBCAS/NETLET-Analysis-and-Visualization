@@ -9,6 +9,7 @@
   "tenant": "Catalog",
     "letter_id": "Id",
     "author": "Autor",
+    "identities": "People",
     "identity_author": "Autor",
     "authors": "Authors",
     "recipient": "Recipient",
@@ -26,7 +27,19 @@
     "keyword_categories": "Keywords",
     "relation_tenants": "Catalogs for comparition",
     "date": "Date",
-    "date_year": "Year"
+    "date_year": "Year",
+    "languages": "Languages",
+    "incipit": "Incipit",
+    "explicit": "Explicit",
+    "content": "Content",
+    "abstract": "Abstract",
+    "latitude": "latitude",
+    "longitude": "longitude",
+    "letters": "Letters",
+    "letters_from": "Letters from here",
+    "letters_to": "Letters to here",
+    "places": "Places",
+    "place_mentioned": "Mentioned"
   },
   "action": {
     "view_in_hiko": "View in HIKO DB",
