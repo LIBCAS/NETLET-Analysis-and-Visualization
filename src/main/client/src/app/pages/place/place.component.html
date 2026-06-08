@@ -1,40 +1,47 @@
 @if (place()) {
-<div class="app-place">
+<div class="app-detail">
   <h2>{{ place()?.name }}</h2>
-<div>
-  <label>{{ 'field.latitude' | translate }}:</label>
-  <div>{{ place().latitude }}</div>
-  
-  <label>{{ 'field.longitude' | translate }}:</label>
-  <div>{{ place().longitude }}</div>
-</div>
 
-<div>
-  <label>{{ 'field.letters' | translate }}:</label>
-  <div>{{ place().stats.count }}</div>
-  
-  <label>{{ 'field.letters_from' | translate }}:</label>
-  <div>{{ place().stats.orig.count }}</div>
-  
-  <label>{{ 'field.letters_to' | translate }}:</label>
-  <div>{{ place().stats.dest.count }}</div>
-  
-  <label>{{ 'field.stats_mentioned' | translate }}:</label>
-  <div>{{ place().stats.mentioned.count }}</div>
-  
-</div>
+  <fieldset>
+    <legend>{{ 'field.position' | translate }}</legend>
+    <div>
+      <label>{{ 'field.latitude' | translate }}:</label>
+      <div>{{ place().latitude }}</div>
 
-<div style="height: 350px; width: 600px; position: relative;">
-  <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"
-    (leafletMapReady)="onMapReady($event)">
+      <label>{{ 'field.longitude' | translate }}:</label>
+      <div>{{ place().longitude }}</div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>{{ 'field.stats' | translate }}</legend>
+    <div>
+      <label>{{ 'field.letters' | translate }}:</label>
+      <div>{{ place().stats.count }}</div>
+
+      <label>{{ 'field.letters_from' | translate }}:</label>
+      <div>{{ place().stats.orig.count }}</div>
+
+      <label>{{ 'field.letters_to' | translate }}:</label>
+      <div>{{ place().stats.dest.count }}</div>
+
+      <label>{{ 'field.stats_mentioned' | translate }}:</label>
+      <div>{{ place().stats.mentioned.count }}</div>
+
+    </div>
+
+  </fieldset>
+
+  <div style="height: 350px; width: 600px; position: relative;">
+    <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"
+      (leafletMapReady)="onMapReady($event)">
+    </div>
   </div>
-</div>
 
-@if(place().geoname_id) {
-<div>
-  <a class="app-link" [href]="'http://www.geonames.org/'+place().geoname_id+'/calw.html'" target="_blank">Geonames</a>
-</div>
-}
+  @if(place().geoname_id) {
+  <div>
+    <a class="app-link" [href]="'http://www.geonames.org/'+place().geoname_id+'/calw.html'" target="_blank">Geonames</a>
+  </div>
+  }
 
 </div>
 }

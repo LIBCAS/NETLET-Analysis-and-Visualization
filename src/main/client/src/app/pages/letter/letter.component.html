@@ -1,9 +1,13 @@
 @if (letter()) {
-<div class="app-letter">
-  <div>
-    <label>{{ 'datum' | translate }}:</label>
-    <div>{{ letter().date_computed | date : 'dd.MM.yyyy'}}</div>
-  </div>
+<div class="app-detail">
+
+  <fieldset>
+    <legend>{{ 'field.dates' | translate }}</legend>
+    <div>
+      <label>{{ 'datum' | translate }}:</label>
+      <div>{{ letter().date_computed | date : 'dd.MM.yyyy'}}</div>
+    </div>
+  </fieldset>
 
   <fieldset>
     <legend>{{ 'field.identities' | translate }}</legend>

@@ -27,6 +27,8 @@
     "keyword_categories": "Keywords",
     "relation_tenants": "Catalogs for comparition",
     "date": "Date",
+    "dates": "Dates",
+    "detail": "Details",
     "date_year": "Year",
     "languages": "Languages",
     "incipit": "Incipit",
@@ -39,6 +41,7 @@
     "letters_from": "Letters from here",
     "letters_to": "Letters to here",
     "places": "Places",
+    "position": "Position",
     "stats_mentioned": "Mentioned",
     "copies": "Repozitáře a verze",
     "Copy": "Repozitáře",
@@ -58,6 +61,7 @@
     "stats": "Statistics"
   },
   "action": {
+    "search": "Search",
     "view_in_hiko": "View in HIKO DB",
     "letter_details": "Letter details"
   },

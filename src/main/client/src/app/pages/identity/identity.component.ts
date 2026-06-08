@@ -77,7 +77,7 @@ export class IdentityComponent {
           type: this.chartType + '',
           smooth: true,
           symbol: 'none',
-          data: this.identity().stats.author.years.buckets.map((c: JSONFacet) => [Date.parse(c.val), c.count])
+          data: this.identity().stats.author.years.buckets.map((c: JSONFacet) => [c.val, c.count])
         });
     }
     if (this.identity().stats.recipient.years) {
@@ -86,7 +86,7 @@ export class IdentityComponent {
           type: this.chartType + '',
           smooth: true,
           symbol: 'none',
-          data: this.identity().stats.recipient.years.buckets.map((c: JSONFacet) => [Date.parse(c.val), c.count])
+          data: this.identity().stats.recipient.years.buckets.map((c: JSONFacet) => [c.val, c.count])
         });
     }
     if (this.identity().stats.mentioned.years) {
@@ -95,7 +95,7 @@ export class IdentityComponent {
           type: this.chartType + '',
           smooth: true,
           symbol: 'none',
-          data: this.identity().stats.mentioned.years.buckets.map((c: JSONFacet) => [Date.parse(c.val), c.count])
+          data: this.identity().stats.mentioned.years.buckets.map((c: JSONFacet) => [c.val, c.count])
         });
     }
     this.chartOptions = {
@@ -115,7 +115,7 @@ export class IdentityComponent {
         top: 30
       },
       xAxis: {
-        type: 'time',
+        type: 'category',
         //boundaryGap: ['5%', '5%'],
         triggerEvent: true,
       },

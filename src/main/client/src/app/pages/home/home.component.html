@@ -10,8 +10,8 @@
         </mat-form-field>
 
         <mat-form-field class="app-fill-w" appearance="outline">
-            <input type="text" placeholder="{{ 'identities' | translate}}"
-                attr.aria-label="{{ 'identities' | translate}}" matInput [formField]="searchForm.identities"
+            <input type="text" placeholder="{{ 'field.identities' | translate}}"
+                attr.aria-label="{{ 'field.identities' | translate}}" matInput [formField]="searchForm.identities"
                 [matAutocomplete]="autoIdentities">
 
             <mat-autocomplete #autoIdentities="matAutocomplete">
@@ -29,7 +29,7 @@
         </mat-form-field> -->
 
         <mat-form-field class="app-fill-w" appearance="outline">
-            <input type="text" placeholder="{{ 'places' | translate}}" attr.aria-label="{{ 'places' | translate}}"
+            <input type="text" placeholder="{{ 'field.places' | translate}}" attr.aria-label="{{ 'places' | translate}}"
                 matInput [formField]="searchForm.places" [matAutocomplete]="autoPlaces">
 
             <mat-autocomplete #autoPlaces="matAutocomplete">
@@ -46,16 +46,16 @@
         </mat-form-field> -->
 
         <mat-form-field class="app-fill-w" appearance="outline">
-            <input type="text" placeholder="{{ 'keywords' | translate}}" attr.aria-label="{{ 'keywords' | translate}}"
+            <input type="text" placeholder="{{ 'field.keywords' | translate}}" attr.aria-label="{{ 'keywords' | translate}}"
                 matInput [matAutocomplete]="auto" (keyup)="checkKeywords($event)">
 
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setKeyword($event)"  [displayWith]="displayFn">
-                <mat-optgroup [label]="'categories'">
+                <mat-optgroup [label]="'field.categories' | translate">
                     @for (option of categories(); track option) {
                     <mat-option [value]="option">{{option.value}}</mat-option>
                     }
                 </mat-optgroup>
-                <mat-optgroup [label]="'keywords'">
+                <mat-optgroup [label]="'field.keywords' | translate">
                     @for (option of keywords(); track option) {
                     <mat-option [value]="option">{{option.value}}</mat-option>
                     }
@@ -70,7 +70,7 @@
             <input [formField]="searchForm.keywords" matInput />
         </mat-form-field> -->
         <div class="app-text-right">
-            <button matIconButton [title]="'search' | translate" (click)="search()"><mat-icon>search</mat-icon></button>
+            <button matIconButton [title]="'action.search' | translate" (click)="search()"><mat-icon>search</mat-icon></button>
         </div>
         
     </mat-card>
