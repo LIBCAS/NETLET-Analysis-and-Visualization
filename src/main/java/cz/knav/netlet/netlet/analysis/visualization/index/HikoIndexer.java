@@ -357,9 +357,9 @@ public class HikoIndexer {
     
     private void setPeriod(SolrInputDocument doc, int date_year) {
         String period = "unknown";
-        if (date_year > 1580 && date_year <= 1670) {
+        if (date_year > 1500 && date_year <= 1800) {
             period = "1";
-        } else if (date_year > 1670 && date_year <= 1939) {
+        } else if (date_year > 1800 && date_year <= 1939) {
             period = "2";
         } else if (date_year > 1939) {
             period = "3";

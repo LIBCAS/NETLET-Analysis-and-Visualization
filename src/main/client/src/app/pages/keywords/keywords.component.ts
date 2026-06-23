@@ -237,11 +237,13 @@ export class KeywordsComponent {
     const data: any[] = [];
     this.keyword_categories.forEach((p: JSONFacet) => {
       let i = 0;
-      data.push({
-        id: p.val,
-        name: p.val,
-        value: p.count
-      })
+      if (p.val) {
+        data.push({
+          id: p.val,
+          name: p.val,
+          value: p.count
+        });
+      }
     });
 
     this.pieOptions = {
@@ -285,24 +287,26 @@ export class KeywordsComponent {
     const formatUtil = echarts.format;
     const data: any = [];
     this.totalBuckets = 0;
-    this.keyword_categories.forEach((cat: any) => {
+    this.keyword_categories.filter(cat => cat.val != '').forEach((cat: any) => {
       const ks: any = [];
       const buckets = role === 'authors' ? cat.keywords_autor.buckets : cat.keywords_recipient.buckets;
       buckets.forEach((k: any) => {
-        if (this.keyword_categories_tree[cat.val]?.includes(k.val)) {
+        if (k.val && this.keyword_categories_tree[cat.val]?.includes(k.val)) {
           const ids: any = [];
           this.totalBuckets += k.identities.buckets.length;
           k.identities.buckets.forEach((i: any) => {
+            if (i.val){
             ids.push({
               value: i.count,
               name: i.val
-            })
+            })}
           });
+          if (k.val){
           ks.push({
             value: k.count,
             children: ids,
             name: k.val
-          })
+          })}
         }
       });
       data.push({

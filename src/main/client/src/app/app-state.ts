@@ -144,6 +144,8 @@ export interface Tenant {
     p.destination = this.usedFacets().filter(k => k.field === 'destinations').map(k => k.value);
     p.places = this.usedFacets().filter(k => k.field === 'places').map(k => k.value);
     p.identities = this.usedFacets().filter(k => k.field === 'identities').map(k => k.value);
+    p.year_from = this.usedFacets().filter(k => k.field === 'year_from').map(k => k.value);
+    p.year_to = this.usedFacets().filter(k => k.field === 'year_to').map(k => k.value);
   }
 
   selectedTenants() {
@@ -165,7 +167,6 @@ export interface Tenant {
   decodeState(s: string) {
     if (s) {
       const obj = JSON.parse(decodeURIComponent(atob(s)));
-      console.log(obj)
       this.q = obj.q;
       this.usedFacets.set(obj.f);
       //this.tenants().forEach(t => {t.selected = false});

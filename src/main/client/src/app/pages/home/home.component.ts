@@ -32,6 +32,8 @@ export class HomeComponent {
 
   searchModel = signal({
     tenants: [],
+    year_from: '',
+    year_to: '',
     identities: '',
     places: ''
   });
@@ -134,6 +136,12 @@ export class HomeComponent {
     }
     if(this.searchModel().identities) {
       usedFacets.push({field: 'identities', value: this.searchModel().identities});
+    }
+    if(this.searchModel().year_from) {
+      usedFacets.push({field: 'year_from', value: this.searchModel().year_from});
+    }
+    if(this.searchModel().year_to) {
+      usedFacets.push({field: 'year_to', value: this.searchModel().year_to});
     }
 
     this.state.usedFacets.set([...usedFacets]);

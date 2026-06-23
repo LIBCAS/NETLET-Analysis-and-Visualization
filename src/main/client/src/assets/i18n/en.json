@@ -58,12 +58,15 @@
     "death_year": "death_year",
     "identity_type": "identity_type",
     "nationality": "nationality",
-    "stats": "Statistics"
+    "stats": "Statistics",
+    "year_from": "From year",
+    "year_to": "To year"
   },
   "action": {
     "search": "Search",
     "view_in_hiko": "View in HIKO DB",
-    "letter_details": "Letter details"
+    "letter_details": "Letter details",
+    "selectAll": "Select all"
   },
   "invalidTenant": "There is no available data for this Catalog"
 }

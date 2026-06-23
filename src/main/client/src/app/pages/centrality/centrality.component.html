@@ -4,7 +4,8 @@
 <div class="app-fxLayout app-row app-fill" style="position: relative;">
   <div style="flex: 1 30%;" class="app-filters">
     
-    <app-facets [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'professions', 'origins', 'destinations']"
+    <app-facets 
+    [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'professions', 'origins', 'destinations']"
       [facets]="facets()" (onFiltersChanged)="onFiltersChanged($event)" (onMouserOver)="showNodeExt($event)"
       (onMouseOut)="hideNode()"></app-facets> 
 

@@ -80,6 +80,7 @@ export class RelationComponent {
       const sc = this.state.stateChanged();
       if (sc > 0) {
         this.limits = this.state.getTenantsRange();
+        this.tenant = this.state.selectedTenants()[0];
         this.getData(true);
       } else {
         this.loading = false;

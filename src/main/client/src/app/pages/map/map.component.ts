@@ -86,7 +86,7 @@ export class MapComponent {
   graphOptions: ECOption = {};
   graphChart: EChartsType;
 
-  nodes: { [id: string]: { coords: [number, number], name: string } } = {};
+  nodes: { [id: string]: { coords: [number, number], name: string, count: number } } = {};
   links: {
     [id: string]: {
       node1: [number, number], node2: [number, number], count: number,
@@ -337,8 +337,8 @@ export class MapComponent {
       if (this.inLimits(letter.date_year) && letter.places && letter.origin) {
         letter.places.forEach((place: Place) => {
           if (place.latitude && !this.nodes[place.id]) {
-            this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name };
-            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1] });
+            this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name, count: 0 };
+            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: 0 });
           }
         });
 
@@ -347,6 +347,9 @@ export class MapComponent {
         const place_destination = letter.places.find(p => p.role === 'destination');
 
         if (place_origin && place_destination && place_origin.latitude && place_destination.latitude) {
+          this.nodes[place_origin.id].count = this.nodes[place_origin.id].count + 1;
+          this.nodes[place_destination.id].count = this.nodes[place_destination.id].count + 1;
+
           if (!this.links[linkId]) {
             this.links[linkId] = {
               node1: [place_origin.latitude, place_origin.longitude],
@@ -389,6 +392,12 @@ export class MapComponent {
     //   // this.linkNodes(link.node1, link.node2, link.count, link.letters);
     // });
 
+    
+    Object.keys(this.nodes).forEach(key => {
+      const node = this.nodes[key];
+      nodes.filter((n:any) => n.id === key).forEach((n:any) => {n.count = node.count});
+    });
+
     this.graphData = {
       links,
       nodes
@@ -420,7 +429,7 @@ export class MapComponent {
         formatter: (params: any) => {
           return params.dataType === 'edge' ?
             `${params.data.label} (${params.data.count})` :
-            params.name
+            `${params.data.name} (${params.data.count})`
         }
       },
       series: [

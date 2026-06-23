@@ -150,6 +150,9 @@ export class PeriodsComponent {
   }
 
   getData(setResponse: boolean) {
+    if (this.state.selectedTenants().length === 0) {
+      return
+    }
     this.loading = true;
     this.invalidTenant = false;
     const p: any = {};
@@ -214,7 +217,7 @@ export class PeriodsComponent {
     this.periods.forEach((p: JSONFacet) => {
       const period = p.val;
       data[period] = [];
-      p[facetName].buckets.forEach((k: JSONFacet) => {
+      p[facetName].buckets.filter((k: JSONFacet) => k.val !== '').forEach((k: JSONFacet) => {
         data[period].push({
           id: k.val,
           name: k.val,

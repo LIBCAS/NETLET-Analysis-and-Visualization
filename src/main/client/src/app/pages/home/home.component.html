@@ -9,6 +9,17 @@
             </mat-select>
         </mat-form-field>
 
+        <div class="app-fxLayout app-gap-4">
+        <mat-form-field class="app-fill-w" style="margin-right:5px;" appearance="outline">
+            <input type="number" placeholder="{{ 'field.year_from' | translate}}"
+                attr.aria-label="{{ 'field.year_from' | translate}}" matInput [formField]="searchForm.year_from" >
+        </mat-form-field>
+        <mat-form-field class="app-fill-w" style="margin-left:5px;" appearance="outline">
+            <input type="number" placeholder="{{ 'field.year_to' | translate}}"
+                attr.aria-label="{{ 'field.year_to' | translate}}" matInput [formField]="searchForm.year_to" >
+        </mat-form-field>
+        </div>
+
         <mat-form-field class="app-fill-w" appearance="outline">
             <input type="text" placeholder="{{ 'field.identities' | translate}}"
                 attr.aria-label="{{ 'field.identities' | translate}}" matInput [formField]="searchForm.identities"

@@ -47,6 +47,25 @@ export class FacetsComponent {
   filteredOptions: string[];
   controls: { [name: string]: FormControl<string> } = {};
 
+  allSelected: undefined;
+  tenants_ordered: [
+    'komensky',
+    'brezina',
+    'deml',
+    'blekastad',
+    'kalivoda',
+    'marci',
+    'musil',
+    'neumann',
+    'pamatky',
+    'patocka',
+    'polanus',
+    'sachs',
+    'studenti',
+    'tgm',
+    'ucenci'
+  ];
+
   log(e: any) {
     console.log(e)
   }
@@ -90,8 +109,17 @@ export class FacetsComponent {
     return options.filter(option => option.toLowerCase().includes(filterValue));
   }
 
+  someSelected() {
+    const sel = this.state.selectedTenants().length;
+    return sel > 0 && sel < this.state.tenants().length;
+  }
+
+  toggleAll() {
+    this.state.tenants().forEach(t => t.selected = this.allSelected);
+    this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
+  }
+
   clickTenant(t: Tenant) {
-    // this.state.setSelectedTenants();
     this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
   }
 
