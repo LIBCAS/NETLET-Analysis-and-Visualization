@@ -17,10 +17,11 @@ import {AsyncPipe} from '@angular/common';
 import { AppService } from '../../app.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { httpResource } from '@angular/common/http';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterModule, TranslateModule, FormsModule, FormField, AsyncPipe,
+  imports: [RouterModule, TranslateModule, FormsModule, FormField, MatDatepickerModule,
     MatCardModule, MatButtonModule, MatFormFieldModule, MatInputModule,
     MatSelectModule, MatIconModule, MatAutocompleteModule],
   templateUrl: './home.component.html',
@@ -29,6 +30,11 @@ import { httpResource } from '@angular/common/http';
 export class HomeComponent {
 
   readonly router = inject(Router);
+
+  year_min: Date = new Date();
+  year_max: Date = new Date();
+  date_from: Date;
+  date_to: Date;
 
   searchModel = signal({
     tenants: [],
@@ -78,6 +84,18 @@ export class HomeComponent {
 
   ngOnInit() {
     this.state.tenants().forEach(t => {t.available = true});
+    const mins: number[] = this.state.tenants().map(t => t.date_year_min);
+    const maxs: number[] = this.state.tenants().map(t => t.date_year_max);
+    this.year_min = new Date(Math.min(...mins), 0, 1);
+    this.year_max = new Date(Math.max(...maxs), 0, 1);
+  }
+
+  doDateFromByYear(e: any) {
+    this.date_from = new Date(e.c.year+'-01-01');
+  }
+
+  doDateToByYear(e: any) {
+    this.date_to = new Date(e.c.year+'-01-01');
   }
 
   // checkIdentities(val: any) {
@@ -142,6 +160,13 @@ export class HomeComponent {
     }
     if(this.searchModel().year_to) {
       usedFacets.push({field: 'year_to', value: this.searchModel().year_to});
+    }
+    
+    if(this.date_from) {
+      usedFacets.push({field: 'date_from', value: this.date_from.toISOString()});
+    }
+    if(this.date_to) {
+      usedFacets.push({field: 'date_to', value: this.date_to.toISOString()});
     }
 
     this.state.usedFacets.set([...usedFacets]);

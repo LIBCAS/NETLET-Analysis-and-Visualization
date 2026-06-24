@@ -60,7 +60,9 @@
     "nationality": "nationality",
     "stats": "Statistics",
     "year_from": "From year",
-    "year_to": "To year"
+    "year_to": "To year",
+    "date_from": "From",
+    "date_to": "To"
   },
   "action": {
     "search": "Search",

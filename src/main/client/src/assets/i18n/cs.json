@@ -102,7 +102,9 @@
     "nationality": "Narodnost",
     "stats": "Statistiky",
     "year_from": "Od roku",
-    "year_to": "Do roku"
+    "year_to": "Do roku",
+    "date_from": "Od",
+    "date_to": "Do"
   },
   "action": {
     "search": "Hledat",

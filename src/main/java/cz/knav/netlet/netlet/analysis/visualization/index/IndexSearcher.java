@@ -873,6 +873,18 @@ public class IndexSearcher {
       }
     }
 
+    String date_from = request.getParameter("date_from");
+    String date_to = request.getParameter("date_to");
+    if ((date_from != null && !date_from.isBlank()) || (date_to != null && !date_to.isBlank())) {
+      if (date_from == null || date_from.isBlank()) {
+        date_from = "*";
+      }
+      if (date_to == null || date_to.isBlank()) {
+        date_to = "*";
+      }
+      jrequest = jrequest.withFilter("date_computed_range:[" + date_from + " TO " + date_to + "]"); 
+    }
+
     String year_from = request.getParameter("year_from");
     String year_to = request.getParameter("year_to");
     if ((year_from != null && !year_from.isBlank()) || (year_to != null && !year_to.isBlank())) {
@@ -949,6 +961,7 @@ public class IndexSearcher {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       SolrQuery query = new SolrQuery("name_lower:" + prefix + "*")
+              .addFilterQuery("{!collapse field=name_str}")
               .setFields("id,table_id,name,tenant")
               .setSort(SolrQuery.SortClause.asc("name_sort"))
               .setRows(10);
@@ -1013,6 +1026,7 @@ public class IndexSearcher {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       SolrQuery query = new SolrQuery("name_lower:" + prefix + "*")
+              .addFilterQuery("{!collapse field=name}")
               .setFields("id,table_id,name,tenant")
               .setSort(SolrQuery.SortClause.asc("name_sort"))
               .setRows(10);

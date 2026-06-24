@@ -10,14 +10,38 @@
         </mat-form-field>
 
         <div class="app-fxLayout app-gap-4">
-        <mat-form-field class="app-fill-w" style="margin-right:5px;" appearance="outline">
+
+          <mat-form-field class="app-fill-w" style="margin-right:5px;" appearance="outline">
+            <input matInput [matDatepicker]="datum_od" [(ngModel)]="date_from" [placeholder]="('field.date_from' | translate)"
+             (click)="datum_od.open()">
+            <mat-datepicker-toggle matSuffix [for]="datum_od"></mat-datepicker-toggle>
+            <mat-datepicker #datum_od startView="multi-year" [startAt]="year_min" (yearSelected)="doDateFromByYear($event)">
+                <mat-datepicker-actions>
+                <button matButton matDatepickerCancel>OK</button>
+                </mat-datepicker-actions>
+            </mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="app-fill-w" style="margin-left:5px;" appearance="outline">
+            <input matInput [matDatepicker]="datum_do" [(ngModel)]="date_to" [placeholder]="'field.date_to' | translate" (click)="datum_do.open()">
+            <mat-datepicker-toggle matSuffix [for]="datum_do"></mat-datepicker-toggle>
+            <mat-datepicker #datum_do startView="multi-year" [startAt]="year_max" (yearSelected)="doDateToByYear($event)">
+                <mat-datepicker-actions>
+                <button matButton matDatepickerCancel>OK</button>
+                </mat-datepicker-actions>
+            </mat-datepicker>
+
+          </mat-form-field>
+
+
+
+        <!-- <mat-form-field class="app-fill-w" style="margin-right:5px;" appearance="outline">
             <input type="number" placeholder="{{ 'field.year_from' | translate}}"
                 attr.aria-label="{{ 'field.year_from' | translate}}" matInput [formField]="searchForm.year_from" >
         </mat-form-field>
         <mat-form-field class="app-fill-w" style="margin-left:5px;" appearance="outline">
             <input type="number" placeholder="{{ 'field.year_to' | translate}}"
                 attr.aria-label="{{ 'field.year_to' | translate}}" matInput [formField]="searchForm.year_to" >
-        </mat-form-field>
+        </mat-form-field> -->
         </div>
 
         <mat-form-field class="app-fill-w" appearance="outline">

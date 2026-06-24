@@ -425,6 +425,7 @@ public class HikoIndexer {
             String place_id = ("local".equals(scope) ? tenant : "global") + "_" + rs.getInt("id");
             JSONObject pl = places.getJSONObject(place_id);
             doc.addField("place_id", rs.getInt("id"));
+            doc.addField("place_names", pl.optString("name"));
             doc.addField("name", pl.optString("name"));
             doc.addField("country", pl.optString("country"));
             doc.addField("note", pl.optString("note"));
