@@ -3,7 +3,7 @@
   <as-split-area [size]="320">
     <div style="flex: 1 30%;" class="app-filters">
       <app-facets
-        [fields]="['authors', 'recipients', 'mentioned','keyword_categories', 'professions', 'origins', 'destinations']"
+        [fields]="['authors', 'recipients', 'mentioned','keyword_categories', 'keywords', 'professions', 'origins', 'destinations']"
         [sub_fields]="{'keyword_categories': 'keywords'}" [renderLists]="false"
         [facets]="facets()" (onFiltersChanged)="onFiltersChanged($event)"></app-facets>
     </div>

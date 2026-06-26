@@ -827,6 +827,7 @@ public class IndexSearcher {
                     .setSort("index")
                     .withDomain(new DomainMap().withTagsToExclude("ffprofession"))
                     .setMinCount(1))
+            .withFacet("keywords", keywordsFacet)
             .withFacet("keyword_categories", keywordsCategoriesFacet)
             .withFacet("mentioned", new TermsFacetMap("identity_mentioned")
                     .setLimit(1000)
