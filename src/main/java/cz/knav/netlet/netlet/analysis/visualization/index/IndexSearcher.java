@@ -422,7 +422,7 @@ public class IndexSearcher {
                       //.withTagsToExclude("fftenant")
                       )
                       .setMinCount(1))
-              .withFacet("keywords", categoriesFacet)
+              .withFacet("keywords_author", categoriesFacet)
               // .withFacet("identity_mentioned", identity_mentionedFacet)
               .withFacet("recipients", new TermsFacetMap("identity_recipient")
                       .setLimit(1000)
@@ -801,7 +801,7 @@ public class IndexSearcher {
             .setSort("index")
             .setLimit(1000)
             .setMinCount(1);
-
+    
     final TermsFacetMap keywordsCategoriesFacet = new TermsFacetMap("keywords_category_" + lang)
             .setLimit(1000)
             .withDomain(new DomainMap().withTagsToExclude("ffkeywords"))
@@ -962,7 +962,8 @@ public class IndexSearcher {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       SolrQuery query = new SolrQuery("name_lower:" + prefix + "*")
-              .addFilterQuery("{!collapse field=name_str}")
+              //.addFilterQuery("{!collapse field=name_str min=if(eq(tenant,'global'),0,1)}")
+              .addFilterQuery("tenant:global")
               .setFields("id,table_id,name,tenant")
               .setSort(SolrQuery.SortClause.asc("name_sort"))
               .setRows(10);

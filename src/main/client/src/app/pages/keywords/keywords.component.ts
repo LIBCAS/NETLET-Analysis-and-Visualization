@@ -193,7 +193,7 @@ export class KeywordsComponent {
       this.authors = resp.facets.authors.buckets;
       this.recipients = this.solrResponse.facets.recipients.buckets;
       // this.mentioned = resp.facets.mentioned.buckets;
-      this.keyword_categories = resp.facets.keywords.buckets;
+      this.keyword_categories = resp.facets.keywords_author.buckets;
 
       this.keyword_categories.forEach(k => {
         k.selected = this.selectedKeywords.includes(k.val);

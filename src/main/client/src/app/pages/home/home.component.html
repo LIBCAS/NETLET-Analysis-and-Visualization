@@ -51,7 +51,7 @@
 
             <mat-autocomplete #autoIdentities="matAutocomplete">
                 @for (option of identities(); track option) {
-                <mat-option [value]="option.name">{{option.name}}</mat-option>
+                <mat-option [value]="option.name">{{option.name}} ({{ option.tenant }})</mat-option>
                 }
             </mat-autocomplete>
 
