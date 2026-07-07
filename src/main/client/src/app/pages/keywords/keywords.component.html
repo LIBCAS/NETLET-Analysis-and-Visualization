@@ -33,7 +33,8 @@
           <mat-checkbox [(ngModel)]="includeRecipients" (change)="getData(true)">{{ 'field.recipients' | translate}}</mat-checkbox>
         </mat-expansion-panel>
       </div>
-      <div class="app-fill-w" style="overflow: auto; ">
+
+      <div class="app-fill-w" style="overflow: auto; " [class.app-disabled]="loading">
         <mat-card appearance="outlined">
           <mat-card-content>
             <div style="overflow: auto; height:350px; ">
@@ -64,6 +65,7 @@
           </mat-card>
         }
       </div>
+
     </div>
   </div>
 }

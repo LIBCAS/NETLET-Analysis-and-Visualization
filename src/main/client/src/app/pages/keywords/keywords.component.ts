@@ -175,6 +175,13 @@ export class KeywordsComponent {
     p.includeAuthors = this.includeAuthors;
     p.includeRecipients = this.includeRecipients;
     this.state.addFilters(p);
+    if (this.treeMapChartAutors) {
+      this.treeMapChartAutors.clear();
+    }
+    if (this.treeMapChartRecipients) {
+      this.treeMapChartRecipients.clear();
+    }
+    
     this.service.getKeywords(p as HttpParams).subscribe((resp: any) => {
       this.translation.onLangChange.subscribe(() => { this.getData(true) });
       if (!resp) {
@@ -287,7 +294,7 @@ export class KeywordsComponent {
     const formatUtil = echarts.format;
     const data: any = [];
     this.totalBuckets = 0;
-    this.keyword_categories.filter(cat => cat.val != '').forEach((cat: any) => {
+    this.keyword_categories.filter(cat => cat.val != '').forEach((cat: any, idx: number) => {
       const ks: any = [];
       const buckets = role === 'authors' ? cat.keywords_autor.buckets : cat.keywords_recipient.buckets;
       buckets.forEach((k: any) => {
