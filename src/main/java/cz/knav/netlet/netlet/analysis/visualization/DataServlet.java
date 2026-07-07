@@ -147,7 +147,7 @@ public class DataServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
-                ret = IndexSearcher.getIdentityLetters(request);  
+                ret = IndexSearcher.identityLetters(request);  
                 
                 return ret;
             }

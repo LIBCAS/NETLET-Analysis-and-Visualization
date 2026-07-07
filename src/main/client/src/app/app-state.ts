@@ -134,6 +134,7 @@ export interface Tenant {
   }
 
   addFilters(p: any) {
+    p.identity = this.usedFacets().filter(k => k.field === 'identities').map(k => k.value);
     p.author = this.usedFacets().filter(k => k.field === 'authors').map(k => k.value);
     p.recipient = this.usedFacets().filter(k => k.field === 'recipients').map(k => k.value);
     p.mentioned = this.usedFacets().filter(k => k.field === 'mentioned').map(k => k.value);
@@ -143,7 +144,7 @@ export interface Tenant {
     p.origin = this.usedFacets().filter(k => k.field === 'origins').map(k => k.value);
     p.destination = this.usedFacets().filter(k => k.field === 'destinations').map(k => k.value);
     p.places = this.usedFacets().filter(k => k.field === 'places').map(k => k.value);
-    p.identities = this.usedFacets().filter(k => k.field === 'identities').map(k => k.value);
+    //p.identities = this.usedFacets().filter(k => k.field === 'identities').map(k => k.value);
     p.year_from = this.usedFacets().filter(k => k.field === 'year_from').map(k => k.value);
     p.year_to = this.usedFacets().filter(k => k.field === 'year_to').map(k => k.value);
     p.date_from = this.usedFacets().filter(k => k.field === 'date_from').map(k => k.value);

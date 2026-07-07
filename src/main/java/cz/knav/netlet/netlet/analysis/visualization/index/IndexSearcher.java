@@ -523,7 +523,7 @@ public class IndexSearcher {
     return ret;
   }
 
-  public static JSONObject getIdentityLetters(HttpServletRequest request) {
+  public static JSONObject identityLetters(HttpServletRequest request) {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
@@ -559,27 +559,28 @@ public class IndexSearcher {
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
               //.withFilter("status:publish")
-              .setLimit(rows)
               .withFilter("date_year:[1500 TO *]")
               .withFilter("identity_recipient:*")
               .withFilter("identity_author:*")
               .returnFields("letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,identity_mentioned,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
-              .withFacet("date_year", rangeFacet)
-              .withFacet("keywords", categoriesFacet)
-              .withFacet("mentioned", new TermsFacetMap("identity_mentioned")
-                      .setLimit(1000)
-                      .setSort("index")
-                      .setMinCount(1))
-              .withFacet("recipients", new TermsFacetMap("identity_recipient")
-                      .setLimit(1000)
-                      .setSort("index")
-                      .withDomain(new DomainMap().withTagsToExclude("ffrecipients"))
-                      .setMinCount(1))
-              .withFacet("authors", new TermsFacetMap("identity_author")
-                      .setLimit(1000)
-                      .setSort("index")
-                      .setMinCount(1));
+//              .withFacet("date_year", rangeFacet)
+//              .withFacet("keywords", categoriesFacet)
+//              .withFacet("mentioned", new TermsFacetMap("identity_mentioned")
+//                      .setLimit(1000)
+//                      .setSort("index")
+//                      .setMinCount(1))
+//              .withFacet("recipients", new TermsFacetMap("identity_recipient")
+//                      .setLimit(1000)
+//                      .setSort("index")
+//                      .withDomain(new DomainMap().withTagsToExclude("ffrecipients"))
+//                      .setMinCount(1))
+//              .withFacet("authors", new TermsFacetMap("identity_author")
+//                      .setLimit(1000)
+//                      .setSort("index")
+//                      .setMinCount(1))
+              .setLimit(rows);
 
+      jrequest = addFacets(request, jrequest, lang); 
       jrequest = addFilters(request, jrequest, lang);
 
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
@@ -731,9 +732,9 @@ public class IndexSearcher {
         date_range = "1000,2025";
       }
       String[] years = date_range.split(",");
-      RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1MONTH")
-              .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
-              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+//      RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1MONTH")
+//              .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
+//              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
       //QueryFacetMap qfm = new QueryFacetMap("date_year:[1000 TO 2000]").withSubFacet("date_computed_range", rangeFacet);
 
       String rowsP = request.getParameter("rows");
@@ -844,6 +845,11 @@ public class IndexSearcher {
                     .setLimit(1000)
                     .setSort("index")
                     .withDomain(new DomainMap().withTagsToExclude("ffauthors"))
+                    .setMinCount(1))
+            .withFacet("identities", new TermsFacetMap("identity_name")
+                    .setLimit(1000)
+                    .setSort("index")
+                    .withDomain(new DomainMap().withTagsToExclude("ffidentities"))
                     .setMinCount(1));
   }
 
@@ -903,6 +909,10 @@ public class IndexSearcher {
       jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(\"" + String.join("\" OR \"", request.getParameterValues("author")) + "\")");
     }
 
+    if (request.getParameter("identity") != null) {
+      jrequest = jrequest.withFilter("{!tag=ffidentities}identity_name:(\"" + String.join("\" OR \"", request.getParameterValues("identity")) + "\")");
+    }
+
     if (request.getParameter("recipient") != null) {
       jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(\"" + String.join("\" OR \"", request.getParameterValues("recipient")) + "\")");
     }
@@ -943,11 +953,6 @@ public class IndexSearcher {
       String f = String.join("\" OR \"", request.getParameterValues("places"));
       jrequest = jrequest.withFilter("origin_name:(\"" + f + "\") OR destination_name:(\"" + f + "\")");
     }
-
-    if (request.getParameter("identities") != null) {
-      String f = String.join("\" OR \"", request.getParameterValues("identities"));
-      jrequest = jrequest.withFilter("identity_name:(\"" + f + "\")");
-    }
     return jrequest;
   }
 
@@ -967,7 +972,7 @@ public class IndexSearcher {
               .addFilterQuery("tenant:global")
               .setFields("id,table_id,name,tenant")
               .setSort(SolrQuery.SortClause.asc("name_sort"))
-              .setRows(10);
+              .setRows(40);
       query.set("wt", "json");
 
       QueryRequest qreq = new QueryRequest(query);
@@ -997,7 +1002,7 @@ public class IndexSearcher {
       SolrQuery query = new SolrQuery(field + ":" + prefix + "*")
               .setFields(fl)
               .setSort(SolrQuery.SortClause.asc("name_sort"))
-              .setRows(20);
+              .setRows(40);
       query.set("wt", "json");
 
       if (collapse) {
@@ -1032,7 +1037,7 @@ public class IndexSearcher {
               .addFilterQuery("{!collapse field=name}")
               .setFields("id,table_id,name,tenant")
               .setSort(SolrQuery.SortClause.asc("name_sort"))
-              .setRows(10);
+              .setRows(40);
       //query.addFilterQuery("tenant:global OR tenant:"+tenant);
       query.set("wt", "json");
 
