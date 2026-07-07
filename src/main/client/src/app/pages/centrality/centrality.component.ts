@@ -71,7 +71,6 @@ export class CentralityComponent {
   authors: JSONFacet[];
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
-  keywords: JSONFacet[];
 
   filters: {field: string, value: string}[] = [];
 
@@ -284,16 +283,14 @@ export class CentralityComponent {
       }
       this.facets.set(resp.facets);
 
-      this.authors = resp.facets.authors.buckets;
-      this.recipients = resp.facets.recipients.buckets;
+      this.authors = resp.facets.chart_authors.buckets;
+      this.recipients = resp.facets.chart_recipients.buckets;
 
       this.recipients.forEach(k => {
         k.selected = this.selectedRecipients.includes(k.val);
       });
 
-      this.mentioned = resp.facets.mentioned.buckets;
-
-      this.keywords = resp.facets.keywords.buckets;
+      this.mentioned = resp.facets.chart_mentioned.buckets;
 
       this.processResponse();
       this.loading = false;
