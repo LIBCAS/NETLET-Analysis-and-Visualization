@@ -44,6 +44,9 @@ export class ProfessionsComponent {
   solrResponse: any;
   facets = signal<FacetFields>({});
   limits: [Date, Date];
+
+  includeAuthors: boolean = true;
+  includeRecipients: boolean = true;
   tenants: Tenant[] = [];
   graphOptions: EChartsOption = {};
   graphChart: ECharts;
@@ -172,11 +175,14 @@ export class ProfessionsComponent {
     p.tenant_year_range = this.state.getTenantsRange().toString();
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     p.lang = this.translation.currentLang;
+    p.includeAuthors = this.includeAuthors;
+    p.includeRecipients = this.includeRecipients;
     if (!setResponse) {
       p.rows = 0;
     } else {
       p.rows = 10000;
     }
+    this.state.addFilters(p);
     this.service.getProfessions(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
@@ -190,16 +196,10 @@ export class ProfessionsComponent {
       if (setResponse) {
         const ts: JSONFacet[] = resp.facets.tenants.buckets;
         this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
-        // if (!this.state.tenant().available) {
-        //   // this.state.tenant.set(null);
-        //   this.loading = false;
-        //   this.invalidTenant = true;
-        //   return;
-        // }
         this.solrResponse = resp;
       }
-      this.professions_author = resp.facets.authors ? resp.facets.authors.buckets : null;
-      this.professions_recipient = resp.facets.recipients ? resp.facets.recipients.buckets : null;
+      this.professions_author = resp.facets.authors ? resp.facets.chart_authors.buckets : null;
+      this.professions_recipient = resp.facets.recipients ? resp.facets.chart_recipients.buckets : null;
       // this.professions_mentioned = resp.facets.professions_mentioned.buckets;
       this.processResponse();
       this.loading = false;
@@ -212,14 +212,24 @@ export class ProfessionsComponent {
 
   setPieChart() {
     const data: any[] = [];
-    this.professions_author.forEach((p: JSONFacet) => {
-      data.push({
-        id: p.val,
-        name: p.val,
-        value: p.count
-      })
-    });
-
+    if (this.includeAuthors) {
+      this.professions_author.forEach((p: JSONFacet) => {
+        data.push({
+          id: p.val,
+          name: p.val,
+          value: p.count
+        })
+      });
+    }
+    if (this.includeRecipients) {
+      this.professions_recipient.forEach((p: JSONFacet) => {
+        data.push({
+          id: p.val,
+          name: p.val,
+          value: p.count
+        })
+      });
+    }
     this.pieOptions = {
       title: {
         show: true,
@@ -272,30 +282,34 @@ export class ProfessionsComponent {
     const maxCount: number = Math.max(
       this.professions_author[0].count,
       this.professions_recipient[0].count);
-    this.professions_author.forEach((identity: JSONFacet) => {
-      nodes.push({
-        // id: identity.id + '',
-        id: identity.val + '_authors',
-        name: identity.val,
-        value: identity.count,
-        category: 'authors',
-        symbolSize: maxSize * identity.count / maxCount + minSize,
-        x: Math.random() * w,
-        y: Math.random() * h
-      })
-    });
-    this.professions_recipient.forEach((identity: JSONFacet) => {
-      nodes.push({
-        // id: identity.id + '',
-        id: identity.val + '_recipients',
-        name: identity.val,
-        value: identity.count,
-        category: 'recipients',
-        symbolSize: maxSize * identity.count / maxCount + minSize,
-        x: Math.random() * w,
-        y: Math.random() * h
-      })
-    });
+    if (this.includeAuthors){
+      this.professions_author.forEach((identity: JSONFacet) => {
+        nodes.push({
+          // id: identity.id + '',
+          id: identity.val + '_authors',
+          name: identity.val,
+          value: identity.count,
+          category: 'authors',
+          symbolSize: maxSize * identity.count / maxCount + minSize,
+          x: Math.random() * w,
+          y: Math.random() * h
+        })
+      });
+    }
+    if (this.includeRecipients){
+      this.professions_recipient.forEach((identity: JSONFacet) => {
+        nodes.push({
+          // id: identity.id + '',
+          id: identity.val + '_recipients',
+          name: identity.val,
+          value: identity.count,
+          category: 'recipients',
+          symbolSize: maxSize * identity.count / maxCount + minSize,
+          x: Math.random() * w,
+          y: Math.random() * h
+        })
+      });
+    }
 
     this.solrResponse.response.docs.forEach((letter: Letter) => {
       if (this.inLimits(letter.date_year) && letter.identities) {

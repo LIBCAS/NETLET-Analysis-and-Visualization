@@ -361,7 +361,7 @@ public class IndexSearcher {
     return ret;
   }
 
-  public static JSONObject getKeywords(HttpServletRequest request) {
+  public static JSONObject keywords(HttpServletRequest request) {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       String lang = request.getParameter("lang");
@@ -596,7 +596,7 @@ public class IndexSearcher {
     return ret;
   }
 
-  public static JSONObject getProfessions(HttpServletRequest request) {
+  public static JSONObject professions(HttpServletRequest request) {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       String lang = request.getParameter("lang");
@@ -630,18 +630,19 @@ public class IndexSearcher {
                       .setLimit(1000)
                       .withDomain(new DomainMap().withTagsToExclude("fftenant").withTagsToExclude("ffdate_year"))
                       .setMinCount(1))
-              .withFacet("professions", new TermsFacetMap("professions_" + lang)
+//              .withFacet("chart_professions", new TermsFacetMap("professions_" + lang)
+//                      .setLimit(1000)
+//                      .setMinCount(1))
+//              .withFacet("chart_mentioned", new TermsFacetMap("professions_mentioned_" + lang)
+//                      .setLimit(1000)
+//                      .setMinCount(1))
+              .withFacet("chart_authors", new TermsFacetMap("professions_author_" + lang)
                       .setLimit(1000)
                       .setMinCount(1))
-              .withFacet("authors", new TermsFacetMap("professions_author_" + lang)
-                      .setLimit(1000)
-                      .setMinCount(1))
-              .withFacet("recipients", new TermsFacetMap("professions_recipient_" + lang)
-                      .setLimit(1000)
-                      .setMinCount(1))
-              .withFacet("mentioned", new TermsFacetMap("professions_mentioned_" + lang)
+              .withFacet("chart_recipients", new TermsFacetMap("professions_recipient_" + lang)
                       .setLimit(1000)
                       .setMinCount(1));
+      jrequest = addFacets(request, jrequest, lang);
       jrequest = addFilters(request, jrequest, lang);
 
       jrequest.setResponseParser(new InputStreamResponseParser("json"));

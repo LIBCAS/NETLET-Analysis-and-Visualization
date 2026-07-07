@@ -164,7 +164,7 @@ public class DataServlet extends HttpServlet {
         KEYWORDS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = IndexSearcher.getKeywords(request);
+                JSONObject ret = IndexSearcher.keywords(request);
                 
                 return ret;
             }
@@ -256,7 +256,7 @@ public class DataServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
-                    ret = IndexSearcher.getProfessions(request);
+                    ret = IndexSearcher.professions(request);
                 return ret;
             }
         },

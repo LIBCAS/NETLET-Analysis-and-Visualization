@@ -169,7 +169,7 @@ export interface Tenant {
   decodeState(s: string) {
     if (s) {
       const obj = JSON.parse(decodeURIComponent(atob(s)));
-      console.log(obj)
+      //console.log(obj)
       this.q = obj.q;
       this.usedFacets.set(obj.f);
       //this.tenants().forEach(t => {t.selected = false});
