@@ -242,6 +242,7 @@ export class KeywordsComponent {
 
   setPieChart() {
     const data: any[] = [];
+
     this.keyword_categories.forEach((p: JSONFacet) => {
       let i = 0;
       if (p.val) {

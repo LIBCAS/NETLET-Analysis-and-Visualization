@@ -15,21 +15,23 @@
     <div>
       <label>{{ 'field.authors' | translate }}:</label>
       @for (a of authors(); track a) {
-        <div><a class="app-link" [routerLink]="'/identity/'+a.id">{{ a.name }}</a></div>
+        <div><a class="app-link" [routerLink]="'/identity/'+(a.global_identity ? ('global_'+ a.global_identity.id) : a.id)">{{ a.name }}</a></div>
       }
     </div>
 
     <div>
       <label>{{ 'field.recipients' | translate }}:</label>
       @for (a of recipients(); track a) {
-        <div><a class="app-link" [routerLink]="'/identity/'+a.id">{{ a.name }}</a></div>
+        <div><a class="app-link" [routerLink]="'/identity/'+(a.global_identity ? ('global_'+ a.global_identity.id) : a.id)">{{ a.name }}</a></div>
       }
     </div>
 
     <div>
       <label>{{ 'field.mentioned' | translate }}:</label>
       @for (a of mentioned(); track a) {
-        <div><a class="app-link" [routerLink]="'/identity/'+a.id">{{ a.name }}</a></div>
+        <div>
+          <a class="app-link" [routerLink]="'/identity/'+ (a.global_identity ? ('global_'+ a.global_identity.id) : a.id)">{{ a.name }}</a>
+        </div>
       }
     </div>
   </fieldset>

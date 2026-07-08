@@ -24,15 +24,6 @@
           (onChangeLimits)="changeLimits($event)"></app-years-chart>
         }
       </div>
-      <div>
-        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-          <mat-expansion-panel-header>
-            <mat-panel-title> {{ 'Identities to include' | translate}} </mat-panel-title>
-          </mat-expansion-panel-header>
-          <mat-checkbox [(ngModel)]="includeAuthors" (change)="getData(true)">{{ 'field.authors' | translate}}</mat-checkbox>
-          <mat-checkbox [(ngModel)]="includeRecipients" (change)="getData(true)">{{ 'field.recipients' | translate}}</mat-checkbox>
-        </mat-expansion-panel>
-      </div>
 
       <div class="app-fill-w" style="overflow: auto; " [class.app-disabled]="loading">
         <mat-card appearance="outlined">
@@ -44,6 +35,15 @@
             </div>
           </mat-card-content>
         </mat-card>
+      <div>
+        <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> {{ 'Identities to show' | translate}} </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-checkbox [(ngModel)]="includeAuthors" (change)="getData(true)">{{ 'field.authors' | translate}}</mat-checkbox>
+          <mat-checkbox [(ngModel)]="includeRecipients" (change)="getData(true)">{{ 'field.recipients' | translate}}</mat-checkbox>
+        </mat-expansion-panel>
+      </div>
         @if (this.includeAuthors) {
           <mat-card appearance="outlined">
             <mat-card-content>

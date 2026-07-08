@@ -51,16 +51,16 @@
             <ng-container matColumnDef="author">
               <th mat-header-cell *matHeaderCellDef> {{ 'field.author' | translate}} </th>
               <td mat-cell *matCellDef="let element">
-                @for (p of letterIdentities(element, 'author'); track p) {
-                  <div><a class="app-link" [routerLink]="'/identity/'+p.id">{{ p.name }}</a></div>
+                @for (a of letterIdentities(element, 'author'); track a) {
+                  <div><a class="app-link" [routerLink]="'/identity/'+ (a.global_identity ? ('global_'+ a.global_identity.id) : a.id)">{{ a.name }}</a></div>
                 }  </td>
             </ng-container>
 
             <ng-container matColumnDef="recipient">
               <th mat-header-cell *matHeaderCellDef> {{ 'field.recipient' | translate}} </th>
               <td mat-cell *matCellDef="let element">
-                @for (p of letterIdentities(element, 'recipient'); track p) {
-                  <div><a class="app-link" [routerLink]="'/identity/'+p.id">{{ p.name }}</a></div>
+                @for (a of letterIdentities(element, 'recipient'); track a) {
+                  <div><a class="app-link" [routerLink]="'/identity/'+ (a.global_identity ? ('global_'+ a.global_identity.id) : a.id)">{{ a.name }}</a></div>
                 } </td>
             </ng-container>
 

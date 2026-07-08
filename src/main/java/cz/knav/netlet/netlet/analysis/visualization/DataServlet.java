@@ -119,6 +119,20 @@ public class DataServlet extends HttpServlet {
                 return json;
             }
         },
+        INDEX_HIKO_LETTER {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                JSONObject json = new JSONObject();
+                try {
+                    HikoIndexer hi = new HikoIndexer();
+                    json = hi.indexLetter(req.getParameter("tenant"), req.getParameter("id"));
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE, "Error", ex);
+                    json.put("error", ex.toString());
+                }
+                return json;
+            }
+        },
         INDEX_HIKO_DB {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

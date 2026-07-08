@@ -1,21 +1,21 @@
 import { httpResource } from '@angular/common/http';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { JSONFacet } from '../../shared/facet';
 
 import * as echarts from 'echarts/core';
 
 //@ts-ignore
 import langCZ from 'echarts/lib/i18n/langCS.js';
-import { EChartsOption } from 'echarts';
-import { BarChart, LineChart } from 'echarts/charts';
+import { EChartsOption, ECharts } from 'echarts';
+import { BarChart, LineChart, PieChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { NgxEchartsDirective, NgxEchartsModule, provideEchartsCore } from 'ngx-echarts';
 
 
-echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent,
+echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent, PieChart,
   GridComponent, TitleComponent]);
 echarts.registerLocale("CZ", langCZ)
 
@@ -31,6 +31,7 @@ echarts.registerLocale("CZ", langCZ)
 export class IdentityComponent {
 
   identityId = signal('');
+  private translation = inject(TranslateService);
   private activatedRoute = inject(ActivatedRoute);
 
   identityRes: any = httpResource(() => ({
@@ -47,8 +48,11 @@ export class IdentityComponent {
   
   limits: [Date, Date];
   chartOptions: EChartsOption | any;
-  chart: echarts.ECharts;
+  chart: ECharts;
   chartType: string = 'line';
+  
+  pieOptions: EChartsOption = {};
+  pieChart: ECharts;
 
   constructor() {
     this.activatedRoute.params.subscribe((params) => {
@@ -60,13 +64,64 @@ export class IdentityComponent {
       if (identity) {
         setTimeout(() => {
           this.setOptions();
+          this.setPieChart();
         }, 100)
       }
     })
   }
 
+  onPieChartInit(e: any) {
+    this.pieChart = e;
+  }
+
   onChartInit(e: any) {
     this.chart = e;
+  }
+
+  setPieChart() {
+    const data: any[] = [];
+
+    this.identity().stats.tenant.buckets.forEach((p: JSONFacet) => {
+      let i = 0;
+      if (p.val) {
+        data.push({
+          id: p.val,
+          name: p.val,
+          value: p.count
+        });
+      }
+    });
+
+    this.pieOptions = {
+      title: {
+        show: true,
+        text: this.translation.instant('field.tenant'),
+        left: 'center'
+      },
+      legend: {
+        type: data.length > 15 ? 'scroll' : 'plain',
+        orient: 'vertical',
+        right: 10,
+        data: data.map(a => a.name),
+        formatter: name => {
+          var series: any = this.pieChart.getOption()['series'];
+          var value = series[0].data.filter((row: any) => row.name === name)[0].value
+          return name + ' - ' + value;
+        },
+      },
+      tooltip: {
+      },
+      series: [
+        {
+          //color: this.colors,
+          type: 'pie',
+          radius: '55%',
+          center: ['30%', '50%'],
+          selectedMode: 'single',
+          data: data
+        }
+      ]
+    }
   }
 
   setOptions() {
