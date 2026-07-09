@@ -10,6 +10,10 @@ import java.net.http.HttpResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
@@ -801,10 +805,21 @@ public class IndexSearcher {
       date_range = "1000,2025";
     }
     String[] years = date_range.split(",");
-    RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1MONTH")
+    String gap = "+1MONTH";
+    
+//    Date from = dtformatter.parse(years[0]);
+//    Date until = dtformatter.parse(years[1]);
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    LocalDateTime date1 = LocalDate.parse(years[0], dtf).atStartOfDay();
+    LocalDateTime date2 = LocalDate.parse(years[1], dtf).atStartOfDay();
+    long daysBetween = Duration.between(date1, date2).toDays();
+    if (daysBetween < 30000) {
+      gap = "+1DAY";
+    }
+    
+    RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), gap)
             .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
             .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
-    //QueryFacetMap qfm = new QueryFacetMap("date_year:[1000 TO 2000]").withSubFacet("date_computed_range", rangeFacet);
 
     final TermsFacetMap keywordsFacet = new TermsFacetMap("keywords_" + lang)
             .setSort("index")

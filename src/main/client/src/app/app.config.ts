@@ -8,7 +8,7 @@ import { AppService } from './app.service';
 import { AppState } from './app-state';
 import { AppConfiguration } from './app-configuration';
 import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
-import { registerLocaleData } from '@angular/common';
+import { DatePipe, registerLocaleData } from '@angular/common';
 
 
 
@@ -51,6 +51,6 @@ export const appConfig: ApplicationConfig = {
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
     provideHttpClient(),
     { provide: APP_INITIALIZER, useFactory: (config: AppConfiguration) => () => config.load(), deps: [AppConfiguration], multi: true },
-    TranslateService, AppState, AppService
+    TranslateService, AppState, AppService, DatePipe
   ]
 };

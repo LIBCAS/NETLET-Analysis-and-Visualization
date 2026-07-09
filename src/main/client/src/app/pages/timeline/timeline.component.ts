@@ -118,7 +118,8 @@ export class TimelineComponent {
     private translation: TranslateService,
     public state: AppState,
     private service: AppService,
-    private config: AppConfiguration
+    private config: AppConfiguration,
+    private datePipe: DatePipe
   ) {
     effect(() => {
       const sc = this.state.stateChanged();
@@ -128,7 +129,7 @@ export class TimelineComponent {
         this.loading = false;
         this.letters.set([]);
         this.facets.set({});
-        this.setOptions([]);
+        this.setOptions([], []);
       }
     })
     // effect(() => {
@@ -175,7 +176,11 @@ export class TimelineComponent {
       // this.showLetters.set(true);
 
       this.excludeDate = false;
-      this.limits = [new Date(option.dataZoom[0].startValue), new Date(option.dataZoom[0].endValue)];
+      // console.log(option)
+      // console.log(option.series[0].data[option.dataZoom[0].startValue][0])
+      // console.log(new Date(option.series[0].data[option.dataZoom[0].startValue][0]));
+      this.limits = [new Date(option.series[0].data[option.dataZoom[0].startValue][0]), new Date(option.series[0].data[option.dataZoom[0].endValue][0])];
+      //this.limits = [new Date(option.dataZoom[0].startValue), new Date(option.dataZoom[0].endValue)];
       this.getData(false);
     });
 
@@ -232,7 +237,7 @@ export class TimelineComponent {
     this.facets.set({});
     this.showLetters.set(false);
     if (setGraph) {
-      this.setOptions([])
+      this.setOptions([], [])
     }
     const p: any = {};
     p.tenant = this.state.selectedTenants().map(t => t.val);
@@ -273,7 +278,7 @@ export class TimelineComponent {
     });
   }
 
-  setOptions(data: any) {
+  setOptions(data: any, date: any) {
     this.chartOptions = {
       tooltip: {
         trigger: 'axis',
@@ -302,8 +307,9 @@ export class TimelineComponent {
         }
       },
       xAxis: {
-        type: 'time',
-        //boundaryGap: ['5%', '5%'],
+        //type: 'time',
+        type: 'category',
+        data: date,
         triggerEvent: true,
       },
       yAxis: {
@@ -339,8 +345,10 @@ export class TimelineComponent {
     this.loading = true;
     this.chart.clear();
     setTimeout(() => {
-      const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
-      this.setOptions(data);
+    //  const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
+      const data = this.date_facet.buckets.map(c => c.count);
+    const date = this.date_facet.buckets.map(c => new Date(c.val).toDateString());
+      this.setOptions(data, date);
       this.loading = false;
 
     }, 100);
@@ -348,9 +356,11 @@ export class TimelineComponent {
 
   processResponse() {
     this.date_facet = this.solrResponse.facets.date_computed_range;
-    const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
+    //const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
+    const data = this.date_facet.buckets.map(c => c.count);
+    const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'dd.MM.yyyy'));
     // console.log(data)
-    this.setOptions(data);
+    this.setOptions(data, date);
   }
 
   viewLetter(id: number, t: string) {
