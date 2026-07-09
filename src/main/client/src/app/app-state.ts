@@ -192,4 +192,11 @@ export interface Tenant {
     }
     this.stateChanged.set(this.usedFacets().length + this.selectedTenants().length)
   }
+
+  facetsVisible = true;
+  facetsSize = 320;
+  gutterClick(e: any){
+    this.facetsVisible = !this.facetsVisible;
+    this.facetsSize = this.facetsVisible ? 320 : 0;
+  }
 }

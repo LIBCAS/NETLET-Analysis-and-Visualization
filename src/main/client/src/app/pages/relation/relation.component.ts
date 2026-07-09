@@ -26,12 +26,13 @@ import { FacetFields, JSONFacet } from '../../shared/facet';
 import { Letter } from '../../shared/letter';
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 import { FacetsComponent } from "../../components/facets/facets.component";
+import { AngularSplitModule } from "angular-split";
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-relation',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent, AngularSplitModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],

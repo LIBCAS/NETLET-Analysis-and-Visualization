@@ -1,10 +1,10 @@
 @if (loading) {
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
-<div class="app-fxLayout app-row app-fill" style="position: relative;">
-  <div style="flex: 1 30%;" class="app-filters">
-
-    @if (tenant) {
+<as-split direction="horizontal" [unit]="'pixel'" (gutterClick)="state.gutterClick($event)">
+  <as-split-area [size]="state.facetsSize" >
+    <div style="flex: 1 30%;" class="app-filters">
+       @if (tenant) {
       <div>
         <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
           <mat-expansion-panel-header>
@@ -29,10 +29,10 @@
       [fields]="['recipients']"
       [sub_fields]="{'keyword_categories': 'keywords'}"
       [facets]="facets()" (onMouserOver)="showNode($event)" (onMouseOut)="hideNode()"></app-facets>
-
-
-</div>
-<div class="app-content app-fill-w app-fill-h">
+    </div>
+  </as-split-area>
+  <as-split-area>
+    <div class="app-content app-fill-w app-fill-h">
   <div class="app-years">
     @if (solrResponse?.facets.date_year) {
       <app-years-chart [dateYearFacet]="solrResponse.facets.date_year"
@@ -54,4 +54,5 @@
     </div>
   }
 </div>
-</div>
+  </as-split-area>
+</as-split>

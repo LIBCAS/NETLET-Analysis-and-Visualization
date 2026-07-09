@@ -26,12 +26,13 @@ import { YearsChartComponent } from "../../components/years-chart/years-chart.co
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FacetsComponent } from "../../components/facets/facets.component";
+import { AngularSplitModule } from "angular-split";
 
 echarts.use([BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
 
 @Component({
   selector: 'app-keywords',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, AngularSplitModule],
   templateUrl: './keywords.component.html',
   styleUrl: './keywords.component.scss',
   providers: [
@@ -40,7 +41,6 @@ echarts.use([BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent,
 })
 export class KeywordsComponent {
   loading: boolean;
-  invalidTenant: boolean;
   solrResponse: any;
   facets = signal<FacetFields>({});
   limits: [Date, Date];
@@ -164,7 +164,6 @@ export class KeywordsComponent {
 
   getData(setResponse: boolean) {
     this.loading = true;
-    this.invalidTenant = false;
     const p: any = {};
     p.tenant = this.state.selectedTenants().map(t => t.val);
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();

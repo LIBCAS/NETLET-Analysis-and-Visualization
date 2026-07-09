@@ -29,12 +29,13 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { AppConfiguration } from '../../app-configuration';
 import { FacetsComponent } from "../../components/facets/facets.component";
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
+import { AngularSplitModule } from "angular-split";
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-identities',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, LettersInfoComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, LettersInfoComponent, AngularSplitModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],

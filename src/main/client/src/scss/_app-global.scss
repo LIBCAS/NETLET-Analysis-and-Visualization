@@ -324,7 +324,7 @@ fieldset {
     position: absolute;
     width: 600px;
     right: 20px;
-    top:210px;
+    top:var(--mat-toolbar-standard-height, 64px);
     z-index: 2000;
 }
 

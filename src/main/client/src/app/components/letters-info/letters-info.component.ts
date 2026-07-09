@@ -79,6 +79,7 @@ export class LettersInfoComponent {
       
     } else {
       this.filteredData.set([...this.data()]);
+      console.log(this.filteredData())
       this.computedHeader.set(this.header());
     }
     

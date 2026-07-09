@@ -168,7 +168,7 @@ export class YearsChartComponent {
     this.chartRok.setOption({
       title: {
         show: true,
-        text: this.limits[0] + ' - ' + this.limits[1]
+        text: this.limits[0] + '–' + this.limits[1]
       }
     })
   }
@@ -262,7 +262,7 @@ export class YearsChartComponent {
         show: true,
         left: 'center',
         top: 8,
-        text: this.limits[0] + ' - ' + this.limits[1]
+        text: this.limits[0] + '–' + this.limits[1]
       },
       toolbox: { show: false },
       brush: {

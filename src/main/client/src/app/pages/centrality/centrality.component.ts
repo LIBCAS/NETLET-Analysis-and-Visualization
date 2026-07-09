@@ -30,12 +30,13 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { AppConfiguration } from '../../app-configuration';
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 import { FacetsComponent } from "../../components/facets/facets.component";
+import { AngularSplitModule } from "angular-split";
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-centrality',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent, AngularSplitModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -343,7 +344,7 @@ export class CentralityComponent {
       // });
 
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_recipient', 'keyword_categories_cs', 'date_year', 'action'];
+      this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
 
       this.infoHeader = `${identity} wrote letters to:`;
       this.state.showInfo.set(true);
@@ -373,7 +374,7 @@ export class CentralityComponent {
       // });
 
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_recipient', 'keyword_categories_cs', 'date_year', 'action'];
+      this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
       this.infoHeader = `${identity} received letters from:`;
       this.state.showInfo.set(true);
     });
@@ -403,7 +404,7 @@ export class CentralityComponent {
 
       this.infoHeader = `${identity} is mentioned in:`;
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_recipient', 'keyword_categories_cs', 'date_year', 'action'];
+      this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
       this.state.showInfo.set(true);
     });
   }
@@ -577,7 +578,7 @@ export class CentralityComponent {
           },
           blur: {
             itemStyle: {
-              opacity: .5
+              opacity: .75
             }
 
           }

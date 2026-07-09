@@ -40,6 +40,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AppConfiguration } from '../../app-configuration';
 import { FacetsComponent } from "../../components/facets/facets.component";
+import { AngularSplitModule } from "angular-split";
 
 
 type ECOption = ComposeOption<
@@ -58,7 +59,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Titl
   imports: [TranslateModule, FormsModule, LeafletModule,
     MatCardModule, MatExpansionModule, MatCheckboxModule, MatFormFieldModule,
     MatSelectModule, MatInputModule, MatListModule, MatIconModule,
-    MatProgressBarModule, YearsChartComponent, LettersInfoComponent, FacetsComponent],
+    MatProgressBarModule, YearsChartComponent, LettersInfoComponent, FacetsComponent, AngularSplitModule],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss'
 })

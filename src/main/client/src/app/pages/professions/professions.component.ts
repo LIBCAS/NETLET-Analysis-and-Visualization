@@ -26,12 +26,13 @@ import { LabelLayout } from "echarts/features";
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FacetsComponent } from "../../components/facets/facets.component";
+import { AngularSplitModule } from "angular-split";
 
 echarts.use([CanvasRenderer, PieChart, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-professions',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent],
+  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, AngularSplitModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
