@@ -572,7 +572,7 @@ public class IndexSearcher {
               .withFilter("identity_recipient:*")
               .withFilter("identity_author:*")
               .returnFields("letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,identity_mentioned,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
-//              .withFacet("date_year", rangeFacet)
+              .withFacet("date_year", rangeFacet)
 //              .withFacet("keywords", categoriesFacet)
               .withFacet("chart_mentioned", new TermsFacetMap("identity_mentioned")
                       .setLimit(1000)

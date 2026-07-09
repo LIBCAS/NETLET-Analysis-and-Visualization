@@ -20,6 +20,7 @@
       
     <div>
       <mat-checkbox [(ngModel)]="allIncluded" (click)="processResponse()" [title]="config.excluded_identities()">Včetně hlavních aktérů</mat-checkbox>
+      <mat-checkbox [(ngModel)]="showOverlap" (click)="toggleOverlap()">Zobrazit  všechny názvy</mat-checkbox>
     </div>
 
     <div class="app-fxFlex">

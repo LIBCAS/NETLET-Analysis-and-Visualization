@@ -62,9 +62,10 @@ export class CentralityComponent {
     nodes: {
       category: number,
       id: string,
-      name: string
-      symbolSize: number
-      value: number
+      name: string,
+      symbolSize: number,
+      value: number,
+      z?: number
     }[]
   };
 
@@ -72,10 +73,11 @@ export class CentralityComponent {
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
 
-  filters: {field: string, value: string}[] = [];
+  filters: { field: string, value: string }[] = [];
 
   selectedRecipients: string[] = [];
   allIncluded = false;
+  showOverlap = false;
 
   colors = [
     "#d87c7c",
@@ -131,26 +133,26 @@ export class CentralityComponent {
     this.graphChart = e;
 
     this.graphChart.on('click', (params: any) => {
-      if (params.dataType === 'node'){
+      if (params.dataType === 'node') {
         if (params.data.category === 'mentioned') {
           this.mentionedLabel(params.data.name);
         } else if (params.data.category === 'authors') {
           this.authorLabel(params.data.name);
         } else if (params.data.category === 'recipients') {
           this.recipientLabel(params.data.name);
-        } 
+        }
       }
     });
 
-    this.graphChart.on('mouseover', {seriesIndex: 0}, (params: any) => {
-      this.showNodeExt({field: params.data.category, value: params.data.name})
+    this.graphChart.on('mouseover', { seriesIndex: 0 }, (params: any) => {
+      this.showNodeExt({ field: params.data.category, value: params.data.name })
     });
 
-    this.graphChart.on('mouseout', {seriesIndex: 0}, (params: any) => {
+    this.graphChart.on('mouseout', { seriesIndex: 0 }, (params: any) => {
       this.hideNode()
     });
 
-    
+
   }
 
   // clickTenant(t: Tenant) {
@@ -171,11 +173,13 @@ export class CentralityComponent {
 
   changeRunning(r: boolean) {
     this.running = r;
-    this.graphChart.setOption({series: [
-            {
-              animation: !this.running
-            }
-          ]});
+    this.graphChart.setOption({
+      series: [
+        {
+          animation: !this.running
+        }
+      ]
+    });
   }
 
   clickRecipient(k: JSONFacet) {
@@ -185,17 +189,17 @@ export class CentralityComponent {
   }
 
   addFilter(field: string, val: string) {
-    this.filters.push({field: field, value: val});
+    this.filters.push({ field: field, value: val });
     this.getData(true);
   }
 
-  usedFacets: {field: string, value: string}[] = [];
-  onFiltersChanged(usedFacets: {field: string, value: string}[]) {
+  usedFacets: { field: string, value: string }[] = [];
+  onFiltersChanged(usedFacets: { field: string, value: string }[]) {
     this.usedFacets = usedFacets;
     this.getData(true);
   }
 
-  showNode(e: {field: string, value: string}) {
+  showNode(e: { field: string, value: string }) {
     if (!this.graphData.categories.find(c => c.name === e.field)) {
       return;
     }
@@ -236,7 +240,7 @@ export class CentralityComponent {
   }
 
   selected: number[] = [];
-  showNodeExt(e: {field: string, value: string}) {
+  showNodeExt(e: { field: string, value: string }) {
     this.selected = [];
     this.selected.push(this.graphData.nodes.findIndex(n => n.id === e.value + '_authors'));
     this.selected.push(this.graphData.nodes.findIndex(n => n.id === e.value + '_recipients'));
@@ -328,7 +332,7 @@ export class CentralityComponent {
       //   } else if (letter.keywords_cs?.length > 0) {
       //     popup += ` (${letter.keywords_cs.join(', ')})`;
       //   } else {
-          
+
       //   }
 
       //   const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
@@ -337,12 +341,12 @@ export class CentralityComponent {
       //   this.infoContent = popup;
 
       // });
-      
+
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
       this.infoFields = ['letter_id', 'identity_recipient', 'keyword_categories_cs', 'date_year', 'action'];
 
-        this.infoHeader = `${identity} wrote letters to:`;
-        this.state.showInfo.set(true);
+      this.infoHeader = `${identity} wrote letters to:`;
+      this.state.showInfo.set(true);
     });
   }
 
@@ -358,7 +362,7 @@ export class CentralityComponent {
       //   } else if (letter.keywords_cs?.length > 0) {
       //     popup += ` (${letter.keywords_cs.join(', ')})`;
       //   } else {
-          
+
       //   }
 
       //   const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
@@ -367,7 +371,7 @@ export class CentralityComponent {
 
       //   this.infoContent = popup;
       // });
-      
+
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
       this.infoFields = ['letter_id', 'identity_recipient', 'keyword_categories_cs', 'date_year', 'action'];
       this.infoHeader = `${identity} received letters from:`;
@@ -396,11 +400,11 @@ export class CentralityComponent {
 
       //   this.infoContent = popup;
       // });
-      
-        this.infoHeader = `${identity} is mentioned in:`;
+
+      this.infoHeader = `${identity} is mentioned in:`;
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
       this.infoFields = ['letter_id', 'identity_recipient', 'keyword_categories_cs', 'date_year', 'action'];
-        this.state.showInfo.set(true);
+      this.state.showInfo.set(true);
     });
   }
 
@@ -425,17 +429,17 @@ export class CentralityComponent {
     const maxSize = 60;
     const minSize = 10;
     let maxCount = this.allIncluded ?
-    Math.max(
-      ...this.mentioned.map(r => r.count),
-      ...this.recipients.map(r => r.count),
-      ...this.authors.map(r => r.count)
-    )
-    :
-    Math.max(
-      ...this.mentioned.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count),
-      ...this.recipients.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count),
-      ...this.authors.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count)
-    );
+      Math.max(
+        ...this.mentioned.map(r => r.count),
+        ...this.recipients.map(r => r.count),
+        ...this.authors.map(r => r.count)
+      )
+      :
+      Math.max(
+        ...this.mentioned.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count),
+        ...this.recipients.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count),
+        ...this.authors.filter(i => !this.config.excluded_identities().includes(i.val)).map(r => r.count)
+      );
     this.mentioned.forEach((identity: JSONFacet, index: number) => {
       const pos = this.setPosition(h, w, identity.count, maxCount);
       nodes.push({
@@ -575,12 +579,24 @@ export class CentralityComponent {
             itemStyle: {
               opacity: .5
             }
-            
+
           }
 
         }
       ]
     };
+  }
+
+  toggleOverlap() {
+    this.graphChart.setOption({
+      series: [
+        {
+          labelLayout: {
+            hideOverlap: !this.showOverlap
+          }
+        }
+      ]
+    });
   }
 
   closeInfo() {
