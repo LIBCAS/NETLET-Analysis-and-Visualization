@@ -358,7 +358,10 @@ export class RelationComponent {
           // selectedMode: 'single',
           data: this.graphData.categories.map(function (a) {
             return a.name;
-          })
+          }),
+          formatter: (name: string) => {
+            return this.translation.instant('catalog.' + name);
+          }
         }
       ],
       animationDuration: 1500,

@@ -411,7 +411,8 @@ export class CentralityComponent {
 
   processResponse() {
     const categories = [{
-      name: 'authors', itemStyle: {
+      name: 'authors', 
+      itemStyle: {
         color: this.config.colors['author']
       }
     }, {
@@ -527,8 +528,12 @@ export class CentralityComponent {
         {
           show: true,
           bottom: 5,
-          data: this.graphData.categories
-          // data: [{ name: 'mentioned' }, { name: 'recipients' }, { name: 'authors' }]
+          data: this.graphData.categories,
+          
+          formatter: (name: string) => {
+            return this.translation.instant('field.'+name);
+          }
+          
         }
       ],
       animationDuration: 1500,

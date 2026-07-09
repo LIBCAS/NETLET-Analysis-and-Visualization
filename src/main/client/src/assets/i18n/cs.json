@@ -5,6 +5,10 @@
   "views": "Typy zobrazení",
   "clearSelection": "Zrušit výběr",
   "usedFilters": "Vybrané filtry",
+  "identities_to_show": "Zobrazit identity",
+  "keywords_by_category" : "Klíčová slova podle kategorií",
+  "line" : "křivka",
+  "bar":"sloupce",
   "home": {
     "centrality": {
       "header": "Centralita",
@@ -53,7 +57,7 @@
     "author": "Autor",
     "identities": "Osoby",
     "identity_author": "Autor",
-    "authors": "Autori",
+    "authors": "Autoři",
     "recipient": "Adresát",
     "identity_recipient": "Adresát",
     "recipients": "Adresáti",
@@ -67,7 +71,7 @@
     "professions": "Profese",
     "keywords": "Klíčová slova",
     "keyword_categories": "Kategorie klíčových slov",
-    "relation_tenants": "Katalogy pro porovnani",
+    "relation_tenants": "Katalogy pro porovnání",
     "date": "Datum",
     "dates": "Data",
     "detail": "Detaily",
@@ -112,5 +116,24 @@
     "letter_details": "Zobrazit dopis",
     "selectAll": "Vybrat všechny"
   },
-  "invalidTenant": "Nejsou k dispozice data pro tento Katalog"
+  "invalidTenant": "Nejsou k dispozice data pro tento Katalog",
+  "catalog": {
+    "brezina": "Březina",
+    "deml": "Deml",
+    "blekastad": "Blekastad",
+    "kalivoda": "Kalivoda",
+    "komensky": "Komenský",
+    "marci": "Marci",
+    "musil": "Musil",
+    "neumann": "Neumann",
+    "pamatky": "Památky",
+    "patocka": "Patočka",
+    "polanus": "Polanus",
+    "sachs": "Sachs",
+    "studenti": "Studenti",
+    "tgm": "TGM",
+    "ucenci": "Učenci",
+    "both": "Oba katalogy"
+  }
+
 }

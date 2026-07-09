@@ -545,13 +545,14 @@ public class HikoIndexer {
         doc.addField("identity_name", gi.getString("name"));
       }
 
-      addProfessions(id, role, doc, tenant);
+      identity.put("professions", addProfessions(id, role, doc, tenant));
+      //JSONArray ps = addProfessions(id, role, doc, tenant);
       doc.addField("identities", identity.toString());
-
+ 
     }
   }
 
-  private void addProfessions(String identityId, String role, SolrInputDocument doc, String tenant) {
+  private JSONArray addProfessions(String identityId, String role, SolrInputDocument doc, String tenant) {
     JSONArray lprofessions = getIdentityProfessions(identityId);
     for (int i = 0; i < lprofessions.length(); i++) {
       JSONObject rs = lprofessions.getJSONObject(i);
@@ -577,8 +578,9 @@ public class HikoIndexer {
         doc.addField("professions_category_" + role + "_cs", pc.optString("category_cs", null));
         doc.addField("professions_category_" + role + "_en", pc.optString("category_en", null));
       }
-      rs.append("professions", k);
+      // rs.append("professions", k);
       doc.addField("professions", k.toString());
     }
+    return lprofessions;
   }
 }

@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, effect, Inject, NgZone, signal, DOCUMENT } from '@angular/core';
+import { Component, effect, Inject, NgZone, signal, DOCUMENT, Injectable } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -33,7 +33,7 @@ import { Identity, Letter, Place } from '../../shared/letter';
 import { AppConfiguration } from '../../app-configuration';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { AngularSplitModule } from 'angular-split';
 echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent,
   GridComponent, TitleComponent, BrushComponent, ToolboxComponent, DataZoomComponent]);
@@ -43,7 +43,33 @@ import langCZ from 'echarts/lib/i18n/langCS.js';
 import { debounceTime, Subject } from 'rxjs';
 import { FacetsComponent } from "../../components/facets/facets.component";
 
-echarts.registerLocale("CZ", langCZ)
+echarts.registerLocale("CZ", langCZ);
+
+
+
+@Injectable()
+export class MyCustomPaginatorIntl implements MatPaginatorIntl {
+  changes = new Subject<void>();
+
+  // For internationalization, the `$localize` function from
+  // the `@angular/localize` package can be used.
+  firstPageLabel = `First page`;
+  itemsPerPageLabel = `Počet dopisů na stránku:`; 
+  lastPageLabel = `Last page`;
+
+  // You can set labels to an arbitrary string too, or dynamically compute
+  // it through other third-party internationalization libraries.
+  nextPageLabel = 'Next page';
+  previousPageLabel = 'Previous page';
+
+  getRangeLabel(page: number, pageSize: number, length: number): string {
+    if (length === 0) {
+      return `Stránka 1 z 1`;
+    }
+    const amountPages = Math.ceil(length / pageSize);
+    return `Stránka ${page + 1} z ${amountPages}`;
+  }
+}
 
 @Component({
   selector: 'app-timeline',
@@ -54,6 +80,7 @@ echarts.registerLocale("CZ", langCZ)
     MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, MatTooltipModule, FacetsComponent],
   providers: [
     provideEchartsCore({ echarts }),
+    {provide: MatPaginatorIntl, useClass: MyCustomPaginatorIntl},
   ],
   templateUrl: './timeline.component.html',
   styleUrl: './timeline.component.scss'

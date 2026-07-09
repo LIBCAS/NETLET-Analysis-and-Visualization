@@ -199,10 +199,10 @@ export class ProfessionsComponent {
         this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
         this.solrResponse = resp;
       }
-      this.professions_author = resp.facets.authors ? resp.facets.chart_authors.buckets : null;
-      this.professions_recipient = resp.facets.recipients ? resp.facets.chart_recipients.buckets : null;
+      this.professions_author = resp.facets.chart_authors ? resp.facets.chart_authors.buckets : null;
+      this.professions_recipient = resp.facets.chart_recipients ? resp.facets.chart_recipients.buckets : null;
       // this.professions_mentioned = resp.facets.professions_mentioned.buckets;
-      this.processResponse();
+      this.processResponse(false);
       this.loading = false;
     });
   }
@@ -234,7 +234,7 @@ export class ProfessionsComponent {
     this.pieOptions = {
       title: {
         show: true,
-        text: 'Professions',
+        text: this.translation.instant('field.professions'),
         left: 'center'
       },
       legend: {
@@ -245,7 +245,7 @@ export class ProfessionsComponent {
         formatter: name => {
           var series: any = this.pieChart.getOption()['series'];
           var value = series[0].data.filter((row:any) => row.name === name)[0].value
-          return name + ' - ' + value;
+          return name + ' – ' + value;
 },
       },
       tooltip: {
@@ -267,14 +267,16 @@ export class ProfessionsComponent {
     }
   }
 
-  processResponse() {
+  processResponse(skipLinks: boolean) {
 
     if (this.solrResponse.response.numFound === 0) {
       return;
     }
     this.setPieChart();
+    if (skipLinks) {
+      return;
+    }
     const categories = [{ name: 'authors' }, { name: 'recipients' }];
-    const links: any[] = [];
     const nodes: any[] = [];
     const h = this.graphChart.getHeight();
     const w = this.graphChart.getWidth() - 20;
@@ -283,7 +285,7 @@ export class ProfessionsComponent {
     const maxCount: number = Math.max(
       this.professions_author[0].count,
       this.professions_recipient[0].count);
-    if (this.includeAuthors){
+    //if (this.includeAuthors){
       this.professions_author.forEach((identity: JSONFacet) => {
         nodes.push({
           // id: identity.id + '',
@@ -296,8 +298,8 @@ export class ProfessionsComponent {
           y: Math.random() * h
         })
       });
-    }
-    if (this.includeRecipients){
+    //}
+    //if (this.includeRecipients){
       this.professions_recipient.forEach((identity: JSONFacet) => {
         nodes.push({
           // id: identity.id + '',
@@ -310,40 +312,42 @@ export class ProfessionsComponent {
           y: Math.random() * h
         })
       });
-    }
+    //}
 
-    this.solrResponse.response.docs.forEach((letter: Letter) => {
-      if (this.inLimits(letter.date_year) && letter.identities) {
-        const a = letter.identities.find(i => i.role === 'author').professions;
-        const r = letter.identities.find(i => i.role === 'recipient').professions;
-        if (a && r) {
-          a.forEach(pa => {
-            r.forEach(pr => {
-              const id = pa.id + '_' + pr.id;
-              const link = links.find(l => l.id === id);
-              if (!link) {
-                links.push({
-                  id: id,
-                  source: pa[this.translation.currentLang] + '_author',
-                  target: pr[this.translation.currentLang] + '_recipient',
-                  label: pa[this.translation.currentLang] + ' > ' + pr[this.translation.currentLang],
-                  count: 1
-                });
-              } else {
-                link.count++
-              }
+      const links: any[] = [];
+      this.solrResponse.response.docs.forEach((letter: Letter) => {
+        if (letter.identities) {
+          const a = letter.identities.find(i => i.role === 'author')?.professions;
+          const r = letter.identities.find(i => i.role === 'recipient')?.professions;
+          if (a && r) {
+            a.forEach(pa => {
+              r.forEach(pr => {
+                //const id = pa.id + '_' + pr.id;
+                const id = pa.name.cs + '_' + pr.name.cs;
+                const link = links.find(l => l.id === id);
+                if (!link) {
+                  links.push({
+                    id: id,
+                    source: pa.name.cs + '_authors',
+                    target: pr.name.cs + '_recipients',
+                    label: pa.name.cs + ' > ' + pr.name.cs,
+                    count: 1
+                  });
+                } else {
+                  link.count++
+                }
+              });
             });
-          });
+          }
+
         }
-
-      }
-    });
-
-    this.graphData = {
-      categories,
-      links,
-      nodes
-    };
+      });
+    
+      this.graphData = {
+        categories,
+        links,
+        nodes
+      };
 
     // console.log(this.graphData)
     this.graphOptions = {
@@ -365,7 +369,10 @@ export class ProfessionsComponent {
           // selectedMode: 'single',
           data: this.graphData.categories.map(function (a) {
             return a.name;
-          })
+          }),
+          formatter: (name: string) => {
+            return this.translation.instant('field.'+name);
+          }
         }
       ],
       animationDuration: 1500,

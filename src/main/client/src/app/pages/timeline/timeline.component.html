@@ -22,11 +22,12 @@
         </div>
         <div class="app-fxLayout app-row">
           <div style="flex: 1 30%;">
-            <h4>Počet dopisů ({{ this.limits[0] | date : 'dd.MM.yyyy'}} - {{ this.limits[1] | date : 'dd.MM.yyyy'}}): {{
+            <h4>Počet dopisů ({{ this.limits[0] | date : 'dd.MM.yyyy'}} – {{ this.limits[1] | date : 'dd.MM.yyyy'}}): {{
               numFound }} </h4>
           </div>
 
-          <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="numFound"
+          <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)"
+           [length]="numFound"
             [pageSize]="rows" [showFirstLastButtons]="false" [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageIndex"
             aria-label="Select page">
           </mat-paginator>

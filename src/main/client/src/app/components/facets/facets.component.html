@@ -13,7 +13,7 @@
           <mat-checkbox [(ngModel)]="k.selected">
             @if (colored()) {
               <span [style.color]="config.tenant_colors[k.val]">{{ k.val}} ({{k.count}}) </span>
-            } @else{{{ k.val}} ({{k.count}})}</mat-checkbox>
+            } @else{{{ 'catalog.'+ k.val | translate}} ({{k.count}})}</mat-checkbox>
         </mat-list-item>
       }
     </mat-list>

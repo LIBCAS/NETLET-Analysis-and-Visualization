@@ -34,6 +34,6 @@ export interface Identity {
     role: string,
     name: string,
     geoname_id: number,
-    professions: {[lang:string]: any, cs: string, en: string, id: number}[],
+    professions: {[lang:string]: any, name: {cs: string, en: string, id: number}}[],
     global_identity? : any
 }

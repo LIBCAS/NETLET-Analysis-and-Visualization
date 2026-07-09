@@ -5,6 +5,8 @@
   "views": "Views",
   "clearSelection": "Clear selection",
   "usedFilters": "Used filters",
+  "identities_to_show": "Identities to show",
+  "keywords_by_category" : "Keywords by categories",
   "field": {
   "tenant": "Catalog",
     "letter_id": "Id",
@@ -70,5 +72,22 @@
     "letter_details": "Letter details",
     "selectAll": "Select all"
   },
-  "invalidTenant": "There is no available data for this Catalog"
+  "invalidTenant": "There is no available data for this Catalog",
+  "catalog": {
+    "brezina": "Březina",
+    "deml": "Deml",
+    "blekastad": "Blekastad",
+    "kalivoda": "Kalivoda",
+    "komensky": "Komenský",
+    "marci": "Marci",
+    "musil": "Musil",
+    "neumann": "Neumann",
+    "pamatky": "Památky",
+    "patocka": "Patočka",
+    "polanus": "Polanus",
+    "sachs": "Sachs",
+    "studenti": "Studenti",
+    "tgm": "TGM",
+    "ucenci": "Učenci"
+  }
 }

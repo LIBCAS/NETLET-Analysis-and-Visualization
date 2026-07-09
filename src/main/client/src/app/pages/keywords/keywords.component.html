@@ -32,7 +32,7 @@
       <div>
         <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
           <mat-expansion-panel-header>
-            <mat-panel-title> {{ 'Identities to show' | translate}} </mat-panel-title>
+            <mat-panel-title> {{ 'identities_to_show' | translate}} </mat-panel-title>
           </mat-expansion-panel-header>
           <mat-checkbox [(ngModel)]="includeAuthors" (change)="getData(true)">{{ 'field.authors' | translate}}</mat-checkbox>
           <mat-checkbox [(ngModel)]="includeRecipients" (change)="getData(true)">{{ 'field.recipients' | translate}}</mat-checkbox>

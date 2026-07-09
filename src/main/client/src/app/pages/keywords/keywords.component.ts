@@ -267,7 +267,7 @@ export class KeywordsComponent {
         formatter: name => {
           var series: any = this.pieChart.getOption()['series'];
           var value = series[0].data.filter((row: any) => row.name === name)[0].value
-          return name + ' - ' + value;
+          return name + ' – ' + value;
         },
       },
       tooltip: {
@@ -349,7 +349,7 @@ export class KeywordsComponent {
       series: [
         {
           roam: 'move',
-          name: 'Keywords by categories',
+          name:  this.translation.instant('keywords_by_category'),
           type: 'treemap',
           colorMappingBy: 'id',
           leafDepth: 2,

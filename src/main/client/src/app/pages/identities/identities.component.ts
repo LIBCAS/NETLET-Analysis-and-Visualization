@@ -397,7 +397,10 @@ export class IdentitiesComponent {
           bottom: 5,
           data: this.graphData.categories.map(function (a) {
             return a.name;
-          })
+          }),
+          formatter: (name: string) => {
+            return this.translation.instant('field.'+name);
+          }
         }
       ],
       animationDuration: 1500,
