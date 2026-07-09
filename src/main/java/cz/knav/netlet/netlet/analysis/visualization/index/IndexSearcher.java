@@ -813,7 +813,7 @@ public class IndexSearcher {
     LocalDateTime date1 = LocalDate.parse(years[0], dtf).atStartOfDay();
     LocalDateTime date2 = LocalDate.parse(years[1], dtf).atStartOfDay();
     long daysBetween = Duration.between(date1, date2).toDays();
-    if (daysBetween < 30000) {
+    if (daysBetween < 36500) {
       gap = "+1DAY";
     }
     

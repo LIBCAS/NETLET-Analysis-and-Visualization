@@ -179,8 +179,8 @@ export class TimelineComponent {
       // console.log(option)
       // console.log(option.series[0].data[option.dataZoom[0].startValue][0])
       // console.log(new Date(option.series[0].data[option.dataZoom[0].startValue][0]));
-      this.limits = [new Date(option.series[0].data[option.dataZoom[0].startValue][0]), new Date(option.series[0].data[option.dataZoom[0].endValue][0])];
-      //this.limits = [new Date(option.dataZoom[0].startValue), new Date(option.dataZoom[0].endValue)];
+      //this.limits = [new Date(option.series[0].data[option.dataZoom[0].startValue][0]), new Date(option.series[0].data[option.dataZoom[0].endValue][0])];
+      this.limits = [new Date(option.dataZoom[0].startValue), new Date(option.dataZoom[0].endValue)];
       this.getData(false);
     });
 
@@ -307,9 +307,10 @@ export class TimelineComponent {
         }
       },
       xAxis: {
-        //type: 'time',
-        type: 'category',
-        data: date,
+        type: 'time',
+        //type: 'category',
+        //data: date,
+        boundaryGap: false,
         triggerEvent: true,
       },
       yAxis: {
@@ -331,6 +332,7 @@ export class TimelineComponent {
           name: 'Počet dopisů',
           type: this.chartType + '',
           //triggerLineEvent: true,
+          
           smooth: true,
           symbol: 'none',
           areaStyle: {},
@@ -345,8 +347,8 @@ export class TimelineComponent {
     this.loading = true;
     this.chart.clear();
     setTimeout(() => {
-    //  const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
-      const data = this.date_facet.buckets.map(c => c.count);
+      const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
+    //  const data = this.date_facet.buckets.map(c => c.count);
     const date = this.date_facet.buckets.map(c => new Date(c.val).toDateString());
       this.setOptions(data, date);
       this.loading = false;
@@ -356,8 +358,8 @@ export class TimelineComponent {
 
   processResponse() {
     this.date_facet = this.solrResponse.facets.date_computed_range;
-    //const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
-    const data = this.date_facet.buckets.map(c => c.count);
+    const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
+    //const data = this.date_facet.buckets.map(c => c.count);
     const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'dd.MM.yyyy'));
     // console.log(data)
     this.setOptions(data, date);
