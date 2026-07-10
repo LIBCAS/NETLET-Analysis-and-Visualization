@@ -36,7 +36,7 @@ export interface Tenant {
     },
     {
       header: 'relation',
-      text: 'Míra jejich zprostředkovatelské pozice mezi dvěma a více sítěmi',
+      text: 'Míra jejich zprostředkovatelské pozice mezi dvěma sítěmi',
       route: 'relation'
     },
     {

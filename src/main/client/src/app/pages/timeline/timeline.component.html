@@ -22,7 +22,7 @@
         </div>
         <div class="app-fxLayout app-row">
           <div style="flex: 1 30%;">
-            <h4>Počet dopisů ({{ this.limits[0] | date : 'dd.MM.yyyy'}} – {{ this.limits[1] | date : 'dd.MM.yyyy'}}): {{
+            <h4>Počet dopisů ({{ this.limits[0] | date : 'dd. M. yyyy'}} – {{ this.limits[1] | date : 'dd. M. yyyy'}}): {{
               numFound }} </h4>
           </div>
 
@@ -83,7 +83,7 @@
 
             <ng-container matColumnDef="date">
               <th mat-header-cell *matHeaderCellDef> {{ 'field.date' | translate}} </th>
-              <td mat-cell *matCellDef="let element"> {{ element.date_computed | date : 'dd.MM.yyyy'}} </td>
+              <td mat-cell *matCellDef="let element"> {{ element.date_computed | date : 'd. M. yyyy'}} </td>
             </ng-container>
 
             <ng-container matColumnDef="action" stickyEnd>

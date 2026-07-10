@@ -355,7 +355,7 @@ export class TimelineComponent {
     setTimeout(() => {
       const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
     //  const data = this.date_facet.buckets.map(c => c.count);
-    const date = this.date_facet.buckets.map(c => new Date(c.val).toDateString());
+    const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'd. M. yyyy'));
       this.setOptions(data, date);
       this.loading = false;
 
@@ -366,7 +366,7 @@ export class TimelineComponent {
     this.date_facet = this.solrResponse.facets.date_computed_range;
     //const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
     const data = this.date_facet.buckets.map(c => c.count);
-    const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'dd.MM.yyyy'));
+    const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'd. M. yyyy'));
     // console.log(data)
     this.setOptions(data, date);
   }

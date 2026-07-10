@@ -236,21 +236,21 @@ export class PeriodsComponent {
         },
         {
           show: true,
-          text: "1. obdobi",
+          text: "1. období",
           left: '20%',
           bottom: '0',
           textAlign: 'center'
         },
         {
           show: true,
-          text: "2. obdobi",
+          text: "2. období",
           left: '50%',
           bottom: '0',
           textAlign: 'center'
         },
         {
           show: true,
-          text: "3. obdobi",
+          text: "3. období",
           left: '80%',
           bottom: '0',
           textAlign: 'center'
@@ -277,7 +277,7 @@ export class PeriodsComponent {
       },
       series: [
         {
-          name: "1. obdobi",
+          name: "1. období",
           //color: this.colors,
           type: 'pie',
           radius: '40%',
@@ -286,7 +286,7 @@ export class PeriodsComponent {
           data: data['1']
         },
         {
-          name: "2. obdobi",
+          name: "2. období",
           //color: this.colors,
           type: 'pie',
           radius: '40%',
@@ -295,7 +295,7 @@ export class PeriodsComponent {
           data: data['2']
         },
         {
-          name: "3. obdobi",
+          name: "3. období",
           //color: this.colors,
           type: 'pie',
           radius: '40%',
