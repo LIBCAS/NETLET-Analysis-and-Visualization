@@ -115,7 +115,8 @@
     "search": "Hledat",
     "view_in_hiko": "Zobrazit v HIKO",
     "letter_details": "Zobrazit dopis",
-    "selectAll": "Vybrat všechny"
+    "selectAll": "Vybrat všechny",
+    "showLinks": "Zobrazit spojky"
   },
   "invalidTenant": "Nejsou k dispozice data pro tento Katalog",
   "catalog": {

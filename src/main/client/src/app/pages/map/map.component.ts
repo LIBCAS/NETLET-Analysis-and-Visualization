@@ -259,7 +259,8 @@ export class MapComponent {
       category: number,
       id: string,
       name: string
-      symbolSize: number
+      symbolSize: number,
+      color: string,
       value: number
     }[]
   }
@@ -328,6 +329,19 @@ export class MapComponent {
     return n >= this.limits[0].getFullYear() && n <= this.limits[1].getFullYear();
   }
 
+  
+  maxSize = 10; // 16
+  minSize = 6;
+  getColor(count: number) {
+    if (count > 12) {
+      return '#f00'
+    } else if (count > 8) {
+      return 'rgb(255, 145, 0)'
+    } else {
+      return '#00f'
+    }
+  }
+
   setGraphData() {
 
     this.nodes = {};
@@ -339,7 +353,7 @@ export class MapComponent {
         letter.places.forEach((place: Place) => {
           if (place.latitude && !this.nodes[place.id]) {
             this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name, count: 0 };
-            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: 0 });
+            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: 0, color: '#00f', symbolSize: 6 });
           }
         });
 
@@ -378,8 +392,11 @@ export class MapComponent {
           } else {
             this.links[linkId].count++;
             this.links[linkId].letters.push(letter);
-            this.links[linkId].authors.concat(letter.identity_author)
-            this.links[linkId].recipients.concat(letter.identity_recipient)
+            this.links[linkId].authors.concat(letter.identity_author);
+            if (this.links[linkId].recipients) {
+              this.links[linkId].recipients.concat(letter.identity_recipient)
+            }
+            
           }
         }
       };
@@ -393,10 +410,20 @@ export class MapComponent {
     //   // this.linkNodes(link.node1, link.node2, link.count, link.letters);
     // });
 
+    let maxCount = 0;
     
     Object.keys(this.nodes).forEach(key => {
       const node = this.nodes[key];
-      nodes.filter((n:any) => n.id === key).forEach((n:any) => {n.count = node.count});
+      nodes.filter((n:any) => n.id === key).forEach((n:any) => {
+        n.count = node.count; 
+        maxCount = Math.max(maxCount, node.count)
+      });
+      nodes.filter((n:any) => n.id === key).forEach((n:any) => {
+        n.symbolSize = this.maxSize * node.count / maxCount + this.minSize;
+        n.itemStyle = {
+          color: this.getColor(n.symbolSize)
+        }
+      });
     });
 
     this.graphData = {
@@ -438,9 +465,8 @@ export class MapComponent {
           type: 'graph',
           // use `lmap` as the coordinate system
           coordinateSystem: 'lmap',
-          // data items [[lng, lat, value], [lng, lat, value], ...]
           data: this.graphData.nodes,
-          links: this.graphData.links,
+          links: this.showLinks ? this.graphData.links : [], 
 
           edgeSymbol: ['circle', 'arrow'],
           edgeSymbolSize: [2, 6],
@@ -539,6 +565,15 @@ export class MapComponent {
     const lmap = lmapComponent.getLeaflet();
 
     LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: 'OpenStreetMaps' }).addTo(lmap);
+  }
+
+  showLinks = true;
+  toggleLinks() {
+    this.graphChart.setOption({
+      series: {
+        links: this.showLinks ? this.graphData.links : []
+      }
+    })
   }
 
 }

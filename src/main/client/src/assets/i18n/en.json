@@ -71,7 +71,8 @@
     "search": "Search",
     "view_in_hiko": "View in HIKO DB",
     "letter_details": "Letter details",
-    "selectAll": "Select all"
+    "selectAll": "Select all",
+    "showLinks": "Show links"
   },
   "invalidTenant": "There is no available data for this Catalog",
   "catalog": {

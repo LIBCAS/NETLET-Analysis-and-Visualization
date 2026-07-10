@@ -11,12 +11,13 @@
   </as-split-area>
   <as-split-area>
     <div class="app-content app-fill-w app-fill-h">
-  <div class="app-years">
-    @if (solrResponse?.facets.date_year) {
-      <app-years-chart [dateYearFacet]="solrResponse.facets.date_year"
-      (onChangeLimits)="changeLimits($event)" [withAnimation]="true" (onChangeRunning)="changeRunning($event)"></app-years-chart>
-    }
-  </div>
+      <div class="app-years">
+        @if (solrResponse?.facets.date_year) {
+          <app-years-chart [dateYearFacet]="solrResponse.facets.date_year"
+          (onChangeLimits)="changeLimits($event)" [withAnimation]="true" (onChangeRunning)="changeRunning($event)"></app-years-chart>
+        }
+      </div>
+    <mat-checkbox [(ngModel)]="showLinks" (change)="toggleLinks()">{{ 'action.showLinks' | translate}}</mat-checkbox>
   <div style="height: 100%; width: 100%;" id="echarts-lmap" class="app-fxFlex"></div>
   <!-- <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"
   (leafletMapReady)="onMapReady($event)">
