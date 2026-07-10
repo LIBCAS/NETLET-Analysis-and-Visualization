@@ -124,6 +124,7 @@ export class TimelineComponent {
     effect(() => {
       const sc = this.state.stateChanged();
       if (sc > 0) {
+        this.limits = this.state.getTenantsRange();
         this.getData(true);
       } else {
         this.loading = false;
@@ -200,13 +201,15 @@ export class TimelineComponent {
 
   changeTenant() {
     this.excludeDate = true;
-    this.getData(true);
     this.limits = this.state.getTenantsRange();
+    this.getData(true);
   }
 
   //usedFacets: { field: string, value: string }[] = [];
   onFiltersChanged(usedFacets: { field: string, value: string }[]) {
     //this.usedFacets = usedFacets;
+    this.limits = this.state.getTenantsRange();
+    console.log(this.limits)
     this.getData(true);
   }
 
@@ -307,15 +310,17 @@ export class TimelineComponent {
         }
       },
       xAxis: {
-        type: 'time',
-        //type: 'category',
-        //data: date,
+        //type: 'time',
+        type: 'category',
+        data: date,
         boundaryGap: false,
         triggerEvent: true,
       },
       yAxis: {
         type: 'value',
         allowDecimals: false,
+        //interval: 1,
+        format: '0'
       },
       dataZoom: [
         {
@@ -359,8 +364,8 @@ export class TimelineComponent {
 
   processResponse() {
     this.date_facet = this.solrResponse.facets.date_computed_range;
-    const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
-    //const data = this.date_facet.buckets.map(c => c.count);
+    //const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
+    const data = this.date_facet.buckets.map(c => c.count);
     const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'dd.MM.yyyy'));
     // console.log(data)
     this.setOptions(data, date);
