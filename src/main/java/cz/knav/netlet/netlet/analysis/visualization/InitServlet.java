@@ -1,5 +1,6 @@
 package cz.knav.netlet.netlet.analysis.visualization;
 
+import cz.knav.netlet.netlet.analysis.visualization.index.HikoIndexer;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -8,6 +9,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -27,6 +31,11 @@ public class InitServlet extends HttpServlet {
 
   //Default config directory in webapp
   public static String DEFAULT_I18N_DIR = "/assets/i18n";
+  
+  
+  public static ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
+  public static ScheduledFuture<?> future;
+  public static boolean taskRunning;
 
 
   /**
@@ -60,9 +69,27 @@ public class InitServlet extends HttpServlet {
     } else {
       CONFIG_DIR = System.getProperty("user.home") + File.separator + CONFIG_DIR;
     }
-
     
     LOGGER.log(Level.INFO, "CONFIG_DIR is -> {0}", CONFIG_DIR);
+    
+//    long period = 1000L * 60L * 60L * 24L; // jednou denne
+//    future = executor.scheduleAtFixedRate(new Runnable() {
+//
+//        @Override
+//        public void run() {
+//
+//            try {
+//                LOGGER.log(Level.INFO, "Running future");
+//                InitServlet.taskRunning = true;
+//                HikoIndexer hi = new HikoIndexer();
+//                hi.update(1, "DAY");
+//                LOGGER.log(Level.INFO, "Future finished");
+//            } catch (Exception ioe) {
+//                LOGGER.log(Level.SEVERE, "", ioe);
+//            }
+//        }
+//
+//    }, 1000L, period, TimeUnit.MILLISECONDS);
   }
   
   @Override
