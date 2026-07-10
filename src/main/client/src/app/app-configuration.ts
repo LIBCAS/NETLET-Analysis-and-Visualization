@@ -62,7 +62,9 @@ import { Configuration } from './shared/config';
             switchMap((cfg: any) => {
                 this.config = cfg as Configuration;
                 return this.http.get('api/data/get_tenants').pipe(tap((res: any) => {
-                    this.state.tenants.set(res.buckets);
+                    const ts = res.buckets;
+                    ts.sort((t1: any, t2: any) => t1.val.localeCompare(t2.val));
+                    this.state.tenants.set(ts);
                     this.state.tenants().forEach(t => {
                         t.date_computed_max = new Date(t.date_computed_max_s);
                         t.date_computed_min = new Date(t.date_computed_min_s);

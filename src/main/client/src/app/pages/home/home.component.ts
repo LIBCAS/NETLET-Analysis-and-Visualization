@@ -64,16 +64,7 @@ export class HomeComponent {
   categories = signal<{value: string,type: string}[]>([]);
 
   constructor(public state: AppState, private service: AppService){
-
-    // effect(() => {
-    //   this.checkIdentities(this.searchForm.identities().value());
-    // // });
-    // effect(() => {
-    //   if (this.searchModel().keywords) {
-    //     this.checkKeywords(this.searchModel().keywords);
-    //   }
-      
-    // });
+    
     effect(() => {
       if (this.searchModel().places) {
         this.checkPlaces(this.searchModel().places);

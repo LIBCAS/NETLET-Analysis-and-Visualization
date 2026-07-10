@@ -13,7 +13,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
@@ -815,7 +814,7 @@ public class IndexSearcher {
     long daysBetween = Duration.between(date1, date2).toDays();
     if (daysBetween < 36500) {
       gap = "+1DAY";
-    }
+    }  
     
     RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), gap)
             .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))

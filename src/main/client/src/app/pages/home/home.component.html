@@ -4,7 +4,7 @@
             <mat-label>{{ 'tenants' | translate}}</mat-label>
             <mat-select multiple="true" [formField]="searchForm.tenants">
                 @for (t of state.tenants(); track t) {
-                <mat-option [value]="t">{{ t.val | translate}}</mat-option>
+                <mat-option [value]="t">{{ 'catalog.' + t.val | translate }}</mat-option>
                 }
             </mat-select>
         </mat-form-field>

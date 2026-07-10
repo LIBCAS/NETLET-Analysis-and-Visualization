@@ -46,7 +46,7 @@
 
             <ng-container matColumnDef="tenant">
               <th mat-header-cell *matHeaderCellDef> {{ 'field.tenant' | translate}} </th>
-              <td mat-cell *matCellDef="let element"> {{element.tenant}} </td>
+              <td mat-cell *matCellDef="let element"> {{ 'catalog.' + element.tenant | translate }} </td>
             </ng-container>
 
             <ng-container matColumnDef="author">

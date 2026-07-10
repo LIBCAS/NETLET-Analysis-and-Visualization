@@ -315,6 +315,7 @@ export class TimelineComponent {
       },
       yAxis: {
         type: 'value',
+        allowDecimals: false,
       },
       dataZoom: [
         {
