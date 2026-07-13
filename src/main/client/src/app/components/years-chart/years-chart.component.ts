@@ -183,7 +183,8 @@ export class YearsChartComponent {
     this.rokSeries.push({ value: facet.after.count, 
       //itemStyle: { color: '#00c' } 
     });
-    this.rokAxis = facet.buckets.map(c => new Date(c.val).getFullYear() + '');
+    //this.rokAxis = facet.buckets.map(c => new Date(c.val).getFullYear() + '');
+    this.rokAxis = facet.buckets.map(c => c.val + '');
     this.rokAxis.push(this.limits[1] + '');
 
 
@@ -266,6 +267,10 @@ export class YearsChartComponent {
       },
         toolbox: {
           show: true,
+          iconStyle: {
+            borderColor: '#6578ba',
+            color: 'none'
+          },
           feature: {
             myTool1: {
                 show: this.withAnimation(),

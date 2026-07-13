@@ -7,6 +7,9 @@
   "usedFilters": "Used filters",
   "identities_to_show": "Identities to show",
   "keywords_by_category" : "Keywords by categories",
+  
+  "professions by letter":"Professions by letter",
+  "professions by identity":"Profession by identity",
   "field": {
   "tenant": "Catalog",
     "letter_id": "Id",

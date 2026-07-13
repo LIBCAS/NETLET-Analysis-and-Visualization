@@ -37,6 +37,7 @@ public class IndexSearcher {
 
   public static final Logger LOGGER = Logger.getLogger(IndexSearcher.class.getName());
   final static SimpleDateFormat dtformatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+  final static SimpleDateFormat yearformatter = new SimpleDateFormat("yyyy");
 
   public static JSONObject getLetterFromHIKO(String id, String tenant) {
     JSONObject ret = new JSONObject();
@@ -486,7 +487,14 @@ public class IndexSearcher {
         date_range = "1000,2025";
       }
       String[] years = date_range.split(",");
-      RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
+//      RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
+//              .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
+//              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+
+      RangeFacetMap rangeFacet = new RangeFacetMap("date_year", 
+              Integer.parseInt(years[0].split("-")[0]),
+              Integer.parseInt(years[1].split("-")[0]),
+              1)
               .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
               .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
 
@@ -500,8 +508,7 @@ public class IndexSearcher {
               .setQuery("*:*")
               //.withFilter("status:publish")
               .setLimit(rows)
-              .withFilter("origin:*")
-              .withFilter("destination:*")
+              .withFilter("origin:* OR destination:*")
               .returnFields("letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,origin,destination,origin_id,destination_id,origin_name,destination_name,places:[json],identities:[json],keywords_category_cs,keywords_cs")
               .withFacet("date_year", rangeFacet)
               .withFacet("keywords_cs", keywords_csFacet)
@@ -629,6 +636,13 @@ public class IndexSearcher {
       if (rowsP != null && !rowsP.isBlank()) {
         rows = Integer.valueOf(rowsP);
       }
+      
+      final TermsFacetMap authorFacet = new TermsFacetMap("identity_author")
+                .setLimit(1000)
+                .setMinCount(1);
+      final TermsFacetMap recipientFacet = new TermsFacetMap("identity_recipient")
+                .setLimit(1000)
+                .setMinCount(1);
 
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
@@ -641,18 +655,14 @@ public class IndexSearcher {
                       .setLimit(1000)
                       .withDomain(new DomainMap().withTagsToExclude("fftenant").withTagsToExclude("ffdate_year"))
                       .setMinCount(1))
-//              .withFacet("chart_professions", new TermsFacetMap("professions_" + lang)
-//                      .setLimit(1000)
-//                      .setMinCount(1))
-//              .withFacet("chart_mentioned", new TermsFacetMap("professions_mentioned_" + lang)
-//                      .setLimit(1000)
-//                      .setMinCount(1))
               .withFacet("chart_authors", new TermsFacetMap("professions_author_" + lang)
                       .setLimit(1000)
-                      .setMinCount(1))
+                      .setMinCount(1)
+                      .withSubFacet("authors", authorFacet))
               .withFacet("chart_recipients", new TermsFacetMap("professions_recipient_" + lang)
                       .setLimit(1000)
-                      .setMinCount(1));
+                      .setMinCount(1) 
+                      .withSubFacet("recipients", recipientFacet));
       jrequest = addFacets(request, jrequest, lang);
       jrequest = addFilters(request, jrequest, lang);
 

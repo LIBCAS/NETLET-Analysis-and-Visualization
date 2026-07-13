@@ -55,6 +55,8 @@ export class ProfessionsComponent {
 
   pieOptions: EChartsOption = {};
   pieChart: ECharts;
+  pie2Options: EChartsOption = {};
+  pie2Chart: ECharts;
 
   graphData: {
     categories: { name: string }[],
@@ -110,6 +112,10 @@ export class ProfessionsComponent {
 
   onPieChartInit(e: any) {
     this.pieChart = e;
+  }
+
+  onPie2ChartInit(e: any) {
+    this.pie2Chart = e;
   }
 
   clickTenant(t: Tenant) {
@@ -233,8 +239,8 @@ export class ProfessionsComponent {
     }
     this.pieOptions = {
       title: {
-        show: true,
-        text: this.translation.instant('field.professions'),
+        show: false,
+        text: this.translation.instant('professions by letter'),
         left: 'center'
       },
       legend: {
@@ -244,6 +250,68 @@ export class ProfessionsComponent {
         data: data.map(a => a.name),
         formatter: name => {
           var series: any = this.pieChart.getOption()['series'];
+          var value = series[0].data.filter((row:any) => row.name === name)[0].value
+          return name + ' – ' + value;
+},
+      },
+      tooltip: {
+        // formatter: (params: any) => {
+        //   return params.dataType === 'edge' ?
+        //     `${params.data.label} (${params.data.count})` :
+        //     params.name
+        // }
+      },
+      series: [
+        {
+          type: 'pie',
+          radius: '55%',
+          center: ['30%', '50%'],
+          selectedMode: 'single',
+          data: data
+        }
+      ]
+    }
+    this.setPie2Chart();
+  }
+
+  setPie2Chart() {
+    const data: any[] = [];
+    if (this.includeAuthors) {
+      this.professions_author.forEach((p: JSONFacet) => {
+        data.push({
+          id: p.val,
+          name: p.val,
+          value: p['authors'].buckets.length
+        })
+      });
+    }
+    if (this.includeRecipients) {
+      this.professions_recipient.forEach((p: JSONFacet) => {
+        const pro = data.find(pr => p.val === pr.id);
+        if (pro) {
+          pro.value += p['recipients'].buckets.length
+        } else {
+          data.push({
+            id: p.val,
+            name: p.val,
+            value: p['recipients'].buckets.length
+          });
+        }
+      });
+    }
+    this.pie2Options = {
+      title: {
+        show: false,
+        text: this.translation.instant('field.professions'),
+        left: 'center'
+      },
+      legend: {
+        type: data.length > 20 ? 'scroll' : 'plain',
+        orient: 'vertical',
+        right: 10,
+        data: data.map(a => a.name),
+        formatter: name => {
+          var series: any = this.pie2Chart.getOption()['series'];
           var value = series[0].data.filter((row:any) => row.name === name)[0].value
           return name + ' – ' + value;
 },

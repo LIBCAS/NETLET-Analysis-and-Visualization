@@ -72,24 +72,24 @@ public class InitServlet extends HttpServlet {
     
     LOGGER.log(Level.INFO, "CONFIG_DIR is -> {0}", CONFIG_DIR);
     
-    long period = 1000L * 60L * 60L * 24L; // jednou denne
-    future = executor.scheduleAtFixedRate(new Runnable() {
-
-        @Override
-        public void run() {
-
-            try {
-                LOGGER.log(Level.INFO, "Running future");
-                InitServlet.taskRunning = true;
-                HikoIndexer hi = new HikoIndexer();
-                hi.update(1, "DAYS");
-                LOGGER.log(Level.INFO, "Future finished");
-            } catch (Exception ioe) {
-                LOGGER.log(Level.SEVERE, "", ioe);
-            }
-        }
-
-    }, 1000L, period, TimeUnit.MILLISECONDS); 
+//    long period = 1000L * 60L * 60L * 24L; // jednou denne
+//    future = executor.scheduleAtFixedRate(new Runnable() {
+//
+//        @Override
+//        public void run() {
+//
+//            try {
+//                LOGGER.log(Level.INFO, "Running future");
+//                InitServlet.taskRunning = true;
+//                HikoIndexer hi = new HikoIndexer();
+//                hi.update(1, "DAYS");
+//                LOGGER.log(Level.INFO, "Future finished");
+//            } catch (Exception ioe) {
+//                LOGGER.log(Level.SEVERE, "", ioe);
+//            }
+//        }
+//
+//    }, 1000L, period, TimeUnit.MILLISECONDS); 
   }
   
   @Override

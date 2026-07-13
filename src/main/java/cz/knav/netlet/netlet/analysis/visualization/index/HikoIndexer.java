@@ -408,9 +408,13 @@ public class HikoIndexer {
     doc.addField("content", rs.optString("content"));
 
     //LocalDate date = LocalDate.parse(rs.optString("date_computed"), dformatter);
-    int date_year = rs.optInt("date_year");
-    int date_month = rs.optInt("date_month");
-    int date_day = rs.optInt("date_day");
+    int date_year = rs.optInt("date_year", 0);
+    int date_month = rs.optInt("date_month", 0);
+    int date_day = rs.optInt("date_day", 0);
+    if (date_year > 0) {
+      date_month = Math.max(date_month, 1);
+      date_day = Math.max(date_day, 1);
+    }
     try {
       LocalDate date = LocalDate.of(date_year, date_month, date_day);
       doc.addField("date_computed", date.atStartOfDay().format(dtformatter));
@@ -420,6 +424,15 @@ public class HikoIndexer {
 
     doc.addField("date_year", date_year);
     setPeriod(doc, date_year);
+    
+    
+//      <field name="date_marked" type="string" indexed="true" stored="true" />
+//  <field name="date_uncertain" type="boolean" indexed="true" stored="true" />
+//  <field name="date_approximate" type="boolean" indexed="true" stored="true" />
+//  <field name="date_inferred" type="boolean" indexed="true" stored="true" />
+//  <field name="date_is_range" type="boolean" indexed="true" stored="true" />
+//  <field name="date_note" type="string" indexed="true" stored="true" />
+//          
 
     addPlaces(rs.getJSONArray("origins"), "origin", doc, tenant);
     addPlaces(rs.getJSONArray("destinations"), "destination", doc, tenant);

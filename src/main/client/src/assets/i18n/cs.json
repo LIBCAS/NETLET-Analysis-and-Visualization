@@ -9,6 +9,8 @@
   "keywords_by_category" : "Klíčová slova podle kategorií",
   "line" : "křivka",
   "bar":"sloupce",
+  "professions by letter":"Profese podle počtu dopisů",
+  "professions by identity":"Profese podle počtu osob",
   "home": {
     "centrality": {
       "header": "Centralita",
