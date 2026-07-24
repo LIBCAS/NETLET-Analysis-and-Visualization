@@ -13,6 +13,8 @@ import java.text.Normalizer;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -174,7 +176,7 @@ public class HikoIndexer {
   }
 
   public JSONObject update(int value, String unit) {
-    Date start = new Date();
+    LocalDateTime start = LocalDateTime.now();
     JSONObject ret = new JSONObject();
 
 //--data-urlencode "filter[updated_at_after]=2025-05-18 09:19:02" \
@@ -203,17 +205,44 @@ public class HikoIndexer {
       ret.put("error", ex);
     }
 
-    Date end = new Date();
-    ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+    LocalDateTime end = LocalDateTime.now();
+    ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
     LOGGER.log(Level.INFO, "Update HIKO finished. {0} letters indexed");
     return ret;
   }
+  
+  private void clearAll(SolrClient client, LocalDateTime start) {
+    clear(client, "identities", start);
+    clear(client, "keywords", start);
+    clear(client, "professions", start);
+    clear(client, "places", start);
+    clear(client, "locations", start);
+    clear(client, "hiko", start);
+  }
+  
+  private void clear(SolrClient client, String collection, LocalDateTime start) {
+    try {
+      String to = dtformatter.format(start);
+      System.out.println(to);
+      client.deleteByQuery(collection, "indextime:[* TO " + to + "]");
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, "Error clearing index", ex);
+    }
+  }
 
   public JSONObject full() {
-    Date start = new Date();
+    LocalDateTime start = LocalDateTime.now();
     JSONObject ret = new JSONObject();
     LOGGER.log(Level.INFO, "Indexing HIKO letters");
     try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+      
+      ret.put("places", indexPlaces());
+      ret.put("global-keywords", indexGlobalKeywords());
+      ret.put("keywords", indexKeywords());
+      ret.put("locations", indexLocations());
+      ret.put("professions", indexProfessions());
+      ret.put("identities", indexIdentities(null));
+      
       initKeywords();
       initPlaces();
       initProfessions();
@@ -221,19 +250,20 @@ public class HikoIndexer {
       for (String tenant : tenants) {
         indexLetters(client, ret, tenant, null);
       }
+      clearAll(client, start);
       client.commit("hiko");
     } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
       ret.put("error", ex);
     }
-    Date end = new Date();
-    ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+    LocalDateTime end = LocalDateTime.now();
+    ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
     LOGGER.log(Level.INFO, "Indexing HIKO finished. {0} letters indexed");
     return ret;
   }
 
   public JSONObject indexTenant(String tenant) {
-    Date start = new Date();
+    LocalDateTime start = LocalDateTime.now();
     JSONObject ret = new JSONObject();
     LOGGER.log(Level.INFO, "Indexing HIKO letters");
     try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr"))
@@ -249,14 +279,14 @@ public class HikoIndexer {
       LOGGER.log(Level.SEVERE, "Error indexing tenant", ex);
       ret.put("error", ex);
     }
-    Date end = new Date();
-    ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+    LocalDateTime end = LocalDateTime.now();
+    ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
     LOGGER.log(Level.INFO, "Indexing HIKO finished. {0} letters indexed");
     return ret;
   }
 
   public JSONObject indexLetter(String tenant, String id) {
-    Date start = new Date();
+    LocalDateTime start = LocalDateTime.now();
     JSONObject ret = new JSONObject();
     LOGGER.log(Level.INFO, "Indexing HIKO letters");
     try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr"))
@@ -270,8 +300,8 @@ public class HikoIndexer {
       LOGGER.log(Level.SEVERE, "Error indexing tenant", ex);
       ret.put("error", ex);
     }
-    Date end = new Date();
-    ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+    LocalDateTime end = LocalDateTime.now();
+    ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
     LOGGER.log(Level.INFO, "Indexing HIKO finished. {0} letters indexed");
     return ret;
   }
@@ -618,7 +648,7 @@ public class HikoIndexer {
 
     private void initKeywordCategories(String tenant, boolean isGlobal) throws URISyntaxException, IOException, InterruptedException {
         String t = tenant;
-        if (Options.getInstance().getJSONObject("hiko").optBoolean("isECTest", true)) {
+        if (Options.getInstance().getBoolean("isVaTest", true)) {
             t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
         }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
@@ -648,7 +678,7 @@ public class HikoIndexer {
 
     private void initProfessionCategories(String tenant, boolean isGlobal) throws URISyntaxException, IOException, InterruptedException {
         String t = tenant;
-        if (Options.getInstance().getJSONObject("hiko").optBoolean("isECTest", true)) {
+        if (Options.getInstance().getBoolean("isVaTest", true)) {
             t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
         }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
@@ -678,7 +708,7 @@ public class HikoIndexer {
 
     
     public JSONObject indexIdentities(String rtenant) throws URISyntaxException, IOException, InterruptedException {
-        Date start = new Date();
+        LocalDateTime start = LocalDateTime.now();
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO identities");
         try (SolrClient client = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) { 
@@ -696,15 +726,15 @@ public class HikoIndexer {
             LOGGER.log(Level.SEVERE, "Error indexing identities", ex);
             ret.put("error", ex);
         }
-        Date end = new Date();
-        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        LocalDateTime end = LocalDateTime.now();
+        ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
         LOGGER.log(Level.INFO, "Indexing HIKO identities FINISHED");
         return ret;
     }
 
     public JSONObject indexTenant(String tenant, String type) throws URISyntaxException, IOException, InterruptedException {
         LOGGER.log(Level.INFO, "Indexing tenant {0} -> {1}", new Object[]{tenant, type});
-        Date start = new Date();
+        LocalDateTime start = LocalDateTime.now();
         JSONObject ret = new JSONObject();
         try (SolrClient client = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
@@ -746,8 +776,8 @@ public class HikoIndexer {
             LOGGER.log(Level.SEVERE, "Error indexing tenant", ex);
             ret.put("error", ex);
         }
-        Date end = new Date();
-        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        LocalDateTime end = LocalDateTime.now();
+        ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
         LOGGER.log(Level.INFO, "Indexing tenant {0} -> {1} FINISHED", new Object[]{tenant, type});
         return ret;
 
@@ -769,7 +799,7 @@ public class HikoIndexer {
         if (tenant.equals("global")) {
             t = "brezina"; //jakykoli
         }
-        if (Options.getInstance().getJSONObject("hiko").optBoolean("isECTest", true)) {
+        if (Options.getInstance().getBoolean("isVaTest", true)) {
             t = Options.getInstance().getJSONObject("test_mappings").getString(t);
         }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
@@ -833,10 +863,10 @@ public class HikoIndexer {
                      * odborný), učitel (bez specifikace) ", "en": " pedagogue"
                      * }, "category_id": 10 } ]
                      */
-                    JSONArray professions = rs.optJSONArray("professions");
-                    if (professions != null) {
-                        for (int k = 0; k < professions.length(); k++) {
-                            JSONObject p = professions.getJSONObject(k);
+                    JSONArray japrofessions = rs.optJSONArray("professions");
+                    if (japrofessions != null) {
+                        for (int k = 0; k < japrofessions.length(); k++) {
+                            JSONObject p = japrofessions.getJSONObject(k);
                             doc.addField("professions", p.toString());
                             doc.addField("professions_cs", p.getJSONObject("name").optString("cs"));
                             doc.addField("professions_en", p.getJSONObject("name").optString("en"));
@@ -897,22 +927,26 @@ public class HikoIndexer {
     }
 
     public JSONObject indexPlaces() throws URISyntaxException, IOException, InterruptedException {
-        Date start = new Date();
+      //  LocalDateTime start = LocalDateTime.now();
+      LocalDateTime start = LocalDateTime.now();
+      String to = dtformatter.format(start);
+      System.out.println(to);
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO places");
         try (SolrClient client = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
-            Set<String> tenants = Options.getInstance().getJSONObject("test_mappings").keySet();
-            for (String tenant : tenants) {
-                indexTenantPlaces(client, ret, tenant);
-            }
-
+            indexGlobalPlaces(client, ret);
+//            Set<String> tenants = Options.getInstance().getJSONObject("test_mappings").keySet();
+//            for (String tenant : tenants) {
+//                indexTenantPlaces(client, ret, tenant);
+//            }
+            clear(client, "places", start);
             client.commit("places");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
             LOGGER.log(Level.SEVERE, "Error indexing places", ex);
             ret.put("error", ex);
         }
-        Date end = new Date();
-        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        LocalDateTime end = LocalDateTime.now();
+        ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
         LOGGER.log(Level.INFO, "Indexing HIKO places FINISHED");
         return ret;
 
@@ -920,7 +954,7 @@ public class HikoIndexer {
 
     public void indexTenantPlaces(SolrClient client, JSONObject ret, String tenant) throws URISyntaxException, IOException, InterruptedException, SolrServerException {
         String t = tenant;
-        if (Options.getInstance().getJSONObject("hiko").optBoolean("isECTest", true)) {
+        if (Options.getInstance().getBoolean("isVaTest", true)) {
             t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
         }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
@@ -966,35 +1000,35 @@ public class HikoIndexer {
     }
 
     public JSONObject indexGlobalPlaces() throws URISyntaxException, IOException, InterruptedException {
-        Date start = new Date();
+        LocalDateTime start = LocalDateTime.now();
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO global PLACES");
         try (SolrClient client = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
             JSONArray tenants = Options.getInstance().getJSONObject("test_mappings").names();
-            indexGlobalPlaces(client, ret, tenants.getString(0));
+            indexGlobalPlaces(client, ret);
 
             client.commit("places");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
             LOGGER.log(Level.SEVERE, "Error indexing global places", ex);
             ret.put("error", ex);
         }
-        Date end = new Date();
-        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        LocalDateTime end = LocalDateTime.now();
+        ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
         LOGGER.log(Level.INFO, "Indexing HIKO PLACES FINISHED");
         return ret;
 
     }
 
-    private void indexGlobalPlaces(SolrClient client, JSONObject ret, String tenant) throws URISyntaxException, IOException, InterruptedException, SolrServerException {
-        String t = tenant;
-        if (Options.getInstance().getJSONObject("hiko").optBoolean("isECTest", true)) {
-            t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
+    private void indexGlobalPlaces(SolrClient client, JSONObject ret) throws URISyntaxException, IOException, InterruptedException, SolrServerException {
+        String t = "brezina";
+        if (Options.getInstance().getBoolean("isVaTest", true)) {
+            t = Options.getInstance().getJSONObject("test_mappings").getString("brezina");
         }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
                 .replace("{tenant}", t)
                 + "/global-places?per_page=100";
         int tindexed = 0;
-        LOGGER.log(Level.INFO, "Indexing global places {0} -> {1}", new Object[]{tenant, url});
+        LOGGER.log(Level.INFO, "Indexing global places {0} -> {1}", new Object[]{t, url});
         try (HttpClient httpclient = HttpClient
                 .newBuilder()
                 .build()) {
@@ -1010,22 +1044,18 @@ public class HikoIndexer {
                 JSONArray docs = resp.getJSONArray("data");
                 for (int i = 0; i < docs.length(); i++) {
                     JSONObject rs = docs.getJSONObject(i);
-
                     SolrInputDocument doc = processPlace(rs, "global");
                     client.add("places", doc);
-                    ret.put("global_" + tenant, tindexed++);
-                    if (tindexed % 500 == 0) {
-                        client.commit("places");
-                        LOGGER.log(Level.INFO, "Global {0} -> {1} docs", new Object[]{tenant, tindexed});
-                    }
-
+                    ret.put("global", tindexed++);
                 }
+                client.commit("places");
+                LOGGER.log(Level.INFO, "Global {0} docs", tindexed);
                 url = resp.getJSONObject("links").optString("next", null);
                 Thread.sleep(1000);
             }
         } catch (Exception ex) {
-            ret.put("global_" + tenant, ex.toString());
-            LOGGER.log(Level.SEVERE, "Error in tenant {0} -> {1}", new Object[]{tenant, ex.toString()});
+            ret.put("global", ex.toString());
+            LOGGER.log(Level.SEVERE, "Error in tenant {0} -> {1}", new Object[]{t, ex.toString()});
         }
     }
 
@@ -1059,7 +1089,7 @@ public class HikoIndexer {
     }
 
     public JSONObject indexLocations() throws URISyntaxException, IOException, InterruptedException {
-        Date start = new Date();
+        LocalDateTime start = LocalDateTime.now();
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO locations");
         try (SolrClient client = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
@@ -1073,8 +1103,8 @@ public class HikoIndexer {
             LOGGER.log(Level.SEVERE, "Error indexing locations", ex);
             ret.put("error", ex);
         }
-        Date end = new Date();
-        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        LocalDateTime end = LocalDateTime.now();
+        ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
         LOGGER.log(Level.INFO, "Indexing HIKO locations FINISHED");
         return ret;
 
@@ -1086,7 +1116,7 @@ public class HikoIndexer {
         if (tenant.equals("global")) {
             t = "brezina"; //jakykoli
         }
-        if (Options.getInstance().getJSONObject("hiko").optBoolean("isECTest", true)) {
+        if (Options.getInstance().getBoolean("isVaTest", true)) {
             t = Options.getInstance().getJSONObject("test_mappings").getString(t);
         }
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
@@ -1141,7 +1171,7 @@ public class HikoIndexer {
     }
 
     public JSONObject indexGlobalKeywords() throws URISyntaxException, IOException, InterruptedException {
-        Date start = new Date();
+        LocalDateTime start = LocalDateTime.now();
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO global keywords");
         try (SolrClient client = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
@@ -1151,8 +1181,8 @@ public class HikoIndexer {
             LOGGER.log(Level.SEVERE, "Error indexing global keywords", ex);
             ret.put("error", ex);
         }
-        Date end = new Date();
-        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        LocalDateTime end = LocalDateTime.now();
+        ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
         LOGGER.log(Level.INFO, "Indexing HIKO keywords FINISHED");
         return ret;
 
@@ -1160,8 +1190,8 @@ public class HikoIndexer {
 
     private void indexGlobalKeywords(SolrClient client, JSONObject ret, String tenant) throws URISyntaxException, IOException, InterruptedException, SolrServerException {
         String t = tenant;
-        if (Options.getInstance().getJSONObject("hiko").optBoolean("isECTest", true)) {
-            t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
+        if (Options.getInstance().getBoolean("isVaTest", true)) {
+            t = Options.getInstance().getJSONObject("test_mappings").getString(tenant); 
         }
         initKeywordCategories(tenant, true);
         String url = Options.getInstance().getJSONObject("hiko").getString("api")
@@ -1192,7 +1222,7 @@ public class HikoIndexer {
     }
 
     public JSONObject indexKeywords() {
-        Date start = new Date();
+        LocalDateTime start = LocalDateTime.now();
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO keywords");
         try (SolrClient client = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
@@ -1210,8 +1240,8 @@ public class HikoIndexer {
             LOGGER.log(Level.SEVERE, "Error indexing keywords", ex);
             ret.put("error", ex);
         }
-        Date end = new Date();
-        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        LocalDateTime end = LocalDateTime.now();
+        ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
         LOGGER.log(Level.INFO, "Indexing HIKO keywords FINISHED");
         return ret;
 
@@ -1219,7 +1249,7 @@ public class HikoIndexer {
 
     private void indexTenantKeywords(SolrClient client, JSONObject ret, String tenant) throws URISyntaxException, IOException, InterruptedException, SolrServerException {
         String t = tenant;
-        if (Options.getInstance().getJSONObject("hiko").optBoolean("isECTest", true)) {
+        if (Options.getInstance().getBoolean("isVaTest", true)) {
             t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
         }
         initKeywordCategories(tenant, false);
@@ -1288,7 +1318,7 @@ public class HikoIndexer {
     }
 
     public JSONObject indexGlobalProfessions() throws URISyntaxException, IOException, InterruptedException {
-        Date start = new Date();
+        LocalDateTime start = LocalDateTime.now();
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO global Professions");
         try (SolrClient client = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
@@ -1298,8 +1328,8 @@ public class HikoIndexer {
             LOGGER.log(Level.SEVERE, "Error indexing global Professions", ex);
             ret.put("error", ex);
         }
-        Date end = new Date();
-        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        LocalDateTime end = LocalDateTime.now();
+        ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
         LOGGER.log(Level.INFO, "Indexing HIKO Professions FINISHED");
         return ret;
 
@@ -1307,7 +1337,7 @@ public class HikoIndexer {
 
     private void indexGlobalProfessions(SolrClient client, JSONObject ret, String tenant) throws URISyntaxException, IOException, InterruptedException, SolrServerException {
         String t = tenant;
-        if (Options.getInstance().getJSONObject("hiko").optBoolean("isECTest", true)) {
+        if (Options.getInstance().getBoolean("isVaTest", true)) {
             t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
         }
         initProfessionCategories(tenant, true);
@@ -1339,7 +1369,7 @@ public class HikoIndexer {
     }
 
     public JSONObject indexProfessions() throws URISyntaxException, IOException, InterruptedException {
-        Date start = new Date();
+        LocalDateTime start = LocalDateTime.now();
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO Professions");
         try (SolrClient client = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
@@ -1353,8 +1383,8 @@ public class HikoIndexer {
             LOGGER.log(Level.SEVERE, "Error indexing Professions", ex);
             ret.put("error", ex);
         }
-        Date end = new Date();
-        ret.put("ellapsed time", DurationFormatUtils.formatDuration(end.getTime() - start.getTime(), "HH:mm:ss.S"));
+        LocalDateTime end = LocalDateTime.now();
+        ret.put("ellapsed time", DurationFormatUtils.formatDurationHMS(Duration.between(end, start).toMillis()));
         LOGGER.log(Level.INFO, "Indexing HIKO Professions FINISHED");
         return ret;
 
@@ -1362,7 +1392,7 @@ public class HikoIndexer {
 
     private void indexTenantProfessions(SolrClient client, JSONObject ret, String tenant) throws URISyntaxException, IOException, InterruptedException, SolrServerException {
         String t = tenant;
-        if (Options.getInstance().getJSONObject("hiko").optBoolean("isECTest", true)) {
+        if (Options.getInstance().getBoolean("isVaTest", true)) {
             t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
         }
         initKeywordCategories(tenant, false);
