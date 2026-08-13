@@ -310,11 +310,14 @@ export class TimelineComponent {
         }
       },
       xAxis: {
-        //type: 'time',
-        type: 'category',
-        data: date,
+        type: 'time',
+        //type: 'category',
+        //data: date,
         boundaryGap: false,
         triggerEvent: true,
+        axisLabel: {
+          hideOverlap: true // Prevents dense labels from crashing into each other
+        }
       },
       yAxis: {
         type: 'value',
@@ -323,6 +326,8 @@ export class TimelineComponent {
         format: '0'
       },
       dataZoom: [
+    //     { type: 'slider', xAxisIndex: 0 },
+    // { type: 'inside', xAxisIndex: 0 }
         {
           type: 'inside',
           start: 0,
@@ -365,7 +370,8 @@ export class TimelineComponent {
   processResponse() {
     this.date_facet = this.solrResponse.facets.date_computed_range;
     //const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
-    const data = this.date_facet.buckets.map(c => c.count);
+    const data = this.date_facet.buckets.map(c => [c.val.substring(0,10), c.count]);
+    //const data = this.date_facet.buckets.map(c => c.count);
     const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'd. M. yyyy'));
     // console.log(data)
     this.setOptions(data, date);
