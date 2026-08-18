@@ -54,7 +54,7 @@ export class MyCustomPaginatorIntl implements MatPaginatorIntl {
   // For internationalization, the `$localize` function from
   // the `@angular/localize` package can be used.
   firstPageLabel = `First page`;
-  itemsPerPageLabel = `Počet dopisů na stránku:`; 
+  itemsPerPageLabel = `Počet dopisů na stránku:`;
   lastPageLabel = `Last page`;
 
   // You can set labels to an arbitrary string too, or dynamically compute
@@ -80,7 +80,7 @@ export class MyCustomPaginatorIntl implements MatPaginatorIntl {
     MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, MatTooltipModule, FacetsComponent],
   providers: [
     provideEchartsCore({ echarts }),
-    {provide: MatPaginatorIntl, useClass: MyCustomPaginatorIntl},
+    { provide: MatPaginatorIntl, useClass: MyCustomPaginatorIntl },
   ],
   templateUrl: './timeline.component.html',
   styleUrl: './timeline.component.scss'
@@ -101,6 +101,7 @@ export class TimelineComponent {
   chartType: string = 'bar';
 
   date_facet: { buckets: JSONFacet[], after: { count: number } };
+  years_facet: { buckets: JSONFacet[], after: { count: number } };
 
   displayedColumns = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
   rows = 100;
@@ -244,7 +245,8 @@ export class TimelineComponent {
     }
     const p: any = {};
     p.tenant = this.state.selectedTenants().map(t => t.val);
-    p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
+    //p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
+    p.date_range = this.datePipe.transform(this.limits[0], 'yyyy-01-01') + ',' + this.datePipe.transform(this.limits[1], 'yyyy-01-01');
 
     p.rows = this.rows;
 
@@ -261,7 +263,7 @@ export class TimelineComponent {
 
       this.solrResponse = resp;
       this.facets.set(resp.facets);
-      
+
       if (resp.facets['tenants']?.buckets.length > 0 && this.state.selectedTenants().length === 0) {
         this.state.tenants.update(ts => {
           ts.forEach(t => { t.selected = this.facets()['tenants']?.buckets.findIndex(b => b.val === t.val) > -1 });
@@ -283,21 +285,41 @@ export class TimelineComponent {
 
   setOptions(data: any, date: any) {
     this.chartOptions = {
+      legend: {
+        show: true,
+        left: 10
+      },
       tooltip: {
         trigger: 'axis',
-        position: function (pt: any) {
-          return [pt[0], '10%'];
-        }
+        // position: function (pt: any) {
+        //   return [pt[0], '10%'];
+        // }
       },
       title: {
         left: 'center',
         text: 'Zobrazení dopisů v chronologickém pořadí'
       },
-      grid: {
-        left: 30,
-        right: 30,
-        top: 30
-      },
+      // grid: {
+      //   left: 30,
+      //   right: 30,
+      //   top: 30
+      // },
+
+      grid: [
+        {
+          left: 60,
+          rigth: '50px',
+          height: '25%'
+        },
+        {
+          left: 60,
+          rigth: '50px',
+          top: '55%',
+          height: '35%'
+        }
+      ],
+
+
       toolbox: {
         orient: 'vertical',
         left: 'right',
@@ -309,46 +331,87 @@ export class TimelineComponent {
           restore: {}
         }
       },
-      xAxis: {
-        type: 'time',
-        //type: 'category',
-        //data: date,
-        boundaryGap: false,
-        triggerEvent: true,
-        axisLabel: {
-          hideOverlap: true // Prevents dense labels from crashing into each other
-        }
-      },
-      yAxis: {
-        type: 'value',
-        allowDecimals: false,
-        //interval: 1,
-        format: '0'
-      },
-      dataZoom: [
-    //     { type: 'slider', xAxisIndex: 0 },
-    // { type: 'inside', xAxisIndex: 0 }
+      xAxis: [
+
         {
-          type: 'inside',
-          start: 0,
-          end: 100
+          type: 'category',
+          boundaryGap: true,
+          triggerEvent: true,
+          axisLabel: {
+            hideOverlap: true // Prevents dense labels from crashing into each other
+          },
+          //data: this.years_facet ? this.years_facet.buckets.map(c => c.val) : []
         },
         {
+          gridIndex: 1,
+          type: 'time',
+          //type: 'category',
+          //data: date,
+          boundaryGap: true,
+          triggerEvent: true,
+          axisLabel: {
+            hideOverlap: true // Prevents dense labels from crashing into each other
+          },
+          position: 'top'
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value',
+        },
+        {
+          gridIndex: 1,
+          //type: 'value',
+          allowDecimals: false,
+          minInterval: 1,
+          inverse: true
+          //interval: 1,
+          //format: '0'
+        }
+      ],
+      dataZoom: [
+        {
+          realtime: true,
           start: 0,
-          end: 100
+          end: 100,
+          xAxisIndex: [0, 1]
+        },
+        {
+          type: 'inside',
+          realtime: true,
+          start: 0,
+          end: 100,
+          xAxisIndex: [0, 1]
         }
       ],
       series: [
         {
+
+          name: 'Počet dopisů za rok',
+          type: this.chartType + '',
+          //triggerLineEvent: true,
+          barCategoryGap: 0,
+          barGap: '-100%',
+
+          smooth: true,
+          symbol: 'none',
+          areaStyle: {},
+          data: this.years_facet ? this.years_facet.buckets.map(c => [c.val, c.count]) : []
+        },
+        {
+          
+
+          xAxisIndex: 1,
+          yAxisIndex: 1,
           name: 'Počet dopisů',
           type: this.chartType + '',
           //triggerLineEvent: true,
-          
+
           smooth: true,
           symbol: 'none',
           areaStyle: {},
           data: data
-        }
+        },
       ]
 
     };
@@ -359,8 +422,8 @@ export class TimelineComponent {
     this.chart.clear();
     setTimeout(() => {
       const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
-    //  const data = this.date_facet.buckets.map(c => c.count);
-    const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'd. M. yyyy'));
+      //  const data = this.date_facet.buckets.map(c => c.count);
+      const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'd. M. yyyy'));
       this.setOptions(data, date);
       this.loading = false;
 
@@ -369,8 +432,9 @@ export class TimelineComponent {
 
   processResponse() {
     this.date_facet = this.solrResponse.facets.date_computed_range;
+    this.years_facet = this.solrResponse.facets.years;
     //const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
-    const data = this.date_facet.buckets.map(c => [c.val.substring(0,10), c.count]);
+    const data = this.date_facet.buckets.map(c => [c.val.substring(0, 10), c.count]);
     //const data = this.date_facet.buckets.map(c => c.count);
     const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'd. M. yyyy'));
     // console.log(data)
