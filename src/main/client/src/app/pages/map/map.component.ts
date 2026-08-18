@@ -329,16 +329,19 @@ export class MapComponent {
     return n >= this.limits[0].getFullYear() && n <= this.limits[1].getFullYear();
   }
 
-  
-  maxSize = 10; // 16
+  // SymbolSize [6,16]
+  maxSize = 10; 
   minSize = 6;
   getColor(count: number) {
     if (count > 12) {
+      //return '#f00'
       return '#f00'
     } else if (count > 8) {
-      return 'rgb(255, 145, 0)'
+      //return 'rgb(255, 145, 0)'
+      return '#c00'
     } else {
-      return '#00f'
+      //return '#00f'
+      return '#900'
     }
   }
 
@@ -416,10 +419,10 @@ export class MapComponent {
       const node = this.nodes[key];
       nodes.filter((n:any) => n.id === key).forEach((n:any) => {
         n.count = node.count; 
-        maxCount = Math.max(maxCount, node.count)
+        maxCount = Math.max(maxCount, node.count) -1;
       });
       nodes.filter((n:any) => n.id === key).forEach((n:any) => {
-        n.symbolSize = this.maxSize * node.count / maxCount + this.minSize;
+        n.symbolSize = this.maxSize * (node.count-1) / maxCount + this.minSize;
         n.itemStyle = {
           color: this.getColor(n.symbolSize)
         }
