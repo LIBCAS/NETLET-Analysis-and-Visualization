@@ -169,20 +169,14 @@ export class TimelineComponent {
 
   onChartInit(e: any) {
     this.chart = e;
-    this.chart.on('dataZoom', () => {
+    this.chart.on('dataZoom', (params: any) => {
       var option: any = this.chart.getOption();
-      // const letters = this.solrResponse.response.docs.filter((doc: Letter) => 
-      //   (Date.parse(doc.date_computed) >= option.dataZoom[0].startValue) && (Date.parse(doc.date_computed) <= option.dataZoom[0].endValue));
-      // this.letters.set(letters);
-
-      // this.showLetters.set(true);
 
       this.excludeDate = false;
-      // console.log(option)
       // console.log(option.series[0].data[option.dataZoom[0].startValue][0])
       // console.log(new Date(option.series[0].data[option.dataZoom[0].startValue][0]));
       //this.limits = [new Date(option.series[0].data[option.dataZoom[0].startValue][0]), new Date(option.series[0].data[option.dataZoom[0].endValue][0])];
-      this.limits = [new Date(option.dataZoom[0].startValue), new Date(option.dataZoom[0].endValue)];
+      this.limits = [new Date(option.dataZoom[1].startValue), new Date(option.dataZoom[1].endValue)];
       this.getData(false);
     });
 
@@ -284,6 +278,8 @@ export class TimelineComponent {
   }
 
   setOptions(data: any, date: any) {
+    const dataZoomStart = data.length > 0 ? data[0][0] : 0;
+    const dataZoomEnd = data.length > 0 ? data[data.length-1][0] : 100;
     this.chartOptions = {
       legend: {
         show: true,
@@ -309,13 +305,13 @@ export class TimelineComponent {
         {
           left: 60,
           rigth: '50px',
-          height: '25%'
+          //height: '25%'
         },
         {
           left: 60,
-          rigth: '50px',
-          top: '55%',
-          height: '35%'
+          rigth: '-50px',
+          //top: '55%',
+          //height: '35%'
         }
       ],
 
@@ -334,12 +330,14 @@ export class TimelineComponent {
       xAxis: [
 
         {
+          show: false,
           type: 'category',
           boundaryGap: true,
           triggerEvent: true,
           axisLabel: {
             hideOverlap: true // Prevents dense labels from crashing into each other
           },
+          position: 'top',
           //data: this.years_facet ? this.years_facet.buckets.map(c => c.val) : []
         },
         {
@@ -351,8 +349,7 @@ export class TimelineComponent {
           triggerEvent: true,
           axisLabel: {
             hideOverlap: true // Prevents dense labels from crashing into each other
-          },
-          position: 'top'
+          }
         }
       ],
       yAxis: [
@@ -364,24 +361,21 @@ export class TimelineComponent {
           //type: 'value',
           allowDecimals: false,
           minInterval: 1,
-          inverse: true
-          //interval: 1,
-          //format: '0'
+          position: 'right',
+          //inverse: true
         }
       ],
       dataZoom: [
         {
-          realtime: true,
-          start: 0,
-          end: 100,
-          xAxisIndex: [0, 1]
+          type: 'inside',
+          start: dataZoomStart,
+          end: dataZoomEnd,
+          xAxisIndex: [0,1]
         },
         {
-          type: 'inside',
-          realtime: true,
-          start: 0,
-          end: 100,
-          xAxisIndex: [0, 1]
+          start: dataZoomStart,
+          end: dataZoomEnd,
+          xAxisIndex: 1
         }
       ],
       series: [
@@ -392,6 +386,10 @@ export class TimelineComponent {
           //triggerLineEvent: true,
           barCategoryGap: 0,
           barGap: '-100%',
+          itemStyle: {
+            opacity: .5,
+            color: '#f80'
+          },
 
           smooth: true,
           symbol: 'none',
@@ -400,10 +398,13 @@ export class TimelineComponent {
         },
         {
           
+          itemStyle: {
+            color: '#00c'
+          },
 
           xAxisIndex: 1,
           yAxisIndex: 1,
-          name: 'Počet dopisů',
+          name: 'Počet dopisů za den',
           type: this.chartType + '',
           //triggerLineEvent: true,
 

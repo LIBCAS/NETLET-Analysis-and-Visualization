@@ -329,20 +329,22 @@ export class MapComponent {
     return n >= this.limits[0].getFullYear() && n <= this.limits[1].getFullYear();
   }
 
-  // SymbolSize [6,16]
+ 
   maxSize = 10; 
   minSize = 6;
-  getColor(count: number) {
-    if (count > 12) {
-      //return '#f00'
-      return '#f00'
-    } else if (count > 8) {
-      //return 'rgb(255, 145, 0)'
-      return '#c00'
-    } else {
-      //return '#00f'
-      return '#900'
-    }
+  getColor(symbolSize: number) {
+    // symbolSize [6,16]
+    const sat = Math.floor(12.8 * (symbolSize - 6)) + 127;
+      return 'rgb(0, 0, '+sat+')';
+    // if (symbolSize > 12) {
+    //   //return '#f00'
+    // } else if (symbolSize > 8) {
+    //   //return 'rgb(255, 145, 0)'
+    //   return '#c00'
+    // } else {
+    //   //return '#00f'
+    //   return '#900'
+    // }
   }
 
   setGraphData() {
