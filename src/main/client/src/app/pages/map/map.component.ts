@@ -335,7 +335,7 @@ export class MapComponent {
   getColor(symbolSize: number) {
     // symbolSize [6,16]
     const sat = Math.floor(12.8 * (symbolSize - 6)) + 127;
-      return 'rgb(0, 0, '+sat+')';
+      return 'rgb('+sat+', 80, 80)';
     // if (symbolSize > 12) {
     //   //return '#f00'
     // } else if (symbolSize > 8) {
