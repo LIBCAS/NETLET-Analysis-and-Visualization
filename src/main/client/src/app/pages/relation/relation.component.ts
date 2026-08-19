@@ -27,6 +27,7 @@ import { Letter } from '../../shared/letter';
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 import { FacetsComponent } from "../../components/facets/facets.component";
 import { AngularSplitModule } from "angular-split";
+import { AppConfiguration } from '../../app-configuration';
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
@@ -66,12 +67,16 @@ export class RelationComponent {
   authors: JSONFacet[];
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
+  
+  allIncluded = false;
+  showOverlap = false;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
     private _ngZone: NgZone,
     private translation: TranslateService,
+    public config: AppConfiguration,
     public state: AppState,
     private service: AppService
   ) {
@@ -157,9 +162,14 @@ export class RelationComponent {
 
   clickTenant(k: Tenant) {
     this.closeInfo();
-    this.state.tenants().forEach(t => t.selected = false);
+    this.state.tenants().forEach(t => {
+      if (this.tenant.val !== t.val)
+      t.selected = false
+    });
     // k.selected = !k.selected;
     k.selected = true;
+    //set date_range
+    this.limits = this.state.getTenantsRange();
     this.getData(true);
   }
 
@@ -258,12 +268,16 @@ export class RelationComponent {
   }
 
   processResponse() {
-    const categories = [{ name: this.tenant.val }];
-    const other = this.state.tenants().find(t => t.selected);
-    if (other) {
-      categories.push({ name: other.val });
+    const categories = [];
+    this.state.tenants().forEach(t => {
+      if (t.selected) {
+        categories.push({ name: t.val });
+      }
+    });
+    if (categories.length > 1) {
+      categories.push({ name: 'both' });
     }
-    categories.push({ name: 'both' });
+    
     const links: any[] = [];
     const nodes: any[] = [];
     const h = this.graphChart.getHeight();
@@ -272,7 +286,9 @@ export class RelationComponent {
     const minSize = 10;
     // let maxCount = Math.max(...this.authors.map(r => r.count), ...this.recipients.map(r => r.count));
     let maxCount = Math.max(...this.mentioned.map(r => r.count));
+    const excluded = this.config.excluded_identities();
     this.recipients.forEach((identity: JSONFacet) => {
+      if (this.allIncluded || !excluded.includes(identity.val)) {
       let zone = 0;
       let category = null;
 
@@ -285,21 +301,7 @@ export class RelationComponent {
           zone = category === this.tenant.val ? -1 : 1;
         }
       }
-      // const t1 = this.solrResponse.response.docs.find((letter: Letter) => { return letter.tenant === this.tenant.val && letter.identity_mentioned?.includes(identity.val)  });
-      // if (t1) {
-      //   category = this.tenant.val;
-      //   zone = 1;
-      // }
-      // if (other) {
-      //   const t2 = this.solrResponse.response.docs.find((letter: Letter) => { return letter.tenant === other.val && letter.identity_mentioned?.includes(identity.val) });
-      //   if (t2 && t1) {
-      //     category = 'both';
-      //     zone = 0;
-      //   } else if (t2) {
-      //     category = other.val;
-      //     zone = -1;
-      //   }
-      // }
+      
       const pos = this.setPosition(h, w, identity.count, maxCount, zone);
       nodes.push({
         id: identity.val,
@@ -310,6 +312,7 @@ export class RelationComponent {
         x: pos.x,
         y: pos.y,
       })
+    }
     });
 
     // this.solrResponse.response.docs.forEach((letter: Letter) => {
@@ -406,4 +409,17 @@ export class RelationComponent {
       ]
     };
   }
+
+toggleOverlap() {
+    this.graphChart.setOption({
+      series: [
+        {
+          labelLayout: {
+            hideOverlap: !this.showOverlap
+          }
+        }
+      ]
+    });
+  }
+
 }

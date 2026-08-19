@@ -172,10 +172,14 @@ export class TimelineComponent {
     this.chart.on('dataZoom', (params: any) => {
       var option: any = this.chart.getOption();
 
+
+  // var axis = myChart.getModel().option.xAxis[0];
+  // var starttime = axis.data[axis.rangeStart];
+  // var endtime = axis.data[axis.rangeEnd];
+  // console.log(starttime,endtime);
+
       this.excludeDate = false;
-      // console.log(option.series[0].data[option.dataZoom[0].startValue][0])
-      // console.log(new Date(option.series[0].data[option.dataZoom[0].startValue][0]));
-      //this.limits = [new Date(option.series[0].data[option.dataZoom[0].startValue][0]), new Date(option.series[0].data[option.dataZoom[0].endValue][0])];
+      
       this.limits = [new Date(option.dataZoom[1].startValue), new Date(option.dataZoom[1].endValue)];
       this.getData(false);
     });

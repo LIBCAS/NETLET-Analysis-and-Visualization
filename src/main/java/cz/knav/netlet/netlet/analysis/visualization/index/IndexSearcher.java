@@ -320,7 +320,7 @@ public class IndexSearcher {
 //            RangeFacetMap rangeFacet = new RangeFacetMap("date_year", Long.parseLong(years[0]), Long.parseLong(years[1]), 1)
 //                    .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
             
-                RangeFacetMap yearsFacet = new RangeFacetMap("date_year", Integer.parseInt(years[0].substring(0, 4)), Integer.parseInt(years[1].substring(0, 4)), 1)
+      RangeFacetMap yearsFacet = new RangeFacetMap("date_year", Integer.parseInt(years[0].substring(0, 4)), Integer.parseInt(years[1].substring(0, 4)), 1)
             .withDomain(new DomainMap().withTagsToExclude("ffyear_range"))
             .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
 
@@ -503,6 +503,10 @@ public class IndexSearcher {
               1)
               .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
               .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+      
+      RangeFacetMap yearsFacet = new RangeFacetMap("date_year", Integer.parseInt(years[0].substring(0, 4)), Integer.parseInt(years[1].substring(0, 4)), 1)
+            .withDomain(new DomainMap().withTagsToExclude("ffyear_range"))
+            .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
 
       String rowsP = request.getParameter("rows");
       int rows = 0;
@@ -516,7 +520,7 @@ public class IndexSearcher {
               .setLimit(rows)
               .withFilter("origin:* OR destination:*")
               .returnFields("letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,origin,destination,origin_id,destination_id,origin_name,destination_name,places:[json],identities:[json],keywords_category_cs,keywords_cs")
-              .withFacet("date_year", rangeFacet)
+              .withFacet("years", yearsFacet)
               .withFacet("keywords_cs", keywords_csFacet)
               .withFacet("keyword_categories", categories_csFacet)
               .withFacet("mentioned", identity_mentionedFacet)
@@ -696,9 +700,13 @@ public class IndexSearcher {
         date_range = "1000,2025";
       }
       String[] years = date_range.split(",");
-      RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
-              .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
-              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+//      RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
+//              .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
+//              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+      
+      RangeFacetMap yearsFacet = new RangeFacetMap("date_year", Integer.parseInt(years[0].substring(0, 4)), Integer.parseInt(years[1].substring(0, 4)), 1)
+            .withDomain(new DomainMap().withTagsToExclude("ffyear_range"))
+            .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
 
       final TermsFacetMap keywords_facet = new TermsFacetMap("keywords_category_" + lang)
               .setLimit(1000)
@@ -719,7 +727,7 @@ public class IndexSearcher {
               //.withFilter("status:publish")
               .setLimit(rows)
               .withFacet("periods", periodsFacet)
-              .withFacet("date_year", rangeFacet)
+              .withFacet("years", yearsFacet)
               .withFacet("tenants", new TermsFacetMap("tenant")
                       .setLimit(1000)
                       .withDomain(new DomainMap().withTagsToExclude("fftenant").withTagsToExclude("ffdate_year"))
@@ -829,8 +837,8 @@ public class IndexSearcher {
     
 //    LocalDateTime date1 = LocalDate.parse(years[0], dtf).atStartOfDay();
 //    LocalDateTime date2 = LocalDate.parse(years[1], dtf).atStartOfDay();
-    LocalDate date1 = LocalDate.parse(years[0]);
-    LocalDate date2 = LocalDate.parse(years[1]);
+    LocalDate date1 = LocalDate.parse(years[0].substring(0,10));
+    LocalDate date2 = LocalDate.parse(years[1].substring(0,10));
     long daysBetween = Duration.between(date1.atStartOfDay(), date2.atStartOfDay()).toDays();
     if (daysBetween < 36500) {
       gap = "+1DAY";
@@ -848,7 +856,6 @@ public class IndexSearcher {
             .withDomain(new DomainMap().withTagsToExclude("ffyear_range"))
             .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
     
-            
 
     final TermsFacetMap keywordsFacet = new TermsFacetMap("keywords_" + lang)
             .setSort("index")
@@ -910,15 +917,18 @@ public class IndexSearcher {
   }
 
   public static JsonQueryRequest addFilters(HttpServletRequest request, JsonQueryRequest jrequest, String lang, boolean excludeDateRange) {
-    String other_tenant = request.getParameter("other_tenant");
-    if (other_tenant != null) {
-      String tenant = request.getParameter("tenant");
-      if (tenant != null && !tenant.isBlank()) {
-        if (!other_tenant.isBlank()) {
-          tenant += " OR tenant:" + other_tenant;
-        }
-        jrequest = jrequest.withFilter("tenant:" + tenant);
-      }
+    String[] other_tenant = request.getParameterValues("other_tenant");
+    if (other_tenant != null && other_tenant.length > 1) {
+      jrequest = jrequest.withFilter("tenant:(" + String.join(" ", other_tenant) + ")");
+      
+//      String tenant = request.getParameter("tenant");
+//      if (tenant != null && !tenant.isBlank()) {
+//        if (!other_tenant.isBlank()) {
+//          tenant += " OR tenant:" + other_tenant;
+//        }
+//        jrequest = jrequest.withFilter("tenant:" + tenant);
+//      }
+      
     } else {
       String[] tenants = request.getParameterValues("tenant");
       if (tenants != null && tenants.length > 0) {

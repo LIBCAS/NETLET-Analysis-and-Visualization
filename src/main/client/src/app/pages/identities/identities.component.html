@@ -10,8 +10,8 @@
   <as-split-area>
       <div class="app-content app-fill-w app-fill-h">
     <div class="app-years">
-      @if (solrResponse?.facets.date_year) {
-      <app-years-chart [dateYearFacet]="solrResponse.facets.date_year" (onChangeLimits)="changeLimits($event)"
+      @if (solrResponse?.facets.years) {
+      <app-years-chart [dateYearFacet]="solrResponse.facets.years" (onChangeLimits)="changeLimits($event)"
         [withAnimation]="false" (onChangeRunning)="changeRunning($event)"></app-years-chart>
       }
     </div>
