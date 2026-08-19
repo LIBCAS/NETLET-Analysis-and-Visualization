@@ -257,6 +257,20 @@ public class DataServlet extends HttpServlet {
                 return ret;
             }
         },
+        SEARCH_LANGUAGES {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                JSONObject ret = new JSONObject();
+
+                String lang = request.getParameter("lang");
+                if (lang == null) {
+                    lang = "cs";
+                }
+                ret.put("languages", IndexSearcher.searchLanguages()
+                        .getJSONObject("facets").getJSONObject("languages").getJSONArray("buckets"));
+                return ret;
+            }
+        },
         SEARCH_PLACES {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {

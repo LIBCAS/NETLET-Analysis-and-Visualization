@@ -105,5 +105,9 @@ export class AppService {
   searchPlaces(params: HttpParams): Observable<any> {
     return this.get('data/search_places', params)
   }
+
+  searchLanguages(params: HttpParams): Observable<any> {
+    return this.get('data/search_languages', params)
+  }
   
 }

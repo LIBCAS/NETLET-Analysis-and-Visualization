@@ -6,7 +6,7 @@
     <div style="flex: 1 30%;" class="app-filters">
       @if(solrResponse?.facets) {
       <app-facets
-        [fields]="['authors', 'recipients', 'mentioned','keyword_categories', 'keywords', 'professions', 'origins', 'destinations']"
+        [fields]="['authors', 'recipients', 'mentioned','keyword_categories', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
         [facets]="facets()" (onMouserOver)="showNode($event)" (onMouseOut)="hideNode()"></app-facets> }
     </div>
   </as-split-area>

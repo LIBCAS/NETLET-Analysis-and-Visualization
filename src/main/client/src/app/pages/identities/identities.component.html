@@ -2,7 +2,7 @@
 <as-split direction="horizontal" [unit]="'pixel'" (gutterClick)="state.gutterClick($event)">
   <as-split-area [size]="state.facetsSize" >
     <div style="flex: 1 30%;" class="app-filters">
-      <app-facets [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'prefessions', 'origins', 'destinations']"
+      <app-facets [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'prefessions', 'origins', 'destinations', 'languages']"
       [facets]="facets()" (onFiltersChanged)="onFiltersChanged($event)" (onMouserOver)="showNode($event)"
       (onMouseOut)="hideNode()"></app-facets>
     </div>

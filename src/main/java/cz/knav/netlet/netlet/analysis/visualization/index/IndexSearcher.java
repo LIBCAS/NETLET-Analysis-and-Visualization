@@ -899,6 +899,11 @@ public class IndexSearcher {
                     .setSort("index")
                     .withDomain(new DomainMap().withTagsToExclude("ffrecipients"))
                     .setMinCount(1))
+            .withFacet("languages", new TermsFacetMap("languages")
+                    .setLimit(100)
+                    .setSort("index")
+                    .withDomain(new DomainMap().withTagsToExclude("fflanguages"))
+                    .setMinCount(1))
             .withFacet("authors", new TermsFacetMap("identity_author")
                     .setLimit(1000)
                     .setSort("index")
@@ -1001,6 +1006,10 @@ public class IndexSearcher {
 
     if (request.getParameter("profession") != null) {
       jrequest = jrequest.withFilter("{!tag=ffprofession}professions_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("profession")) + "\")");
+    }
+
+    if (request.getParameter("languages") != null) {
+      jrequest = jrequest.withFilter("{!tag=fflanguages}languages:(\"" + String.join("\" OR \"", request.getParameterValues("languages")) + "\")");
     }
 
     if (request.getParameter("origin") != null) {
@@ -1108,6 +1117,38 @@ public class IndexSearcher {
       NamedList<Object> resp = solr.request(qreq, "places");
       InputStream is = (InputStream) resp.get("stream");
       ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+
+  /**
+   * Search places for autocomplete
+   *
+   * @param prefix
+   * @param tenant
+   * @param lang
+   * @return
+   */
+  public static JSONObject searchLanguages() {
+    JSONObject ret = new JSONObject();
+    try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+      JsonQueryRequest jrequest = new JsonQueryRequest()
+              .setQuery("*:*")
+              .withFacet("languages", new TermsFacetMap("languages")
+                    .setLimit(1000)
+                    .setSort("index")
+                    .setMinCount(1))
+              .setLimit(0);
+      
+      jrequest.setResponseParser(new InputStreamResponseParser("json"));
+      NamedList<Object> resp = solr.request(jrequest, "hiko");
+      InputStream is = (InputStream) resp.get("stream");
+      ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+
 
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);

@@ -18,8 +18,8 @@ import { AppState } from '../../app-state';
 import { TranslateService } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { DomSanitizer } from '@angular/platform-browser';
-echarts.use([BarChart, CanvasRenderer, LegendComponent, 
-  TooltipComponent, GridComponent, TitleComponent, BrushComponent, 
+echarts.use([BarChart, CanvasRenderer, LegendComponent,
+  TooltipComponent, GridComponent, TitleComponent, BrushComponent,
   ToolboxComponent, VisualMapComponent, MarkAreaComponent]);
 
 const EXPAND_ICON =
@@ -94,6 +94,7 @@ export class YearsChartComponent {
 
   animation: ReturnType<typeof setInterval>;
   running: boolean = false;
+  showPeriods = true;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -164,6 +165,71 @@ export class YearsChartComponent {
     });
   }
 
+  setMarkAreas() {
+    let minRokWithValue = '1000';
+    let maxRokWithValue = '2025';
+
+    minRokWithValue = this.limits[0] + '';
+    maxRokWithValue = this.limits[1] + '';
+    const markAreaData: any = [];
+    if (this.showPeriods) {
+
+      if (this.limits[0] < 1670) {
+        markAreaData.push([
+          {
+            name: '1. období',
+            xAxis: minRokWithValue,
+            itemStyle: {
+              color: '#155605',
+              opacity: 0.5
+            },
+          },
+          {
+            xAxis: Math.min(this.limits[1], 1670) + ''
+          }
+        ]
+        )
+      }
+
+      if (this.limits[0] < 1939 && this.limits[1] > 1670) {
+        markAreaData.push([
+          {
+            name: '2. období',
+            //xAxis: '1670',
+            xAxis: Math.max(this.limits[0], 1670) + '',
+            itemStyle: {
+              color: 'rgb(68, 110, 136)',
+              opacity: 0.4
+            }
+          },
+          {
+            xAxis: Math.min(this.limits[1], 1939) + ''
+          }
+        ]
+        )
+      }
+
+      if (this.limits[1] > 1939) {
+        markAreaData.push([
+          {
+            name: '3. období',
+            // xAxis: '1939',
+            xAxis: Math.max(this.limits[0], 1939) + '',
+            itemStyle: {
+              color: '#00c',
+              opacity: 0.3
+            }
+          },
+          {
+            xAxis: maxRokWithValue
+          }
+        ]
+        )
+      }
+    }
+    return markAreaData;
+  }
+
   setChartTitle() {
     this.chartRok.setOption({
       title: {
@@ -180,13 +246,13 @@ export class YearsChartComponent {
         value: c.count, //itemStyle: { color: color }
       }
     });
-    this.rokSeries.push({ value: facet.after.count, 
+    this.rokSeries.push({
+      value: facet.after.count,
       //itemStyle: { color: '#00c' } 
     });
     //this.rokAxis = facet.buckets.map(c => new Date(c.val).getFullYear() + '');
     this.rokAxis = facet.buckets.map(c => c.val + '');
     this.rokAxis.push(this.limits[1] + '');
-
 
     let minRokWithValue = '1000';
     let maxRokWithValue = '2025';
@@ -194,61 +260,7 @@ export class YearsChartComponent {
     minRokWithValue = this.limits[0] + '';
     maxRokWithValue = this.limits[1] + '';
 
-
-    const markAreaData: any = [];
-
-    if (this.limits[0] < 1670) {
-      markAreaData.push([
-              {
-                name: '1. období',
-                xAxis: minRokWithValue,
-                itemStyle: {
-                  color: '#155605',
-                  opacity: 0.5
-                },
-              },
-              {
-                xAxis: Math.min(this.limits[1], 1670) + ''
-              }
-            ]
-          )
-    }
-
-    if (this.limits[0] < 1939 && this.limits[1] > 1670) {
-      markAreaData.push([
-              {
-                name: '2. období',
-                //xAxis: '1670',
-                xAxis: Math.max(this.limits[0], 1670) + '',
-                itemStyle: {
-                  color: 'rgb(68, 110, 136)',
-                  opacity: 0.4
-                }
-              },
-              {
-                xAxis: Math.min(this.limits[1], 1939) + ''
-              }
-            ]
-          )
-    }
-
-    if (this.limits[1] > 1939) {
-      markAreaData.push([
-              {
-                name: '3. období',
-                // xAxis: '1939',
-                xAxis: Math.max(this.limits[0], 1939) + '',
-                itemStyle: {
-                  color: '#00c',
-                  opacity: 0.3
-                }
-              },
-              {
-                xAxis: maxRokWithValue
-              }
-            ]
-          )
-    }
+    const markAreaData = this.setMarkAreas();
 
     this.chartOptionsRok = {
       animation: false,
@@ -265,39 +277,74 @@ export class YearsChartComponent {
         top: 8,
         text: this.limits[0] + '–' + this.limits[1]
       },
-        toolbox: {
-          show: true,
-          iconStyle: {
-            borderColor: '#6578ba',
-            color: 'none'
-          },
-          feature: {
-            myTool1: {
-                show: this.withAnimation(),
-                title: 'run',
-                icon: 'path://m354.2,247.4l-135.1-92.4c-4.2-3.1-15.4-3.1-16.3,8.6v184.8c1,11.7 12.4,11.9 16.3,8.6l135.1-92.4c3.5-2.1 8.3-10.7 0-17.2zm-130.5,81.3v-145.4l106.1,72.7-106.1,72.7z,path://M256,11C120.9,11,11,120.9,11,256s109.9,245,245,245s245-109.9,245-245S391.1,11,256,11z M256,480.1    C132.4,480.1,31.9,379.6,31.9,256S132.4,31.9,256,31.9S480.1,132.4,480.1,256S379.6,480.1,256,480.1z',
-                onclick: () => {
-                    this.run()
-                }
+      toolbox: {
+        show: true,
+         showTitle: false,
+         tooltip: { 
+            show: true,
+            confine: true,
+            formatter: function (param) {
+                return '<div>' + param.title + '</div>'; // user-defined DOM structure
             },
-            myTool2: {
-                show: this.withAnimation(),
-                title: 'move',
-                icon: `path://M28.5,15.6a2.1,2.1,0,0,0-2.7-.2,1.9,1.9,0,0,0-.2,3L29.2,22H6a2,2,0,0,0,0,4H29.2l-3.6,3.6a1.9,1.9,0,0,0,.2,3,2.1,2.1,0,0,0,2.7-.2l6.9-7a1.9,1.9,0,0,0,0-2.8Z,
+            backgroundColor: '#fff',
+            textStyle: {
+                fontSize: 12,
+            }
+        },
+        iconStyle: {
+          borderColor: '#6578ba',
+          color: 'none'
+        },
+        feature: {
+          myTool1: {
+            show: this.withAnimation(),
+            title: 'run',
+            icon: 'path://m354.2,247.4l-135.1-92.4c-4.2-3.1-15.4-3.1-16.3,8.6v184.8c1,11.7 12.4,11.9 16.3,8.6l135.1-92.4c3.5-2.1 8.3-10.7 0-17.2zm-130.5,81.3v-145.4l106.1,72.7-106.1,72.7z,path://M256,11C120.9,11,11,120.9,11,256s109.9,245,245,245s245-109.9,245-245S391.1,11,256,11z M256,480.1    C132.4,480.1,31.9,379.6,31.9,256S132.4,31.9,256,31.9S480.1,132.4,480.1,256S379.6,480.1,256,480.1z',
+            onclick: () => {
+              this.run()
+            }
+          },
+          myTool2: {
+            show: this.withAnimation(),
+            title: 'move',
+            icon: `path://M28.5,15.6a2.1,2.1,0,0,0-2.7-.2,1.9,1.9,0,0,0-.2,3L29.2,22H6a2,2,0,0,0,0,4H29.2l-3.6,3.6a1.9,1.9,0,0,0,.2,3,2.1,2.1,0,0,0,2.7-.2l6.9-7a1.9,1.9,0,0,0,0-2.8Z,
                         path://M42,6V42a2,2,0,0,0,4,0V6a2,2,0,0,0-4,0Z,
                         path://M6,42V6A2,2,0,0,0,2,6V42a2,2,0,0,0,4,0Z`,
-                onclick: () => {
-                    this.move()
-                }
-            },
-            myTool3: {
-                show: this.withAnimation(),
-                title: 'pause',
-                icon: `path://M12,22 C6.4771525,22 2,17.5228475 2,12 C2,6.4771525 6.4771525,2 12,2 C17.5228475,2 22,6.4771525 22,12 C22,17.5228475 17.5228475,22 12,22 Z M12,21 C16.9705627,21 21,16.9705627 21,12 C21,7.02943725 16.9705627,3 12,3 C7.02943725,3 3,7.02943725 3,12 C3,16.9705627 7.02943725,21 12,21 Z M9,7 C10.1045695,7 11,7.8954305 11,9 L11,15 C11,16.1045695 10.1045695,17 9,17 C7.8954305,17 7,16.1045695 7,15 L7,9 C7,7.8954305 7.8954305,7 9,7 Z M9,8 C8.44771525,8 8,8.44771525 8,9 L8,15 C8,15.5522847 8.44771525,16 9,16 C9.55228475,16 10,15.5522847 10,15 L10,9 C10,8.44771525 9.55228475,8 9,8 Z M15,7 C16.1045695,7 17,7.8954305 17,9 L17,15 C17,16.1045695 16.1045695,17 15,17 C13.8954305,17 13,16.1045695 13,15 L13,9 C13,7.8954305 13.8954305,7 15,7 Z M15,8 C14.4477153,8 14,8.44771525 14,9 L14,15 C14,15.5522847 14.4477153,16 15,16 C15.5522847,16 16,15.5522847 16,15 L16,9 C16,8.44771525 15.5522847,8 15,8 Z`,
-                onclick: () => {
-                    this.stop()
-                }
+            onclick: () => {
+              this.move()
             }
+          },
+          myTool3: {
+            show: this.withAnimation(),
+            title: 'pause',
+            icon: `path://M12,22 C6.4771525,22 2,17.5228475 2,12 C2,6.4771525 6.4771525,2 12,2 C17.5228475,2 22,6.4771525 22,12 C22,17.5228475 17.5228475,22 12,22 Z M12,21 C16.9705627,21 21,16.9705627 21,12 C21,7.02943725 16.9705627,3 12,3 C7.02943725,3 3,7.02943725 3,12 C3,16.9705627 7.02943725,21 12,21 Z M9,7 C10.1045695,7 11,7.8954305 11,9 L11,15 C11,16.1045695 10.1045695,17 9,17 C7.8954305,17 7,16.1045695 7,15 L7,9 C7,7.8954305 7.8954305,7 9,7 Z M9,8 C8.44771525,8 8,8.44771525 8,9 L8,15 C8,15.5522847 8.44771525,16 9,16 C9.55228475,16 10,15.5522847 10,15 L10,9 C10,8.44771525 9.55228475,8 9,8 Z M15,7 C16.1045695,7 17,7.8954305 17,9 L17,15 C17,16.1045695 16.1045695,17 15,17 C13.8954305,17 13,16.1045695 13,15 L13,9 C13,7.8954305 13.8954305,7 15,7 Z M15,8 C14.4477153,8 14,8.44771525 14,9 L14,15 C14,15.5522847 14.4477153,16 15,16 C15.5522847,16 16,15.5522847 16,15 L16,9 C16,8.44771525 15.5522847,8 15,8 Z`,
+            onclick: () => {
+              this.stop()
+            }
+          },
+          myTool4: {
+            show: true,
+            title: 'Zobrazit/skrýt období',
+            icon: `path://M211.79883,44.20117a27.9983,27.9983,0,0,0-42.221,36.56445l-88.8125,88.8125a28.03763,28.03763,0,0,0-36.56421,2.623h-.00049a28.00012,28.00012,0,1,0,42.2212,3.03369l88.81274-88.813a27.99812,27.99812,0,0,0,36.56421-42.22071ZM78.14258,206.14258a20.00046,20.00046,0,1,1-28.28467-28.28516h-.00049a20.00063,20.00063,0,0,1,28.28516,28.28516Zm128-128a20.02563,20.02563,0,0,1-28.2832.002l-.00147-.002a20.00028,20.00028,0,1,1,28.28467,0Z`,
+            
+            onclick: () => {
+              this.showPeriods = !this.showPeriods;
+              const ma = this.setMarkAreas();
+              this.chartRok.setOption({
+                series:{
+                markArea: {
+                  label: {
+                    position: 'insideTop',
+                    color: '#000'
+                  },
+                  silent: true,
+                  data: ma
+                }
+                }
+              })
+
+            }
+          }
         }
       },
       brush: {
@@ -339,19 +386,12 @@ export class YearsChartComponent {
         color: this.barColor,
 
         markArea: {
-          
           label: {
             position: 'insideTop',
             color: '#000'
           },
           silent: true,
-          data: markAreaData,
-          // data: [
-          //   [
-          //     { xAxis: minRokWithValue },
-          //     { xAxis: maxRokWithValue }
-          //   ]
-          // ],
+          data: markAreaData
         },
       }]
     }

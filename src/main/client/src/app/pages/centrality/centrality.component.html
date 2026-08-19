@@ -4,7 +4,7 @@
   <as-split-area [size]="state.facetsSize" >
     <div style="flex: 1 30%;" class="app-filters">
       <app-facets
-        [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'professions', 'origins', 'destinations']"
+        [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
         [facets]="facets()" (onFiltersChanged)="onFiltersChanged($event)" (onMouserOver)="showNodeExt($event)"
         (onMouseOut)="hideNode()"></app-facets>
     </div>

@@ -11,7 +11,7 @@
     <div style="flex: 1 30%;" class="app-filters">
       <app-facets
         [colored]="true"
-        [fields]="['recipients','mentioned']"
+        [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
         [facets]="facets()"></app-facets>
 
       @if (recipients) {

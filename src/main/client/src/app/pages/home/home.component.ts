@@ -46,6 +46,7 @@ export class HomeComponent {
 
   searchForm = form(this.searchModel);
   selectedKeyword = {type: '', value: ''};
+  selectedLanguage = '';
   
   //identities = signal<{id: string,table_id: number,name: string,tenant: string}[]>([]);
 
@@ -60,6 +61,7 @@ export class HomeComponent {
   identities = computed<any>(() => this.identitiesRes.value() ? this.identitiesRes.value().identities : [] );
 
   places = signal<{id: string,table_id: number,name: string,tenant: string}[]>([]);
+  languages = signal<{val: string,count: number}[]>([]);
   keywords = signal<{value: string,type: string}[]>([]);
   categories = signal<{value: string,type: string}[]>([]);
 
@@ -69,6 +71,10 @@ export class HomeComponent {
       if (this.searchModel().places) {
         this.checkPlaces(this.searchModel().places);
       }
+      const p: any = {};
+      this.service.searchLanguages(p).subscribe((resp: any) => {
+        this.languages.set(resp.languages);
+      });
       
     });
   }
@@ -111,6 +117,19 @@ export class HomeComponent {
     return val && val.value ? val.value : '';
   }
 
+  checkLanguages(val: any) {
+    const p: any = {};
+    p.prefix = val.target.value;
+    this.service.searchLanguages(p).subscribe((resp: any) => {
+      this.languages.set(resp.languages);
+    });
+  }
+
+  setLanguage(e: any) {
+    this.selectedLanguage = e.option.value;
+  }
+
+
   checkKeywords(val: any) {
     const p: any = {};
     p.prefix = val.target.value;
@@ -140,6 +159,10 @@ export class HomeComponent {
     // if(this.searchModel().keywords) {
     //   usedFacets.push({field: 'keywords', value: this.searchModel().keywords});
     // }
+    console.log(this.selectedLanguage)
+    if(this.selectedLanguage) {
+      usedFacets.push({field: 'languages', value: this.selectedLanguage});
+    }
     if(this.searchModel().places) {
       usedFacets.push({field: 'places', value: this.searchModel().places});
     }
@@ -154,10 +177,10 @@ export class HomeComponent {
     }
     
     if(this.date_from) {
-      usedFacets.push({field: 'date_from', value: this.date_from.toISOString()});
+      usedFacets.push({field: 'date_from', value: this.date_from.toISOString().substring(0,10)});
     }
     if(this.date_to) {
-      usedFacets.push({field: 'date_to', value: this.date_to.toISOString()});
+      usedFacets.push({field: 'date_to', value: this.date_to.toISOString().substring(0,10)});
     }
 
     this.state.usedFacets.set([...usedFacets]);

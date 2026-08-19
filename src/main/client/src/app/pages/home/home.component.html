@@ -32,16 +32,6 @@
 
           </mat-form-field>
 
-
-
-        <!-- <mat-form-field class="app-fill-w" style="margin-right:5px;" appearance="outline">
-            <input type="number" placeholder="{{ 'field.year_from' | translate}}"
-                attr.aria-label="{{ 'field.year_from' | translate}}" matInput [formField]="searchForm.year_from" >
-        </mat-form-field>
-        <mat-form-field class="app-fill-w" style="margin-left:5px;" appearance="outline">
-            <input type="number" placeholder="{{ 'field.year_to' | translate}}"
-                attr.aria-label="{{ 'field.year_to' | translate}}" matInput [formField]="searchForm.year_to" >
-        </mat-form-field> -->
         </div>
 
         <mat-form-field class="app-fill-w" appearance="outline">
@@ -57,12 +47,6 @@
 
         </mat-form-field>
 
-
-        <!-- <mat-form-field appearance="outline" >
-            <mat-label>{{ 'identities' | translate}}</mat-label>
-            <input [formField]="searchForm.identities" matInput />
-        </mat-form-field> -->
-
         <mat-form-field class="app-fill-w" appearance="outline">
             <input type="text" placeholder="{{ 'field.places' | translate}}" attr.aria-label="{{ 'places' | translate}}"
                 matInput [formField]="searchForm.places" [matAutocomplete]="autoPlaces">
@@ -74,13 +58,10 @@
             </mat-autocomplete>
 
         </mat-form-field>
+        
+        <div class="app-fxLayout app-gap-4">
 
-        <!-- <mat-form-field appearance="outline" >
-            <mat-label>{{ 'places' | translate}}</mat-label>
-            <input [formField]="searchForm.places" matInput />
-        </mat-form-field> -->
-
-        <mat-form-field class="app-fill-w" appearance="outline">
+          <mat-form-field class="app-fill-w" style="margin-right:5px;" appearance="outline">
             <input type="text" placeholder="{{ 'field.keywords' | translate}}" attr.aria-label="{{ 'keywords' | translate}}"
                 matInput [matAutocomplete]="auto" (keyup)="checkKeywords($event)">
 
@@ -97,13 +78,24 @@
                 </mat-optgroup>
 
             </mat-autocomplete>
+          </mat-form-field>
 
-        </mat-form-field>
+          <mat-form-field class="app-fill-w" style="margin-left:5px;" appearance="outline">
+            <input type="text" placeholder="{{ 'field.languages' | translate}}" attr.aria-label="{{ 'languages' | translate}}"
+                matInput [matAutocomplete]="autoLanguages" (keyup)="checkLanguages($event)">
 
-        <!-- <mat-form-field appearance="outline" >
-            <mat-label>{{ 'keywords' | translate}}</mat-label>
-            <input [formField]="searchForm.keywords" matInput />
-        </mat-form-field> -->
+            <mat-autocomplete #autoLanguages="matAutocomplete" (optionSelected)="setLanguage($event)" >
+                @for (option of languages(); track option) {
+                <mat-option [value]="option.val">{{option.val}} ({{option.count}})</mat-option>
+                }
+
+            </mat-autocomplete>
+
+          </mat-form-field>
+
+        </div>
+
+
         <div class="app-text-right">
             <button matIconButton [title]="'action.search' | translate" (click)="search()"><mat-icon>search</mat-icon></button>
         </div>
