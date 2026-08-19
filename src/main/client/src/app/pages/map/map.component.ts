@@ -357,8 +357,8 @@ export class MapComponent {
       if (this.inLimits(letter.date_year) && letter.places && letter.origin) {
         letter.places.forEach((place: Place) => {
           if (place.latitude && !this.nodes[place.id]) {
-            this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name, count: 0 };
-            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: 0, color: '#00f', symbolSize: 6 });
+            this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name, count: 1 };
+            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: 1, color: '#00f', symbolSize: 6 });
           }
         });
 
