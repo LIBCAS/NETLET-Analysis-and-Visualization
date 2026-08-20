@@ -330,10 +330,9 @@ export class MapComponent {
   }
 
  
-  maxSize = 10; 
+  maxSize = 16; 
   minSize = 6;
   getColor(symbolSize: number) {
-    // symbolSize [6,16]
     const sat = Math.floor(12.8 * (symbolSize - this.minSize)) + 127;
       return 'rgb('+sat+', 80, 80)';
   }
@@ -365,8 +364,8 @@ export class MapComponent {
             this.links[linkId] = {
               node1: [place_origin.latitude, place_origin.longitude],
               node2: [place_destination.latitude, place_destination.longitude],
-              authors: letter.identity_author,
-              recipients: letter.identity_recipient,
+              authors: letter.identity_author ? letter.identity_author : [],
+              recipients: letter.identity_recipient ? letter.identity_recipient : [],
               count: 1,
               letters: [letter]
             };
@@ -401,35 +400,42 @@ export class MapComponent {
     links.forEach(link => {
       link.count = this.links[link.id].count
     })
-    // Object.keys(this.links).forEach(key => {
-    //   const link = this.links[key];
-    //   // this.linkNodes(link.node1, link.node2, link.count, link.letters);
-    // });
 
     let maxCount = 0;
-    Object.keys(this.nodes).forEach(key => {
-      const node = this.nodes[key];
-      nodes.filter((n:any) => n.id === key).forEach((n:any) => {
-        n.count = node.count; 
-        maxCount = Math.max(maxCount, node.count) -1;
-      });
+    nodes.forEach((n:any) => {
+      const node = this.nodes[n.id];
+      n.count = node.count; 
+      maxCount = Math.max(maxCount, node.count);
     });
-    Object.keys(this.nodes).forEach(key => {
-      // nodes.filter((n:any) => n.id === key).forEach((n:any) => {
-      //   n.count = node.count; 
-      //   maxCount = Math.max(maxCount, node.count) -1;
-      // });
-      nodes.filter((n:any) => n.id === key).forEach((n:any) => {
-        if (n.count > 0) {
+    nodes.forEach((n:any) => {
+      if (n.count > 0) {
           n.symbolSize = this.maxSize * (n.count-1) / maxCount + this.minSize;
-        } else {
-          n.symbolSize = this.minSize;
-        }
-        n.itemStyle = {
-          color: this.getColor(n.symbolSize)
-        }
-      });
+      } else {
+        n.symbolSize = this.minSize;
+      }
+      n.itemStyle = {
+        color: this.getColor(n.symbolSize)
+      }
     });
+    // Object.keys(this.nodes).forEach(key => {
+    //   const node = this.nodes[key];
+    //   nodes.filter((n:any) => n.id === key).forEach((n:any) => {
+    //     n.count = node.count; 
+    //     maxCount = Math.max(maxCount, node.count) -1;
+    //   });
+    // });
+    // Object.keys(this.nodes).forEach(key => {
+    //   nodes.filter((n:any) => n.id === key).forEach((n:any) => {
+    //     if (n.count > 0) {
+    //       n.symbolSize = this.maxSize * (n.count-1) / maxCount + this.minSize;
+    //     } else {
+    //       n.symbolSize = this.minSize;
+    //     }
+    //     n.itemStyle = {
+    //       color: this.getColor(n.symbolSize)
+    //     }
+    //   });
+    // });
 
     this.graphData = {
       links,
