@@ -136,6 +136,7 @@ export interface Tenant {
 
   addFilters(p: any) {
     this.addFilter(p, 'identity', 'identities');
+    this.addFilter(p, 'identity_main', 'identity_main');
     this.addFilter(p, 'author', 'authors');
     this.addFilter(p, 'recipient', 'recipients');
     this.addFilter(p, 'mentioned', 'mentioned');

@@ -83,7 +83,13 @@
 
             <ng-container matColumnDef="date">
               <th mat-header-cell *matHeaderCellDef> {{ 'field.date' | translate}} </th>
-              <td mat-cell *matCellDef="let element"> {{ element.date_computed | date : 'd. M. yyyy'}} </td>
+              <td mat-cell *matCellDef="let element">
+                @if (element.date_computed) {
+                  {{ element.date_computed | date : 'd. M. yyyy'}}
+                } @else {
+                  <mat-icon style="color:red;">warning</mat-icon>
+                }
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="action" stickyEnd>

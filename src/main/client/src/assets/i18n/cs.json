@@ -63,6 +63,7 @@
     "recipient": "Adresát",
     "identity_recipient": "Adresát",
     "recipients": "Adresáti",
+    "identity_main": "Autor nebo adresát",
     "mentioned": "Zmíněné osoby",
     "origin": "Místo odeslání",
     "origin_name": "Místo odeslání",

@@ -20,6 +20,7 @@
     "recipient": "Recipient",
     "identity_recipient": "Recipient",
     "recipients": "Recipients",
+    "identity_main": "Author or recipient",
     "mentioned": "Mentioned",
     "origin": "Place of origin",
     "origin_name": "Place of origin",

@@ -983,12 +983,19 @@ public class IndexSearcher {
       jrequest = jrequest.withFilter("date_year:[" + year_from + " TO " + year_to + "]");
     }
 
-    if (request.getParameter("author") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(" + String.join(" OR ", request.getParameterValues("author")) + ")");
+    if (request.getParameter("identity_main") != null) {
+      jrequest = jrequest.withFilter(
+              "{!tag=ffidentity_main}identity_author:(" + String.join(" OR ", request.getParameterValues("identity_main")) + ") OR " +
+              "identity_recipient:(" + String.join(" OR ", request.getParameterValues("identity_main")) + ")"
+      );
     }
 
     if (request.getParameter("identity") != null) {
       jrequest = jrequest.withFilter("{!tag=ffidentities}identity_name:(" + String.join(" OR ", request.getParameterValues("identity")) + ")");
+    }
+
+    if (request.getParameter("author") != null) {
+      jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(" + String.join(" OR ", request.getParameterValues("author")) + ")");
     }
 
     if (request.getParameter("recipient") != null) {

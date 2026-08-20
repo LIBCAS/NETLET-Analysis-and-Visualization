@@ -239,8 +239,10 @@ export class YearsChartComponent {
   }
 
   setYearsChart(facet: { buckets: JSONFacet[], after: { count: number } }) {
+    let maxCount = 0;
     this.rokSeries = facet.buckets.map(c => {
       const color = c.val < '1670' ? '#155605' : (c.val < '1939' ? 'rgb(68, 110, 136)' : '#00c');
+      maxCount = Math.max(maxCount, c.count)
       return {
         value: c.count, //itemStyle: { color: color }
       }
@@ -360,6 +362,10 @@ export class YearsChartComponent {
       },
       tooltip: {
         trigger: 'axis',
+        position: function (point, params, dom, rect, size) {
+            // fixed at top
+            return [point[0], '70%'];
+        }
       },
       xAxis: {
         type: 'category',
@@ -374,8 +380,12 @@ export class YearsChartComponent {
         }
       },
       yAxis: {
-        show: false,
+        show: true,
         type: 'value',
+        interval: maxCount,
+        axisLabel: {
+          showMinLabel: false
+        }
       },
       series: [{
         name: '',

@@ -93,6 +93,11 @@
       <mat-list-item title="{{ k.val}} ({{k.count}})" (mouseover)="fireMouserOver(f, k.val)"
         (mouseout)="fireMouseOut(f, k.val)">
         <button (click)="filter(f, k.val, '-')" class="app-small-icon-button" mat-icon-button><mat-icon>block</mat-icon></button>
+        @if(f==='authors' || f === 'recipients') {
+          <button (click)="filter('identity_main', k.val, '')" class="app-small-icon-button app-small2" mat-icon-button [title]="'field.identity_main' | translate">
+            <mat-icon>group</mat-icon>
+          </button>
+        }
         <span (click)="filter(f, k.val, '')">{{ k.val}} ({{k.count}}) </span>
         @if (isUsed(f, k.val)) {
           <button class="app-small-icon-button" mat-icon-button><mat-icon>check</mat-icon></button>

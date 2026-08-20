@@ -362,6 +362,22 @@ fieldset {
    }
 }
 
+.app-small2 {
+   width: 22px !important;
+   height: 22px !important;
+
+   & > *[role=img] {
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+   }
+
+   .mat-mdc-button-touch-target {
+      width: 22px !important;
+      height: 22px !important;
+   }
+}
+
 
   .app-link {
     color: blue;
