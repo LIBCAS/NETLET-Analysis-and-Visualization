@@ -973,56 +973,48 @@ public class IndexSearcher {
     }
 
     if (request.getParameter("author") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(\"" + String.join("\" OR \"", request.getParameterValues("author")) + "\")");
+      jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(" + String.join(" OR ", request.getParameterValues("author")) + ")");
     }
 
     if (request.getParameter("identity") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffidentities}identity_name:(\"" + String.join("\" OR \"", request.getParameterValues("identity")) + "\")");
+      jrequest = jrequest.withFilter("{!tag=ffidentities}identity_name:(" + String.join(" OR ", request.getParameterValues("identity")) + ")");
     }
 
     if (request.getParameter("recipient") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(\"" + String.join("\" OR \"", request.getParameterValues("recipient")) + "\")");
+      jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(" + String.join(" OR ", request.getParameterValues("recipient")) + ")");
     }
 
     if (request.getParameter("mentioned") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffmentioned}identity_mentioned:(\"" + String.join("\" OR \"", request.getParameterValues("mentioned")) + "\")");
+      jrequest = jrequest.withFilter("{!tag=ffmentioned}identity_mentioned:(" + String.join(" OR ", request.getParameterValues("mentioned")) + ")");
     }
-
-//            if (request.getParameter("keyword") != null) {
-//                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword")) + "\")");
-//            }
-//            
-//            
-//            if (request.getParameter("keyword_categories") != null) {
-//                jrequest = jrequest.withFilter("{!tag=ffkeywords}keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword_categories")) + "\")");
-//            }
+    
     if (request.getParameter("keyword") != null) {
-      jrequest = jrequest.withFilter("keywords_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword")) + "\")");
+      jrequest = jrequest.withFilter("keywords_" + lang + ":(" + String.join(" OR ", request.getParameterValues("keyword")) + ")");
     }
 
     if (request.getParameter("keyword_categories") != null) {
-      jrequest = jrequest.withFilter("keywords_category_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("keyword_categories")) + "\")");
+      jrequest = jrequest.withFilter("keywords_category_" + lang + ":(" + String.join(" OR ", request.getParameterValues("keyword_categories")) + ")");
     }
 
     if (request.getParameter("profession") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffprofession}professions_" + lang + ":(\"" + String.join("\" OR \"", request.getParameterValues("profession")) + "\")");
+      jrequest = jrequest.withFilter("{!tag=ffprofession}professions_" + lang + ":(" + String.join(" OR ", request.getParameterValues("profession")) + ")");
     }
 
     if (request.getParameter("languages") != null) {
-      jrequest = jrequest.withFilter("{!tag=fflanguages}languages:(\"" + String.join("\" OR \"", request.getParameterValues("languages")) + "\")");
+      jrequest = jrequest.withFilter("{!tag=fflanguages}languages:(" + String.join(" OR ", request.getParameterValues("languages")) + ")");
     }
 
     if (request.getParameter("origin") != null) {
-      jrequest = jrequest.withFilter("{!tag=fforigin}origin_name" + ":(\"" + String.join("\" OR \"", request.getParameterValues("origin")) + "\")");
+      jrequest = jrequest.withFilter("{!tag=fforigin}origin_name" + ":(" + String.join(" OR ", request.getParameterValues("origin")) + ")");
     }
 
     if (request.getParameter("destination") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffdestination}destination_name" + ":(\"" + String.join("\" OR \"", request.getParameterValues("destination")) + "\")");
+      jrequest = jrequest.withFilter("{!tag=ffdestination}destination_name" + ":(" + String.join(" OR ", request.getParameterValues("destination")) + ")");
     }
 
     if (request.getParameter("places") != null) {
-      String f = String.join("\" OR \"", request.getParameterValues("places"));
-      jrequest = jrequest.withFilter("origin_name:(\"" + f + "\") OR destination_name:(\"" + f + "\")");
+      String f = String.join(" OR ", request.getParameterValues("places"));
+      jrequest = jrequest.withFilter("origin_name:(" + f + ") OR destination_name:(" + f + ")");
     }
     return jrequest;
   }

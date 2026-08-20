@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, output } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatListModule } from '@angular/material/list';
 import { TranslateModule } from '@ngx-translate/core';
@@ -15,11 +15,12 @@ import { AsyncPipe } from '@angular/common';
 import { AppState, Tenant } from '../../app-state';
 import { Router } from '@angular/router';
 import { AppConfiguration } from '../../app-configuration';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-facets',
   imports: [TranslateModule, MatExpansionModule, MatListModule,
-    MatCheckboxModule, MatTooltipModule, MatIconModule,
+    MatCheckboxModule, MatTooltipModule, MatIconModule, MatButtonModule,
     MatAutocompleteModule, MatInputModule, MatFormFieldModule,
     FormsModule, ReactiveFormsModule],
   templateUrl: './facets.component.html',
@@ -36,35 +37,19 @@ export class FacetsComponent {
   fields = input<string[]>([]);
   sub_fields = input<{ [key: string]: string }>({});
 
-  onFiltersChanged = output<{ field: string, value: string }[]>();
+  onFiltersChanged = output<{ field: string, value: string, op: string }[]>();
   onMouserOver = output<{ field: string, value: string }>();
   onMouseOut = output<{ field: string, value: string }>();
 
   hasUsedFacets: boolean;
-  usedFacets: { field: string, value: string }[] = [];
+  usedFacets: { field: string, value: string, op: string }[] = [];
 
   //filteredOptions: Observable<string[]>;
   filteredOptions: string[];
   controls: { [name: string]: FormControl<string> } = {};
 
   allSelected: undefined;
-  tenants_ordered: [
-    'komensky',
-    'brezina',
-    'deml',
-    'blekastad',
-    'kalivoda',
-    'marci',
-    'musil',
-    'neumann',
-    'pamatky',
-    'patocka',
-    'polanus',
-    'sachs',
-    'studenti',
-    'tgm',
-    'ucenci'
-  ];
+  facetsFiltered = signal<FacetFields>({});
 
   log(e: any) {
     console.log(e)
@@ -79,34 +64,37 @@ export class FacetsComponent {
 
     effect(() => {
       const fs = this.fields();
+      this.facetsFiltered.set({...this.facets()});
       if (fs && this.facets()) {
         fs.forEach(f => {
           if (this.facets()[f]) {
             const c = new FormControl();
             c.valueChanges.subscribe(v => {
-              this.filteredOptions = this._filter(v, f);
+              //this.filteredOptions = this._filter(v, f);
+              const filteredOptions: JSONFacet[] = this._filter(v, f);
+              this.facetsFiltered.update((ff: FacetFields) => ({
+                ...ff,
+                [f]: {buckets : filteredOptions}
+              }));
             });
-            // this.filteredOptions = c.valueChanges.pipe(
-            //   startWith(''),
-            //   map(value => this._filter(value || '', f)),
-            // );
             this.controls[f] = c;
           }
         })
       }
 
-      // this.state.tenants().forEach(t => {
-      //   if (this.facets()['tenants']?.buckets.find(b => b.val === t.val)) {
-      //     t.selected = true;
-      //   }
-      // })
     })
-  }
+  } 
 
-  private _filter(value: string, f: string): string[] {
-    const options = this.facets()[f].buckets.map(b => b.val);
-    const filterValue = value.toLowerCase();
-    return options.filter(option => option.toLowerCase().includes(filterValue));
+  normalize(str: string): string {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  }
+  
+
+  private _filter(value: string, f: string): JSONFacet[] {
+    //const options = this.facets()[f].buckets.map(b => b.val);
+    const options = this.facets()[f].buckets;
+    const filterValue = this.normalize(value);
+    return options.filter(option => this.normalize(option.val).includes(filterValue));
   }
 
   someSelected() {
@@ -132,15 +120,15 @@ export class FacetsComponent {
   }
 
   selectAuto(e: MatAutocompleteSelectedEvent, f: string) {
-    this.filter(f, e.option.value)
+    this.filter(f, e.option.value, '')
   }
 
-  filter(field: string, value: string) {
+  filter(field: string, value: string, op: string) {
     const uf = this.usedFacets.find(f => f.field === field && f.value === value);
     if (uf) {
       this.usedFacets = this.usedFacets.filter(f => !(f.field === field && f.value === value));
     } else {
-      this.usedFacets.push({ field, value });
+      this.usedFacets.push({ field, value, op });
     }
     this.hasUsedFacets = this.usedFacets.length > 0;
 
@@ -169,8 +157,8 @@ export class FacetsComponent {
     this.onMouseOut.emit({ field, value });
   }
 
-  clickHeader(e: any, field: string, value: string) {
+  clickHeader(e: any, field: string, value: string, op: string) {
     e.stopPropagation();
-    this.filter(field, value);
+    this.filter(field, value, op);
   }
 }

@@ -26,7 +26,7 @@ export interface Tenant {
   stateChanged = signal<number>(0);
 
   public q: string = '';
-  public usedFacets = signal<{ field: string, value: string }[]>([]);
+  public usedFacets = signal<{ field: string, value: string, op: string }[]>([]);
 
   views = [
     {
@@ -134,22 +134,26 @@ export interface Tenant {
   }
 
   addFilters(p: any) {
-    p.identity = this.usedFacets().filter(k => k.field === 'identities').map(k => k.value);
-    p.author = this.usedFacets().filter(k => k.field === 'authors').map(k => k.value);
-    p.recipient = this.usedFacets().filter(k => k.field === 'recipients').map(k => k.value);
-    p.mentioned = this.usedFacets().filter(k => k.field === 'mentioned').map(k => k.value);
-    p.keyword_categories = this.usedFacets().filter(k => k.field === 'keyword_categories').map(k => k.value);
-    p.keyword = this.usedFacets().filter(k => k.field === 'keywords').map(k => k.value);
-    p.profession = this.usedFacets().filter(k => k.field === 'professions').map(k => k.value);
-    p.origin = this.usedFacets().filter(k => k.field === 'origins').map(k => k.value);
-    p.destination = this.usedFacets().filter(k => k.field === 'destinations').map(k => k.value);
-    p.places = this.usedFacets().filter(k => k.field === 'places').map(k => k.value);
-    //p.identities = this.usedFacets().filter(k => k.field === 'identities').map(k => k.value);
+    this.addFilter(p, 'identity', 'identities');
+    this.addFilter(p, 'author', 'authors');
+    this.addFilter(p, 'recipient', 'recipients');
+    this.addFilter(p, 'mentioned', 'mentioned');
+    this.addFilter(p, 'keyword_categories', 'keyword_categories');
+    this.addFilter(p, 'keyword', 'keywords');
+    this.addFilter(p, 'profession', 'professions');
+    this.addFilter(p, 'origin', 'origins');
+    this.addFilter(p, 'destination', 'destinations');
+    this.addFilter(p, 'places', 'places');
+    this.addFilter(p, 'languages', 'languages');
+    
     p.year_from = this.usedFacets().filter(k => k.field === 'year_from').map(k => k.value);
     p.year_to = this.usedFacets().filter(k => k.field === 'year_to').map(k => k.value);
     p.date_from = this.usedFacets().filter(k => k.field === 'date_from').map(k => k.value);
     p.date_to = this.usedFacets().filter(k => k.field === 'date_to').map(k => k.value);
-    p.languages = this.usedFacets().filter(k => k.field === 'languages').map(k => k.value);
+  }
+
+  addFilter(p: any, param: string, field: string) {
+    p[param] = this.usedFacets().filter(k => k.field === field).map(k => k.op + '"' + k.value + '"');
   }
 
   selectedTenants() {
@@ -171,7 +175,7 @@ export interface Tenant {
   decodeState(s: string) {
     if (s) {
       const obj = JSON.parse(decodeURIComponent(atob(s)));
-      console.log(obj)
+      //console.log(obj)
       this.q = obj.q;
       this.usedFacets.set(obj.f);
       //this.tenants().forEach(t => {t.selected = false});

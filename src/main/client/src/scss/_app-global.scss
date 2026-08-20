@@ -407,8 +407,11 @@ fieldset {
 
   
   .app-views {
-    
     a.app-active {
      color: #00f;
     }
+  }
+
+  .app-excluded {
+    text-decoration: line-through;
   }

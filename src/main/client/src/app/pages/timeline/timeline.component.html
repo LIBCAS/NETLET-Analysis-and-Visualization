@@ -4,7 +4,7 @@
     <div style="flex: 1 30%;" class="app-filters">
       <app-facets
         [fields]="['authors', 'recipients', 'mentioned', 'identities', 'keyword_categories', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
-        [sub_fields]="{'keyword_categories': 'keywords'}" [renderLists]="false"
+        [renderLists]="true"
         [facets]="facets()" (onFiltersChanged)="onFiltersChanged($event)"></app-facets>
     </div>
   </as-split-area>

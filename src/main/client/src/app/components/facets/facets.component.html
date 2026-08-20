@@ -28,8 +28,9 @@
     </mat-expansion-panel-header>
     <mat-list class="app-facet">
       @for(k of usedFacets; track $index; let idx = $index){
-      <mat-list-item (click)="unfilter(k.field, k.value)">
-        <mat-icon>delete_forever</mat-icon> {{ 'field.' + k.field | translate}}: {{ k.value }}
+      <mat-list-item (click)="unfilter(k.field, k.value)" [class.app-excluded]="k.op === '-'">
+        <mat-icon>delete_forever</mat-icon>
+         {{ 'field.' + k.field | translate}}: {{ k.value }}
       </mat-list-item>
       }
     </mat-list>
@@ -52,41 +53,51 @@
               matInput
               (click)="clearAuto(f)"
               [formControl]="controls[f]"
-              [matAutocomplete]="auto" [matAutocompleteConnectedTo]="origin">
+              >
               
-          <div matAutocompleteOrigin #origin="matAutocompleteOrigin">
+          <!-- <div matAutocompleteOrigin #origin="matAutocompleteOrigin">
                 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectAuto($event, f)">
                   @for (option of filteredOptions; track option) {
                     <mat-option [value]="option">{{option}}</mat-option>
                   }
                 </mat-autocomplete>
-          </div>
+          </div> -->
       </mat-form-field>
     
 @if(renderLists()){
     <mat-list class="app-facet">
-      @for(k of facets()[f].buckets; track $index; let idx = $index){
+      @for(k of facetsFiltered()[f].buckets; track $index; let idx = $index){
       @if (sub_fields()[f]) {
-      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="false"
+      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true"
         [togglePosition]="'before'">
         <mat-expansion-panel-header>
           <mat-panel-title><span style="font-size: var(--mat-sys-body-medium-size); font-weight: normal;"
-              (click)="clickHeader($event, f, k.val)">{{ k.val}} ({{k.count}}) </span> </mat-panel-title>
+              (click)="clickHeader($event, f, k.val, '')">{{ k.val}} ({{k.count}}) </span> </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-list>
           @for(k2 of k[sub_fields()[f]].buckets; track $index; let idx = $index){
-          <mat-list-item (click)="filter(f, k.val)" title="{{ k2.val}} ({{k2.count}})"
+          <mat-list-item title="{{ k2.val}} ({{k2.count}})"
             (mouseover)="fireMouserOver(f, k2.val)" (mouseout)="fireMouseOut(f, k2.val)">
-            <mat-checkbox [checked]="isUsed(f, k2.val)">{{ k2.val}} ({{k2.count}}) </mat-checkbox>
+            
+            <button (click)="filter(f, k2.val, '-')" class="app-small-icon-button" mat-icon-button><mat-icon>block</mat-icon></button>
+            <span (click)="filter(f, k2.val, '')">{{ k2.val}} ({{k2.count}}) </span>
+            @if (isUsed(f, k2.val)) {
+              <button class="app-small-icon-button" mat-icon-button><mat-icon>check</mat-icon></button>
+            }
           </mat-list-item>
           }
         </mat-list>
       </mat-expansion-panel>
       } @else {
 
-      <mat-list-item (click)="filter(f, k.val)" title="{{ k.val}} ({{k.count}})" (mouseover)="fireMouserOver(f, k.val)"
+      <mat-list-item title="{{ k.val}} ({{k.count}})" (mouseover)="fireMouserOver(f, k.val)"
         (mouseout)="fireMouseOut(f, k.val)">
-        <mat-checkbox [checked]="isUsed(f, k.val)">{{ k.val}} ({{k.count}}) </mat-checkbox>
+        <button (click)="filter(f, k.val, '-')" class="app-small-icon-button" mat-icon-button><mat-icon>block</mat-icon></button>
+        <span (click)="filter(f, k.val, '')">{{ k.val}} ({{k.count}}) </span>
+        @if (isUsed(f, k.val)) {
+          <button class="app-small-icon-button" mat-icon-button><mat-icon>check</mat-icon></button>
+        }
+            
       </mat-list-item>
       }
       }

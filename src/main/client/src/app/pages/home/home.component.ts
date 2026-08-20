@@ -150,37 +150,37 @@ export class HomeComponent {
       this.state.tenants().find(st => st.val === t.val).selected = true;
     });
 
-    const usedFacets: {field: string, value: string}[] = [];
+    const usedFacets: {field: string, value: string, op: string}[] = [];
     if (this.selectedKeyword.type === 'category') {
-      usedFacets.push({field: 'keyword_categories', value: this.selectedKeyword.value});
+      usedFacets.push({field: 'keyword_categories', value: this.selectedKeyword.value, op: ''});
     } else if(this.selectedKeyword.type === 'keyword') {
-      usedFacets.push({field: 'keywords', value: this.selectedKeyword.value});
+      usedFacets.push({field: 'keywords', value: this.selectedKeyword.value, op: ''});
     }
     // if(this.searchModel().keywords) {
     //   usedFacets.push({field: 'keywords', value: this.searchModel().keywords});
     // }
-    console.log(this.selectedLanguage)
+    
     if(this.selectedLanguage) {
-      usedFacets.push({field: 'languages', value: this.selectedLanguage});
+      usedFacets.push({field: 'languages', value: this.selectedLanguage, op: ''});
     }
     if(this.searchModel().places) {
-      usedFacets.push({field: 'places', value: this.searchModel().places});
+      usedFacets.push({field: 'places', value: this.searchModel().places, op: ''});
     }
     if(this.searchModel().identities) {
-      usedFacets.push({field: 'identities', value: this.searchModel().identities});
+      usedFacets.push({field: 'identities', value: this.searchModel().identities, op: ''});
     }
     if(this.searchModel().year_from) {
-      usedFacets.push({field: 'year_from', value: this.searchModel().year_from});
+      usedFacets.push({field: 'year_from', value: this.searchModel().year_from, op: ''});
     }
     if(this.searchModel().year_to) {
-      usedFacets.push({field: 'year_to', value: this.searchModel().year_to});
+      usedFacets.push({field: 'year_to', value: this.searchModel().year_to, op: ''});
     }
     
     if(this.date_from) {
-      usedFacets.push({field: 'date_from', value: this.date_from.toISOString().substring(0,10)});
+      usedFacets.push({field: 'date_from', value: this.date_from.toISOString().substring(0,10), op: ''});
     }
     if(this.date_to) {
-      usedFacets.push({field: 'date_to', value: this.date_to.toISOString().substring(0,10)});
+      usedFacets.push({field: 'date_to', value: this.date_to.toISOString().substring(0,10), op: ''});
     }
 
     this.state.usedFacets.set([...usedFacets]);
