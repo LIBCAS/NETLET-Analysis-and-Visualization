@@ -334,17 +334,8 @@ export class MapComponent {
   minSize = 6;
   getColor(symbolSize: number) {
     // symbolSize [6,16]
-    const sat = Math.floor(12.8 * (symbolSize - 6)) + 127;
+    const sat = Math.floor(12.8 * (symbolSize - this.minSize)) + 127;
       return 'rgb('+sat+', 80, 80)';
-    // if (symbolSize > 12) {
-    //   //return '#f00'
-    // } else if (symbolSize > 8) {
-    //   //return 'rgb(255, 145, 0)'
-    //   return '#c00'
-    // } else {
-    //   //return '#00f'
-    //   return '#900'
-    // }
   }
 
   setGraphData() {
@@ -357,8 +348,8 @@ export class MapComponent {
       if (this.inLimits(letter.date_year) && letter.places && letter.origin) {
         letter.places.forEach((place: Place) => {
           if (place.latitude && !this.nodes[place.id]) {
-            this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name, count: 1 };
-            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: 1, color: '#00f', symbolSize: 6 });
+            this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name, count: 0 };
+            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: 0, color: '#00f', symbolSize: this.minSize });
           }
         });
 
@@ -416,15 +407,24 @@ export class MapComponent {
     // });
 
     let maxCount = 0;
-    
     Object.keys(this.nodes).forEach(key => {
       const node = this.nodes[key];
       nodes.filter((n:any) => n.id === key).forEach((n:any) => {
         n.count = node.count; 
         maxCount = Math.max(maxCount, node.count) -1;
       });
+    });
+    Object.keys(this.nodes).forEach(key => {
+      // nodes.filter((n:any) => n.id === key).forEach((n:any) => {
+      //   n.count = node.count; 
+      //   maxCount = Math.max(maxCount, node.count) -1;
+      // });
       nodes.filter((n:any) => n.id === key).forEach((n:any) => {
-        n.symbolSize = this.maxSize * (node.count-1) / maxCount + this.minSize;
+        if (n.count > 0) {
+          n.symbolSize = this.maxSize * (n.count-1) / maxCount + this.minSize;
+        } else {
+          n.symbolSize = this.minSize;
+        }
         n.itemStyle = {
           color: this.getColor(n.symbolSize)
         }

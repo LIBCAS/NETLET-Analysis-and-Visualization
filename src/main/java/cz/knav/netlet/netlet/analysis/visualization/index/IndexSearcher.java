@@ -206,7 +206,9 @@ public class IndexSearcher {
       if (!"global".equals(tenant)) {
         jrequest = jrequest.withFilter("tenant:" + tenant);
       }
-      
+      if (!Options.getInstance().getBoolean("includePamatky", false)) {
+        jrequest = jrequest.withFilter("-tenant:pamatky");
+      }
 
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
 
@@ -230,18 +232,23 @@ public class IndexSearcher {
 
       final TermsFacetMap tenantFacet = new TermsFacetMap("tenant")
               .setLimit(100)
-              .setMinCount(0)
+              .setMinCount(1)
               .withStatSubFacet("date_year_min", "min(date_year)")
               .withStatSubFacet("date_year_max", "max(date_year)")
               .withStatSubFacet("date_computed_min_s", "min(date_computed)")
               .withStatSubFacet("date_computed_max_s", "max(date_computed)");
 
-      final JsonQueryRequest jrequest = new JsonQueryRequest()
+      JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
               //.withFilter("status:publish")
               .withFilter("date_year:[1000 TO *]")
               .setLimit(0)
               .withFacet("tenant", tenantFacet);
+      
+      
+      if (!Options.getInstance().getBoolean("includePamatky", false)) {
+        jrequest = jrequest.withFilter("-tenant:pamatky");
+      }
 
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
 
@@ -923,6 +930,10 @@ public class IndexSearcher {
 
   public static JsonQueryRequest addFilters(HttpServletRequest request, JsonQueryRequest jrequest, String lang, boolean excludeDateRange) {
     String[] other_tenant = request.getParameterValues("other_tenant");
+    
+    if (!Options.getInstance().getBoolean("includePamatky", false)) {
+      jrequest = jrequest.withFilter("-tenant:pamatky");
+    }
     if (other_tenant != null && other_tenant.length > 1) {
       jrequest = jrequest.withFilter("tenant:(" + String.join(" ", other_tenant) + ")");
       
