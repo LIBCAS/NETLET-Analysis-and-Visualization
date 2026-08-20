@@ -27,6 +27,7 @@ export interface Tenant {
 
   public q: string = '';
   public usedFacets = signal<{ field: string, value: string, op: string }[]>([]);
+  showPeriods = true;
 
   views = [
     {

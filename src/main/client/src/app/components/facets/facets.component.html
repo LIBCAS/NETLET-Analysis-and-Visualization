@@ -64,7 +64,7 @@
           </div> -->
       </mat-form-field>
     
-@if(renderLists()){
+      
     <mat-list class="app-facet">
       @for(k of facetsFiltered()[f].buckets; track $index; let idx = $index){
       @if (sub_fields()[f]) {
@@ -102,7 +102,7 @@
       }
       }
     </mat-list>
-}
+    
   </mat-expansion-panel>
 </div>
 }

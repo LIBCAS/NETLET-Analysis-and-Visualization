@@ -94,7 +94,6 @@ export class YearsChartComponent {
 
   animation: ReturnType<typeof setInterval>;
   running: boolean = false;
-  showPeriods = true;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -172,7 +171,7 @@ export class YearsChartComponent {
     minRokWithValue = this.limits[0] + '';
     maxRokWithValue = this.limits[1] + '';
     const markAreaData: any = [];
-    if (this.showPeriods) {
+    if (this.state.showPeriods) {
 
       if (this.limits[0] < 1670) {
         markAreaData.push([
@@ -328,7 +327,7 @@ export class YearsChartComponent {
             icon: `path://M211.79883,44.20117a27.9983,27.9983,0,0,0-42.221,36.56445l-88.8125,88.8125a28.03763,28.03763,0,0,0-36.56421,2.623h-.00049a28.00012,28.00012,0,1,0,42.2212,3.03369l88.81274-88.813a27.99812,27.99812,0,0,0,36.56421-42.22071ZM78.14258,206.14258a20.00046,20.00046,0,1,1-28.28467-28.28516h-.00049a20.00063,20.00063,0,0,1,28.28516,28.28516Zm128-128a20.02563,20.02563,0,0,1-28.2832.002l-.00147-.002a20.00028,20.00028,0,1,1,28.28467,0Z`,
             
             onclick: () => {
-              this.showPeriods = !this.showPeriods;
+              this.state.showPeriods = !this.state.showPeriods;
               const ma = this.setMarkAreas();
               this.chartRok.setOption({
                 series:{
