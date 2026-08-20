@@ -26,8 +26,8 @@
 
     <app-facets
       [showTenants]="false"
-      [fields]="['recipients']"
-      [sub_fields]="{'keyword_categories': 'keywords'}"
+        [fields]="['authors', 'recipients', 'mentioned', 'keyword_categories', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
+        [sub_fields]="{'keyword_categories': 'keywords'}" 
       [facets]="facets()" (onMouserOver)="showNode($event)" (onMouseOut)="hideNode()"></app-facets>
     </div>
   </as-split-area>

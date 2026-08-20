@@ -10,8 +10,9 @@
   <div class="app-fxLayout app-row app-fill" style="position: relative;">
     <div style="flex: 1 30%;" class="app-filters">
       <app-facets
+        [fields]="['authors', 'recipients', 'mentioned', 'keyword_categories', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
+        [sub_fields]="{'keyword_categories': 'keywords'}" 
         [colored]="true"
-        [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
         [facets]="facets()"></app-facets>
 
       @if (recipients) {
