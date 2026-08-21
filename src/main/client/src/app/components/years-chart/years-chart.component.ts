@@ -382,7 +382,8 @@ export class YearsChartComponent {
       yAxis: {
         show: true,
         type: 'value',
-        interval: maxCount / 4,
+        interval: Math.floor(maxCount / 4),
+        // allowDecimals: false,
         axisLabel: {
           showMinLabel: false
         }

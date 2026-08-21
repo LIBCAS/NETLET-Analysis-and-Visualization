@@ -17,7 +17,16 @@
           (onChangeLimits)="changeLimits($event)" [withAnimation]="true" (onChangeRunning)="changeRunning($event)"></app-years-chart>
         }
       </div>
-    <mat-checkbox [(ngModel)]="showLinks" (change)="toggleLinks()">{{ 'action.showLinks' | translate}}</mat-checkbox>
+      <div>
+        <mat-checkbox [(ngModel)]="showLinks" (change)="toggleLinks()">{{ 'action.showLinks' | translate}}</mat-checkbox>
+        @if(!loading) {
+        <div style="margin-left: 60%;display: inline-block;"></div>
+        <div class="dot" [style.width]="(maxSize+minSize)+'px'" [style.height]="(maxSize+minSize)+'px'" [style.backgroundColor]="'rgb(255, 80, 80)'"></div>&#160;<span>{{ maxCount() }}</span>
+        <div class="dot" [style.width]="((maxSize+minSize)/2)+'px'" [style.height]="((maxSize+minSize)/2)+'px'" [style.backgroundColor]="'rgb(192, 80, 80)'"></div>&#160;<span>{{ halfCount() }}</span>
+        <div class="dot" [style.width]="(minSize)+'px'" [style.height]="(minSize)+'px'" [style.backgroundColor]="'rgb(127, 80, 80)'"></div>&#160;<span>1</span>
+        }
+        
+      </div>
   <div style="height: 100%; width: 100%;" id="echarts-lmap" class="app-fxFlex"></div>
   <!-- <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"
   (leafletMapReady)="onMapReady($event)">

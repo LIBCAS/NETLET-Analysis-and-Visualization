@@ -1,4 +1,4 @@
-import { Component, effect, Inject, NgZone, DOCUMENT, signal } from '@angular/core';
+import { Component, effect, Inject, NgZone, DOCUMENT, signal, computed } from '@angular/core';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 
@@ -28,6 +28,7 @@ import {
 
 
 import L, { latLng, Map, tileLayer as LtileLayer, MapOptions } from "leaflet";
+import 'leaflet.fullscreen';
 
 import { VisualMapComponentOption, GraphSeriesOption, color } from 'echarts';
 import { use, init, EChartsType, ComposeOption } from "echarts/core";
@@ -329,12 +330,14 @@ export class MapComponent {
     return n >= this.limits[0].getFullYear() && n <= this.limits[1].getFullYear();
   }
 
- 
-  maxSize = 26; 
+
+  maxCount = signal(0);
+  halfCount = computed(() => Math.floor(this.maxCount() / 2));
+  maxSize = 26;
   minSize = 6;
   getColor(symbolSize: number) {
     const sat = Math.floor(12.8 * (symbolSize - this.minSize)) + 127;
-      return 'rgb('+sat+', 80, 80)';
+    return 'rgb(' + sat + ', 80, 80)';
   }
 
   setGraphData() {
@@ -391,7 +394,7 @@ export class MapComponent {
             if (this.links[linkId].recipients) {
               this.links[linkId].recipients.concat(letter.identity_recipient)
             }
-            
+
           }
         }
       };
@@ -400,16 +403,15 @@ export class MapComponent {
     links.forEach(link => {
       link.count = this.links[link.id].count
     })
-
-    let maxCount = 0;
-    nodes.forEach((n:any) => {
+    this.maxCount.set(0);
+    nodes.forEach((n: any) => {
       const node = this.nodes[n.id];
-      n.count = node.count; 
-      maxCount = Math.max(maxCount, node.count);
+      n.count = node.count;
+      this.maxCount.set(Math.max(this.maxCount(), node.count));
     });
-    nodes.forEach((n:any) => {
+    nodes.forEach((n: any) => {
       if (n.count > 0) {
-          n.symbolSize = this.maxSize * (n.count-1) / maxCount + this.minSize;
+        n.symbolSize = this.maxSize * (n.count - 1) / this.maxCount() + this.minSize;
       } else {
         n.symbolSize = this.minSize;
       }
@@ -454,6 +456,7 @@ export class MapComponent {
 
         center: [16.726909, 49.879966],     // [lng, lat]
         zoom: 4,
+        fullscreenControl: true,
         resizeEnable: true,     // automatically handles browser window resize.
         // whether echarts layer should be rendered when the map is moving. Default is true.
         // if false, it will only be re-rendered after the map `moveend`.
@@ -462,6 +465,7 @@ export class MapComponent {
         echartsLayerInteractive: true, // Default: true
         largeMode: false               // Default: false
         // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
+
       },
       tooltip: {
         trigger: 'item',
@@ -477,7 +481,7 @@ export class MapComponent {
           // use `lmap` as the coordinate system
           coordinateSystem: 'lmap',
           data: this.graphData.nodes,
-          links: this.showLinks ? this.graphData.links : [], 
+          links: this.showLinks ? this.graphData.links : [],
 
           edgeSymbol: ['circle', 'arrow'],
           edgeSymbolSize: [2, 6],
@@ -576,6 +580,11 @@ export class MapComponent {
     const lmap = lmapComponent.getLeaflet();
 
     LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: 'OpenStreetMaps' }).addTo(lmap);
+
+
+
+    lmap.on('enterFullscreen', () => lmap.invalidateSize());
+    lmap.on('exitFullscreen', () => lmap.invalidateSize());
   }
 
   showLinks = true;
