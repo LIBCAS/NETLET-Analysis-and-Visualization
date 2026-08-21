@@ -11,11 +11,13 @@
   <as-split-area>
     <div class="app-content app-fill-w app-fill-h">
       <div class="app-timeline">
+        <h3 class="app-fill-w app-text-center">Zobrazení dopisů v chronologickém pořadí</h3>
         <div>
           <mat-radio-group [(ngModel)]="chartType" (change)="changeChartType()">
             <mat-radio-button value="line">{{ 'line' | translate}}</mat-radio-button>
             <mat-radio-button value="bar">{{ 'bar' | translate}}</mat-radio-button>
           </mat-radio-group>
+          <mat-checkbox [(ngModel)]="gridInverse" (change)="processResponse()" >inverse</mat-checkbox>
         </div>
         <div echarts style="height: 100%; width: 100%;" [initOpts]="{ locale: 'CZ' }" [options]="chartOptions"
           (chartInit)="onChartInit($event)">

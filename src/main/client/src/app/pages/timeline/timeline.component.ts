@@ -99,6 +99,7 @@ export class TimelineComponent {
   chartOptions: EChartsOption | any;
   chart: ECharts;
   chartType: string = 'bar';
+  gridInverse = false;
 
   date_facet: { buckets: JSONFacet[], after: { count: number } };
   years_facet: { buckets: JSONFacet[], after: { count: number } };
@@ -131,20 +132,10 @@ export class TimelineComponent {
         this.loading = false;
         this.letters.set([]);
         this.facets.set({});
+        this.years_facet = null;
         this.setOptions([], []);
       }
     })
-    // effect(() => {
-    //   this.tenants = this.state.selectedTenants(); 
-    //   if (this.tenants.length > 0) {
-    //     this.changeTenant();
-    //   } else {
-    //     this.loading = false;
-    //     this.letters.set([]);
-    //     this.facets.set({});
-    //     this.setOptions([]);
-    //   }
-    // })
   }
 
   ngOnInit(): void {
@@ -286,8 +277,8 @@ export class TimelineComponent {
     const dataZoomEnd = data.length > 0 ? data[data.length-1][0] : 100;
     this.chartOptions = {
       legend: {
-        show: true,
-        left: 10
+        show: false,
+        bottom: 10
       },
       tooltip: {
         trigger: 'axis',
@@ -296,26 +287,22 @@ export class TimelineComponent {
         // }
       },
       title: {
+        show: false,
         left: 'center',
         text: 'Zobrazení dopisů v chronologickém pořadí'
       },
-      // grid: {
-      //   left: 30,
-      //   right: 30,
-      //   top: 30
-      // },
 
       grid: [
         {
           left: 60,
           rigth: '50px',
-          //height: '25%'
+          height: this.gridInverse ? '20%' : 'auto', 
         },
         {
           left: 60,
-          rigth: '-50px',
-          //top: '55%',
-          //height: '35%'
+          rigth: this.gridInverse ? '50px' : '-50px',
+          top: this.gridInverse ? '40%' : '60',
+          height: this.gridInverse ? '35%' : 'auto', 
         }
       ],
 
@@ -358,15 +345,24 @@ export class TimelineComponent {
       ],
       yAxis: [
         {
+          name: 'Počet dopisů za rok',
           type: 'value',
+          axisLabel: {
+            showMinLabel: false
+          },
+           splitLine:{show: false}
         },
         {
+          name: 'Počet dopisů za den',
           gridIndex: 1,
-          //type: 'value',
           allowDecimals: false,
           minInterval: 1,
-          position: 'right',
-          //inverse: true
+          position: this.gridInverse ? 'left' : 'right',
+          inverse: this.gridInverse,
+          axisLabel: {
+            showMinLabel: false
+          },
+           splitLine:{show: false}
         }
       ],
       dataZoom: [
@@ -401,20 +397,21 @@ export class TimelineComponent {
           data: this.years_facet ? this.years_facet.buckets.map(c => [c.val, c.count]) : []
         },
         {
+          name: 'Počet dopisů za den',
           
           itemStyle: {
             color: '#00c'
           },
-
+          barWidth: '3px',
           xAxisIndex: 1,
           yAxisIndex: 1,
-          name: 'Počet dopisů za den',
           type: this.chartType + '',
           //triggerLineEvent: true,
 
           smooth: true,
           symbol: 'none',
           areaStyle: {},
+
           data: data
         },
       ]
