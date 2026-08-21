@@ -99,7 +99,7 @@ export class TimelineComponent {
   chartOptions: EChartsOption | any;
   chart: ECharts;
   chartType: string = 'bar';
-  gridInverse = false;
+  gridInverse = true;
 
   date_facet: { buckets: JSONFacet[], after: { count: number } };
   years_facet: { buckets: JSONFacet[], after: { count: number } };
@@ -282,9 +282,9 @@ export class TimelineComponent {
       },
       tooltip: {
         trigger: 'axis',
-        // position: function (pt: any) {
-        //   return [pt[0], '10%'];
-        // }
+        axisPointer: {
+          animation: false
+        }
       },
       title: {
         show: false,
@@ -375,7 +375,7 @@ export class TimelineComponent {
         {
           start: dataZoomStart,
           end: dataZoomEnd,
-          xAxisIndex: 1
+          xAxisIndex: [0,1]
         }
       ],
       series: [
@@ -398,6 +398,7 @@ export class TimelineComponent {
         },
         {
           name: 'Počet dopisů za den',
+          type: this.chartType + '',
           
           itemStyle: {
             color: '#00c'
@@ -405,7 +406,6 @@ export class TimelineComponent {
           barWidth: '3px',
           xAxisIndex: 1,
           yAxisIndex: 1,
-          type: this.chartType + '',
           //triggerLineEvent: true,
 
           smooth: true,
@@ -423,10 +423,11 @@ export class TimelineComponent {
     this.loading = true;
     this.chart.clear();
     setTimeout(() => {
-      const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
-      //  const data = this.date_facet.buckets.map(c => c.count);
-      const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'd. M. yyyy'));
-      this.setOptions(data, date);
+      this.processResponse();
+      // const data = this.date_facet.buckets.map(c => [Date.parse(c.val), c.count]);
+      // //  const data = this.date_facet.buckets.map(c => c.count);
+      // const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'd. M. yyyy'));
+      // this.setOptions(data, date);
       this.loading = false;
 
     }, 100);

@@ -382,7 +382,7 @@ export class YearsChartComponent {
       yAxis: {
         show: true,
         type: 'value',
-        interval: maxCount,
+        interval: maxCount / 4,
         axisLabel: {
           showMinLabel: false
         }

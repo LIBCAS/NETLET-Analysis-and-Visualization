@@ -235,17 +235,15 @@ export class RelationComponent {
     return t.date_computed_min.getFullYear() > this.tenant.date_computed_min.getFullYear();
   }
 
-  setPosition(h: number, w: number, count: number, maxCount: number, zone: number): { x: number, y: number, radius: number } {
-    let x = Math.random() * w,
+  setPosition(h: number, w: number, count: number, maxCount: number, zone: number, isBoth: boolean = false): { x: number, y: number, radius: number } {
+    let x = Math.random() * w *.5,
       y = Math.random() * h;
 
-    const centerX = w / 2; // - (zone * w / 10.0);
-    const centerY = h / 2;
+    const centerX = w * .5; // - (zone * w / 10.0);
+    const centerY = h * .5;
     let radius = ((maxCount - count) / (maxCount - 1));
     radius = radius * zone + (Math.random() * .1 * radius);
-    // const angle = (Math.random() * Math.PI) + (zone * Math.PI / 2.0);
-    // x = Math.cos(angle) * radius * centerX + centerX;
-    // y = Math.sin(angle) * radius * centerY + centerY;
+
 
     x = radius * centerX + centerX;
 
@@ -285,7 +283,7 @@ export class RelationComponent {
     const maxSize = 60;
     const minSize = 10;
     // let maxCount = Math.max(...this.authors.map(r => r.count), ...this.recipients.map(r => r.count));
-    let maxCount = Math.max(...this.mentioned.map(r => r.count));
+    let maxCount = Math.max(...this.recipients.map(r => r.count));
     const excluded = this.config.excluded_identities();
     this.recipients.forEach((identity: JSONFacet) => {
       if (this.allIncluded || !excluded.includes(identity.val)) {
@@ -302,7 +300,7 @@ export class RelationComponent {
         }
       }
       
-      const pos = this.setPosition(h, w, identity.count, maxCount, zone);
+      const pos = this.setPosition(h, w, identity.count, maxCount, zone, category === 'both');
       nodes.push({
         id: identity.val,
         name: identity.val,

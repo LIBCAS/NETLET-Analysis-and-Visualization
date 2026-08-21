@@ -330,7 +330,7 @@ export class MapComponent {
   }
 
  
-  maxSize = 16; 
+  maxSize = 26; 
   minSize = 6;
   getColor(symbolSize: number) {
     const sat = Math.floor(12.8 * (symbolSize - this.minSize)) + 127;
