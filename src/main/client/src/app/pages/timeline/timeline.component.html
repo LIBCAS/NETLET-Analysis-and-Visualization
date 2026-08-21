@@ -17,7 +17,7 @@
             <mat-radio-button value="line">{{ 'line' | translate}}</mat-radio-button>
             <mat-radio-button value="bar">{{ 'bar' | translate}}</mat-radio-button>
           </mat-radio-group>
-          <mat-checkbox [(ngModel)]="gridInverse" (change)="processResponse()" >inverse</mat-checkbox>
+          <mat-checkbox [(ngModel)]="gridInverse" (change)="processResponse()" >dva grafy</mat-checkbox>
         </div>
         <div echarts style="height: 100%; width: 100%;" [initOpts]="{ locale: 'CZ' }" [options]="chartOptions"
           (chartInit)="onChartInit($event)">

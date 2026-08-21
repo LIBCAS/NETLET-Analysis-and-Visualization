@@ -162,7 +162,7 @@ export class TimelineComponent {
     this.chart = e;
     this.chart.on('dataZoom', (params: any) => {
       var option: any = this.chart.getOption();
-
+//console.log(option)
 
   // var axis = myChart.getModel().option.xAxis[0];
   // var starttime = axis.data[axis.rangeStart];
@@ -336,7 +336,7 @@ export class TimelineComponent {
           type: 'time',
           //type: 'category',
           //data: date,
-          boundaryGap: true,
+          //boundaryGap: true,
           triggerEvent: true,
           axisLabel: {
             hideOverlap: true // Prevents dense labels from crashing into each other
@@ -370,7 +370,7 @@ export class TimelineComponent {
           type: 'inside',
           start: dataZoomStart,
           end: dataZoomEnd,
-          xAxisIndex: [0,1]
+          //xAxisIndex: [0,1]
         },
         {
           start: dataZoomStart,
