@@ -69,9 +69,7 @@ public class DataServlet extends HttpServlet {
         GET_TENANTS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                
-                JSONObject ret = IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant");
-                return ret;
+                return IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant");
             }
         },
         INDEX_HIKO {
@@ -181,60 +179,43 @@ public class DataServlet extends HttpServlet {
         MAP{
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = new JSONObject();
-                ret = IndexSearcher.getMapLetters(request);
-                
-                return ret;
+                return IndexSearcher.getMapLetters(request);
             }
         },
         IDENTITIES{
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = new JSONObject();
-                ret = IndexSearcher.identityLetters(request);  
-                
-                return ret;
+                return IndexSearcher.identityLetters(request);  
             }
         },
         RELATION{
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = new JSONObject();
-                ret = IndexSearcher.relation(request);
-                
-                return ret;
+                return IndexSearcher.relation(request);
             }
         },
         KEYWORDS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = IndexSearcher.keywords(request);
-                
-                return ret;
+                return IndexSearcher.keywords(request);
             }
         },
         GET_LETTER {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = IndexSearcher.getLetter(request.getParameter("id"));
-                
-                return ret;
+                return IndexSearcher.getLetter(request.getParameter("id"));
             }
         },
         GET_PLACE {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = IndexSearcher.getPlace(request.getParameter("id"));
-                
-                return ret;
+                return IndexSearcher.getPlace(request.getParameter("id"));
             }
         },
         GET_IDENTITY {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = IndexSearcher.getIdentity(request.getParameter("id"));
-                
-                return ret;
+                return IndexSearcher.getIdentity(request.getParameter("id"));
             }
         },
         SEARCH_KEYWORDS {
@@ -304,26 +285,19 @@ public class DataServlet extends HttpServlet {
         PERIODS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = new JSONObject();
-                ret = IndexSearcher.periods(request);
-                
-                return ret;
+                return IndexSearcher.periods(request);
             }
         },
         PROFESSIONS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = new JSONObject();
-                    ret = IndexSearcher.professions(request);
-                return ret;
+                return IndexSearcher.professions(request);
             }
         },
         TIMELINE {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                JSONObject ret = new JSONObject();
-                    ret = IndexSearcher.getTimeLine(request);
-                return ret;
+                return IndexSearcher.timeline(request);
             }
         }; 
 

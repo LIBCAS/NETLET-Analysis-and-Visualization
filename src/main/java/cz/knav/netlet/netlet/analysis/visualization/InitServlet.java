@@ -1,6 +1,5 @@
 package cz.knav.netlet.netlet.analysis.visualization;
 
-import cz.knav.netlet.netlet.analysis.visualization.index.HikoIndexer;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -11,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  *

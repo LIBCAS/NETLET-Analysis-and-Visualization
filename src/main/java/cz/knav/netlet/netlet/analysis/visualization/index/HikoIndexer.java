@@ -18,7 +18,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -30,7 +29,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.InputStreamResponseParser;
@@ -325,7 +323,6 @@ public class HikoIndexer {
             .replace("{tenant}", t)
             + "/letter/" + id;
 
-    int indexed = 0;
     String r = "";
     try (HttpClient httpclient = HttpClient
             .newBuilder()
@@ -377,7 +374,6 @@ public class HikoIndexer {
 //                .newBuilder()
 //                .build();
     int indexed = 0;
-    String r = "";
     try (HttpClient httpclient = HttpClient
             .newBuilder()
             .build()) {
@@ -776,10 +772,10 @@ public class HikoIndexer {
 
             if ("all".equals(type) || "places".equals(type)) {
 
-                JSONObject places = new JSONObject();
+                JSONObject jplaces = new JSONObject();
                 indexGlobalPlaces();
-                indexTenantPlaces(client, places, tenant);
-                ret.put("places", places);
+                indexTenantPlaces(client, jplaces, tenant);
+                ret.put("places", jplaces);
                 client.commit("places");
             }
 
@@ -1014,9 +1010,7 @@ public class HikoIndexer {
         JSONObject ret = new JSONObject();
         LOGGER.log(Level.INFO, "Indexing HIKO global PLACES");
         try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
-            JSONArray tenants = Options.getInstance().getJSONObject("test_mappings").names();
             indexGlobalPlaces(client, ret);
-
             client.commit("places");
         } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
             LOGGER.log(Level.SEVERE, "Error indexing global places", ex);

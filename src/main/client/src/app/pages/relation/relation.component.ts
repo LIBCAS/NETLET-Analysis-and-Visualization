@@ -166,7 +166,7 @@ export class RelationComponent {
       if (this.tenant.val !== t.val)
       t.selected = false
     });
-    // k.selected = !k.selected;
+    
     k.selected = true;
     //set date_range
     this.limits = this.state.getTenantsRange();

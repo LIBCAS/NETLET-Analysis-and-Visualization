@@ -14,7 +14,7 @@
             @for(k of state.tenants(); track $index; let idx = $index;){
               @let is = intersection(k);
               <mat-list-item (click)="clickTenant(k)">
-                <mat-checkbox [disabled]="k.val === tenant.val || is.start === 0"
+                <mat-checkbox [disabled]="k.val === tenant.val || is.start === 0 || k.selected"
                   [checked]="k.selected || k.val === tenant.val">{{ 'catalog.' + k.val | translate}} 
                   {{k.date_computed_min.getFullYear()}}–{{k.date_computed_max.getFullYear()}} ({{k.count}}) </mat-checkbox>
               </mat-list-item>

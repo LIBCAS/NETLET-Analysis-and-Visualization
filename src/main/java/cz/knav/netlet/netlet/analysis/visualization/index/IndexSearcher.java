@@ -215,8 +215,6 @@ public class IndexSearcher {
       NamedList<Object> resp = solr.request(jrequest, "hiko");
       InputStream is = (InputStream) resp.get("stream");
       String respo = IOUtils.toString(is, "UTF-8");
-//      ret = new JSONObject(respo).getJSONObject("facets")
-//              .getJSONObject("tenant").getJSONArray("buckets").getJSONObject(0);
       ret = new JSONObject(respo).getJSONObject("facets");
 
     } catch (Exception ex) {
@@ -340,7 +338,7 @@ public class IndexSearcher {
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
               .setSort("date_computed asc")
-              .withFilter("date_year:[1500 TO *]")
+              //.withFilter("date_year:[1500 TO *]")
               //.withFilter("status:publish")
               //.withFilter("identity_mentioned:*")
               .returnFields("tenant,date_year,date_computed,identity_name,identity_recipient,identity_author,identity_mentioned,places:[json],identities:[json],keywords_category_cs,keywords_cs")
@@ -500,16 +498,6 @@ public class IndexSearcher {
         date_range = "1000,2025";
       }
       String[] years = date_range.split(",");
-//      RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
-//              .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
-//              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
-
-      RangeFacetMap rangeFacet = new RangeFacetMap("date_year", 
-              Integer.parseInt(years[0].split("-")[0]),
-              Integer.parseInt(years[1].split("-")[0]),
-              1)
-              .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
-              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
       
       RangeFacetMap yearsFacet = new RangeFacetMap("date_year", Integer.parseInt(years[0].substring(0, 4)), Integer.parseInt(years[1].substring(0, 4)), 1)
             .withDomain(new DomainMap().withTagsToExclude("ffyear_range"))
@@ -518,7 +506,7 @@ public class IndexSearcher {
       String rowsP = request.getParameter("rows");
       int rows = 0;
       if (rowsP != null && !rowsP.isBlank()) {
-        rows = Integer.valueOf(rowsP);
+        rows = Integer.parseInt(rowsP);
       }
 
       JsonQueryRequest jrequest = new JsonQueryRequest()
@@ -580,17 +568,8 @@ public class IndexSearcher {
       String rowsP = request.getParameter("rows");
       int rows = 0;
       if (rowsP != null && !rowsP.isBlank()) {
-        rows = Integer.valueOf(rowsP);
+        rows = Integer.parseInt(rowsP);
       }
-
-      final TermsFacetMap keywords_csFacet = new TermsFacetMap("keywords_" + lang)
-              .setLimit(1000)
-              .setMinCount(1);
-      final TermsFacetMap categoriesFacet = new TermsFacetMap("keywords_category_" + lang)
-              .setLimit(1000)
-              .setMinCount(1)
-              //.setSort("index")
-              .withSubFacet("keywords", keywords_csFacet);
 
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
@@ -622,8 +601,6 @@ public class IndexSearcher {
       NamedList<Object> resp = solr.request(jrequest, "hiko");
       InputStream is = (InputStream) resp.get("stream");
       ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
-      jrequest = null;
-      resp = null;
       solr.close();
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
@@ -651,7 +628,7 @@ public class IndexSearcher {
       String rowsP = request.getParameter("rows");
       int rows = 0;
       if (rowsP != null && !rowsP.isBlank()) {
-        rows = Integer.valueOf(rowsP);
+        rows = Integer.parseInt(rowsP);
       }
       
       final TermsFacetMap authorFacet = new TermsFacetMap("identity_author")
@@ -707,9 +684,6 @@ public class IndexSearcher {
         date_range = "1000,2025";
       }
       String[] years = date_range.split(",");
-//      RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1YEAR")
-//              .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
-//              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
       
       RangeFacetMap yearsFacet = new RangeFacetMap("date_year", Integer.parseInt(years[0].substring(0, 4)), Integer.parseInt(years[1].substring(0, 4)), 1)
             .withDomain(new DomainMap().withTagsToExclude("ffyear_range"))
@@ -759,7 +733,7 @@ public class IndexSearcher {
     return ret;
   }
 
-  public static JSONObject getTimeLine(HttpServletRequest request) {
+  public static JSONObject timeline(HttpServletRequest request) {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
@@ -768,37 +742,17 @@ public class IndexSearcher {
         lang = "cs";
       }
 
-      String date_range = request.getParameter("date_range");
-      if (date_range == null || date_range.isBlank()) {
-        date_range = "1000,2025";
-      }
-      String[] years = date_range.split(",");
-//      RangeFacetMap rangeFacet = new RangeFacetMap("date_computed_range", dtformatter.parse(years[0]), dtformatter.parse(years[1]), "+1MONTH")
-//              .withDomain(new DomainMap().withTagsToExclude("ffdate_range"))
-//              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
-      //QueryFacetMap qfm = new QueryFacetMap("date_year:[1000 TO 2000]").withSubFacet("date_computed_range", rangeFacet);
-
       String rowsP = request.getParameter("rows");
       int rows = 0;
       if (rowsP != null && !rowsP.isBlank()) {
-        rows = Integer.valueOf(rowsP);
+        rows = Integer.parseInt(rowsP);
       }
       String offsetP = request.getParameter("offset");
       int offset = 0;
       if (offsetP != null && !offsetP.isBlank()) {
-        offset = Integer.valueOf(offsetP);
+        offset = Integer.parseInt(offsetP);
       }
 
-      final TermsFacetMap keywordsFacet = new TermsFacetMap("keywords_" + lang)
-              .setSort("index")
-              .setLimit(1000)
-              .setMinCount(1);
-
-      final TermsFacetMap keywordsCategoriesFacet = new TermsFacetMap("keywords_category_" + lang)
-              .setLimit(1000)
-              .withDomain(new DomainMap().withTagsToExclude("ffkeywords"))
-              .withSubFacet("keywords", keywordsFacet)
-              .setMinCount(1);
 
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
@@ -806,8 +760,6 @@ public class IndexSearcher {
               //.withFilter("-date_year:0")
               .setLimit(rows)
               .setOffset(offset)
-              //                    .withFilter("identity_recipient:*")
-              //                    .withFilter("identity_author:*")
               .setSort("date_year asc,date_computed asc")
               .returnFields("id,letter_id,tenant,date_computed,date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs");
 
@@ -818,8 +770,6 @@ public class IndexSearcher {
       NamedList<Object> resp = solr.request(jrequest, "hiko");
       InputStream is = (InputStream) resp.get("stream");
       ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
-      jrequest = null;
-      resp = null;
       solr.close();
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
@@ -1075,6 +1025,9 @@ public class IndexSearcher {
    * @param prefix
    * @param tenant
    * @param lang
+   * @param field
+   * @param fl
+   * @param collapse
    * @return
    */
   public static JSONObject searchKeywords(String prefix, String tenant, String lang, String field, String fl, boolean collapse) {
@@ -1136,11 +1089,8 @@ public class IndexSearcher {
   }
 
   /**
-   * Search places for autocomplete
+   * Search langs for autocomplete
    *
-   * @param prefix
-   * @param tenant
-   * @param lang
    * @return
    */
   public static JSONObject searchLanguages() {
