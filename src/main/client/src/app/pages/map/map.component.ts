@@ -447,6 +447,7 @@ export class MapComponent {
   }
 
   setMap() {
+    const d = this.document.getElementById('echarts-lmap');
     // this.map.addLayer(this.linkLayer);
     // this.map.addLayer(this.nodeLayer);
     this.graphOptions = {
@@ -457,6 +458,8 @@ export class MapComponent {
         center: [16.726909, 49.879966],     // [lng, lat]
         zoom: 4,
         fullscreenControl: true,
+        // Expand the ECharts host together with the nested Leaflet container.
+        fullscreenControlOptions: { fullscreenElement: d },
         resizeEnable: true,     // automatically handles browser window resize.
         // whether echarts layer should be rendered when the map is moving. Default is true.
         // if false, it will only be re-rendered after the map `moveend`.
@@ -514,7 +517,6 @@ export class MapComponent {
       ]
     }
 
-    const d = document.getElementById("echarts-lmap");
     if (!this.graphChart) {
       this.graphChart = init(d);
     }
@@ -582,9 +584,12 @@ export class MapComponent {
     LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: 'OpenStreetMaps' }).addTo(lmap);
 
 
-
-    lmap.on('enterFullscreen', () => lmap.invalidateSize());
-    lmap.on('exitFullscreen', () => lmap.invalidateSize());
+    lmap.on('enterFullscreen', () => {
+      lmap.invalidateSize();
+    });
+    lmap.on('exitFullscreen', () => {
+      lmap.invalidateSize();
+    });
   }
 
   showLinks = true;
