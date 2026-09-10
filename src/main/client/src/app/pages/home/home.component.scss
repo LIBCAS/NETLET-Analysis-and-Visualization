@@ -1,7 +1,7 @@
 .app-home-layout {
     display: flex;
     flex-wrap: wrap;
-    padding: 20px 20px 100px;
+    padding: 20px 20px 20px;
     justify-content: center;
 
     mat-card {
@@ -26,7 +26,7 @@
 .app-home-form {
     display: flex;
     justify-content: center;
-    padding: 20px 20px 100px;
+    padding: 20px 20px 20px;
 
     mat-card {
         width: 90%;

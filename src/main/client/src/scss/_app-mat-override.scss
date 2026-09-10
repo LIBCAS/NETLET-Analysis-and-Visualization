@@ -56,10 +56,13 @@
 
   @include mat.card-overrides((
     elevated-container-shape: 0px,
-    outlined-container-shape: 0px
+    outlined-container-shape: 0px,
+    elevated-container-elevation: var(--mat-sys-level3)
   ));
 
 }
+
+
 
 @for $i from 0 through 5 {
     mat-card.mat-elevation-z#{$i} {
