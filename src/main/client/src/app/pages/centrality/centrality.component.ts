@@ -455,6 +455,7 @@ export class CentralityComponent {
         y: pos.y,
         // radiusAxis: pos.radius,
         // angleAxis: pos.angle,
+        draggable: true,
         itemStyle: {
           color: this.config.colors['mentioned']
         }
@@ -474,6 +475,7 @@ export class CentralityComponent {
           x: pos.x,
           y: pos.y,
           // radiusAxis: pos.radius,
+        draggable: true,
           // angleAxis: pos.angle,
           itemStyle: {
             color: this.config.colors['recipient']
@@ -496,6 +498,7 @@ export class CentralityComponent {
           y: pos.y,
           // radiusAxis: pos.radius,
           // angleAxis: pos.angle,
+        draggable: true,
           itemStyle: {
             color: this.config.colors['author']
           }
