@@ -515,6 +515,9 @@ public class IndexSearcher {
               .setLimit(rows)
               .withFilter("origin:* OR destination:*")
               .returnFields("id,letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,origin,destination,origin_id,destination_id,origin_name,destination_name,places:[json],identities:[json],keywords_category_cs,keywords_cs")
+              
+              .withParam("stats", "true")
+              .withParam("stats.field", new String[]{"latitude","longitude"})
               .withFacet("years", yearsFacet)
               .withFacet("keywords_cs", keywords_csFacet)
               .withFacet("keyword_categories", categories_csFacet)

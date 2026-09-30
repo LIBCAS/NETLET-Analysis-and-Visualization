@@ -190,7 +190,6 @@ export class LetterComponent {
 
   setMap() {
     const center = this.graphData.bounds.getCenter();
-    console.log(center)
     this.graphOptions = {
       lmap: {
         // See https://leafletjs.com/reference.html#map-option for details

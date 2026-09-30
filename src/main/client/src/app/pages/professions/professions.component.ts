@@ -361,6 +361,7 @@ export class ProfessionsComponent {
           name: identity.val,
           value: identity.count,
           category: 'authors',
+          draggable: true,
           symbolSize: maxSize * identity.count / maxCount + minSize,
           x: Math.random() * w,
           y: Math.random() * h
@@ -375,6 +376,7 @@ export class ProfessionsComponent {
           name: identity.val,
           value: identity.count,
           category: 'recipients',
+          draggable: true,
           symbolSize: maxSize * identity.count / maxCount + minSize,
           x: Math.random() * w,
           y: Math.random() * h

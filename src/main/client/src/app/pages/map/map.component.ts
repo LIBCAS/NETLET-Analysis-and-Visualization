@@ -455,8 +455,8 @@ export class MapComponent {
         // See https://leafletjs.com/reference.html#map-option for details
         // NOTE: note that this order is reversed from Leaflet's [lat, lng]!
 
-        center: [16.726909, 49.879966],     // [lng, lat]
-        zoom: 4,
+        //center: [16.726909, 49.879966],     // [lng, lat]
+        //zoom: 4,
         fullscreenControl: true,
         // Expand the ECharts host together with the nested Leaflet container.
         fullscreenControlOptions: { fullscreenElement: d },
@@ -581,8 +581,27 @@ export class MapComponent {
     // @ts-ignore
     const lmap = lmapComponent.getLeaflet();
 
-    LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: 'OpenStreetMaps' }).addTo(lmap);
+    //LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OpenStreetMaps' }).addTo(lmap);
 
+    const osm = LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OpenStreetMaps' });
+    const carto = LtileLayer('https://basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png?key=cb1_44kb_1_fcb333c51ecf506f887c03b7', { attribution: 'OpenStreetMaps, CARTO' });
+    const Historical = LtileLayer('https://tiles.traveltimeapp.com/osm-bright/{z}/{x}/{y}.png?key=d7b19cdc', { attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> | Created with <a href="https://traveltime.com" target="_blank">TravelTime API</a>' });
+
+    
+    var baseMaps = {
+        "OpenStreetMap": osm,
+        "CARTO": carto,
+        "Historical": Historical
+    };
+    osm.addTo(lmap);
+    var layerControl = L.control.layers(baseMaps).addTo(lmap);
+    
+
+
+setTimeout(() => {
+  lmap.fitBounds(this.getBounds(), {paddingBottomRight: [500,100]});
+}, 100)
+    
 
     lmap.on('enterFullscreen', () => {
       lmap.invalidateSize();
@@ -599,6 +618,19 @@ export class MapComponent {
         links: this.showLinks ? this.graphData.links : []
       }
     })
+  }
+
+  getBounds() {
+    let latMax = this.solrResponse.stats.stats_fields.latitude.max;
+    let latMin = this.solrResponse.stats.stats_fields.latitude.min;
+    let lngMax = this.solrResponse.stats.stats_fields.longitude.max;
+    let lngMin = this.solrResponse.stats.stats_fields.longitude.min;
+
+    
+
+    const southWest = L.latLng(latMin, lngMin);
+    const northEast = L.latLng(latMax, lngMax);
+    return L.latLngBounds(southWest, northEast);
   }
 
 }

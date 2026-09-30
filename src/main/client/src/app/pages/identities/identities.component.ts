@@ -310,6 +310,7 @@ export class IdentitiesComponent {
         symbolSize: maxSize * identity.count / maxCount + minSize,
         x: pos.x,
         y: pos.y,
+        draggable: true,
         itemStyle: {
           color: this.config.colors['author']
         }
@@ -341,6 +342,7 @@ export class IdentitiesComponent {
           symbolSize: maxSize * identity.count / maxCount + minSize,
           x: pos.x,
           y: pos.y,
+          draggable: true,
           itemStyle: {
             color: this.config.colors['recipient']
           }

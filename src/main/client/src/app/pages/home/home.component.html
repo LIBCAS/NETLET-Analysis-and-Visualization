@@ -1,7 +1,10 @@
 <div class="app-fill-h" style="overflow-y: scroll;">
 <div class="app-home-form">
-    <mat-card class="  app-gap-4">
-        <mat-form-field appearance="outline">
+    <mat-card class="app-gap-4">
+
+        <div class="app-fxLayout app-gap-4">
+
+        <mat-form-field class="app-fill-w" style="margin-right:5px;" appearance="outline">
             <mat-label>{{ 'tenants' | translate}}</mat-label>
             <mat-select multiple="true" [formField]="searchForm.tenants">
                 @for (t of state.tenants(); track t) {
@@ -9,8 +12,6 @@
                 }
             </mat-select>
         </mat-form-field>
-
-        <div class="app-fxLayout app-gap-4">
 
           <mat-form-field class="app-fill-w" style="margin-right:5px;" appearance="outline">
             <input matInput [matDatepicker]="datum_od" [(ngModel)]="date_from" [placeholder]="('field.date_from' | translate)"
@@ -22,6 +23,7 @@
                 </mat-datepicker-actions>
             </mat-datepicker>
           </mat-form-field>
+          
           <mat-form-field class="app-fill-w" style="margin-left:5px;" appearance="outline">
             <input matInput [matDatepicker]="datum_do" [(ngModel)]="date_to" [placeholder]="'field.date_to' | translate" (click)="datum_do.open()">
             <mat-datepicker-toggle matSuffix [for]="datum_do"></mat-datepicker-toggle>

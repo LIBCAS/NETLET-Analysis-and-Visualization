@@ -306,6 +306,7 @@ export class RelationComponent {
         name: identity.val,
         value: identity.count,
         category: category,
+        draggable: true,
         symbolSize: maxSize * identity.count / maxCount + minSize,
         x: pos.x,
         y: pos.y,
