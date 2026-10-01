@@ -1,5 +1,5 @@
 
-import { Component } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,12 +19,15 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent {
+
+  showViews = computed<boolean>(() => !this.state.isHome());
+
   constructor(
     private router: Router,
     public dialog: MatDialog,
     public translator: TranslateService,
     public state: AppState
-  ) { }
+  ) {}
 
   onLanguageChanged(lang: string) {
     //localStorage.setItem('lang', lang);

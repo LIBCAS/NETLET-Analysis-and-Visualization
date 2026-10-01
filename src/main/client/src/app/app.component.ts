@@ -24,24 +24,10 @@ export class AppComponent {
     public state: AppState
   ){}
 
-  // ngOnInit() {
-  //   const urlParams = new URLSearchParams(this.document.location.search);
-  //   const tenant = urlParams.get('tenant');
-  //   let mainTenant = false;
-  //   if (tenant) {
-  //     tenant.split(',').forEach(tenant =>  {
-  //       const st = this.state.tenants.find(t => t.val === tenant);
-  //       if (st) {
-  //         st.selected = true;
-  //       }
-  //     });
-  //     this.state.setSelectedTenants();
-  //   }
-  // }
-
   ngOnInit() {
     const s = this.route.queryParams.pipe(
       switchMap(p => {
+        this.state.isHome.set(false);
         this.processParams(p);
         return of(true);
       })

@@ -15,14 +15,16 @@
         }
       </span>
     } -->
-    <button mat-button [matMenuTriggerFor]="views"  (menuOpened)="op()">{{'views' | translate}}</button>
-    <mat-menu #views="matMenu" class="app-views">
-      @for (t of state.views; track t) {
-        @if (t.route) {
-          <a mat-menu-item [class.app-active]="state.currentView?.route === t.route" [routerLink]="[t.route]" queryParamsHandling="preserve" [title]="t.text" (click)="state.currentView = t">{{ 'home.' + t.header + '.header' | translate}}</a>
+      @if (showViews()) {
+      <button mat-button [matMenuTriggerFor]="views"  (menuOpened)="op()">{{'views' | translate}}</button>
+      <mat-menu #views="matMenu" class="app-views">
+        @for (t of state.views; track t) {
+          @if (t.route) {
+            <a mat-menu-item [class.app-active]="state.currentView?.route === t.route" [routerLink]="[t.route]" queryParamsHandling="preserve" [title]="t.text" (click)="state.currentView = t">{{ 'home.' + t.header + '.header' | translate}}</a>
+          }
         }
+      </mat-menu>
       }
-    </mat-menu>
 
     <!-- <button mat-button [matMenuTriggerFor]="tenants" (menuOpened)="op()">{{'tenants' | translate}}</button>
     <mat-menu #tenants="matMenu">

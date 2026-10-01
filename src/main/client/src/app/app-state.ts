@@ -18,6 +18,7 @@ export interface Tenant {
   providedIn: 'root'
 }) export class AppState {
 
+  public isHome = signal<boolean>(false);
   public showInfo = signal<boolean>(false);
   public tenants = signal<Tenant[]>([]);
   public places = signal<any>({});
@@ -168,6 +169,10 @@ export interface Tenant {
         ts.forEach(t => {t.selected = false});
         return [...ts]
       })
+  }
+
+  hasStateInUrl() {
+    return this.q || this.usedFacets().length > 0 || this.tenants().filter(t => t.selected).length > 0;
   }
 
   encodeState() {

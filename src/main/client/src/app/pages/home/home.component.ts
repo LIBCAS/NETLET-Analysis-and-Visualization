@@ -80,11 +80,13 @@ export class HomeComponent {
   }
 
   ngOnInit() {
+    this.state.isHome.set(true);
     this.state.tenants().forEach(t => {t.available = true});
     const mins: number[] = this.state.tenants().map(t => t.date_year_min);
     const maxs: number[] = this.state.tenants().map(t => t.date_year_max);
     this.year_min = new Date(Math.min(...mins), 0, 1);
     this.year_max = new Date(Math.max(...maxs), 0, 1);
+    this.searchForm().reset();
   }
 
   doDateFromByYear(e: any) {
@@ -140,7 +142,6 @@ export class HomeComponent {
   }
 
   setKeyword(e: any) {
-    console.log(e)
     this.selectedKeyword = {type: e.option.value.type, value: e.option.value.value}
   }
 
@@ -188,7 +189,19 @@ export class HomeComponent {
 
   search() {
     this.setFilters();
-    this.router.navigate(['timeline'], { queryParams: { s: this.state.encodeState() } });
+    if (this.state.hasStateInUrl()) {
+      this.router.navigate(['timeline'], { queryParams: { s: this.state.encodeState() } });
+    }
+    
   }
+
+  gotoView(view: string) {
+    this.setFilters();
+    if (this.state.hasStateInUrl()) {
+      this.router.navigate([view], { queryParams: { s: this.state.encodeState() } });
+    }
+    
+  }
+
 
 }

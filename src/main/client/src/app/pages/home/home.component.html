@@ -100,7 +100,8 @@
 
 
         <div class="app-text-right">
-            <button matIconButton [title]="'action.search' | translate" (click)="search()"><mat-icon>search</mat-icon></button>
+            <button matIconButton [title]="'action.search' | translate" 
+                [disabled]="!searchForm().dirty()" (click)="search()"><mat-icon>search</mat-icon></button>
         </div>
         
     </mat-card>
@@ -120,7 +121,7 @@
             </p>
         </mat-card-content>
         <mat-card-actions align="end" class="app-mat-card-actions">
-            <a [routerLink]="['/'+card.route]" queryParamsHandling="preserve" [disabled]="card.route === ''"
+            <a (click)="gotoView(card.route)"  [disabled]="card.route === '' || !searchForm().dirty()"
                 mat-raised-button>{{ 'View' | translate }}</a>
         </mat-card-actions>
     </mat-card>
