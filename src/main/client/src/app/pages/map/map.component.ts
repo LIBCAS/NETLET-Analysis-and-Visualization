@@ -205,7 +205,7 @@ export class MapComponent {
       }
 
       this.setGraphData();
-      if (withMap) {
+      if (withMap && !this.graphChart) {
         this.setMap();
       } else {
         this.graphChart.setOption({
@@ -216,6 +216,9 @@ export class MapComponent {
             }
           ]
         });
+        setTimeout(() => {
+          this.fitBounds();
+        }, 100);
       }
 
       this.loading = false;
@@ -344,100 +347,57 @@ export class MapComponent {
 
     this.nodes = {};
     const nodes: any = [];
+    this.maxCount.set(this.solrResponse.facets.places.buckets[0].count);
+    this.solrResponse.facets.places.buckets.forEach((f: { val: string, count: number }) => {
+      const place = this.state.places()[f.val];
+      let symbolSize = this.minSize;
+      if (f.count > 0) {
+        symbolSize = this.maxSize * (f.count) / this.maxCount() + this.minSize;
+      } else {
+        symbolSize = this.minSize;
+      }
+      const itemStyle = {
+        color: this.getColor(symbolSize)
+      }
+
+      this.nodes[f.val] = { coords: [place.latitude, place.longitude], name: place.name, count: f.count };
+      nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: f.count, color: '#00f', symbolSize: symbolSize, itemStyle });
+
+    });
+
     this.links = {};
     const links: any[] = [];
-    this.solrResponse.response.docs.forEach((letter: Letter) => {
-      if (this.inLimits(letter.date_year) && letter.places && letter.origin) {
-        letter.places.forEach((place: Place) => {
-          if (place.latitude && !this.nodes[place.id]) {
-            this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name, count: 0 };
-            nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: 0, color: '#00f', symbolSize: this.minSize });
+    this.solrResponse.facets.links.buckets.forEach((f: { val: string, count: number }) => {
+      const parts = f.val.split('-');
+      const linkId = f.val;
+      const place_origin = this.state.places()[parts[0]];
+      const place_destination = this.state.places()[parts[1]];
+      if (place_origin && place_destination && place_origin.latitude && place_destination.latitude) {
+        this.links[linkId] = {
+          node1: [place_origin.latitude, place_origin.longitude],
+          node2: [place_destination.latitude, place_destination.longitude],
+          authors: [],
+          recipients: [],
+          count: f.count,
+          letters: []
+        };
+        links.push({
+          id: linkId,
+          source: parts[0],
+          target: parts[1],
+          authors: [],
+          recipients: [],
+          label: place_origin.name + ' > ' + place_destination.name,
+          labelReversed: place_destination.name + ' > ' + place_origin.name,
+          count: this.links[linkId].count,
+          lineStyle: {
+            color: this.config.tenant_colors[1],
+            width: 1,
+            opacity: 1
           }
         });
-
-        const linkId = letter.origin_id + '_' + letter.destination_id;
-        const place_origin = letter.places.find(p => p.role === 'origin');
-        const place_destination = letter.places.find(p => p.role === 'destination');
-
-        if (place_origin && place_destination && place_origin.latitude && place_destination.latitude) {
-          this.nodes[place_origin.id].count = this.nodes[place_origin.id].count + 1;
-          this.nodes[place_destination.id].count = this.nodes[place_destination.id].count + 1;
-
-          if (!this.links[linkId]) {
-            this.links[linkId] = {
-              node1: [place_origin.latitude, place_origin.longitude],
-              node2: [place_destination.latitude, place_destination.longitude],
-              authors: letter.identity_author ? letter.identity_author : [],
-              recipients: letter.identity_recipient ? letter.identity_recipient : [],
-              count: 1,
-              letters: [letter]
-            };
-            links.push({
-              id: linkId,
-              source: letter.origin_id,
-              target: letter.destination_id,
-              authors: letter.identity_author,
-              recipients: letter.identity_recipient,
-              label: place_origin.name + ' > ' + place_destination.name,
-              labelReversed: place_destination.name + ' > ' + place_origin.name,
-              count: this.links[linkId].count,
-              lineStyle: {
-                color: this.config.tenant_colors[letter.tenant],
-                width: 1,
-                opacity: 1
-              }
-            });
-          } else {
-            this.links[linkId].count++;
-            this.links[linkId].letters.push(letter);
-            this.links[linkId].authors.concat(letter.identity_author);
-            if (this.links[linkId].recipients) {
-              this.links[linkId].recipients.concat(letter.identity_recipient)
-            }
-
-          }
-        }
-      };
-
-    });
-    links.forEach(link => {
-      link.count = this.links[link.id].count
-    })
-    this.maxCount.set(0);
-    nodes.forEach((n: any) => {
-      const node = this.nodes[n.id];
-      n.count = node.count;
-      this.maxCount.set(Math.max(this.maxCount(), node.count));
-    });
-    nodes.forEach((n: any) => {
-      if (n.count > 0) {
-        n.symbolSize = this.maxSize * (n.count - 1) / this.maxCount() + this.minSize;
-      } else {
-        n.symbolSize = this.minSize;
-      }
-      n.itemStyle = {
-        color: this.getColor(n.symbolSize)
       }
     });
-    // Object.keys(this.nodes).forEach(key => {
-    //   const node = this.nodes[key];
-    //   nodes.filter((n:any) => n.id === key).forEach((n:any) => {
-    //     n.count = node.count; 
-    //     maxCount = Math.max(maxCount, node.count) -1;
-    //   });
-    // });
-    // Object.keys(this.nodes).forEach(key => {
-    //   nodes.filter((n:any) => n.id === key).forEach((n:any) => {
-    //     if (n.count > 0) {
-    //       n.symbolSize = this.maxSize * (n.count-1) / maxCount + this.minSize;
-    //     } else {
-    //       n.symbolSize = this.minSize;
-    //     }
-    //     n.itemStyle = {
-    //       color: this.getColor(n.symbolSize)
-    //     }
-    //   });
-    // });
 
     this.graphData = {
       links,
@@ -523,55 +483,6 @@ export class MapComponent {
 
     this.graphChart.setOption(this.graphOptions);
 
-    this.graphChart.on('click', (params: any) => {
-      if (params.dataType === 'node') {
-        this._ngZone.run(() => {
-          const place = params.data.name;
-          // let lettersFrom: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => { return letter.origin === place });
-          // let lettersTo: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => { return letter.destination === place });
-          // this.infoContent = `<div>From: ${lettersFrom.length}</div><div>To: ${lettersTo.length}</div>`;
-
-
-          this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => { return (letter.origin_name + '' === place) || (letter.destination_name + '' === place) });
-          this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
-          this.infoHeader = `Letters from/to ${params.data.name}`;
-          this.infoType = 'place';
-          this.infoTypeData = place;
-          this.state.showInfo.set(true);
-        });
-      } else if (params.dataType === 'edge') {
-
-        this._ngZone.run(() => {
-          // let popup = '';
-          // let letters: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin_name + '' === params.data.source && letter.destination_name + '' === params.data.target);
-          // letters.forEach((letter: Letter) => {
-          //   popup += `<div>${letter.letter_id}.- ${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
-          //   if (letter.keyword_categories_cs?.length > 0) {
-          //     popup += ` (${letter.keyword_categories_cs.join(', ')})</div>`;
-          //   } else if (letter.keywords_cs?.length > 0) {
-          //     popup += ` (${letter.keywords_cs.join(', ')})</div>`;
-          //   } else {
-          //     popup += `</div>`;
-          //   }
-          // });
-          // this.infoContent = popup;
-          this.infoData = this.solrResponse.response.docs.filter((letter: Letter) => letter.origin_id + '' === params.data.source + '' && letter.destination_id + '' === params.data.target + '');
-          this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'origin_name', 'destination_name', 'date_year', 'action'];
-          this.infoHeader = `Letters from ${params.data.label} (${this.infoData.length})`;
-          this.infoType = 'link';
-          const reversed = this.solrResponse.response.docs.filter((letter: Letter) => letter.destination_id + '' === params.data.source + '' && letter.origin_id + '' === params.data.target + '');
-          const header = `Letters from ${params.data.labelReversed} (${reversed.length})`;
-          this.infoTypeData = {
-            header: header,
-            docs: reversed
-          };
-
-
-          this.state.showInfo.set(true);
-        });
-
-      }
-    })
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -587,21 +498,21 @@ export class MapComponent {
     const carto = LtileLayer('https://basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png?key=cb1_44kb_1_fcb333c51ecf506f887c03b7', { attribution: 'OpenStreetMaps, CARTO' });
     const Historical = LtileLayer('https://tiles.traveltimeapp.com/osm-bright/{z}/{x}/{y}.png?key=d7b19cdc', { attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> | Created with <a href="https://traveltime.com" target="_blank">TravelTime API</a>' });
 
-    
+
     var baseMaps = {
-        "OpenStreetMap": osm,
-        "CARTO": carto,
-        "Historical": Historical
+      "OpenStreetMap": osm,
+      "CARTO": carto,
+      "Historical": Historical
     };
     osm.addTo(lmap);
     var layerControl = L.control.layers(baseMaps).addTo(lmap);
-    
 
 
-setTimeout(() => {
-  lmap.fitBounds(this.getBounds(), {paddingBottomRight: [500,100]});
-}, 100)
-    
+
+    setTimeout(() => {
+      this.fitBounds();
+    }, 100);
+
 
     lmap.on('enterFullscreen', () => {
       lmap.invalidateSize();
@@ -619,6 +530,17 @@ setTimeout(() => {
       }
     })
   }
+  fitBounds() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const lmapComponent = this.graphChart.getModel().getComponent("lmap");
+    // Get the instance of Leaflet
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const lmap = lmapComponent.getLeaflet();
+    lmap.fitBounds(this.getBounds(), { paddingBottomRight: [500, 100] });
+  }
+
 
   getBounds() {
     let latMax = this.solrResponse.stats.stats_fields.latitude.max;
@@ -626,7 +548,7 @@ setTimeout(() => {
     let lngMax = this.solrResponse.stats.stats_fields.longitude.max;
     let lngMin = this.solrResponse.stats.stats_fields.longitude.min;
 
-    
+
 
     const southWest = L.latLng(latMin, lngMin);
     const northEast = L.latLng(latMax, lngMax);

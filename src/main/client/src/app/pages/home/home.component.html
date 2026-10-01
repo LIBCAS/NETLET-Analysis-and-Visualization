@@ -106,11 +106,11 @@
     </mat-card>
 </div>
 
-<div class="app-home-layout app-fxLayout app-row app-fill">
+<div class="app-home-layout app-fxLayout app-row ">
 
 
     @for(card of state.views; track $index){
-    <mat-card appearance="outlined">
+    <mat-card >
         <mat-card-header>
             <mat-card-title> {{ 'home.' + card.header + '.header' | translate }} </mat-card-title>
         </mat-card-header>

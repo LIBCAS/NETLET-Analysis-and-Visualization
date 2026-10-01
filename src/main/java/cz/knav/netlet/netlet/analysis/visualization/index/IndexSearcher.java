@@ -2,8 +2,10 @@ package cz.knav.netlet.netlet.analysis.visualization.index;
 
 import cz.knav.netlet.netlet.analysis.visualization.Options;
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -20,6 +22,7 @@ import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.request.json.DomainMap;
@@ -29,6 +32,7 @@ import org.apache.solr.client.solrj.request.json.RangeFacetMap;
 import org.apache.solr.client.solrj.request.json.TermsFacetMap;
 import org.apache.solr.client.solrj.response.InputStreamResponseParser;
 import org.apache.solr.common.util.NamedList;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -222,6 +226,35 @@ public class IndexSearcher {
       ret.put("error", ex);
     }
     return ret;
+  }
+  
+  public static JSONObject getAllPlaces() throws URISyntaxException, IOException, InterruptedException {
+
+    JSONObject places = new JSONObject();
+    try (SolrClient solr = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+
+      JsonQueryRequest jrequest = new JsonQueryRequest()
+              .setQuery("*:*")
+              .returnFields("id,name,country,latitude,longitude,geoname_id,coords")
+              .setLimit(10000);
+
+      jrequest.setResponseParser(new InputStreamResponseParser("json"));
+
+      NamedList<Object> resp = solr.request(jrequest, "places");
+      InputStream is = (InputStream) resp.get("stream");
+      JSONObject ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+
+      JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
+      for (int i = 0; i < docs.length(); i++) {
+        JSONObject d = docs.getJSONObject(i);
+        places.put(d.getString("id") + "", d);
+      }
+
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, "Error {0}", ex);
+      // ret.put("error", ex);
+    }
+    return places;
   }
 
   public static JSONObject getTenants() {
@@ -512,7 +545,7 @@ public class IndexSearcher {
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
               //.withFilter("status:publish")
-              .setLimit(rows)
+              .setLimit(0)
               .withFilter("origin:* OR destination:*")
               .returnFields("id,letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,origin,destination,origin_id,destination_id,origin_name,destination_name,places:[json],identities:[json],keywords_category_cs,keywords_cs")
               
@@ -534,6 +567,12 @@ public class IndexSearcher {
                       .setMinCount(1))
               .withFacet("authors", new TermsFacetMap("identity_author")
                       .setLimit(1000)
+                      .setMinCount(1))
+              .withFacet("places", new TermsFacetMap("place_id")
+                      .setLimit(1000)
+                      .setMinCount(1))
+              .withFacet("links", new TermsFacetMap("link_id")
+                      .setLimit(-1)
                       .setMinCount(1));
 
       jrequest = addFilters(request, jrequest, lang);

@@ -6,13 +6,12 @@ import { FacetFields, JSONFacet } from '../../shared/facet';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
-import { FormArray, FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { map, Observable, startWith } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
-import { AppState, Tenant } from '../../app-state';
+import { debounceTime, Subject, takeUntil } from 'rxjs';
+import { AppState } from '../../app-state';
 import { Router } from '@angular/router';
 import { AppConfiguration } from '../../app-configuration';
 import { MatButtonModule } from '@angular/material/button';
@@ -51,6 +50,9 @@ export class FacetsComponent {
   allSelected: undefined;
   facetsFiltered = signal<FacetFields>({});
 
+  destroy$ = new Subject<void>();
+  tenantClickSubject$ = new Subject<void>();
+
   log(e: any) {
     console.log(e)
   }
@@ -85,6 +87,28 @@ export class FacetsComponent {
     })
   } 
 
+  ngOnInit() {
+    this.tenantClickSubject$.pipe(
+      debounceTime(1500),
+      // complete with component destroy *
+      takeUntil(this.destroy$)
+    )
+    .subscribe(() => this.clickTenant())
+  }
+
+
+  ngOnDestroy() {
+    this.destroy$.next(void 0);
+  }
+
+  clickTenantThrottled(){
+    this.tenantClickSubject$.next(void 0);
+  }
+
+  clickTenant() {
+    this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
+  }
+
   normalize(str: string): string {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   }
@@ -104,10 +128,6 @@ export class FacetsComponent {
 
   toggleAll() {
     this.state.tenants().forEach(t => t.selected = this.allSelected);
-    this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
-  }
-
-  clickTenant(t: Tenant) {
     this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
   }
 

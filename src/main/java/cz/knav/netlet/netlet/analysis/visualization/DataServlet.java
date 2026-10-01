@@ -66,6 +66,15 @@ public class DataServlet extends HttpServlet {
     }
 
     enum Actions {
+        GET_DICTS {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+              JSONObject ret = new JSONObject();
+              ret.put("tenants", IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant"));
+              ret.put("places", IndexSearcher.getAllPlaces());
+                return ret;
+            }
+        },
         GET_TENANTS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -125,6 +134,21 @@ public class DataServlet extends HttpServlet {
                 try {
                     HikoIndexer hi = new HikoIndexer(); 
                     json = hi.update(Integer.parseInt(req.getParameter("value")), req.getParameter("unit"));
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE, "Error", ex);
+                    json.put("error", ex.toString());
+                }
+                return json;
+            }
+        },
+        INDEX_HIKO_TENANTS {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+                JSONObject json = new JSONObject();
+                try {
+                    HikoIndexer hi = new HikoIndexer();
+                    json = hi.indexTenants();
                 } catch (Exception ex) {
                     LOGGER.log(Level.SEVERE, "Error", ex);
                     json.put("error", ex.toString());

@@ -61,8 +61,8 @@ import { Configuration } from './shared/config';
         return this.http.get('assets/config.json').pipe(
             switchMap((cfg: any) => {
                 this.config = cfg as Configuration;
-                return this.http.get('api/data/get_tenants').pipe(tap((res: any) => {
-                    const ts = res.buckets;
+                return this.http.get('api/data/get_dicts').pipe(tap((res: any) => {
+                    const ts = res.tenants.buckets;
                     ts.sort((t1: any, t2: any) => t1.val.localeCompare(t2.val));
                     this.state.tenants.set(ts);
                     this.state.tenants().forEach(t => {
@@ -70,6 +70,7 @@ import { Configuration } from './shared/config';
                         t.date_computed_min = new Date(t.date_computed_min_s);
                         t.available = true
                     });
+                    this.state.places.set(res.places);
                 }));
             }),
             catchError((err) => {

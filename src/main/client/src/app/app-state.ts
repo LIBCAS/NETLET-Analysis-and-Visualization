@@ -20,6 +20,7 @@ export interface Tenant {
 
   public showInfo = signal<boolean>(false);
   public tenants = signal<Tenant[]>([]);
+  public places = signal<any>({});
 
   // public selectedTenants = signal<Tenant[]>([]);
 
