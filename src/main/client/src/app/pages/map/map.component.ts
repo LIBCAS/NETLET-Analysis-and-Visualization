@@ -169,11 +169,12 @@ export class MapComponent {
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
 
     this.state.addFilters(p);
-    if (!withMap) {
-      p.rows = 0;
-    } else {
-      p.rows = 20000;
-    }
+    p.rows = 0;
+    // if (!withMap) {
+    //   p.rows = 0;
+    // } else {
+    //   p.rows = 20000;
+    // }
 
     this.service.getMap(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
@@ -292,12 +293,6 @@ export class MapComponent {
   showNode(identity: JSONFacet) {
     //const idx = this.graphData.nodes.findIndex(n => n.id === identity.val + '_' + category);
     const idx = this.graphData.nodes.findIndex(n => n.id === identity.val);
-    // currentIndex = (currentIndex + 1) % dataLen;
-    // this.graphChart.dispatchAction({
-    //   type: 'showTip',
-    //   seriesIndex: 0,
-    //   dataIndex: idx
-    // });
     this.graphChart.dispatchAction({
       type: 'highlight',
       seriesIndex: 0,
@@ -483,6 +478,21 @@ export class MapComponent {
 
     this.graphChart.setOption(this.graphOptions);
 
+    this.graphChart.on('click', (params: any) => {
+      if (params.dataType === 'node') {
+        this._ngZone.run(() => {
+          this.getNodeData(params);
+        });
+      } else if (params.dataType === 'edge') {
+
+        this._ngZone.run(() => {
+
+          this.getLinkLetters(params);
+          
+        });
+
+      }
+    });
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -496,13 +506,13 @@ export class MapComponent {
 
     const osm = LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OpenStreetMaps' });
     const carto = LtileLayer('https://basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png?key=cb1_44kb_1_fcb333c51ecf506f887c03b7', { attribution: 'OpenStreetMaps, CARTO' });
-    const Historical = LtileLayer('https://tiles.traveltimeapp.com/osm-bright/{z}/{x}/{y}.png?key=d7b19cdc', { attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> | Created with <a href="https://traveltime.com" target="_blank">TravelTime API</a>' });
+    //const Historical = LtileLayer('https://tiles.traveltimeapp.com/osm-bright/{z}/{x}/{y}.png?key=d7b19cdc', { attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> | Created with <a href="https://traveltime.com" target="_blank">TravelTime API</a>' });
 
 
     var baseMaps = {
       "OpenStreetMap": osm,
-      "CARTO": carto,
-      "Historical": Historical
+      "Historical": carto,
+      //"Historical": Historical
     };
     osm.addTo(lmap);
     var layerControl = L.control.layers(baseMaps).addTo(lmap);
@@ -530,6 +540,7 @@ export class MapComponent {
       }
     })
   }
+
   fitBounds() {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -540,7 +551,6 @@ export class MapComponent {
     const lmap = lmapComponent.getLeaflet();
     lmap.fitBounds(this.getBounds(), { paddingBottomRight: [500, 100] });
   }
-
 
   getBounds() {
     let latMax = this.solrResponse.stats.stats_fields.latitude.max;
@@ -553,6 +563,62 @@ export class MapComponent {
     const southWest = L.latLng(latMin, lngMin);
     const northEast = L.latLng(latMax, lngMax);
     return L.latLngBounds(southWest, northEast);
+  }
+
+  getNodeData(params: any) {
+    const place = params.data.id;
+    const p: any = {};
+    p.tenant = this.state.selectedTenants().map(t => t.val);
+    p.tenant_year_range = this.state.getTenantsRange().toString();
+    p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
+
+    this.state.addFilters(p);
+    p.rows = 20000;
+    p.place = place;
+
+    this.service.getMap(p as HttpParams).subscribe((resp: any) => {
+      if (!resp) {
+        return;
+      }
+      this.infoData = resp.response.docs;
+      this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
+      this.infoHeader = `Letters from/to ${params.data.name}`;
+      this.infoType = 'place';
+      this.infoTypeData = place;
+      this.state.showInfo.set(true);
+    });
+  }
+
+  getLinkLetters(params: any) {
+
+
+    const link_id = params.data.id;
+    const reversed_link_id = link_id.split('-')[1] + '-' + link_id.split('-')[0];
+    const p: any = {};
+    p.tenant = this.state.selectedTenants().map(t => t.val);
+    p.tenant_year_range = this.state.getTenantsRange().toString();
+    p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
+
+    this.state.addFilters(p);
+    p.rows = 20000;
+    p.link_id = link_id;
+
+    this.service.getMap(p as HttpParams).subscribe((resp: any) => {
+      if (!resp) {
+        return;
+      }
+      this.infoData = resp.response.docs.filter((letter: Letter) => letter.link_id?.includes(link_id));
+      this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
+      this.infoHeader = `Letters from ${params.data.label} (${this.infoData.length})`;
+      this.infoType = 'link';
+      const reversed = resp.response.docs.filter((letter: Letter) => letter.link_id?.includes(reversed_link_id));
+      const header = `Letters from ${params.data.labelReversed} (${reversed.length})`;
+      this.infoTypeData = {
+        header: header,
+        docs: reversed
+      };
+      this.state.showInfo.set(true);
+    });
   }
 
 }

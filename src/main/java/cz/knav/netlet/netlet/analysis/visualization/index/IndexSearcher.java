@@ -545,11 +545,23 @@ public class IndexSearcher {
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
               //.withFilter("status:publish")
-              .setLimit(0)
+              .setLimit(rows)
               .withFilter("origin:* OR destination:*")
-              .returnFields("id,letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,origin,destination,origin_id,destination_id,origin_name,destination_name,places:[json],identities:[json],keywords_category_cs,keywords_cs")
+              .returnFields("id,letter_id,tenant,date_year,identity_name,identity_recipient,identity_author,origin,destination,link_id,origin_id,destination_id,origin_name,destination_name,places:[json],identities:[json],keywords_category_cs,keywords_cs");
               
-              .withParam("stats", "true")
+
+      if (request.getParameter("place") != null) {
+        String f = request.getParameter("place");
+        jrequest = jrequest.withFilter("origin_id:" + f + " OR destination_id:" + f + ""); 
+        jrequest = jrequest.withParam("stats", "false").withParam("facet", "false");
+      } else if (request.getParameter("link_id") != null) {
+        String f = request.getParameter("link_id");
+        String rf = f.split("-")[1] + '-' + f.split("-")[0];
+        jrequest = jrequest.withFilter("link_id:\"" + f +"\" OR link_id:\"" + rf + "\""); 
+        jrequest = jrequest.withParam("stats", "false").withParam("facet", "false");
+      } else {
+        
+        jrequest = jrequest.withParam("stats", "true")
               .withParam("stats.field", new String[]{"latitude","longitude"})
               .withFacet("years", yearsFacet)
               .withFacet("keywords_cs", keywords_csFacet)
@@ -574,9 +586,9 @@ public class IndexSearcher {
               .withFacet("links", new TermsFacetMap("link_id")
                       .setLimit(-1)
                       .setMinCount(1));
+      }
 
       jrequest = addFilters(request, jrequest, lang);
-
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
       NamedList<Object> resp = solr.request(jrequest, "hiko");
       InputStream is = (InputStream) resp.get("stream");

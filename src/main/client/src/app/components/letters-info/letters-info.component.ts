@@ -39,6 +39,7 @@ export class LettersInfoComponent {
     public state: AppState
   ){
     effect(() => {
+      //console.log(this.data());
       this.filter();
       const show = this.state.showInfo();
       if (!show) {
@@ -64,8 +65,8 @@ export class LettersInfoComponent {
 
   filter() {
     if (this.type() === 'place') {
-      const f = this.data().filter((letter: Letter) => { return (letter.origin_name +'' === this.typeData() && this.showFrom) || 
-        (letter.destination_name +'' === this.typeData() && this.showTo)});
+      const f = this.data().filter((letter: Letter) => { return (letter.origin_id?.includes(this.typeData()) && this.showFrom) || 
+        (letter.destination_id?.includes(this.typeData()) && this.showTo)});
       this.filteredData.set([...f]);
       this.computedHeader.set(this.header());
     } else if (this.type() === 'link') {
