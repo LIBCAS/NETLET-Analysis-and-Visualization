@@ -41,10 +41,17 @@ export class IdentityComponent {
       'id': this.identityId()
     }
   }));
-
   identity = computed<any>(() => this.identityRes.value());
 
-
+  nameInTime = signal('');
+  identityInTimeRes: any = httpResource(() => ({
+    url: `/api/data/identity_in_time`,
+    method: 'GET',
+    params: {
+      'id': this.identityId(), 'name': this.nameInTime()
+    }
+  }));
+  identityInTime = computed<any>(() => this.identityInTimeRes.value());
 
   limits: [Date, Date];
   yearsChartOptions: EChartsOption | any;
@@ -56,6 +63,10 @@ export class IdentityComponent {
 
   identitiesPieOptions: EChartsOption = {};
   identitiesPieChart: ECharts;
+
+  identityYearsChartOptions: EChartsOption | any;
+  identityYearsChart: ECharts;
+  identityYearsChartType: string = 'line';
 
   constructor() {
     this.activatedRoute.params.subscribe((params) => {
@@ -71,7 +82,14 @@ export class IdentityComponent {
           this.setIdentitiesPieChart();
         }, 100)
       }
-    })
+    });
+
+    effect(() => {
+      const i = this.identityInTimeRes.value();
+        if (i) {
+          this.setIdentityYearsOptions();
+        }
+    });
   }
 
   onTenantsPieChartInit(e: any) {
@@ -81,11 +99,12 @@ export class IdentityComponent {
   onIdentitiesPieChartInit(e: any) {
     this.identitiesPieChart = e;
 
-    this.identitiesPieChart.on('click', function (params) {
+    this.identitiesPieChart.on('click', (params: any) => {
       // Check if the clicked component is the yAxis label
       if (params.componentType === 'yAxis') {
         console.log('Clicked Y-Axis value:', params.value);
-        console.log('Clicked Y-Axis name:', params.name);
+        this.nameInTime.set(params.value)
+        
       }
     });
 
@@ -93,6 +112,10 @@ export class IdentityComponent {
 
   onYearsChartInit(e: any) {
     this.yearsChart = e;
+  }
+
+  onIdentityYearsChartInit(e: any) {
+    this.identityYearsChart = e;
   }
 
   setTenantsPieChart() {
@@ -274,6 +297,63 @@ export class IdentityComponent {
         },
       ]
     }
+  }
+
+  
+
+  setIdentityYearsOptions() {
+    const series = [];
+    if (this.identityInTime().author.years) {
+      series.push({
+        name: 'Author',
+        type: this.yearsChartType + '',
+        smooth: true,
+        symbol: 'none',
+        data: this.identityInTime().author.years.buckets.map((c: JSONFacet) => [c.val, c.count])
+      });
+    }
+    if (this.identityInTime().recipient.years) {
+      series.push({
+        name: 'Recipient',
+        type: this.yearsChartType + '',
+        smooth: true,
+        symbol: 'none',
+        data: this.identityInTime().recipient.years.buckets.map((c: JSONFacet) => [c.val, c.count])
+      });
+    }
+    
+    this.identityYearsChartOptions = {
+      tooltip: {
+        trigger: 'axis',
+        position: function (pt: any) {
+          return [pt[0], '10%'];
+        }
+      },
+      title: {
+        left: 'center',
+        text: this.nameInTime()
+      },
+      grid: {
+        left: 30,
+        right: 30,
+        top: 30
+      },
+      xAxis: {
+        type: 'category',
+        //boundaryGap: ['5%', '5%'],
+        triggerEvent: true,
+      },
+      yAxis: {
+        type: 'value',
+      },
+      legend: {
+        show: true,
+        orient: 'vertical',
+        right: 10,
+      },
+      series: series
+
+    };
   }
 
 

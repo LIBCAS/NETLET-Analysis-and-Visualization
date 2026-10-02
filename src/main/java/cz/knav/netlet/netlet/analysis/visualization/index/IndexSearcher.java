@@ -1176,5 +1176,64 @@ public class IndexSearcher {
     }
     return ret;
   }
+  
+  public static JSONObject identityInTime(String id, String name) {
+    JSONObject ret = new JSONObject();
+    try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+      
+      final TermsFacetMap tenantFacet = new TermsFacetMap("tenant")
+              .setLimit(100)
+              .setMinCount(1)
+              .withStatSubFacet("date_year_min", "min(date_year)")
+              .withStatSubFacet("date_year_max", "max(date_year)")
+              .withStatSubFacet("date_computed_min_s", "min(date_computed)")
+              .withStatSubFacet("date_computed_max_s", "max(date_computed)");
+      
+      final JsonQueryRequest jrequest = new JsonQueryRequest()
+              .setQuery("*:*")
+              .withFilter("tenant:global")
+              .withFilter("name:\"" + name + "\"")
+              .returnFields("id")
+              .setLimit(1);
+
+      jrequest.setResponseParser(new InputStreamResponseParser("json"));
+
+      NamedList<Object> resp1 = solr.request(jrequest, "identities");
+      InputStream is1 = (InputStream) resp1.get("stream");
+      JSONObject id2 = new JSONObject(IOUtils.toString(is1, "UTF-8")).getJSONObject("response").getJSONArray("docs").getJSONObject(0);
+
+      JSONObject tr = getTenantRange(id.split("_")[0]);
+      RangeFacetMap rangeFacet = new RangeFacetMap("date_year",
+              tr.optInt("date_year_min", 1500),
+              tr.optInt("date_year_max", 2000),
+              1)
+              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+      String fq = "global".equals(id.split("_")[0]) ? "global_identity_id:" + id.split("_")[1] : "identity_id:" + id;
+      final JsonQueryRequest srequest = new JsonQueryRequest()
+              .setQuery("*:*")
+              .withFilter(fq)
+              //.withFilter("tenant:" + id.split("_")[0])
+              .withFacet("author", new QueryFacetMap("identity_author_id:\"" + id2.optString("id") + "\"") 
+                      .withSubFacet("years", rangeFacet)
+              )
+              .withFacet("recipient", new QueryFacetMap("identity_recipient_id:\"" + id2.optString("id") + "\"")
+                      .withSubFacet("years", rangeFacet)
+              )
+              .withFacet("tenant", tenantFacet)
+              .setLimit(0);
+
+      srequest.setResponseParser(new InputStreamResponseParser("json"));
+
+      NamedList<Object> resp = resp = solr.request(srequest, "hiko");
+      InputStream is = (InputStream) resp.get("stream");
+      ret = new JSONObject(IOUtils.toString(is, "UTF-8")).getJSONObject("facets");
+
+      //ret.put("hiko", getLetterFromHIKO(id.split("_")[1], id.split("_")[0]));
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, "Error {0}", ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
 
 }
