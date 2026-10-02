@@ -45,15 +45,15 @@ export class IdentityComponent {
   identity = computed<any>(() => this.identityRes.value());
 
 
-  
+
   limits: [Date, Date];
   yearsChartOptions: EChartsOption | any;
   yearsChart: ECharts;
   yearsChartType: string = 'line';
-  
+
   tenantsPieOptions: EChartsOption = {};
   tenantsPieChart: ECharts;
-  
+
   identitiesPieOptions: EChartsOption = {};
   identitiesPieChart: ECharts;
 
@@ -145,30 +145,30 @@ export class IdentityComponent {
     const series = [];
     if (this.identity().stats.author.years) {
       series.push({
-          name: 'Author',
-          type: this.yearsChartType + '',
-          smooth: true,
-          symbol: 'none',
-          data: this.identity().stats.author.years.buckets.map((c: JSONFacet) => [c.val, c.count])
-        });
+        name: 'Author',
+        type: this.yearsChartType + '',
+        smooth: true,
+        symbol: 'none',
+        data: this.identity().stats.author.years.buckets.map((c: JSONFacet) => [c.val, c.count])
+      });
     }
     if (this.identity().stats.recipient.years) {
       series.push({
-          name: 'Recipient',
-          type: this.yearsChartType + '',
-          smooth: true,
-          symbol: 'none',
-          data: this.identity().stats.recipient.years.buckets.map((c: JSONFacet) => [c.val, c.count])
-        });
+        name: 'Recipient',
+        type: this.yearsChartType + '',
+        smooth: true,
+        symbol: 'none',
+        data: this.identity().stats.recipient.years.buckets.map((c: JSONFacet) => [c.val, c.count])
+      });
     }
     if (this.identity().stats.mentioned.years) {
       series.push({
-          name: 'Mentioned',
-          type: this.yearsChartType + '',
-          smooth: true,
-          symbol: 'none',
-          data: this.identity().stats.mentioned.years.buckets.map((c: JSONFacet) => [c.val, c.count])
-        });
+        name: 'Mentioned',
+        type: this.yearsChartType + '',
+        smooth: true,
+        symbol: 'none',
+        data: this.identity().stats.mentioned.years.buckets.map((c: JSONFacet) => [c.val, c.count])
+      });
     }
     this.yearsChartOptions = {
       tooltip: {
@@ -203,36 +203,29 @@ export class IdentityComponent {
 
     };
   }
-  
 
+  identitiesPieHeight: string = '300px';
   setIdentitiesPieChart() {
     const recipients: any[] = [];
-if (this.identity().stats.author.recipients){
-    this.identity().stats.author.recipients.buckets.forEach((p: JSONFacet) => {
-      let i = 0;
-      if (p.val) {
-        // recipients.unshift({
-        //   id: p.val,
-        //   name: p.val,
-        //   value: p.count
-        // });
-        recipients.unshift([p.count, p.val]);
-      }
-    });}
+    if (this.identity().stats.author.recipients) {
+      this.identity().stats.author.recipients.buckets.forEach((p: JSONFacet) => {
+        let i = 0;
+        if (p.val) {
+          recipients.unshift([p.count, p.val]);
+        }
+      });
+    }
 
     const authors: any[] = [];
-if (this.identity().stats.recipient.authors)
-  this.identity().stats.recipient.authors.buckets.forEach((p: JSONFacet) => {
-    let i = 0;
-    if (p.val) {
-      // authors.unshift({
-      //   id: p.val,
-      //   name: p.val,
-      //   value: p.count
-      // });
-      authors.push([p.count,p.val]);
-    }
-  });
+    if (this.identity().stats.recipient.authors)
+      this.identity().stats.recipient.authors.buckets.forEach((p: JSONFacet) => {
+        let i = 0;
+        if (p.val) {
+          authors.push([p.count, p.val]);
+        }
+      });
+
+    this.identitiesPieHeight = Math.max(recipients.length, authors.length) * 20 + 'px';
 
 
     this.identitiesPieOptions = {
@@ -270,18 +263,18 @@ if (this.identity().stats.recipient.authors)
         {
           //stack: 'total',
           type: 'bar',
-          name: 'recipients',
+          name: 'jako adresat',
           data: recipients
         },
         {
           //stack: 'total',
           type: 'bar',
-          name: 'authors',
+          name: 'jako autor',
           data: authors
         },
       ]
     }
   }
 
-  
+
 }

@@ -77,13 +77,10 @@
       </div>
     </div>
     
-    <div style="height: 850px; width: 100%; position: relative;">
-      <h3>Adresati / Autori (max 20)</h3>
+    <div [style.height]="identitiesPieHeight" style="width: 100%; position: relative;">
+      <h3>Adresati / Autori (max 100)</h3>
       <div echarts style="width: 100%; height:100%;" [options]="identitiesPieOptions" (chartInit)="onIdentitiesPieChartInit($event)">
       </div>
-      <!-- <h3>Kdo mu psal</h3>
-      <div echarts style="width: 100%; height:100%;" [options]="identitiesPieOptions" (chartInit)="onIdentitiesPieChartInit($event)">
-      </div> -->
     </div>
 
   </fieldset>
