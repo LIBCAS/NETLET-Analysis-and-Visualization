@@ -33,6 +33,21 @@ export interface Tenant {
 
   views = [
     {
+      header: 'timeline',
+      text: 'Zobrazení dopisů v chronologickém pořadí na časové ose',
+      route: 'timeline'
+    },
+    {
+      header: 'map',
+      text: 'Digitální vizualizace zaměřené na geografický horizont jednotlivých osobních korespondenčních souborů.',
+      route: 'map'
+    },
+    {
+      header: 'identities',
+      text: 'Schémata zobrazující vztahy mezi jednotlivými pisateli a příjemci dopisů',
+      route: 'identities'
+    },
+    {
       header: 'centrality',
       text: 'Centralita aktérů korespondence v dané korespondenční síti',
       route: 'centrality'
@@ -43,14 +58,14 @@ export interface Tenant {
       route: 'relation'
     },
     {
+      header: 'professions',
+      text: 'Schémata zobrazující korespondenční vztahy mezi různými profesními skupinami',
+      route: 'professions'
+    },
+    {
       header: 'keywords',
       text: 'Kocitační sítě mapující v dopisech zmiňované osoby ve vztahu ke specifickým tématům či debatám.',
       route: 'keywords'
-    },
-    {
-      header: 'map',
-      text: 'Digitální vizualizace zaměřené na geografický horizont jednotlivých osobních korespondenčních souborů.',
-      route: 'map'
     },
     {
       header: 'periods',
@@ -63,24 +78,9 @@ export interface Tenant {
       route: ''
     },
     {
-      header: 'identities',
-      text: 'Schémata zobrazující vztahy mezi jednotlivými pisateli a příjemci dopisů',
-      route: 'identities'
-    },
-    {
-      header: 'professions',
-      text: 'Schémata zobrazující korespondenční vztahy mezi různými profesními skupinami',
-      route: 'professions'
-    },
-    {
       header: 'themes',
       text: 'Schémata zobrazující tematická propojení dopisů a korespondenčních celků',
       route: ''
-    },
-    {
-      header: 'timeline',
-      text: 'Zobrazení dopisů v chronologickém pořadí na časové ose',
-      route: 'timeline'
     },
   ];
   currentView: { header: string, text: string, route: string };

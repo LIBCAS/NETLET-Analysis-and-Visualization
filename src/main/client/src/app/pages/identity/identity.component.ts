@@ -47,12 +47,15 @@ export class IdentityComponent {
 
   
   limits: [Date, Date];
-  chartOptions: EChartsOption | any;
-  chart: ECharts;
-  chartType: string = 'line';
+  yearsChartOptions: EChartsOption | any;
+  yearsChart: ECharts;
+  yearsChartType: string = 'line';
   
-  pieOptions: EChartsOption = {};
-  pieChart: ECharts;
+  tenantsPieOptions: EChartsOption = {};
+  tenantsPieChart: ECharts;
+  
+  identitiesPieOptions: EChartsOption = {};
+  identitiesPieChart: ECharts;
 
   constructor() {
     this.activatedRoute.params.subscribe((params) => {
@@ -63,22 +66,36 @@ export class IdentityComponent {
       const identity = this.identityRes.value();
       if (identity) {
         setTimeout(() => {
-          this.setOptions();
-          this.setPieChart();
+          this.setYearsOptions();
+          this.setTenantsPieChart();
+          this.setIdentitiesPieChart();
         }, 100)
       }
     })
   }
 
-  onPieChartInit(e: any) {
-    this.pieChart = e;
+  onTenantsPieChartInit(e: any) {
+    this.tenantsPieChart = e;
   }
 
-  onChartInit(e: any) {
-    this.chart = e;
+  onIdentitiesPieChartInit(e: any) {
+    this.identitiesPieChart = e;
+
+    this.identitiesPieChart.on('click', function (params) {
+      // Check if the clicked component is the yAxis label
+      if (params.componentType === 'yAxis') {
+        console.log('Clicked Y-Axis value:', params.value);
+        console.log('Clicked Y-Axis name:', params.name);
+      }
+    });
+
   }
 
-  setPieChart() {
+  onYearsChartInit(e: any) {
+    this.yearsChart = e;
+  }
+
+  setTenantsPieChart() {
     const data: any[] = [];
 
     this.identity().stats.tenant.buckets.forEach((p: JSONFacet) => {
@@ -92,7 +109,7 @@ export class IdentityComponent {
       }
     });
 
-    this.pieOptions = {
+    this.tenantsPieOptions = {
       title: {
         show: true,
         text: this.translation.instant('field.tenant'),
@@ -104,7 +121,7 @@ export class IdentityComponent {
         right: 10,
         data: data.map(a => a.name),
         formatter: name => {
-          var series: any = this.pieChart.getOption()['series'];
+          var series: any = this.tenantsPieChart.getOption()['series'];
           var value = series[0].data.filter((row: any) => row.name === name)[0].value
           return name + ' - ' + value;
         },
@@ -124,12 +141,12 @@ export class IdentityComponent {
     }
   }
 
-  setOptions() {
+  setYearsOptions() {
     const series = [];
     if (this.identity().stats.author.years) {
       series.push({
           name: 'Author',
-          type: this.chartType + '',
+          type: this.yearsChartType + '',
           smooth: true,
           symbol: 'none',
           data: this.identity().stats.author.years.buckets.map((c: JSONFacet) => [c.val, c.count])
@@ -138,7 +155,7 @@ export class IdentityComponent {
     if (this.identity().stats.recipient.years) {
       series.push({
           name: 'Recipient',
-          type: this.chartType + '',
+          type: this.yearsChartType + '',
           smooth: true,
           symbol: 'none',
           data: this.identity().stats.recipient.years.buckets.map((c: JSONFacet) => [c.val, c.count])
@@ -147,13 +164,13 @@ export class IdentityComponent {
     if (this.identity().stats.mentioned.years) {
       series.push({
           name: 'Mentioned',
-          type: this.chartType + '',
+          type: this.yearsChartType + '',
           smooth: true,
           symbol: 'none',
           data: this.identity().stats.mentioned.years.buckets.map((c: JSONFacet) => [c.val, c.count])
         });
     }
-    this.chartOptions = {
+    this.yearsChartOptions = {
       tooltip: {
         trigger: 'axis',
         position: function (pt: any) {
@@ -186,4 +203,85 @@ export class IdentityComponent {
 
     };
   }
+  
+
+  setIdentitiesPieChart() {
+    const recipients: any[] = [];
+if (this.identity().stats.author.recipients){
+    this.identity().stats.author.recipients.buckets.forEach((p: JSONFacet) => {
+      let i = 0;
+      if (p.val) {
+        // recipients.unshift({
+        //   id: p.val,
+        //   name: p.val,
+        //   value: p.count
+        // });
+        recipients.unshift([p.count, p.val]);
+      }
+    });}
+
+    const authors: any[] = [];
+if (this.identity().stats.recipient.authors)
+  this.identity().stats.recipient.authors.buckets.forEach((p: JSONFacet) => {
+    let i = 0;
+    if (p.val) {
+      // authors.unshift({
+      //   id: p.val,
+      //   name: p.val,
+      //   value: p.count
+      // });
+      authors.push([p.count,p.val]);
+    }
+  });
+
+
+    this.identitiesPieOptions = {
+      title: {
+        show: false,
+        text: this.translation.instant('field.recipients'),
+        left: 'center'
+      },
+      legend: {
+        show: true,
+        // type: 'plain',
+        // orient: 'vertical',
+        // right: 10,
+        // data: recipients.map(a => a.name),
+        // formatter: name => {
+        //   var series: any = this.identitiesPieChart.getOption()['series'];
+        //   var value = series[0].data.filter((row: any) => row.name === name)[0].value
+        //   return name + ' - ' + value;
+        // },
+      },
+      tooltip: {
+      },
+      grid: {
+        containLabel: true
+      },
+      yAxis: {
+        type: 'category',
+        triggerEvent: true
+        //data: recipients.map(a => a.name),
+      },
+      xAxis: {
+        type: 'value'
+      },
+      series: [
+        {
+          //stack: 'total',
+          type: 'bar',
+          name: 'recipients',
+          data: recipients
+        },
+        {
+          //stack: 'total',
+          type: 'bar',
+          name: 'authors',
+          data: authors
+        },
+      ]
+    }
+  }
+
+  
 }

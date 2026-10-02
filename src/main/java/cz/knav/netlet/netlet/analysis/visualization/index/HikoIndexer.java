@@ -634,22 +634,28 @@ public class HikoIndexer {
     for (int i = 0; i < identities.length(); i++) {
       JSONObject rs = identities.getJSONObject(i);
       String scope = rs.optString("scope");
+      JSONObject gi = rs.optJSONObject("global_identity");
       String id = ("local".equals(scope) ? tenant : "global") + "_" + rs.getInt("id");
-      doc.addField("identity_id", rs.getInt("id"));
+      if (gi != null) {
+        id = "global_" + gi.getInt("id");
+      }
+      doc.addField("identity_id", id);
       doc.addField("identity_role", role);
       doc.addField("identity_name", rs.getString("name"));
 
       doc.addField("identity_" + role, rs.getString("name"));
+      doc.addField("identity_" + role + "_id", id); 
 
       JSONObject identity = new JSONObject()
               .put("id", id)
               .put("role", role)
               .put("name", rs.getString("name"));
-      JSONObject gi = rs.optJSONObject("global_identity");
       if (gi != null) {
         identity.put("global_identity", gi);
         doc.addField("global_identity_id", gi.getInt("id"));
         doc.addField("identity_name", gi.getString("name"));
+      } else {
+        
       }
 
       identity.put("professions", addProfessions(id, role, doc, tenant));

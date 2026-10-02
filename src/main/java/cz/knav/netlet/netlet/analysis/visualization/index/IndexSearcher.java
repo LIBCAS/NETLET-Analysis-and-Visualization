@@ -160,14 +160,20 @@ public class IndexSearcher {
               tr.optInt("date_year_max", 2000),
               1)
               .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
-      String fq = "global".equals(id.split("_")[0]) ? "global_identity_id:" + id.split("_")[1] : "identity_id:" + id.split("_")[1];
+      String fq = "global".equals(id.split("_")[0]) ? "global_identity_id:" + id.split("_")[1] : "identity_id:" + id;
       final JsonQueryRequest srequest = new JsonQueryRequest()
               .setQuery("*:*")
               .withFilter(fq)
               //.withFilter("tenant:" + id.split("_")[0])
-              .withFacet("author", new QueryFacetMap("identity_author:\"" + ret.optString("name") + "\"").withSubFacet("years", rangeFacet))
-              .withFacet("recipient", new QueryFacetMap("identity_recipient:\"" + ret.optString("name") + "\"").withSubFacet("years", rangeFacet))
-              .withFacet("mentioned", new QueryFacetMap("identity_mentioned:\"" + ret.optString("name") + "\"").withSubFacet("years", rangeFacet))
+              .withFacet("author", new QueryFacetMap("identity_author_id:\"" + id + "\"")
+                      .withSubFacet("years", rangeFacet)
+                      .withSubFacet("recipients", new TermsFacetMap("identity_recipient").setLimit(100))
+              )
+              .withFacet("recipient", new QueryFacetMap("identity_recipient_id:\"" + id + "\"")
+                      .withSubFacet("years", rangeFacet)
+                      .withSubFacet("authors", new TermsFacetMap("identity_author").setLimit(100))
+              )
+              .withFacet("mentioned", new QueryFacetMap("identity_mentioned_id:\"" + id + "\"").withSubFacet("years", rangeFacet))
               .withFacet("tenant", new TermsFacetMap("tenant").setLimit(100)
               .setMinCount(1))
               .setLimit(0);
