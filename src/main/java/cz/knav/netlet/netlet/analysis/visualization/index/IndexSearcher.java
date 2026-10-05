@@ -167,7 +167,8 @@ public class IndexSearcher {
               .withStatSubFacet("date_year_min", "min(date_year)")
               .withStatSubFacet("date_year_max", "max(date_year)")
               .withStatSubFacet("date_computed_min_s", "min(date_computed)")
-              .withStatSubFacet("date_computed_max_s", "max(date_computed)");
+              .withStatSubFacet("date_computed_max_s", "max(date_computed)")
+              ;
       
       
       String fq = "global".equals(id.split("_")[0]) ? "global_identity_id:" + id.split("_")[1] : "identity_id:" + id;
@@ -176,14 +177,15 @@ public class IndexSearcher {
               .withFilter(fq)
               //.withFilter("tenant:" + id.split("_")[0])
               .withFacet("author", new QueryFacetMap("identity_author_id:\"" + id + "\"")
-                      .withSubFacet("years", rangeFacet)
+                      .withSubFacet("years", rangeFacet.withSubFacet("tenant", new TermsFacetMap("tenant")))
                       .withSubFacet("recipients", new TermsFacetMap("identity_recipient_id").setLimit(100))
               )
               .withFacet("recipient", new QueryFacetMap("identity_recipient_id:\"" + id + "\"")
-                      .withSubFacet("years", rangeFacet)
+                      .withSubFacet("years", rangeFacet.withSubFacet("tenant", new TermsFacetMap("tenant")))
                       .withSubFacet("authors", new TermsFacetMap("identity_author_id").setLimit(100))
               )
-              .withFacet("mentioned", new QueryFacetMap("identity_mentioned_id:\"" + id + "\"").withSubFacet("years", rangeFacet))
+              .withFacet("mentioned", new QueryFacetMap("identity_mentioned_id:\"" + id + "\"")
+                      .withSubFacet("years", rangeFacet.withSubFacet("tenant", new TermsFacetMap("tenant"))))
               .withFacet("tenant", tenantFacet)
               .setLimit(0);
 

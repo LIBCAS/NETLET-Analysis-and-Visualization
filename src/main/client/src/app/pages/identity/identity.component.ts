@@ -89,29 +89,42 @@ export class IdentityComponent {
 
     effect(() => {
       const i = this.identityInTimeRes.value();
-        if (i) {
-          this.setIdentityYearsOptions();
-        }
+      if (i) {
+        this.setIdentityYearsOptions();
+      }
     });
   }
 
+  excludedTenants: string[] = [];
   onTenantsPieChartInit(e: any) {
     this.tenantsPieChart = e;
+
+    this.tenantsPieChart.on('click', (params: any) => {
+      if (params.componentType === 'legend') {
+        //this.excludedTenants.push(params.value);
+
+        const i = this.excludedTenants.indexOf(params.value);
+        if (i === -1){
+            this.excludedTenants.push(params.value);
+        } else {
+            this.excludedTenants.splice(i,1);
+        }
+        const series: any = this.setYearsData();
+        this.yearsChart.setOption({ series: series })
+      }
+    });
   }
 
   onIdentitiesBarChartInit(e: any) {
     this.identitiesBarChart = e;
 
     this.identitiesBarChart.on('click', (params: any) => {
-      // Check if the clicked component is the yAxis label
-      console.log(params)
       if (params.componentType === 'yAxis') {
         this.loading.set(true);
         this.nameInTime.set(params.value);
       } else if (params.componentType === 'series') {
         this.loading.set(true);
         this.nameInTime.set(params.name);
-        
       }
     });
 
@@ -146,6 +159,7 @@ export class IdentityComponent {
         left: 'center'
       },
       legend: {
+        triggerEvent: true,
         type: data.length > 15 ? 'scroll' : 'plain',
         orient: 'vertical',
         right: 10,
@@ -171,16 +185,20 @@ export class IdentityComponent {
     }
   }
 
-  
+
 
   getYearsLimits(buckets: any[]): [number, number] {
     let min = 3000;
     let max = 1000;
     if (buckets) {
       buckets.forEach((t: any) => {
-        
-          min = min > t.date_year_min && t.date_year_min > 0 ? t.date_year_min : min;
-          max = max > t.date_year_max ? max : t.date_year_max;
+        if (t.date_year_min === 0) {
+          const y = parseInt(t.date_computed_min_s.split('-')[0]);
+          min = min > y ? y : min;
+        } else {
+          min = min > t.date_year_min ? t.date_year_min : min;
+        }
+        max = max > t.date_year_max ? max : t.date_year_max;
       });
     }
     return [min, max];
@@ -191,38 +209,69 @@ export class IdentityComponent {
     return (limits[0] <= valAsInt) && (valAsInt <= limits[1]);
   }
 
-  setYearsOptions() {
-    const series = [];
+  setYearsData() {
+    const series: any = [];
     const limits = this.getYearsLimits(this.identity().stats.tenant.buckets);
-    if (this.identity().stats.author.years) {
+    if (this.identity().stats.author?.years) {
+
       const d = this.identity().stats.author.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
         name: 'Author',
         type: this.yearsChartType + '',
         smooth: true,
         symbol: 'none',
-        data: d.map((c: JSONFacet) => [c.val, c.count])
+        data: d.map((c: any) => {
+          if (c.count === 0) {
+            return [c.val, c.count]
+          } else {
+            const count = c.tenant.buckets.filter((t: JSONFacet) => !this.excludedTenants.includes(t.val)).reduce((n: any, {count}: any) => n + count, 0);
+            return [c.val, count]
+          }
+        })
       });
     }
-    if (this.identity().stats.recipient.years) {
+    if (this.identity().stats.recipient?.years) {
+      
       const d = this.identity().stats.recipient.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
         name: 'Recipient',
         type: this.yearsChartType + '',
         smooth: true,
         symbol: 'none',
-        data: d.map((c: JSONFacet) => [c.val, c.count])
+        data: d.map((c: any) => {
+          if (c.count === 0) {
+            return [c.val, c.count]
+          } else {
+            const count = c.tenant.buckets.filter((t: JSONFacet) => !this.excludedTenants.includes(t.val)).reduce((n: any, {count}: any) => n + count, 0);
+            return [c.val, count]
+          }
+        })
       });
     }
-    if (this.identity().stats.mentioned.years) {
+    if (this.identity().stats.mentioned?.years) {
+      
+      const d = this.identity().stats.mentioned.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
         name: 'Mentioned',
         type: this.yearsChartType + '',
         smooth: true,
         symbol: 'none',
-        data: this.identity().stats.mentioned.years.buckets.map((c: JSONFacet) => [c.val, c.count])
+        data: d.map((c: any) => {
+          if (c.count === 0) {
+            return [c.val, c.count]
+          } else {
+            const count = c.tenant.buckets.filter((t: JSONFacet) => !this.excludedTenants.includes(t.val)).reduce((n: any, {count}: any) => n + count, 0);
+            return [c.val, count]
+          }
+        })
       });
     }
+    return series;
+  }
+
+  setYearsOptions() {
+    const series: any = this.setYearsData();
+
     this.yearsChartOptions = {
       tooltip: {
         trigger: 'axis',
@@ -241,16 +290,14 @@ export class IdentityComponent {
       },
       xAxis: {
         type: 'category',
-        //boundaryGap: ['5%', '5%'],
-        triggerEvent: true,
+        //triggerEvent: true,
       },
       yAxis: {
         type: 'value',
       },
       legend: {
         show: true,
-        orient: 'vertical',
-        right: 10,
+        bottom: 10,
       },
       series: series
 
@@ -303,7 +350,7 @@ export class IdentityComponent {
         // formatter: '{a0}<br />${this.identity().stats.identities[${b0}].name}: {c0}'
         formatter: (params: any) => {
           //console.log(params)
-          return params.seriesName + '<br/>' + this.identity().stats.identities[params.name].name + ' <strong>' + params.value[0] + '</strong>' 
+          return params.seriesName + '<br/>' + this.identity().stats.identities[params.name].name + ' <strong>' + params.value[0] + '</strong>'
         }
       },
       grid: {
@@ -313,7 +360,7 @@ export class IdentityComponent {
         type: 'category',
         triggerEvent: true,
         axisLabel: {
-        interval: 1,
+          interval: 0,
           formatter: (name: string) => {
             return this.identity().stats.identities[name].name;
           },
@@ -346,7 +393,7 @@ export class IdentityComponent {
       const d = this.identityInTime().recipient.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
         name: 'jako adresat',
-        type: this.yearsChartType + '',
+        type: 'line',
         smooth: true,
         symbol: 'none',
         data: d.map((c: JSONFacet) => [c.val, c.count])
@@ -356,14 +403,14 @@ export class IdentityComponent {
       const d = this.identityInTime().author.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
         name: 'jako autor',
-        type: this.yearsChartType + '',
+        type: 'line',
         smooth: true,
         symbol: 'none',
         data: d.map((c: JSONFacet) => [c.val, c.count])
       });
     }
     this.loading.set(false);
-    
+
     this.identityYearsChartOptions = {
       tooltip: {
         trigger: 'axis',
@@ -373,7 +420,7 @@ export class IdentityComponent {
       },
       title: {
         left: 'center',
-        text: this.identity()?.stats?.identities[this.nameInTime()]?.name 
+        text: this.identity()?.stats?.identities[this.nameInTime()]?.name
       },
       grid: {
         left: 30,
