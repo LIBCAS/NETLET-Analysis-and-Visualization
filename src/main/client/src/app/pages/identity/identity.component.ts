@@ -10,13 +10,13 @@ import * as echarts from 'echarts/core';
 import langCZ from 'echarts/lib/i18n/langCS.js';
 import { EChartsOption, ECharts } from 'echarts';
 import { BarChart, LineChart, PieChart } from 'echarts/charts';
-import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
+import { LegendComponent, TooltipComponent, GridComponent, TitleComponent, DatasetComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { NgxEchartsDirective, NgxEchartsModule, provideEchartsCore } from 'ngx-echarts';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 
-echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent, PieChart,
+echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent, PieChart, DatasetComponent,
   GridComponent, TitleComponent]);
 echarts.registerLocale("CZ", langCZ)
 
@@ -325,10 +325,53 @@ export class IdentityComponent {
         }
       });
 
-    this.identitiesPieHeight = Math.max(recipients.length, authors.length) * 30 + 'px';
+    const dimensions = [...new Set([
+      'names',
+      ...this.identity().stats.recipient.authors.buckets.map((c: JSONFacet) => c.val), 
+      ...this.identity().stats.author.recipients.buckets.map((c: JSONFacet) => c.val)])];
 
+    const source: any[] = [];
+    this.identity().stats.author.recipients.buckets.forEach((c: JSONFacet) => {
+      const s: any = {names: c.val};
+      s['recipient']= c.count;
+      source.push(s)
+    });
+    //const s2: any = {names: 'author'};
+    this.identity().stats.recipient.authors.buckets.forEach((c: JSONFacet) => {
+      const s: any = {names: c.val};
+      s['author']= c.count;
+      source.push(s)
+    });
+
+    const dataset = {
+        dimensions: ['names', 'author', 'recipient'],
+        source: source
+      };
+
+    //this.identitiesPieHeight = Math.max(recipients.length, authors.length) * 30 + 'px';
+    this.identitiesPieHeight = dimensions.length * 30 + 'px';
 
     this.identitiesBarOptions = {
+
+      dataset: dataset,
+      series: [{ type: 'bar', seriesLayoutBy: 'row' }, { type: 'bar', seriesLayoutBy: 'row' }],
+
+      // series: [
+      //   {
+      //     //stack: 'total',
+      //     type: 'bar',
+      //     name: 'jako adresat',
+      //     data: recipients
+      //   },
+      //   {
+      //     //stack: 'total',
+      //     type: 'bar',
+      //     name: 'jako autor',
+      //     data: authors
+      //   },
+      // ],
+
+
       title: {
         show: false,
         text: this.translation.instant('field.recipients'),
@@ -336,15 +379,6 @@ export class IdentityComponent {
       },
       legend: {
         show: true,
-        // type: 'plain',
-        // orient: 'vertical',
-        // right: 10,
-        // data: recipients.map(a => a.name),
-        // formatter: name => {
-        //   var series: any = this.identitiesPieChart.getOption()['series'];
-        //   var value = series[0].data.filter((row: any) => row.name === name)[0].value
-        //   return name + ' - ' + value;
-        // },
       },
       tooltip: {
         // formatter: '{a0}<br />${this.identity().stats.identities[${b0}].name}: {c0}'
@@ -358,6 +392,7 @@ export class IdentityComponent {
       },
       yAxis: {
         type: 'category',
+        inverse: true,
         triggerEvent: true,
         axisLabel: {
           interval: 0,
@@ -367,23 +402,11 @@ export class IdentityComponent {
         },
       },
       xAxis: {
-        type: 'value'
-      },
-      series: [
-        {
-          //stack: 'total',
-          type: 'bar',
-          name: 'jako adresat',
-          data: recipients
-        },
-        {
-          //stack: 'total',
-          type: 'bar',
-          name: 'jako autor',
-          data: authors
-        },
-      ]
+        //type: 'value'
+      }
     }
+
+    console.log(this.identitiesBarOptions)
   }
 
   setIdentityYearsOptions() {
@@ -429,8 +452,6 @@ export class IdentityComponent {
       },
       xAxis: {
         type: 'category',
-        //boundaryGap: ['5%', '5%'],
-        triggerEvent: true,
       },
       yAxis: {
         type: 'value',
