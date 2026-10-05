@@ -235,7 +235,7 @@ export class TimelineComponent {
     const p: any = {};
     p.tenant = this.state.selectedTenants().map(t => t.val);
     //p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
-    p.date_range = this.datePipe.transform(this.limits[0], 'yyyy-01-01') + ',' + this.datePipe.transform(this.limits[1], 'yyyy-01-01');
+    p.date_range = this.datePipe.transform(this.limits[0], 'yyyy-01-01') + ',' + this.datePipe.transform(this.limits[1], 'yyyy-12-31');
 
     p.rows = this.rows;
 
