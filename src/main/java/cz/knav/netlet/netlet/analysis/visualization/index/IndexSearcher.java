@@ -160,6 +160,16 @@ public class IndexSearcher {
               tr.optInt("date_year_max", 2000),
               1)
               .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+      
+      final TermsFacetMap tenantFacet = new TermsFacetMap("tenant")
+              .setLimit(100)
+              .setMinCount(1)
+              .withStatSubFacet("date_year_min", "min(date_year)")
+              .withStatSubFacet("date_year_max", "max(date_year)")
+              .withStatSubFacet("date_computed_min_s", "min(date_computed)")
+              .withStatSubFacet("date_computed_max_s", "max(date_computed)");
+      
+      
       String fq = "global".equals(id.split("_")[0]) ? "global_identity_id:" + id.split("_")[1] : "identity_id:" + id;
       final JsonQueryRequest srequest = new JsonQueryRequest()
               .setQuery("*:*")
@@ -167,24 +177,24 @@ public class IndexSearcher {
               //.withFilter("tenant:" + id.split("_")[0])
               .withFacet("author", new QueryFacetMap("identity_author_id:\"" + id + "\"")
                       .withSubFacet("years", rangeFacet)
-                      .withSubFacet("recipients", new TermsFacetMap("identity_recipient").setLimit(100))
+                      .withSubFacet("recipients", new TermsFacetMap("identity_recipient_id").setLimit(100))
               )
               .withFacet("recipient", new QueryFacetMap("identity_recipient_id:\"" + id + "\"")
                       .withSubFacet("years", rangeFacet)
-                      .withSubFacet("authors", new TermsFacetMap("identity_author").setLimit(100))
+                      .withSubFacet("authors", new TermsFacetMap("identity_author_id").setLimit(100))
               )
               .withFacet("mentioned", new QueryFacetMap("identity_mentioned_id:\"" + id + "\"").withSubFacet("years", rangeFacet))
-              .withFacet("tenant", new TermsFacetMap("tenant").setLimit(100)
-              .setMinCount(1))
+              .withFacet("tenant", tenantFacet)
               .setLimit(0);
 
       srequest.setResponseParser(new InputStreamResponseParser("json"));
 
       resp = solr.request(srequest, "hiko");
       is = (InputStream) resp.get("stream");
-      ret.put("stats", new JSONObject(IOUtils.toString(is, "UTF-8")).getJSONObject("facets"));
-
-      //ret.put("hiko", getLetterFromHIKO(id.split("_")[1], id.split("_")[0]));
+      
+      JSONObject stats = new JSONObject(IOUtils.toString(is, "UTF-8")).getJSONObject("facets");
+      stats.put("identities", getIdentitiesByHikoFilter(id));
+      ret.put("stats", stats);
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
       ret.put("error", ex);
@@ -261,6 +271,35 @@ public class IndexSearcher {
       // ret.put("error", ex);
     }
     return places;
+  }
+  
+  public static JSONObject getAllIdentities() throws URISyntaxException, IOException, InterruptedException {
+
+    JSONObject identities = new JSONObject();
+    try (SolrClient solr = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+
+      JsonQueryRequest jrequest = new JsonQueryRequest()
+              .setQuery("*:*")
+              .returnFields("id,name,name_normalized")
+              .setLimit(100000);
+
+      jrequest.setResponseParser(new InputStreamResponseParser("json"));
+
+      NamedList<Object> resp = solr.request(jrequest, "identities");
+      InputStream is = (InputStream) resp.get("stream");
+      JSONObject ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+
+      JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
+      for (int i = 0; i < docs.length(); i++) {
+        JSONObject d = docs.getJSONObject(i);
+        identities.put(d.getString("id") + "", d);
+      }
+
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, "Error {0}", ex);
+      // ret.put("error", ex);
+    }
+    return identities;
   }
 
   public static JSONObject getTenants() {
@@ -1168,6 +1207,8 @@ public class IndexSearcher {
       NamedList<Object> resp = solr.request(jrequest, "hiko");
       InputStream is = (InputStream) resp.get("stream");
       ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+      
+      
 
 
     } catch (Exception ex) {
@@ -1177,7 +1218,7 @@ public class IndexSearcher {
     return ret;
   }
   
-  public static JSONObject identityInTime(String id, String name) {
+  public static JSONObject twoIdentitiesInTime(String id, String id2) {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       
@@ -1188,19 +1229,6 @@ public class IndexSearcher {
               .withStatSubFacet("date_year_max", "max(date_year)")
               .withStatSubFacet("date_computed_min_s", "min(date_computed)")
               .withStatSubFacet("date_computed_max_s", "max(date_computed)");
-      
-      final JsonQueryRequest jrequest = new JsonQueryRequest()
-              .setQuery("*:*")
-              .withFilter("tenant:global")
-              .withFilter("name:\"" + name + "\"")
-              .returnFields("id")
-              .setLimit(1);
-
-      jrequest.setResponseParser(new InputStreamResponseParser("json"));
-
-      NamedList<Object> resp1 = solr.request(jrequest, "identities");
-      InputStream is1 = (InputStream) resp1.get("stream");
-      JSONObject id2 = new JSONObject(IOUtils.toString(is1, "UTF-8")).getJSONObject("response").getJSONArray("docs").getJSONObject(0);
 
       JSONObject tr = getTenantRange(id.split("_")[0]);
       RangeFacetMap rangeFacet = new RangeFacetMap("date_year",
@@ -1208,15 +1236,18 @@ public class IndexSearcher {
               tr.optInt("date_year_max", 2000),
               1)
               .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
-      String fq = "global".equals(id.split("_")[0]) ? "global_identity_id:" + id.split("_")[1] : "identity_id:" + id;
+      //String fq = "global".equals(id.split("_")[0]) ? "global_identity_id:" + id.split("_")[1] : "identity_id:" + id;
+      String fq = "identity_author_id:\"" + id + "\" OR identity_recipient_id:\"" + id + "\"";
+      String fq2 = "identity_author_id:\"" + id2 + "\" OR identity_recipient_id:\"" + id2 + "\"";
       final JsonQueryRequest srequest = new JsonQueryRequest()
               .setQuery("*:*")
               .withFilter(fq)
+              .withFilter(fq2)
               //.withFilter("tenant:" + id.split("_")[0])
-              .withFacet("author", new QueryFacetMap("identity_author_id:\"" + id2.optString("id") + "\"") 
+              .withFacet("author", new QueryFacetMap("identity_author_id:\"" + id2 + "\"") 
                       .withSubFacet("years", rangeFacet)
               )
-              .withFacet("recipient", new QueryFacetMap("identity_recipient_id:\"" + id2.optString("id") + "\"")
+              .withFacet("recipient", new QueryFacetMap("identity_recipient_id:\"" + id2 + "\"")
                       .withSubFacet("years", rangeFacet)
               )
               .withFacet("tenant", tenantFacet)
@@ -1224,9 +1255,10 @@ public class IndexSearcher {
 
       srequest.setResponseParser(new InputStreamResponseParser("json"));
 
-      NamedList<Object> resp = resp = solr.request(srequest, "hiko");
+      NamedList<Object> resp = solr.request(srequest, "hiko");
       InputStream is = (InputStream) resp.get("stream");
       ret = new JSONObject(IOUtils.toString(is, "UTF-8")).getJSONObject("facets");
+      
 
       //ret.put("hiko", getLetterFromHIKO(id.split("_")[1], id.split("_")[0]));
     } catch (Exception ex) {
@@ -1234,6 +1266,40 @@ public class IndexSearcher {
       ret.put("error", ex);
     }
     return ret;
+  }
+  
+  
+  
+  public static JSONObject getIdentitiesByHikoFilter(String id) {
+    JSONObject identities = new JSONObject();
+    try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+      
+      
+      String fq = "{!join fromIndex=hiko to=id from=identity_id}(identity_author_id:"+id+" OR identity_recipient_id:" + id + ")"; 
+      final JsonQueryRequest srequest = new JsonQueryRequest()
+              .setQuery("*:*")
+              .withFilter(fq)
+              .returnFields("id,name")
+              .setLimit(10000);
+
+      srequest.setResponseParser(new InputStreamResponseParser("json"));
+
+      NamedList<Object> resp = solr.request(srequest, "identities");
+      InputStream is = (InputStream) resp.get("stream");
+      JSONObject ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+      
+      JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
+      for (int i = 0; i < docs.length(); i++) {
+        JSONObject d = docs.getJSONObject(i);
+        identities.put(d.getString("id") + "", d);
+      }
+
+      //ret.put("hiko", getLetterFromHIKO(id.split("_")[1], id.split("_")[0]));
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, "Error {0}", ex);
+      identities.put("error", ex);
+    }
+    return identities;
   }
 
 }

@@ -13,6 +13,7 @@ import { BarChart, LineChart, PieChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { NgxEchartsDirective, NgxEchartsModule, provideEchartsCore } from 'ngx-echarts';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 
 echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent, PieChart,
@@ -21,7 +22,7 @@ echarts.registerLocale("CZ", langCZ)
 
 @Component({
   selector: 'app-identity',
-  imports: [TranslateModule, NgxEchartsModule, NgxEchartsDirective],
+  imports: [TranslateModule, NgxEchartsModule, NgxEchartsDirective, MatProgressBarModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -61,12 +62,14 @@ export class IdentityComponent {
   tenantsPieOptions: EChartsOption = {};
   tenantsPieChart: ECharts;
 
-  identitiesPieOptions: EChartsOption = {};
-  identitiesPieChart: ECharts;
+  identitiesBarOptions: EChartsOption = {};
+  identitiesBarChart: ECharts;
 
   identityYearsChartOptions: EChartsOption | any;
   identityYearsChart: ECharts;
   identityYearsChartType: string = 'line';
+
+  loading = signal(false);
 
   constructor() {
     this.activatedRoute.params.subscribe((params) => {
@@ -96,14 +99,18 @@ export class IdentityComponent {
     this.tenantsPieChart = e;
   }
 
-  onIdentitiesPieChartInit(e: any) {
-    this.identitiesPieChart = e;
+  onIdentitiesBarChartInit(e: any) {
+    this.identitiesBarChart = e;
 
-    this.identitiesPieChart.on('click', (params: any) => {
+    this.identitiesBarChart.on('click', (params: any) => {
       // Check if the clicked component is the yAxis label
+      console.log(params)
       if (params.componentType === 'yAxis') {
-        console.log('Clicked Y-Axis value:', params.value);
-        this.nameInTime.set(params.value)
+        this.loading.set(true);
+        this.nameInTime.set(params.value);
+      } else if (params.componentType === 'series') {
+        this.loading.set(true);
+        this.nameInTime.set(params.name);
         
       }
     });
@@ -164,24 +171,47 @@ export class IdentityComponent {
     }
   }
 
+  
+
+  getYearsLimits(buckets: any[]): [number, number] {
+    let min = 3000;
+    let max = 1000;
+    if (buckets) {
+      buckets.forEach((t: any) => {
+        
+          min = min > t.date_year_min && t.date_year_min > 0 ? t.date_year_min : min;
+          max = max > t.date_year_max ? max : t.date_year_max;
+      });
+    }
+    return [min, max];
+  }
+
+  inLimits(c: JSONFacet, limits: [number, number]): boolean {
+    const valAsInt: number = parseInt(c.val);
+    return (limits[0] <= valAsInt) && (valAsInt <= limits[1]);
+  }
+
   setYearsOptions() {
     const series = [];
+    const limits = this.getYearsLimits(this.identity().stats.tenant.buckets);
     if (this.identity().stats.author.years) {
+      const d = this.identity().stats.author.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
         name: 'Author',
         type: this.yearsChartType + '',
         smooth: true,
         symbol: 'none',
-        data: this.identity().stats.author.years.buckets.map((c: JSONFacet) => [c.val, c.count])
+        data: d.map((c: JSONFacet) => [c.val, c.count])
       });
     }
     if (this.identity().stats.recipient.years) {
+      const d = this.identity().stats.recipient.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
         name: 'Recipient',
         type: this.yearsChartType + '',
         smooth: true,
         symbol: 'none',
-        data: this.identity().stats.recipient.years.buckets.map((c: JSONFacet) => [c.val, c.count])
+        data: d.map((c: JSONFacet) => [c.val, c.count])
       });
     }
     if (this.identity().stats.mentioned.years) {
@@ -248,10 +278,10 @@ export class IdentityComponent {
         }
       });
 
-    this.identitiesPieHeight = Math.max(recipients.length, authors.length) * 20 + 'px';
+    this.identitiesPieHeight = Math.max(recipients.length, authors.length) * 30 + 'px';
 
 
-    this.identitiesPieOptions = {
+    this.identitiesBarOptions = {
       title: {
         show: false,
         text: this.translation.instant('field.recipients'),
@@ -270,14 +300,24 @@ export class IdentityComponent {
         // },
       },
       tooltip: {
+        // formatter: '{a0}<br />${this.identity().stats.identities[${b0}].name}: {c0}'
+        formatter: (params: any) => {
+          //console.log(params)
+          return params.seriesName + '<br/>' + this.identity().stats.identities[params.name].name + ' <strong>' + params.value[0] + '</strong>' 
+        }
       },
       grid: {
         containLabel: true
       },
       yAxis: {
         type: 'category',
-        triggerEvent: true
-        //data: recipients.map(a => a.name),
+        triggerEvent: true,
+        axisLabel: {
+        interval: 1,
+          formatter: (name: string) => {
+            return this.identity().stats.identities[name].name;
+          },
+        },
       },
       xAxis: {
         type: 'value'
@@ -299,28 +339,30 @@ export class IdentityComponent {
     }
   }
 
-  
-
   setIdentityYearsOptions() {
     const series = [];
-    if (this.identityInTime().author.years) {
+    const limits = this.getYearsLimits(this.identityInTime().tenant?.buckets);
+    if (this.identityInTime().recipient?.years) {
+      const d = this.identityInTime().recipient.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
-        name: 'Author',
+        name: 'jako adresat',
         type: this.yearsChartType + '',
         smooth: true,
         symbol: 'none',
-        data: this.identityInTime().author.years.buckets.map((c: JSONFacet) => [c.val, c.count])
+        data: d.map((c: JSONFacet) => [c.val, c.count])
       });
     }
-    if (this.identityInTime().recipient.years) {
+    if (this.identityInTime().author?.years) {
+      const d = this.identityInTime().author.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
-        name: 'Recipient',
+        name: 'jako autor',
         type: this.yearsChartType + '',
         smooth: true,
         symbol: 'none',
-        data: this.identityInTime().recipient.years.buckets.map((c: JSONFacet) => [c.val, c.count])
+        data: d.map((c: JSONFacet) => [c.val, c.count])
       });
     }
+    this.loading.set(false);
     
     this.identityYearsChartOptions = {
       tooltip: {
@@ -331,7 +373,7 @@ export class IdentityComponent {
       },
       title: {
         left: 'center',
-        text: this.nameInTime()
+        text: this.identity()?.stats?.identities[this.nameInTime()]?.name 
       },
       grid: {
         left: 30,
@@ -348,8 +390,7 @@ export class IdentityComponent {
       },
       legend: {
         show: true,
-        orient: 'vertical',
-        right: 10,
+        bottom: 10,
       },
       series: series
 

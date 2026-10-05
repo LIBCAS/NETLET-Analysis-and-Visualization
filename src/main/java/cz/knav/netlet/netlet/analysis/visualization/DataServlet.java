@@ -72,6 +72,7 @@ public class DataServlet extends HttpServlet {
               JSONObject ret = new JSONObject();
               ret.put("tenants", IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant"));
               ret.put("places", IndexSearcher.getAllPlaces());
+              //ret.put("identities", IndexSearcher.getAllIdentities());
                 return ret;
             }
         },
@@ -245,7 +246,7 @@ public class DataServlet extends HttpServlet {
         IDENTITY_IN_TIME {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.identityInTime(request.getParameter("id"), request.getParameter("name")); 
+                return IndexSearcher.twoIdentitiesInTime(request.getParameter("id"), request.getParameter("name")); 
             }
         },
         SEARCH_KEYWORDS {
