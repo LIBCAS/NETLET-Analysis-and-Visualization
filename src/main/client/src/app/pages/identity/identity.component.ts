@@ -49,7 +49,7 @@ export class IdentityComponent {
     url: `/api/data/identity_in_time`,
     method: 'GET',
     params: {
-      'id': this.identityId(), 'name': this.nameInTime()
+      'id': this.identityId(), 'id2': this.nameInTime()
     }
   }));
   identityInTime = computed<any>(() => this.identityInTimeRes.value());

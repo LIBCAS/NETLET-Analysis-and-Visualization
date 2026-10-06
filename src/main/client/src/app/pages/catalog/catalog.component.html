@@ -1,0 +1,46 @@
+@if (catalog()) {
+<div class="app-detail">
+    <h2>{{ 'catalog.' + catalogId() | translate}}</h2>
+    <fieldset>
+        <legend>{{ 'field.stats' | translate }}</legend>
+        <div>
+            <label>{{ 'letters_count' | translate }}:</label>
+            <div>{{ catalog().response.numFound }}</div>
+
+            <label>{{ 'authors' | translate }}:</label>
+            <div>{{ catalog().facets.authors.numBuckets }}</div>
+
+            <label>{{ 'recipients' | translate }}:</label>
+            <div>{{ catalog().facets.recipients.numBuckets }}</div>
+
+            <label>{{ 'mentioned' | translate }}:</label>
+            <div>{{ catalog().facets.mentioned.numBuckets }}</div>
+
+        </div>
+
+    </fieldset>
+
+    <div echarts style="height: 250px; width: 100%;" [options]="chartOptionsRok" (chartInit)="onChartRokInit($event)">
+    </div>
+
+    <div style="width: 100%; display: flex; ">
+        <div style="width: 30%;">
+            <h3>Hlavni osoby</h3>
+            <ul>
+                @for(f of catalog().facets.identity.buckets; track f) {
+                <li><a class="app-link" (click)="showCorrespondence(f.val)">{{ catalog().identities[f.val].name }}</a></li>
+                }
+
+            </ul>
+        </div>
+        <div style="height: 250px; width: 70%; position: relative; ">
+            <div style="position: relative;top:0;">@if(loading()){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
+            <div echarts [class.app-loading-identity]="loading()" style="height: 100%; width: 100%;"
+                [initOpts]="{ locale: 'CZ' }" [options]="identityYearsChartOptions"
+                (chartInit)="onIdentityYearsChartInit($event)">
+            </div>
+        </div>
+    </div>
+
+</div>
+}

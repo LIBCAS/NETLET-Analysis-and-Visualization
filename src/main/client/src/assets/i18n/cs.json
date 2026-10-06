@@ -11,6 +11,8 @@
   "bar":"sloupce",
   "professions by letter":"Profese podle počtu dopisů",
   "professions by identity":"Profese podle počtu osob",
+  "letters_count": "Počet dopisů",
+  "letters_count_by_year": "Počet dopisů za rok",
   "home": {
     "centrality": {
       "header": "Centralita",

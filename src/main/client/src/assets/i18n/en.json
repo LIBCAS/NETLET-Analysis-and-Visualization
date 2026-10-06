@@ -10,6 +10,8 @@
   
   "professions by letter":"Professions by letter",
   "professions by identity":"Profession by identity",
+  "letters_count": "Number of letters",
+  "letters_count_by_year": "Number of letters by year",
   "field": {
   "tenant": "Catalog",
     "letter_id": "Id",

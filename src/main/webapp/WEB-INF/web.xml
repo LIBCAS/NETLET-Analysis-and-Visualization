@@ -32,6 +32,7 @@
         <url-pattern>/letter/*</url-pattern>
         <url-pattern>/identity/*</url-pattern>
         <url-pattern>/place/*</url-pattern>
+        <url-pattern>/catalog/*</url-pattern>
         <url-pattern>/map</url-pattern>
         <url-pattern>/home</url-pattern>
     </servlet-mapping>

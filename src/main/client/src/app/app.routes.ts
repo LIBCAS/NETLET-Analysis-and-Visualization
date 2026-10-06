@@ -12,6 +12,7 @@ import { PeriodsComponent } from './pages/periods/periods.component';
 import { LetterComponent } from './pages/letter/letter.component';
 import { PlaceComponent } from './pages/place/place.component';
 import { IdentityComponent } from './pages/identity/identity.component';
+import { CatalogComponent } from './pages/catalog/catalog.component';
 
 export const routes: Routes = [
     {path: '', component: HomeComponent},
@@ -25,6 +26,7 @@ export const routes: Routes = [
     {path: 'professions', component: ProfessionsComponent},
     {path: 'keywords', component: KeywordsComponent},
     {path: 'timeline', component: TimelineComponent},
+    {path: 'catalog/:id', component: CatalogComponent},
     {path: 'letter/:id', component: LetterComponent},
     {path: 'identity/:id', component: IdentityComponent},
     {path: 'place/:id', component: PlaceComponent}
