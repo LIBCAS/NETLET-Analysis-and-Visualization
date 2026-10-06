@@ -634,7 +634,7 @@ public class IndexSearcher {
     return ret;
   }
 
-  public static JSONObject identityLetters(HttpServletRequest request) {
+  public static JSONObject identityFacets(HttpServletRequest request) {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
@@ -696,7 +696,7 @@ public class IndexSearcher {
     return ret;
   }
   
-  public static JSONObject mentioned(HttpServletRequest request) {
+  public static JSONObject identityLetters(HttpServletRequest request) {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
@@ -713,7 +713,7 @@ public class IndexSearcher {
 
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
-              .withFilter("identity_mentioned:\"" + request.getParameter("mentioned") +"\"")
+              //.withFilter("identity_mentioned:\"" + request.getParameter("mentioned") +"\"")
               .returnFields("id,letter_id,identity_author,identity_recipient,date_year,origin_name,destination_name")
               .setLimit(rows);
 
@@ -1067,11 +1067,11 @@ public class IndexSearcher {
     }
 
     if (request.getParameter("author") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(" + String.join(" OR ", request.getParameterValues("author")) + ")");
+      jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(\"" + String.join("\" OR \"", request.getParameterValues("author")) + "\")");
     }
 
     if (request.getParameter("recipient") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(" + String.join(" OR ", request.getParameterValues("recipient")) + ")");
+      jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(\"" + String.join("\" OR \"", request.getParameterValues("recipient")) + "\")");
     }
 
     if (request.getParameter("mentioned") != null) {

@@ -130,15 +130,15 @@ export class RelationComponent {
 
           this.state.addFilters(p);
           p.rows = 20000;
-          p.mentioned = identity;
+          p.recipient = identity;
 
 
-          this.service.getMentioned(p as HttpParams).subscribe((resp: any) => {
+          this.service.getIdentitiyLetters(p as HttpParams).subscribe((resp: any) => {
 
             this.infoContent = '';
             this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
             this.infoData = resp.response.docs;
-            this.infoHeader = 'Letters in which ' + identity + ' is mentioned (' + this.infoData.length + ')';
+            this.infoHeader = 'Letters with ' + identity + ' as recipient (' + this.infoData.length + ')';
             this.state.showInfo.set(true);
 
 

@@ -69,8 +69,8 @@ export class AppService {
     return this.get('data/relation', params)
   }
 
-  getMentioned(params: HttpParams): Observable<any> {
-    return this.get('data/mentioned', params)
+  getIdentitiyLetters(params: HttpParams): Observable<any> {
+    return this.get('data/identity_letters', params)
   }
 
   getMap(params: HttpParams): Observable<any> {
