@@ -12,6 +12,7 @@ import { JSONFacet } from '../../shared/facet';
 import { BarChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
+import { AppConfiguration } from '../../app-configuration';
 echarts.use([BarChart, CanvasRenderer, LegendComponent,
   TooltipComponent, GridComponent, TitleComponent]);
 
@@ -28,6 +29,7 @@ export class CatalogComponent {
 
   private activatedRoute = inject(ActivatedRoute);
   private translation = inject(TranslateService);
+  private config = inject(AppConfiguration);
   catalogId = signal('');
 
   catalogRes: any = httpResource(() => ({
@@ -51,10 +53,10 @@ export class CatalogComponent {
 
   authorInTime = signal('');
   identityInTimeRes: any = httpResource(() => ({
-    url: `/api/data/identity_in_time`,
+    url: `/api/data/identity_in_catalog`,
     method: 'GET',
     params: {
-      'id2': this.authorInTime()
+      'id': this.authorInTime(), 'catalog': this.catalogId()
     }
   }));
   identityInTime = computed<any>(() => this.identityInTimeRes.value());
@@ -208,6 +210,7 @@ export class CatalogComponent {
       const d = this.identityInTime().recipient.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
         name: 'jako adresat',
+        color: this.config.colors['recipient'],
         type: 'line',
         smooth: true,
         symbol: 'none',
@@ -218,6 +221,18 @@ export class CatalogComponent {
       const d = this.identityInTime().author.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
         name: 'jako autor',
+        color: this.config.colors['author'],
+        type: 'line',
+        smooth: true,
+        symbol: 'none',
+        data: d.map((c: JSONFacet) => [c.val, c.count])
+      });
+    }
+    if (this.identityInTime().mentioned?.years) {
+      const d = this.identityInTime().mentioned.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
+      series.push({
+        name: 'mentioned',
+        color: this.config.colors['mentioned'],
         type: 'line',
         smooth: true,
         symbol: 'none',
