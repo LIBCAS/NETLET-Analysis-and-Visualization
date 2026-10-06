@@ -206,8 +206,15 @@ export class CatalogComponent {
   setIdentityYearsOptions() {
     const series = [];
     const limits = this.getYearsLimits(this.identityInTime().tenant?.buckets);
+
+    let maxCount = 0;
+
+
     if (this.identityInTime().recipient?.years) {
       const d = this.identityInTime().recipient.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
+      d.forEach((c: JSONFacet) => {
+        maxCount = Math.max(maxCount, c.count)
+      });
       series.push({
         name: 'jako adresat',
         color: this.config.colors['recipient'],
@@ -219,6 +226,9 @@ export class CatalogComponent {
     }
     if (this.identityInTime().author?.years) {
       const d = this.identityInTime().author.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
+      d.forEach((c: JSONFacet) => {
+        maxCount = Math.max(maxCount, c.count)
+      });
       series.push({
         name: 'jako autor',
         color: this.config.colors['author'],
@@ -230,6 +240,9 @@ export class CatalogComponent {
     }
     if (this.identityInTime().mentioned?.years) {
       const d = this.identityInTime().mentioned.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
+      d.forEach((c: JSONFacet) => {
+        maxCount = Math.max(maxCount, c.count)
+      });
       series.push({
         name: 'mentioned',
         color: this.config.colors['mentioned'],
@@ -261,7 +274,12 @@ export class CatalogComponent {
         type: 'category',
       },
       yAxis: {
+        show: true,
         type: 'value',
+        interval: Math.floor(maxCount / 4),
+        axisLabel: {
+          showMinLabel: false
+        }
       },
       legend: {
         show: true,
