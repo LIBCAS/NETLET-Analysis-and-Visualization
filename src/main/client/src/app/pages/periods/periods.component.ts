@@ -107,7 +107,7 @@ export class PeriodsComponent {
 
     this.translation.onLangChange.subscribe(() => { this.getData(true) });
     this.state.tenants().forEach(t => { t.available = true });
-    this.state.currentView = this.state.views.find(v => v.route === 'keywords');
+    this.state.currentView = this.state.views.find(v => v.route === 'periods');
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     if (this.tenants.length > 0 && this.identitiesChart) {
       this.limits = this.state.getTenantsRange();

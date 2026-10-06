@@ -107,6 +107,8 @@ export class RelationComponent {
 
   infoContent: string;
   infoHeader: string;
+  infoData: any[];
+  infoFields: string[];
   closeInfo() {
     this.infoHeader = null;
     this.infoContent = null;
@@ -120,28 +122,27 @@ export class RelationComponent {
         this._ngZone.run(() => {
           const identity = params.data.name;
 
-          this.infoContent = '';
-          const letters: Letter[] = this.solrResponse.response.docs.filter((letter: Letter) => { return letter.identity_mentioned?.includes(identity) });
-          this.infoHeader = 'Letters in which ' + identity + ' is mentioned (' + letters.length + ')';
-          letters.forEach(letter => {
-            this.infoContent += `<div>${letter.identity_author?.[0]} -> ${letter.identity_recipient?.[0]}: ${letter.date_year}</div>`;
-            // if (letter.places) {
-            //   const origin = letter.places.find(p => p.role === 'origin').name;
-            //   const destination = letter.places.find(p => p.role === 'destination').name;
-            // } else {
 
-            // }
+          const p: any = {};
+          p.tenant = this.state.selectedTenants().map(t => t.val);
+          p.tenant_year_range = this.state.getTenantsRange().toString();
+          p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
 
-            // if (letter.keyword_categories_cs?.length > 0) {
-            //   this.infoContent += ` (${letter.keyword_categories_cs.join(', ')})</div>`;
-            // } else if (letter.keywords_cs?.length > 0) {
-            //   this.infoContent += ` (${letter.keywords_cs.join(', ')})</div>`;
-            // } else {
-            //   this.infoContent += `</div>`;
-            // }
+          this.state.addFilters(p);
+          p.rows = 20000;
+          p.mentioned = identity;
+
+
+          this.service.getMentioned(p as HttpParams).subscribe((resp: any) => {
+
+            this.infoContent = '';
+            this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
+            this.infoData = resp.response.docs;
+            this.infoHeader = 'Letters in which ' + identity + ' is mentioned (' + this.infoData.length + ')';
+            this.state.showInfo.set(true);
+
 
           });
-          this.state.showInfo.set(true);
         });
 
       }

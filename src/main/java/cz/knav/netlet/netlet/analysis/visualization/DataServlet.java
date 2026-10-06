@@ -219,6 +219,12 @@ public class DataServlet extends HttpServlet {
                 return IndexSearcher.relation(request);
             }
         },
+        MENTIONED{
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.mentioned(request);
+            }
+        },
         KEYWORDS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
