@@ -674,27 +674,10 @@ export class MapComponent {
     if (this.geoJsonLayer) {
       this.geoJsonLayer.removeFrom(lmap);
     }
-      // resp.features.forEach((data: any, index: number) => {
-      //     const f: any = {};
-      //     f.type = data.type;
-      //     f.properties = data.properties;
-
-      //     f.layer = geoJSON((data.geometry as any), { style: () => ({ color: '#333', weight: 1, fillColor: '#444', fillOpacity: .2 }) });
-
-      //     // f.layer.bindTooltip(this.getTooltip(f.nazev, f.count), {
-      //     //   opacity: 0.9,
-      //     //   sticky: true,
-      //     //   direction: 'top'
-      //     // });
-      //     //this.model1.overlayLayers.push(f);
-      //     //this.layers.push(f.layer);
-      //     f.layer.addTo(lmap);
-      // });
-      this.geoJsonLayer = geoJSON((resp as any), { style: () => ({ color: '#333', weight: 1, fillColor: '#444', fillOpacity: .2 }) });
+    
+      this.geoJsonLayer = geoJSON((resp as any), { style: () => ({ color: '#333', weight: 1, fillColor: '#fff', fillOpacity: .4 }) });
 
       this.geoJsonLayer.addTo(lmap);
-      // this.layers.unshift(this.model1.baseLayers[0].layer);
-      // const l: any = this.model1.overlayLayers[0].layer;
     });
   }
 
