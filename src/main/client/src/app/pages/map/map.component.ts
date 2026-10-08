@@ -511,17 +511,17 @@ export class MapComponent {
     //LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OpenStreetMaps' }).addTo(lmap);
 
     const osm = LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OpenStreetMaps' });
-    const carto = LtileLayer('https://basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png?key=cb1_44kb_1_fcb333c51ecf506f887c03b7', { attribution: 'OpenStreetMaps, CARTO' });
+    //const carto = LtileLayer('https://basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png?key=cb1_44kb_1_fcb333c51ecf506f887c03b7', { attribution: 'OpenStreetMaps, CARTO' });
     //const Historical = LtileLayer('https://tiles.traveltimeapp.com/osm-bright/{z}/{x}/{y}.png?key=d7b19cdc', { attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> | Created with <a href="https://traveltime.com" target="_blank">TravelTime API</a>' });
 
 
-    var baseMaps = {
-      "OpenStreetMap": osm,
-      "Historical": carto,
-      //"Historical": Historical
-    };
+    // var baseMaps = {
+    //   "OpenStreetMap": osm,
+    //   "Historical": carto,
+    //   //"Historical": Historical
+    // };
     osm.addTo(lmap);
-    var layerControl = L.control.layers(baseMaps).addTo(lmap);
+    //var layerControl = L.control.layers(baseMaps).addTo(lmap);
 
     setTimeout(() => {
       this.fitBounds();

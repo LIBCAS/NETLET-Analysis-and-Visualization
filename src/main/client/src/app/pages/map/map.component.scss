@@ -1,3 +1,9 @@
+::ng-deep {
+    .lmap-ec-layer {
+        z-index: 300 !important;
+    }
+}
+
 .dot {
     border-radius: 50%;
     display: inline-block;
