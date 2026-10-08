@@ -80,6 +80,7 @@ export class MapComponent {
   };
 
   geojsons: string[] = ['1500', '1530', '1600', '1650', '1700', '1715', '1783', '1800', '1815', '1878', '1880', '1900', '1914', '1920', '1930', '1938', '1945', '1960', '1994', '2000', '2010'];
+  geojsonsFiltered = signal<string[]>([]);
   selectedGeo = signal<string>('');
 
   solrResponse: any;
@@ -178,6 +179,8 @@ export class MapComponent {
     // } else {
     //   p.rows = 20000;
     // }
+
+    this.filterGeos();
 
     this.service.getMap(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
@@ -626,9 +629,16 @@ export class MapComponent {
     this.getGeos(this.selectedGeo())
   }
 
-  geoJsonLayer: any;
-  getGeos(year: string) {
-    if (!year) {
+  filterGeos() {
+    const first = this.geojsons.findIndex(g => parseInt(g) > this.limits[0].getFullYear()) - 1;
+    const last = this.geojsons.findIndex(g => parseInt(g) > this.limits[1].getFullYear());
+    this.geojsonsFiltered.set(this.geojsons.slice(Math.max(0, first), Math.min(last, this.geojsons.length - 1)));
+    this.selectedGeo.set('')
+    this.clearGeos();
+  }
+
+  clearGeos() {
+    if (this.graphChart) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const lmapComponent = this.graphChart.getModel().getComponent("lmap");
@@ -640,6 +650,14 @@ export class MapComponent {
       if (this.geoJsonLayer) {
         this.geoJsonLayer.removeFrom(lmap);
       }
+    }
+  }
+  
+
+  geoJsonLayer: any;
+  getGeos(year: string) {
+    if (!year) {
+      this.clearGeos();
       return;
     }
 

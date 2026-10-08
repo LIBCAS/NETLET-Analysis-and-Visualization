@@ -17,13 +17,13 @@
           (onChangeLimits)="changeLimits($event)" [withAnimation]="true" (onChangeRunning)="changeRunning($event)"></app-years-chart>
         }
       </div>
-      <div style="display: flex;">
+      <div class="app-fxLayout app-gap-4">
         <div><mat-checkbox [(ngModel)]="showLinks" (change)="toggleLinks()">{{ 'action.showLinks' | translate}}</mat-checkbox></div>
         <div>
         <label>&#160;&#160;Zobrazení státních hranic podle roku&#160;&#160;</label>
             <mat-select [(value)]="selectedGeo" (selectionChange)="onSelectionChange($event)">
               <mat-option [value]="''"></mat-option>
-              @for(g of geojsons; track g) {
+              @for(g of geojsonsFiltered(); track g) {
                 <mat-option [value]="g">rok: {{ g }}</mat-option>
               }
             </mat-select>
@@ -38,9 +38,6 @@
         
       </div>
       <div style="height: 100%; width: 100%;" id="echarts-lmap" class="app-fxFlex"></div>
-  <!-- <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"
-  (leafletMapReady)="onMapReady($event)">
-</div> -->
 </div>
   </as-split-area>
 </as-split>
