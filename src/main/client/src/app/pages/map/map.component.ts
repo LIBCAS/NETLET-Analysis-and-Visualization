@@ -649,10 +649,16 @@ export class MapComponent {
     }
   }
 
+  geoJsonControl: any;
   addControl(lmap: any) {
-    const legend: any = new L.Control({ position: 'bottomright' });
+    if (this.geoJsonControl) {
+      //this.geoJsonControl.removeFrom(lmap);
+      lmap.removeControl(this.geoJsonControl);
+    }
+    
+    this.geoJsonControl = new L.Control({ position: 'bottomright' });
 
-    legend.onAdd = (map: any) => {
+    this.geoJsonControl.onAdd = (map: any) => {
 
       const div = L.DomUtil.create('div', 'info legend');
       const label = L.DomUtil.create('label', 'title');
@@ -682,7 +688,7 @@ export class MapComponent {
       return div;
     };
 
-    legend.addTo(lmap);
+    this.geoJsonControl.addTo(lmap);
   }
 
   clearGeos(lmap: any) {
