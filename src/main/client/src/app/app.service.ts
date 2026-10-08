@@ -113,5 +113,10 @@ export class AppService {
   searchLanguages(params: HttpParams): Observable<any> {
     return this.get('data/search_languages', params)
   }
+
+  getGeos(year: string) {
+    const url = `assets/geojson/world_${year}.geojson`;
+    return this.http.get(url);
+  }
   
 }

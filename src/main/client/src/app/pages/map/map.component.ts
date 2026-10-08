@@ -27,7 +27,7 @@ import {
 } from "@joakimono/echarts-extension-leaflet/src/export";
 
 
-import L, { latLng, Map, tileLayer as LtileLayer, MapOptions } from "leaflet";
+import L, { latLng, Map, tileLayer as LtileLayer, MapOptions, geoJSON } from "leaflet";
 import 'leaflet.fullscreen';
 
 import { VisualMapComponentOption, GraphSeriesOption, color } from 'echarts';
@@ -78,6 +78,9 @@ export class MapComponent {
     zoom: 4,
     center: latLng(49.879966, 16.726909)
   };
+
+  geojsons: string[] = ['1500', '1530', '1600', '1650', '1700', '1715', '1783', '1800', '1815', '1878', '1880', '1900', '1914', '1920', '1930', '1938', '1945', '1960', '1994', '2000', '2010'];
+  selectedGeo = signal<string>('');
 
   solrResponse: any;
   facets = signal<FacetFields>({});
@@ -517,8 +520,6 @@ export class MapComponent {
     osm.addTo(lmap);
     var layerControl = L.control.layers(baseMaps).addTo(lmap);
 
-
-
     setTimeout(() => {
       this.fitBounds();
     }, 100);
@@ -618,6 +619,64 @@ export class MapComponent {
         docs: reversed
       };
       this.state.showInfo.set(true);
+    });
+  }
+
+  onSelectionChange(event: any) {
+    this.getGeos(this.selectedGeo())
+  }
+
+  geoJsonLayer: any;
+  getGeos(year: string) {
+    if (!year) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const lmapComponent = this.graphChart.getModel().getComponent("lmap");
+      // Get the instance of Leaflet
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const lmap = lmapComponent.getLeaflet();
+
+      if (this.geoJsonLayer) {
+        this.geoJsonLayer.removeFrom(lmap);
+      }
+      return;
+    }
+
+    this.service.getGeos(year).subscribe((resp:any) => {
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const lmapComponent = this.graphChart.getModel().getComponent("lmap");
+    // Get the instance of Leaflet
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const lmap = lmapComponent.getLeaflet();
+
+    if (this.geoJsonLayer) {
+      this.geoJsonLayer.removeFrom(lmap);
+    }
+      // resp.features.forEach((data: any, index: number) => {
+      //     const f: any = {};
+      //     f.type = data.type;
+      //     f.properties = data.properties;
+
+      //     f.layer = geoJSON((data.geometry as any), { style: () => ({ color: '#333', weight: 1, fillColor: '#444', fillOpacity: .2 }) });
+
+      //     // f.layer.bindTooltip(this.getTooltip(f.nazev, f.count), {
+      //     //   opacity: 0.9,
+      //     //   sticky: true,
+      //     //   direction: 'top'
+      //     // });
+      //     //this.model1.overlayLayers.push(f);
+      //     //this.layers.push(f.layer);
+      //     f.layer.addTo(lmap);
+      // });
+      this.geoJsonLayer = geoJSON((resp as any), { style: () => ({ color: '#333', weight: 1, fillColor: '#444', fillOpacity: .2 }) });
+
+      this.geoJsonLayer.addTo(lmap);
+      // this.layers.unshift(this.model1.baseLayers[0].layer);
+      // const l: any = this.model1.overlayLayers[0].layer;
     });
   }
 
