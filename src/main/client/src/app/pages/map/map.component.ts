@@ -27,7 +27,7 @@ import {
 } from "@joakimono/echarts-extension-leaflet/src/export";
 
 
-import L, { latLng, Map, tileLayer as LtileLayer, MapOptions, geoJSON } from "leaflet";
+import L, { latLng, Map, tileLayer as LtileLayer, MapOptions, geoJSON, control } from "leaflet";
 import 'leaflet.fullscreen';
 
 import { VisualMapComponentOption, GraphSeriesOption, color } from 'echarts';
@@ -494,7 +494,7 @@ export class MapComponent {
         this._ngZone.run(() => {
 
           this.getLinkLetters(params);
-          
+
         });
 
       }
@@ -523,6 +523,7 @@ export class MapComponent {
     osm.addTo(lmap);
     //var layerControl = L.control.layers(baseMaps).addTo(lmap);
 
+    this.filterGeos();
     setTimeout(() => {
       this.fitBounds();
     }, 100);
@@ -633,12 +634,9 @@ export class MapComponent {
     const first = this.geojsons.findIndex(g => parseInt(g) > this.limits[0].getFullYear()) - 1;
     const last = this.geojsons.findIndex(g => parseInt(g) > this.limits[1].getFullYear());
     this.geojsonsFiltered.set(this.geojsons.slice(Math.max(0, first), Math.min(last, this.geojsons.length - 1)));
-    this.selectedGeo.set('')
-    this.clearGeos();
-  }
-
-  clearGeos() {
+    this.selectedGeo.set('');
     if (this.graphChart) {
+
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const lmapComponent = this.graphChart.getModel().getComponent("lmap");
@@ -646,22 +644,58 @@ export class MapComponent {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const lmap = lmapComponent.getLeaflet();
-
-      if (this.geoJsonLayer) {
-        this.geoJsonLayer.removeFrom(lmap);
-      }
+      this.clearGeos(lmap);
+      this.addControl(lmap)
     }
   }
-  
+
+  addControl(lmap: any) {
+    const legend: any = new L.Control({ position: 'bottomright' });
+
+    legend.onAdd = (map: any) => {
+
+      const div = L.DomUtil.create('div', 'info legend');
+      const label = L.DomUtil.create('label', 'title');
+      label.textContent = 'Zobrazení státních hranic podle roku';
+      div.appendChild(label);
+      this.geojsonsFiltered().forEach((rok: string) => {
+        const r = L.DomUtil.create('div', 'rok');
+        r.id = 'geo_rok_' + rok;
+        r.innerHTML = rok;
+        r.onclick = (e: any) => {
+          const els = this.document.getElementsByClassName('rok');
+          Array.from(els).forEach((element: any) => {
+            element.classList = 'rok';
+          });
+          if (this.selectedGeo() === rok) {
+            this.selectedGeo.set('')
+          } else {
+            this.selectedGeo.set(rok);
+          r.classList = 'rok selected';
+          }
+          this.getGeos(this.selectedGeo());
+        };
+
+        div.appendChild(r);
+      });
+
+      return div;
+    };
+
+    legend.addTo(lmap);
+  }
+
+  clearGeos(lmap: any) {
+
+    if (this.geoJsonLayer) {
+      this.geoJsonLayer.removeFrom(lmap);
+    }
+
+  }
+
 
   geoJsonLayer: any;
   getGeos(year: string) {
-    if (!year) {
-      this.clearGeos();
-      return;
-    }
-
-    this.service.getGeos(year).subscribe((resp:any) => {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -670,11 +704,17 @@ export class MapComponent {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const lmap = lmapComponent.getLeaflet();
-
-    if (this.geoJsonLayer) {
-      this.geoJsonLayer.removeFrom(lmap);
+    if (!year) {
+      this.clearGeos(lmap);
+      return;
     }
-    
+
+    this.service.getGeos(year).subscribe((resp: any) => {
+
+      if (this.geoJsonLayer) {
+        this.geoJsonLayer.removeFrom(lmap);
+      }
+
       this.geoJsonLayer = geoJSON((resp as any), { style: () => ({ color: '#333', weight: 1, fillColor: '#fff', fillOpacity: .4 }) });
 
       this.geoJsonLayer.addTo(lmap);

@@ -2,6 +2,24 @@
     .lmap-ec-layer {
         z-index: 300 !important;
     }
+
+    .info {
+        background-color: white;
+        border: solid #aaa 1px;
+        box-shadow: 5px 2px 2px #ccc;
+        padding: 3px;
+
+        .title {
+            font-weight: bolder;
+        }
+
+        .rok {
+            cursor: pointer;
+            &.selected {
+                color: red;
+            }
+        }
+    }
 }
 
 .dot {
