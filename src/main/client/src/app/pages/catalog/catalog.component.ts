@@ -1,6 +1,6 @@
 import { httpResource } from '@angular/common/http';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -13,12 +13,15 @@ import { BarChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { AppConfiguration } from '../../app-configuration';
+import { AppState } from '../../app-state';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 echarts.use([BarChart, CanvasRenderer, LegendComponent,
   TooltipComponent, GridComponent, TitleComponent]);
 
 @Component({
   selector: 'app-catalog',
-  imports: [TranslateModule, LeafletModule, NgxEchartsDirective, MatProgressBarModule],
+  imports: [TranslateModule, LeafletModule, NgxEchartsDirective, MatProgressBarModule, MatIconModule, MatButtonModule],
   templateUrl: './catalog.component.html',
   styleUrl: './catalog.component.scss',
   providers: [
@@ -27,9 +30,12 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent,
 })
 export class CatalogComponent {
 
+  readonly router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
   private translation = inject(TranslateService);
   private config = inject(AppConfiguration);
+  private state = inject(AppState);
+
   catalogId = signal('');
 
   catalogRes: any = httpResource(() => ({
@@ -88,8 +94,19 @@ export class CatalogComponent {
     });
   }
 
+  search() {
+
+    this.state.tenants().find(st => st.val === this.catalogId()).selected = true;
+
+    if (this.state.hasStateInUrl()) {
+      this.router.navigate(['timeline'], { queryParams: { s: this.state.encodeState() } });
+    }
+
+  }
+
   setData(tenant: any) {
     this.setYearsChart(this.catalog().facets.years);
+    this.showCorrespondence(this.catalog().facets.identity.buckets[0].val);
   }
 
   onChartRokInit(e: any) {

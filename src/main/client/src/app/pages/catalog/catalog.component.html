@@ -4,8 +4,9 @@
     <fieldset>
         <legend>{{ 'field.stats' | translate }}</legend>
         <div>
-            <label>{{ 'letters_count' | translate }}:</label>
-            <div>{{ catalog().response.numFound }}</div>
+            <label><button matIconButton class="app-hiko app-small-icon-button" [title]="'action.search' | translate" 
+                 (click)="search()"><mat-icon>search</mat-icon></button>{{ 'letters_count' | translate }}:</label>
+            <div>{{ catalog().response.numFound }} </div>
 
             <label>{{ 'authors' | translate }}:</label>
             <div>{{ catalog().facets.authors.numBuckets }}</div>
@@ -20,15 +21,17 @@
 
     </fieldset>
 
-    <div echarts style="height: 250px; width: 100%;" [options]="chartOptionsRok" (chartInit)="onChartRokInit($event)">
+    <div echarts style="height: 250px; width: 100%;margin-bottom: 20px;" [options]="chartOptionsRok" (chartInit)="onChartRokInit($event)">
     </div>
 
+    <h3>Korespondence</h3>
     <div style="width: 100%; display: flex; ">
+        
         <div style="width: 30%;">
             <h3>Hlavni osoby</h3>
             <ul>
                 @for(f of catalog().facets.identity.buckets; track f) {
-                <li><a class="app-link" (click)="showCorrespondence(f.val)">{{ catalog().identities[f.val].name }}</a></li>
+                <li><a class="app-link" [class.app-selected-identity]="f.val === authorInTime()" (click)="showCorrespondence(f.val)">{{ catalog().identities[f.val].name }}</a></li>
                 }
 
             </ul>
