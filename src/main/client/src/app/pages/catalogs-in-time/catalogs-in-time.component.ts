@@ -173,7 +173,7 @@ export class CatalogsInTimeComponent {
         top: 30
       },
       xAxis: {
-        type: 'category',
+        type: 'category'
         //data: facet.buckets.map(b => b.val)
       },
       yAxis: {

@@ -1,6 +1,6 @@
 import { httpResource } from '@angular/common/http';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { JSONFacet } from '../../shared/facet';
 
@@ -14,6 +14,9 @@ import { LegendComponent, TooltipComponent, GridComponent, TitleComponent, Datas
 import { CanvasRenderer } from 'echarts/renderers';
 import { NgxEchartsDirective, NgxEchartsModule, provideEchartsCore } from 'ngx-echarts';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { AppState } from '../../app-state';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 
 echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent, PieChart, DatasetComponent,
@@ -22,7 +25,7 @@ echarts.registerLocale("CZ", langCZ)
 
 @Component({
   selector: 'app-identity',
-  imports: [TranslateModule, NgxEchartsModule, NgxEchartsDirective, MatProgressBarModule],
+  imports: [TranslateModule, NgxEchartsModule, NgxEchartsDirective, MatProgressBarModule, MatButtonModule, MatIconModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -32,8 +35,10 @@ echarts.registerLocale("CZ", langCZ)
 export class IdentityComponent {
 
   identityId = signal('');
+  readonly router = inject(Router);
   private translation = inject(TranslateService);
   private activatedRoute = inject(ActivatedRoute);
+  private state = inject(AppState);
 
   identityRes: any = httpResource(() => ({
     url: `/api/data/get_identity`,
@@ -93,6 +98,13 @@ export class IdentityComponent {
         this.setIdentityYearsOptions();
       }
     });
+  }
+
+  search(field: string) {
+
+    this.state.usedFacets.set([{ field, value: this.identity()?.name, op: '' }]);
+    this.router.navigate(['timeline'], { queryParams: { s: this.state.encodeState() } });
+
   }
 
   excludedTenants: string[] = [];

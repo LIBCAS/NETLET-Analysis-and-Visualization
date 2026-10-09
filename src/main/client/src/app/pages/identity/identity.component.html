@@ -40,22 +40,26 @@
     <legend>{{ 'field.stats' | translate }}</legend>
 
     <div>
-      <label>{{ 'field.letters' | translate }}:</label>
+      <label><button matIconButton class="app-hiko app-small-icon-button" [title]="'action.search' | translate" 
+                 (click)="search('identities')"><mat-icon>search</mat-icon></button>{{ 'field.letters' | translate }}:</label>
       <div>{{ identity().stats.count }}</div>
     </div>
 
     <div>
-      <label>{{ 'field.author' | translate }}:</label>
+      <label><button matIconButton class="app-hiko app-small-icon-button" [title]="'action.search' | translate" 
+                 (click)="search('authors')"><mat-icon>search</mat-icon></button>{{ 'field.author' | translate }}:</label>
       <div>{{ identity().stats.author.count }}</div>
     </div>
 
     <div>
-      <label>{{ 'field.recipient' | translate }}:</label>
+      <label><button matIconButton class="app-hiko app-small-icon-button" [title]="'action.search' | translate" 
+                 (click)="search('recipients')"><mat-icon>search</mat-icon></button>{{ 'field.recipient' | translate }}:</label>
       <div>{{ identity().stats.recipient.count }}</div>
     </div>
 
     <div>
-      <label>{{ 'field.stats_mentioned' | translate }}:</label>
+      <label><button matIconButton class="app-hiko app-small-icon-button" [title]="'action.search' | translate" 
+                 (click)="search('mentioned')"><mat-icon>search</mat-icon></button>{{ 'field.stats_mentioned' | translate }}:</label>
       <div>{{ identity().stats.mentioned.count }}</div>
     </div>
     <div  style="height: 300px; width: 100%; position: relative;display: flex; ">

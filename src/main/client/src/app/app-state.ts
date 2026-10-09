@@ -177,13 +177,14 @@ export interface Tenant {
 
   encodeState() {
     const obj = { q: this.q, f: this.usedFacets(), t: this.tenants().filter(t => t.selected).map(t => t.val)};
+    console.log(obj)
     return btoa(encodeURIComponent(JSON.stringify(obj)));
   }
 
   decodeState(s: string) {
     if (s) {
       const obj = JSON.parse(decodeURIComponent(atob(s)));
-      //console.log(obj)
+      console.log(obj)
       this.q = obj.q;
       this.usedFacets.set(obj.f);
       //this.tenants().forEach(t => {t.selected = false});

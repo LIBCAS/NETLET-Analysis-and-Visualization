@@ -1117,15 +1117,15 @@ public class IndexSearcher {
     }
 
     if (request.getParameter("author") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(\"" + String.join("\" OR \"", request.getParameterValues("author")) + "\")");
+      jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(" + String.join(" OR ", request.getParameterValues("author")) + ")");
     }
 
     if (request.getParameter("recipient") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(\"" + String.join("\" OR \"", request.getParameterValues("recipient")) + "\")");
+      jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(" + String.join(" OR ", request.getParameterValues("recipient")) + ")");
     }
 
     if (request.getParameter("mentioned") != null) {
-      jrequest = jrequest.withFilter("{!tag=ffmentioned}identity_mentioned:(\"" + String.join("\" OR \"", request.getParameterValues("mentioned")) + "\")");
+      jrequest = jrequest.withFilter("{!tag=ffmentioned}identity_mentioned:(" + String.join("\" OR \"", request.getParameterValues("mentioned")) + ")");
     }
 
     if (request.getParameter("keyword") != null) {
