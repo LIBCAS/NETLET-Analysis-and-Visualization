@@ -37,7 +37,7 @@ export class CatalogsInTimeComponent {
   private config = inject(AppConfiguration);
   public state = inject(AppState);
 
-  facets = signal<FacetFields>({});
+  facets = signal<FacetFields>(null);
   loading = signal(false);
   count: number;
 
@@ -71,7 +71,7 @@ export class CatalogsInTimeComponent {
 
   getData() {
     this.loading.set(true);
-    this.facets.set({});
+    this.facets.set(null);
     const p: any = {};
     p.tenant = this.state.selectedTenants().map(t => t.val);
     p.rows = 0;
@@ -151,8 +151,16 @@ export class CatalogsInTimeComponent {
     this.yearsChartOptions = {
       tooltip: {
         trigger: 'axis',
-        position: function (pt: any) {
-          return [pt[0], '10%'];
+        formatter: (params: any, ticket: string, callback: (ticket: string, html: string | HTMLElement | HTMLElement[])=> void) => {
+          //console.log(params)
+          let ret = params[0].name + '<br/>';
+          params.forEach((serie: any) => {
+            if (serie.value[1] > 0) {
+              ret += `${serie.marker}<span style="font-size:14px;color:#6d6e73;font-weight:400;margin-left:2px">
+              ${this.translation.instant('catalog.'+serie.seriesName)}</span><span style="float:right;margin-left:20px;font-size:14px;color:#6d6e73;font-weight:900">${serie.value[1]}</span><br/>`;
+            }
+          });
+          return ret;
         }
       },
       title: {
@@ -181,6 +189,9 @@ export class CatalogsInTimeComponent {
         orient: 'vertical',
         top: 30,
         left: 30,
+        formatter: (name: string) => {
+            return this.translation.instant('catalog.'+name);
+        }
       },
       dataZoom: [
         {
