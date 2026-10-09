@@ -261,6 +261,12 @@ public class DataServlet extends HttpServlet {
                 return IndexSearcher.twoIdentitiesInTime(request.getParameter("id"), request.getParameter("id2")); 
             }
         },
+        CATALOGS_IN_TIME {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.catalogsInTime(); 
+            }
+        },
         IDENTITY_IN_CATALOG {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {

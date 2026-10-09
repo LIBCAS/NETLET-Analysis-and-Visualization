@@ -406,7 +406,6 @@ export class IdentityComponent {
       }
     }
 
-    console.log(this.identitiesBarOptions)
   }
 
   setIdentityYearsOptions() {

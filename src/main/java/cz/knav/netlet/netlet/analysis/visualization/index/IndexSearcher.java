@@ -1459,5 +1459,38 @@ public class IndexSearcher {
     }
     return identities;
   }
+  
+  public static JSONObject catalogsInTime() {
+    JSONObject ret = new JSONObject();
+    try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+      
+      RangeFacetMap rangeFacet = new RangeFacetMap("date_year", 1550, 2020,1)
+              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+      JsonQueryRequest srequest = new JsonQueryRequest()
+              .setQuery("*:*")
+              .withFilter("-tenant:pamatky")
+//              .withFacet("years", rangeFacet
+//                      .withSubFacet("tenant", new TermsFacetMap("tenant"))
+//              )
+              .withFacet("tenant", new TermsFacetMap("tenant")
+                      .withSubFacet("years",rangeFacet )
+                      .setLimit(100)
+              )
+              .setLimit(0);
+
+      srequest.setResponseParser(new InputStreamResponseParser("json"));
+
+      NamedList<Object> resp = solr.request(srequest, "hiko");
+      InputStream is = (InputStream) resp.get("stream");
+      ret = new JSONObject(IOUtils.toString(is, "UTF-8")).getJSONObject("facets");
+      
+
+      //ret.put("hiko", getLetterFromHIKO(id.split("_")[1], id.split("_")[0]));
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, "Error {0}", ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
 
 }

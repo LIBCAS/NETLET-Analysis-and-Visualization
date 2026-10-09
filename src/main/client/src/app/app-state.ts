@@ -73,9 +73,9 @@ export interface Tenant {
       route: 'periods'
     },
     {
-      header: 'map_dynamika',
+      header: 'catalogs_in_time',
       text: 'Statisticky pojaté grafy a časové osy porovnávající dynamiku vývoje jednotlivých korespondenčních celků v časové dimenzi',
-      route: ''
+      route: 'catalogs'
     },
     {
       header: 'themes',

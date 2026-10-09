@@ -118,5 +118,9 @@ export class AppService {
     const url = `assets/geojson/world_${year}.geojson`;
     return this.http.get(url);
   }
+
+  getCatalogsInTime(params: HttpParams): Observable<any> {
+    return this.get('data/catalogs_in_time', params)
+  }
   
 }

@@ -34,8 +34,8 @@
       "header": "Období",
       "text": "Komparativně pojatá zobrazení v rámci tří hlavních období"
     },
-    "map_dynamika": {
-      "header": "",
+    "catalogs_in_time": {
+      "header": "Dynamika katalogů",
       "text": "Statisticky pojaté grafy a časové osy porovnávající dynamiku vývoje jednotlivých korespondenčních celků v časové dimenzi"
     },
     "identities": {
