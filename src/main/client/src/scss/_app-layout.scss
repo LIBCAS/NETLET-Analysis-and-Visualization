@@ -18,8 +18,12 @@ html, body {
 
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: var(--app-font-family); // redesign
   font-size: 14px;
+  background: var(--app-color-soft); // redesign
+  color: var(--app-color-ink); // redesign
+  -webkit-font-smoothing: antialiased; // redesign
+  text-rendering: optimizeLegibility; // redesign
   .app-content-wrapper {
     padding: var(--app-default-wrapper);
   }

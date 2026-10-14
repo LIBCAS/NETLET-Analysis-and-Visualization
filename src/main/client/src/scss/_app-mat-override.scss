@@ -95,3 +95,91 @@
     padding: 0 16px 16px 16px !important;
   }
 }
+
+// redesign
+:root {
+  @include mat.form-field-overrides((
+    container-height: 40px,
+    container-vertical-padding: 6px,
+    container-text-size: 14px,
+    container-text-weight: 500,
+    outlined-container-shape: 8px,
+    outlined-outline-color: var(--app-color-line),
+    outlined-hover-outline-color: #cfc7bf,
+    outlined-focus-outline-color: var(--app-color-primary),
+    outlined-label-text-color: var(--app-color-muted),
+    outlined-hover-label-text-color: var(--app-color-ink),
+    outlined-focus-label-text-color: var(--app-color-primary-strong),
+    filled-container-color: #fbfaf8,
+    filled-focus-active-indicator-color: var(--app-color-primary),
+    filled-hover-active-indicator-color: var(--app-color-primary-strong),
+    hover-state-layer-opacity: 0,
+    focus-state-layer-opacity: 0
+  ));
+
+  @include mat.button-overrides((
+    filled-container-color: var(--app-color-primary-strong),
+    filled-label-text-color: #ffffff,
+    filled-container-shape: 8px,
+    filled-container-height: 36px,
+    outlined-container-shape: 8px,
+    outlined-container-height: 36px,
+    outlined-outline-color: rgba(122, 86, 73, .32),
+    outlined-label-text-color: var(--app-color-primary-strong),
+    protected-container-shape: 8px,
+    protected-container-height: 36px,
+    protected-container-color: #ffffff,
+    protected-label-text-color: var(--app-color-primary-strong),
+    text-container-shape: 8px,
+    text-container-height: 36px,
+    text-label-text-color: var(--app-color-primary-strong),
+    tonal-container-shape: 8px,
+    tonal-container-height: 36px,
+    tonal-container-color: #f0ebe6,
+    tonal-label-text-color: var(--app-color-primary-strong)
+  ));
+
+  @include mat.toolbar-overrides((
+    container-background-color: rgba(255, 255, 255, .92),
+    container-text-color: var(--app-color-ink),
+    standard-height: 68px,
+    title-text-size: 16px,
+    title-text-weight: 700
+  ));
+
+  @include mat.card-overrides((
+    elevated-container-shape: 8px,
+    outlined-container-shape: 8px,
+    filled-container-shape: 8px,
+    elevated-container-color: #ffffff,
+    outlined-container-color: #ffffff,
+    filled-container-color: #fbfaf8,
+    outlined-outline-color: var(--app-color-line),
+    elevated-container-elevation: none
+  ));
+
+  @include mat.tabs-overrides((
+    container-height: 44px,
+    active-indicator-color: var(--app-color-primary-strong),
+    active-label-text-color: var(--app-color-primary-strong),
+    inactive-label-text-color: var(--app-color-muted),
+    active-hover-label-text-color: var(--app-color-primary-strong),
+    inactive-hover-label-text-color: var(--app-color-ink),
+    label-text-size: 14px,
+    label-text-weight: 700
+  ));
+
+  @include mat.table-overrides((
+    background-color: #ffffff,
+    row-item-outline-color: var(--app-color-line),
+    row-item-label-text-color: var(--app-color-ink),
+    header-headline-color: var(--app-color-muted)
+  ));
+
+  @include mat.paginator-overrides((
+    container-background-color: transparent,
+    container-text-color: var(--app-color-muted),
+    enabled-icon-color: var(--app-color-primary-strong),
+    disabled-icon-color: #cfc7bf
+  ));
+}
