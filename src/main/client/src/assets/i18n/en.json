@@ -23,6 +23,9 @@
     "czech": "Čeština",
     "english": "English"
   },
+  "footer": {
+    "license": "Developed under the license"
+  },
   "home": {
     "centrality": {
       "header": "Centrality",

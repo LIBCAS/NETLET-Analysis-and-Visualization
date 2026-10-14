@@ -23,6 +23,9 @@
     "czech": "Čeština",
     "english": "English"
   },
+  "footer": {
+    "license": "Vývoj probíhá pod licencí"
+  },
   "home": {
     "centrality": {
       "header": "Centralita",
