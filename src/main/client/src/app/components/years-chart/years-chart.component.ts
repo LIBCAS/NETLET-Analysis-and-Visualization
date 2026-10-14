@@ -5,7 +5,7 @@ import * as echarts from 'echarts/core';
 import { EChartsOption, ECharts } from 'echarts';
 import { BarChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
-import { DataZoomComponent, LegendComponent, MarkAreaComponent, VisualMapComponent } from 'echarts/components';
+import { DataZoomComponent, LegendComponent, MarkAreaComponent, MarkLineComponent } from 'echarts/components';
 import { TooltipComponent } from 'echarts/components';
 import { GridComponent } from 'echarts/components';
 import { TitleComponent } from 'echarts/components';
@@ -18,9 +18,9 @@ import { AppState } from '../../app-state';
 import { TranslateService } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { DomSanitizer } from '@angular/platform-browser';
-echarts.use([BarChart, CanvasRenderer, LegendComponent,
+echarts.use([BarChart, CanvasRenderer, LegendComponent, MarkLineComponent,
   TooltipComponent, GridComponent, TitleComponent, BrushComponent, DataZoomComponent,
-  ToolboxComponent, VisualMapComponent, MarkAreaComponent]);
+  ToolboxComponent, MarkAreaComponent]);
 
 const EXPAND_ICON =
   `
@@ -130,11 +130,11 @@ export class YearsChartComponent {
       // Triggers a shallow update forcing ECharts to repaint the elements 
       // and handle the object interpolation safely
       this.chartRok.setOption({
-        brush: {} 
+        brush: {}
       });
     });
 
-    
+
 
 
     this.setYearsChart(this.dateYearFacet());
@@ -193,9 +193,7 @@ export class YearsChartComponent {
             itemStyle: {
               color: 'rgba(255,255,255,0)',
               //opacity: 0,
-              borderWidth: 1,
-            borderColor: '#000',
-            borderRadius: 'solid'
+              
             },
           },
           {
@@ -214,10 +212,6 @@ export class YearsChartComponent {
             itemStyle: {
               color: 'rgba(255,255,255,0)',
               //opacity: 0,
-              
-              borderWidth: 1,
-            borderColor: '#000',
-            borderRadius: 'solid'
             }
           },
           {
@@ -236,11 +230,6 @@ export class YearsChartComponent {
             itemStyle: {
               color: 'rgba(255,255,255,0)',
               //opacity: 0,
-              
-              
-              borderWidth: 1,
-            borderColor: '#000',
-            borderRadius: 'solid'
             }
           },
           {
@@ -304,17 +293,17 @@ export class YearsChartComponent {
       },
       toolbox: {
         show: true,
-         showTitle: false,
-         tooltip: { 
-            show: true,
-            confine: true,
-            formatter: function (param) {
-                return '<div>' + param.title + '</div>'; // user-defined DOM structure
-            },
-            backgroundColor: '#fff',
-            textStyle: {
-                fontSize: 12,
-            }
+        showTitle: false,
+        tooltip: {
+          show: true,
+          confine: true,
+          formatter: function (param) {
+            return '<div>' + param.title + '</div>'; // user-defined DOM structure
+          },
+          backgroundColor: '#fff',
+          textStyle: {
+            fontSize: 12,
+          }
         },
         iconStyle: {
           borderColor: '#6578ba',
@@ -352,20 +341,20 @@ export class YearsChartComponent {
             show: true,
             title: 'Zobrazit/skrýt období',
             icon: `path://M211.79883,44.20117a27.9983,27.9983,0,0,0-42.221,36.56445l-88.8125,88.8125a28.03763,28.03763,0,0,0-36.56421,2.623h-.00049a28.00012,28.00012,0,1,0,42.2212,3.03369l88.81274-88.813a27.99812,27.99812,0,0,0,36.56421-42.22071ZM78.14258,206.14258a20.00046,20.00046,0,1,1-28.28467-28.28516h-.00049a20.00063,20.00063,0,0,1,28.28516,28.28516Zm128-128a20.02563,20.02563,0,0,1-28.2832.002l-.00147-.002a20.00028,20.00028,0,1,1,28.28467,0Z`,
-            
+
             onclick: () => {
               this.state.showPeriods = !this.state.showPeriods;
               const ma = this.setMarkAreas();
               this.chartRok.setOption({
-                series:{
-                markArea: {
-                  label: {
-                    position: 'insideTop',
-                    color: '#000'
-                  },
-                  silent: true,
-                  data: ma
-                }
+                series: {
+                  markArea: {
+                    label: {
+                      position: 'insideTop',
+                      color: '#000'
+                    },
+                    silent: true,
+                    data: ma
+                  }
                 }
               })
 
@@ -373,13 +362,13 @@ export class YearsChartComponent {
           }
         }
       },
-      
+
       dataZoom: [
         {
           type: 'slider',
           start: 0,
           end: 100,
-          xAxisIndex: [0,1]
+          xAxisIndex: [0, 1]
         }
       ],
       // brush: {
@@ -400,8 +389,8 @@ export class YearsChartComponent {
       tooltip: {
         trigger: 'axis',
         position: function (point, params, dom, rect, size) {
-            // fixed at top
-            return [point[0], '70%'];
+          // fixed at top
+          return [point[0], '70%'];
         }
       },
       xAxis: {
@@ -415,10 +404,12 @@ export class YearsChartComponent {
         axisPointer: {
           z: 100
         },
-        axisLabel: {color: function (value: any, index: number) {
-          const color = value < '1670' ? '#c00' : (value < '1870' ? '#eee' : (value < '1939' ? '#0c0' : '#00c'));
-          return color;
-        }}
+        axisLabel: {
+          color: function (value: any, index: number) {
+            const color = value < '1670' ? '#a00' : (value < '1870' ? '#eee' : (value < '1939' ? '#060' : '#00a'));
+            return color;
+          }
+        }
       },
       yAxis: {
         show: true,
@@ -445,16 +436,49 @@ export class YearsChartComponent {
           ])
         },
 
+        markLine: {
+          symbol: 'none',
+
+          label: {
+            show: true,
+            opacity: 1,
+            color: '#000'
+          },
+          data:
+            [
+              {
+                symbol: 'none',
+                label: {
+                  show: false,
+                  formatter: '1. období'
+                },
+                xAxis: '1670'
+              },
+              {
+                symbol: 'none',
+                label: {
+                  show: false,
+                  formatter: '1. období'
+                },
+                xAxis: '1870'
+              },
+              {
+                symbol: 'none',
+                label: {
+                  show: false,
+                  formatter: '1. období'
+                },
+                xAxis: '1939'
+              }
+            ]
+        },
+
         markArea: {
           label: {
             position: 'insideTop',
             color: '#000'
           },
           silent: true,
-          itemStyle: {
-            borderColor: '#000',
-            borderRadius: 'solid'
-          },
           data: markAreaData
         },
       }]
@@ -481,16 +505,16 @@ export class YearsChartComponent {
     })
 
     setTimeout(() => {
-      this.chartRok.dispatchAction({
-        type: 'brush',
-        areas: [
-          {
-            brushType: 'lineX',
-            coordRange: [minRokWithValue, maxRokWithValue],
-            xAxisIndex: 0
-          }
-        ]
-      });
+      // this.chartRok.dispatchAction({
+      //   type: 'brush',
+      //   areas: [
+      //     {
+      //       brushType: 'lineX',
+      //       coordRange: [minRokWithValue, maxRokWithValue],
+      //       xAxisIndex: 0
+      //     }
+      //   ]
+      // });
 
       // this.chartRok.dispatchAction({
       //   type: 'takeGlobalCursor',
