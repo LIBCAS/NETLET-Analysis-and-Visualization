@@ -671,6 +671,7 @@ public class IndexSearcher {
                         .setLimit(1000)
                         .setMinCount(1))
                 .withFacet("links", new TermsFacetMap("link_id")
+                        .withSubFacet("tenant", new TermsFacetMap("tenant"))
                         .setLimit(-1)
                         .setMinCount(1));
       }

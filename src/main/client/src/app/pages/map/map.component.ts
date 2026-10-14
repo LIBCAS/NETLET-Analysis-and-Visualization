@@ -378,7 +378,7 @@ export class MapComponent {
 
     this.links = {};
     const links: any[] = [];
-    this.solrResponse.facets.links.buckets.forEach((f: { val: string, count: number }) => {
+    this.solrResponse.facets.links.buckets.forEach((f: { val: string, count: number, tenant: any }) => {
       const parts = f.val.split('-');
       const linkId = f.val;
       const place_origin = this.state.places()[parts[0]];
@@ -402,7 +402,7 @@ export class MapComponent {
           labelReversed: place_destination.name + ' > ' + place_origin.name,
           count: this.links[linkId].count,
           lineStyle: {
-            color: this.config.tenant_colors[1],
+            color: this.config.tenant_colors[f.tenant.buckets[0].val],
             width: 1,
             opacity: 1
           }
