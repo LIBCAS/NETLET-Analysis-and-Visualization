@@ -5,7 +5,7 @@ import * as echarts from 'echarts/core';
 import { EChartsOption, ECharts } from 'echarts';
 import { BarChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
-import { LegendComponent, MarkAreaComponent, VisualMapComponent } from 'echarts/components';
+import { DataZoomComponent, LegendComponent, MarkAreaComponent, VisualMapComponent } from 'echarts/components';
 import { TooltipComponent } from 'echarts/components';
 import { GridComponent } from 'echarts/components';
 import { TitleComponent } from 'echarts/components';
@@ -19,7 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { DomSanitizer } from '@angular/platform-browser';
 echarts.use([BarChart, CanvasRenderer, LegendComponent,
-  TooltipComponent, GridComponent, TitleComponent, BrushComponent,
+  TooltipComponent, GridComponent, TitleComponent, BrushComponent, DataZoomComponent,
   ToolboxComponent, VisualMapComponent, MarkAreaComponent]);
 
 const EXPAND_ICON =
@@ -125,6 +125,18 @@ export class YearsChartComponent {
 
   onChartRokInit(e: any) {
     this.chartRok = e;
+
+    this.chartRok.on('brushSelected', (params: any) => {
+      // Triggers a shallow update forcing ECharts to repaint the elements 
+      // and handle the object interpolation safely
+      this.chartRok.setOption({
+        brush: {} 
+      });
+    });
+
+    
+
+
     this.setYearsChart(this.dateYearFacet());
   }
 
@@ -179,8 +191,11 @@ export class YearsChartComponent {
             name: '1. období',
             xAxis: minRokWithValue,
             itemStyle: {
-              color: '#155605',
-              opacity: 0.5
+              color: 'rgba(255,255,255,0)',
+              //opacity: 0,
+              borderWidth: 1,
+            borderColor: '#000',
+            borderRadius: 'solid'
             },
           },
           {
@@ -190,15 +205,19 @@ export class YearsChartComponent {
         )
       }
 
-      if (this.limits[0] < 1939 && this.limits[1] > 1670) {
+      if (this.limits[0] < 1939 && this.limits[1] > 1870) {
         markAreaData.push([
           {
             name: '2. období',
             //xAxis: '1670',
-            xAxis: Math.max(this.limits[0], 1670) + '',
+            xAxis: Math.max(this.limits[0], 1870) + '',
             itemStyle: {
-              color: 'rgb(68, 110, 136)',
-              opacity: 0.4
+              color: 'rgba(255,255,255,0)',
+              //opacity: 0,
+              
+              borderWidth: 1,
+            borderColor: '#000',
+            borderRadius: 'solid'
             }
           },
           {
@@ -215,8 +234,13 @@ export class YearsChartComponent {
             // xAxis: '1939',
             xAxis: Math.max(this.limits[0], 1939) + '',
             itemStyle: {
-              color: '#00c',
-              opacity: 0.3
+              color: 'rgba(255,255,255,0)',
+              //opacity: 0,
+              
+              
+              borderWidth: 1,
+            borderColor: '#000',
+            borderRadius: 'solid'
             }
           },
           {
@@ -266,12 +290,12 @@ export class YearsChartComponent {
     this.chartOptionsRok = {
       animation: false,
 
-      grid: {
-        // left: 0,
-        // right: 0,
-        top: 30,
-        bottom: 25
-      },
+      // grid: {
+      //   // left: 0,
+      //   // right: 0,
+      //   top: 30,
+      //   bottom: 25
+      // },
       title: {
         show: true,
         left: 'center',
@@ -297,6 +321,7 @@ export class YearsChartComponent {
           color: 'none'
         },
         feature: {
+          restore: {},
           myTool1: {
             show: this.withAnimation(),
             title: 'run',
@@ -348,18 +373,30 @@ export class YearsChartComponent {
           }
         }
       },
-      brush: {
-        toolbox: ['clear'],
-        brushType: 'lineX',
-        brushMode: 'single',
-        removeOnClick: true,
-        xAxisIndex: 0,
-        z: 1,
-        brushLink: 'all',
-        outOfBrush: {
-          colorAlpha: 0.5
+      
+      dataZoom: [
+        {
+          type: 'slider',
+          start: 0,
+          end: 100,
+          xAxisIndex: [0,1]
         }
-      },
+      ],
+      // brush: {
+      //   toolbox: ['clear'],
+      //   brushType: 'lineX',
+      //   brushMode: 'single',
+      //   removeOnClick: true,
+      //   xAxisIndex: 0,
+      //   z: 1,
+      //   brushLink: 'all',
+      //   inBrush: {
+      //     //colorAlpha: 1
+      //   },
+      //   outOfBrush: {
+      //     colorAlpha: 0
+      //   }
+      // },
       tooltip: {
         trigger: 'axis',
         position: function (point, params, dom, rect, size) {
@@ -377,7 +414,11 @@ export class YearsChartComponent {
         max: 'dataMax',
         axisPointer: {
           z: 100
-        }
+        },
+        axisLabel: {color: function (value: any, index: number) {
+          const color = value < '1670' ? '#c00' : (value < '1870' ? '#eee' : (value < '1939' ? '#0c0' : '#00c'));
+          return color;
+        }}
       },
       yAxis: {
         show: true,
@@ -393,7 +434,16 @@ export class YearsChartComponent {
         type: 'bar',
         data: this.rokSeries,
         barCategoryGap: 0,
-        color: this.barColor,
+        //color: this.barColor,
+
+        itemStyle: {
+          borderRadius: [2, 2, 0, 0],
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#188df0' },
+            //{ offset: 0.5, color: '#188df0' },
+            { offset: 1, color: '#83bff6' }
+          ])
+        },
 
         markArea: {
           label: {
@@ -401,6 +451,10 @@ export class YearsChartComponent {
             color: '#000'
           },
           silent: true,
+          itemStyle: {
+            borderColor: '#000',
+            borderRadius: 'solid'
+          },
           data: markAreaData
         },
       }]
@@ -438,14 +492,14 @@ export class YearsChartComponent {
         ]
       });
 
-      this.chartRok.dispatchAction({
-        type: 'takeGlobalCursor',
-        key: 'brush',
-        brushOption: {
-          brushType: 'lineX',
-          brushMode: 'single'
-        }
-      });
+      // this.chartRok.dispatchAction({
+      //   type: 'takeGlobalCursor',
+      //   key: 'brush',
+      //   brushOption: {
+      //     brushType: 'lineX',
+      //     brushMode: 'single'
+      //   }
+      // });
     }, 50);
 
   }

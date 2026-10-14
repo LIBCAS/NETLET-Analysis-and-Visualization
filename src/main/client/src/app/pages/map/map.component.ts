@@ -345,7 +345,7 @@ export class MapComponent {
   }
 
   setGraphData() {
-
+    
     this.nodes = {};
     const nodes: any = [];
     this.maxCount.set(this.solrResponse.facets.places.buckets[0].count);
@@ -358,11 +358,21 @@ export class MapComponent {
         symbolSize = this.minSize;
       }
       const itemStyle = {
-        color: this.getColor(symbolSize)
+        //borderColor: '#fff',
+        //borderWidth: 2,
+        //color: this.getColor(symbolSize);
+        color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [
+          { offset: 0, color: '#ff7e5f' },  // Barva uprostřed
+          { offset: 1, color: this.getColor(symbolSize) },   // Barva na okrajích
+        ]),
       }
 
       this.nodes[f.val] = { coords: [place.latitude, place.longitude], name: place.name, count: f.count };
-      nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: f.count, color: '#00f', symbolSize: symbolSize, itemStyle });
+      nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: f.count, color: '#00f', 
+        //symbol: 'image://' + svgGradientCircle,
+        symbolSize: symbolSize, 
+        itemStyle
+       });
 
     });
 
@@ -463,6 +473,7 @@ export class MapComponent {
             min: 0.4,
             max: 2
           },
+          
           lineStyle: {
             color: 'source',
             curveness: 0.3
