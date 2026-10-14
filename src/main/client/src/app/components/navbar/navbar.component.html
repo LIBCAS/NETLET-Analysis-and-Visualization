@@ -12,14 +12,6 @@
       Vyhledavani
     </a>
 
-      <!-- <a mat-button >{{ 'Login' | translate }}</a> -->
-
-      <!-- @if (state.selectedTenants().length > 0) {
-        <span class="app-container-header">{{ 'tenant' | translate }}: {{ formatTenants() }}@if (state.currentView) {
-          <span>.&nbsp;&nbsp;{{ 'view' | translate }}: {{ state.currentView.route| translate }}</span>
-        }
-      </span>
-    } -->
       @if (showViews()) {
       <button mat-button class="app-navbar-link" [matMenuTriggerFor]="views"  (menuOpened)="op()">{{'views' | translate}}</button>
       <mat-menu #views="matMenu" class="app-views">
@@ -42,14 +34,6 @@
       <span>Projekt NETLET</span>
       <mat-icon aria-hidden="true">open_in_new</mat-icon>
     </a>
-
-    <!-- <button mat-button [matMenuTriggerFor]="tenants" (menuOpened)="op()">{{'tenants' | translate}}</button>
-    <mat-menu #tenants="matMenu">
-      @for (t of state.tenants(); track t) {
-        <a [disabled]="!t.available" mat-menu-item (click)="changeTenant(t)">{{ t.val | translate}}</a>
-      }
-    </mat-menu> -->
-
 
   <button mat-button class="app-navbar-lang" [matMenuTriggerFor]="menu" (menuOpened)="op()">{{ translator.currentLang | translate}}</button>
   <mat-menu #menu="matMenu">
