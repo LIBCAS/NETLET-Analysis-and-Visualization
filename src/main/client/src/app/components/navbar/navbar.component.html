@@ -1,12 +1,17 @@
-<mat-toolbar color="primary" class="app-fxLayout-row">
-  <div class="app-fxFlex">
-    <a [routerLink]="['/']" queryParamsHandling="replace" class="app-fxFlex app-fxLayout app-row app-center-v">
-      <img src="https://netlet.lib.cas.cz/wp-content/uploads/2023/08/netlet-logo-white.svg" title="Netlet"
-        class="app-logo" />
-        <span class="app-logo-desc">Analysis & Visualization</span>
-      </a>
-    </div>
-    <div class="app-fxLayout app-row app-center-v">
+<!-- redesign -->
+<mat-toolbar class="app-navbar">
+  <a [routerLink]="['/']" queryParamsHandling="replace" class="app-navbar-brand" aria-label="NETLET">
+    <img src="https://netlet.lib.cas.cz/wp-content/uploads/2023/08/netlet-logo-white.svg" title="Netlet" alt="NETLET" class="app-logo" />
+    <span class="app-logo-desc">Analysis &amp; Visualization</span>
+  </a>
+
+  <!-- redesign -->
+  <nav class="app-navbar-nav" aria-label="Hlavni navigace">
+    <!-- redesign -->
+    <a mat-button class="app-navbar-link" [routerLink]="['/']" queryParamsHandling="replace" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      Vyhledavani
+    </a>
+
       <!-- <a mat-button >{{ 'Login' | translate }}</a> -->
 
       <!-- @if (state.selectedTenants().length > 0) {
@@ -16,7 +21,7 @@
       </span>
     } -->
       @if (showViews()) {
-      <button mat-button [matMenuTriggerFor]="views"  (menuOpened)="op()">{{'views' | translate}}</button>
+      <button mat-button class="app-navbar-link" [matMenuTriggerFor]="views"  (menuOpened)="op()">{{'views' | translate}}</button>
       <mat-menu #views="matMenu" class="app-views">
         @for (t of state.views; track t) {
           @if (t.route) {
@@ -26,6 +31,18 @@
       </mat-menu>
       }
 
+    <!-- redesign -->
+    <a mat-button class="app-navbar-link app-navbar-external" href="https://netlet-conversion-editor.inovatika.dev/" target="_blank" rel="noreferrer">
+      <span>Conversion Editor</span>
+      <mat-icon aria-hidden="true">open_in_new</mat-icon>
+    </a>
+
+    <!-- redesign -->
+    <a mat-button class="app-navbar-link app-navbar-external" href="https://netlet.lib.cas.cz/" target="_blank" rel="noreferrer">
+      <span>Projekt NETLET</span>
+      <mat-icon aria-hidden="true">open_in_new</mat-icon>
+    </a>
+
     <!-- <button mat-button [matMenuTriggerFor]="tenants" (menuOpened)="op()">{{'tenants' | translate}}</button>
     <mat-menu #tenants="matMenu">
       @for (t of state.tenants(); track t) {
@@ -34,10 +51,10 @@
     </mat-menu> -->
 
 
-  <button mat-button [matMenuTriggerFor]="menu" (menuOpened)="op()">{{ translator.currentLang | translate}}</button>
+  <button mat-button class="app-navbar-lang" [matMenuTriggerFor]="menu" (menuOpened)="op()">{{ translator.currentLang | translate}}</button>
   <mat-menu #menu="matMenu">
     <button mat-menu-item (click)="onLanguageChanged('cs')">Český</button>
     <button mat-menu-item (click)="onLanguageChanged('en')">English</button>
   </mat-menu>
-</div>
+  </nav>
 </mat-toolbar>
