@@ -13,6 +13,16 @@
   "professions by identity":"Professions by number of people",
   "letters_count": "Number of letters",
   "letters_count_by_year": "Number of letters by year",
+  "navbar": {
+    "search": "Search",
+    "main_navigation": "Main navigation",
+    "brand_description": "Analysis & Visualization",
+    "conversion_editor": "Conversion Editor",
+    "project": "NETLET Project",
+    "language": "Change language",
+    "czech": "Čeština",
+    "english": "English"
+  },
   "home": {
     "centrality": {
       "header": "Centrality",
