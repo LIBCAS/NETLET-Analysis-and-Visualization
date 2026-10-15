@@ -1,96 +1,122 @@
 <!-- redesign -->
-<mat-card appearance="outlined" class="app-search-panel">
-  <div class="app-search-fields">
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <span matTextPrefix class="app-search-label">{{ 'field.date_from' | translate }}</span>
-      <input matInput [matDatepicker]="datum_od" [(ngModel)]="date_from" [attr.aria-label]="'field.date_from' | translate" (ngModelChange)="searchForm().markAsDirty()" (click)="datum_od.open()">
-      <mat-datepicker-toggle matIconSuffix [for]="datum_od"></mat-datepicker-toggle>
-      <mat-datepicker #datum_od startView="multi-year" [startAt]="year_min" (yearSelected)="doDateFromByYear($event)">
-        <mat-datepicker-actions>
-          <button matButton matDatepickerCancel>OK</button>
-        </mat-datepicker-actions>
-      </mat-datepicker>
-    </mat-form-field>
+<div class="app-home-intro">
+  <section class="app-home-hero" aria-labelledby="app-home-heading">
+    <div class="app-home-copy">
+      <p class="app-home-eyebrow">{{ 'home.intro.eyebrow' | translate }}</p>
+      <h1 id="app-home-heading">{{ 'home.intro.title' | translate }}</h1>
+      <p class="app-home-lede">{{ 'home.intro.text' | translate }}</p>
+    </div>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <span matTextPrefix class="app-search-label">{{ 'field.date_to' | translate }}</span>
-      <input matInput [matDatepicker]="datum_do" [(ngModel)]="date_to" [attr.aria-label]="'field.date_to' | translate" (ngModelChange)="searchForm().markAsDirty()" (click)="datum_do.open()">
-      <mat-datepicker-toggle matIconSuffix [for]="datum_do"></mat-datepicker-toggle>
-      <mat-datepicker #datum_do startView="multi-year" [startAt]="year_max" (yearSelected)="doDateToByYear($event)">
-        <mat-datepicker-actions>
-          <button matButton matDatepickerCancel>OK</button>
-        </mat-datepicker-actions>
-      </mat-datepicker>
-    </mat-form-field>
+    <mat-card appearance="outlined" class="app-search-panel">
+      <div class="app-search-fields">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <span matTextPrefix class="app-search-label">{{ 'field.date_from' | translate }}</span>
+          <input matInput [matDatepicker]="datum_od" [(ngModel)]="date_from" [attr.aria-label]="'field.date_from' | translate" (ngModelChange)="searchForm().markAsDirty()" (click)="datum_od.open()">
+          <mat-datepicker-toggle matIconSuffix [for]="datum_od"></mat-datepicker-toggle>
+          <mat-datepicker #datum_od startView="multi-year" [startAt]="year_min" (yearSelected)="doDateFromByYear($event)">
+            <mat-datepicker-actions>
+              <button matButton matDatepickerCancel>OK</button>
+            </mat-datepicker-actions>
+          </mat-datepicker>
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="app-search-wide">
-      <span matTextPrefix class="app-search-label">{{ 'field.identities' | translate }}</span>
-      <input type="text" matInput [attr.aria-label]="'field.identities' | translate" [formField]="searchForm.identities" [matAutocomplete]="autoIdentities">
-      <mat-autocomplete #autoIdentities="matAutocomplete">
-        @for (option of identities(); track option) {
-          <mat-option [value]="option.name">{{ option.name }} ({{ option.birth_year }}–{{ option.death_year }}) ({{ option.tenant }})</mat-option>
-        }
-      </mat-autocomplete>
-    </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <span matTextPrefix class="app-search-label">{{ 'field.date_to' | translate }}</span>
+          <input matInput [matDatepicker]="datum_do" [(ngModel)]="date_to" [attr.aria-label]="'field.date_to' | translate" (ngModelChange)="searchForm().markAsDirty()" (click)="datum_do.open()">
+          <mat-datepicker-toggle matIconSuffix [for]="datum_do"></mat-datepicker-toggle>
+          <mat-datepicker #datum_do startView="multi-year" [startAt]="year_max" (yearSelected)="doDateToByYear($event)">
+            <mat-datepicker-actions>
+              <button matButton matDatepickerCancel>OK</button>
+            </mat-datepicker-actions>
+          </mat-datepicker>
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="app-search-wide">
-      <span matTextPrefix class="app-search-label">{{ 'field.places' | translate }}</span>
-      <input type="text" matInput [attr.aria-label]="'field.places' | translate" [formField]="searchForm.places" [matAutocomplete]="autoPlaces">
-      <mat-autocomplete #autoPlaces="matAutocomplete">
-        @for (option of places(); track option) {
-          <mat-option [value]="option.name">{{ option.name }}</mat-option>
-        }
-      </mat-autocomplete>
-    </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="app-search-wide">
+          <span matTextPrefix class="app-search-label">{{ 'field.identities' | translate }}</span>
+          <input type="text" matInput [attr.aria-label]="'field.identities' | translate" [formField]="searchForm.identities" [matAutocomplete]="autoIdentities">
+          <mat-autocomplete #autoIdentities="matAutocomplete">
+            @for (option of identities(); track option) {
+              <mat-option [value]="option.name">{{ option.name }} ({{ option.birth_year }}–{{ option.death_year }}) ({{ option.tenant }})</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <span matTextPrefix class="app-search-label">{{ 'field.keywords' | translate }}</span>
-      <input type="text" matInput [attr.aria-label]="'field.keywords' | translate" [matAutocomplete]="auto" (keyup)="checkKeywords($event)">
-      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setKeyword($event)" [displayWith]="displayFn">
-        <mat-optgroup [label]="'field.categories' | translate">
-          @for (option of categories(); track option) {
-            <mat-option [value]="option">{{ option.value }}</mat-option>
-          }
-        </mat-optgroup>
-        <mat-optgroup [label]="'field.keywords' | translate">
-          @for (option of keywords(); track option) {
-            <mat-option [value]="option">{{ option.value }}</mat-option>
-          }
-        </mat-optgroup>
-      </mat-autocomplete>
-    </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="app-search-wide">
+          <span matTextPrefix class="app-search-label">{{ 'field.places' | translate }}</span>
+          <input type="text" matInput [attr.aria-label]="'field.places' | translate" [formField]="searchForm.places" [matAutocomplete]="autoPlaces">
+          <mat-autocomplete #autoPlaces="matAutocomplete">
+            @for (option of places(); track option) {
+              <mat-option [value]="option.name">{{ option.name }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <span matTextPrefix class="app-search-label">{{ 'field.languages' | translate }}</span>
-      <input type="text" matInput [attr.aria-label]="'field.languages' | translate" [matAutocomplete]="autoLanguages" (keyup)="checkLanguages($event)">
-      <mat-autocomplete #autoLanguages="matAutocomplete" (optionSelected)="setLanguage($event)">
-        @for (option of languages(); track option) {
-          <mat-option [value]="option.val">{{ option.val }} ({{ option.count }})</mat-option>
-        }
-      </mat-autocomplete>
-    </mat-form-field>
-  </div>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <span matTextPrefix class="app-search-label">{{ 'field.keywords' | translate }}</span>
+          <input type="text" matInput [attr.aria-label]="'field.keywords' | translate" [matAutocomplete]="auto" (keyup)="checkKeywords($event)">
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setKeyword($event)" [displayWith]="displayFn">
+            <mat-optgroup [label]="'field.categories' | translate">
+              @for (option of categories(); track option) {
+                <mat-option [value]="option">{{ option.value }}</mat-option>
+              }
+            </mat-optgroup>
+            <mat-optgroup [label]="'field.keywords' | translate">
+              @for (option of keywords(); track option) {
+                <mat-option [value]="option">{{ option.value }}</mat-option>
+              }
+            </mat-optgroup>
+          </mat-autocomplete>
+        </mat-form-field>
 
-  <!-- redesign -->
-  <div class="app-catalog-strip" role="group" [attr.aria-label]="'tenants' | translate">
-    <p>{{ 'tenants' | translate }}</p>
-    @for (t of state.tenants(); track t.val) {
-      <div class="app-catalog-chip" [class.app-selected]="isTenantSelected(t)">
-        <mat-checkbox [checked]="isTenantSelected(t)" (change)="toggleTenant(t, $event.checked)">
-          {{ 'catalog.' + t.val | translate }}
-        </mat-checkbox>
-        <a class="app-catalog-info" [routerLink]="'/catalog/' + t.val" [title]="('field.detail' | translate) + ': ' + ('catalog.' + t.val | translate)" [attr.aria-label]="('field.detail' | translate) + ': ' + ('catalog.' + t.val | translate)">
-          <mat-icon aria-hidden="true">info_outline</mat-icon>
-        </a>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <span matTextPrefix class="app-search-label">{{ 'field.languages' | translate }}</span>
+          <input type="text" matInput [attr.aria-label]="'field.languages' | translate" [matAutocomplete]="autoLanguages" (keyup)="checkLanguages($event)">
+          <mat-autocomplete #autoLanguages="matAutocomplete" (optionSelected)="setLanguage($event)">
+            @for (option of languages(); track option) {
+              <mat-option [value]="option.val">{{ option.val }} ({{ option.count }})</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
       </div>
-    }
-  </div>
+
+      <!-- redesign -->
+      <div class="app-catalog-strip" role="group" [attr.aria-label]="'tenants' | translate">
+        <p>{{ 'tenants' | translate }}</p>
+        @for (t of state.tenants(); track t.val) {
+          <div class="app-catalog-chip" [class.app-selected]="isTenantSelected(t)">
+            <mat-checkbox [checked]="isTenantSelected(t)" (change)="toggleTenant(t, $event.checked)">
+              {{ 'catalog.' + t.val | translate }}
+            </mat-checkbox>
+            <a class="app-catalog-info" [routerLink]="'/catalog/' + t.val" [title]="('field.detail' | translate) + ': ' + ('catalog.' + t.val | translate)" [attr.aria-label]="('field.detail' | translate) + ': ' + ('catalog.' + t.val | translate)">
+              <mat-icon aria-hidden="true">info_outline</mat-icon>
+            </a>
+          </div>
+        }
+      </div>
+
+      <!-- redesign -->
+      <button matIconButton class="app-search-submit" [title]="'action.search' | translate" [attr.aria-label]="'action.search' | translate" [disabled]="!searchForm().dirty()" (click)="search()">
+        <mat-icon aria-hidden="true">search</mat-icon>
+      </button>
+    </mat-card>
+  </section>
 
   <!-- redesign -->
-  <button matIconButton class="app-search-submit" [title]="'action.search' | translate" [attr.aria-label]="'action.search' | translate" [disabled]="!searchForm().dirty()" (click)="search()">
-    <mat-icon aria-hidden="true">search</mat-icon>
-  </button>
-</mat-card>
+  <section class="app-home-overview" [attr.aria-label]="'home.overview.label' | translate">
+    <div class="app-home-stat">
+      <strong>{{ state.tenants().length }}</strong>
+      <span>{{ 'home.overview.catalogs' | translate }}</span>
+    </div>
+    <div class="app-home-stat">
+      <strong>{{ timeRange() }}</strong>
+      <span>{{ 'home.overview.time_range' | translate }}</span>
+    </div>
+    <div class="app-home-stat">
+      <strong>{{ activeViewsCount() }}</strong>
+      <span>{{ 'home.overview.active_views' | translate }}</span>
+    </div>
+  </section>
+</div>
 
 
 <!-- <div class="app-home-layout app-fxLayout app-row">

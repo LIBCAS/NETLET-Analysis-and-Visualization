@@ -150,3 +150,9 @@ $alerts: (
   --mat-table-row-item-container-height: 40px;
   --mat-sys-body-large-size: .9rem;
 }
+
+// redesign
+:root {
+  --app-home-inline-padding: clamp(18px, 4vw, 64px);
+  --app-home-overview-overlap: 22px;
+}

@@ -3,7 +3,8 @@
 // redesign
 :host {
   display: block;
-  padding: 32px clamp(18px, 4vw, 64px);
+  padding-bottom: 54px; // redesign
+  background: var(--app-color-paper); // redesign
 }
 
 .app-search-panel {
@@ -22,8 +23,8 @@
   ));
 
   position: relative;
-  max-width: 720px;
-  margin: 0 auto;
+  min-width: 0; // redesign
+  width: 100%; // redesign
   padding: 16px 16px 58px;
   box-shadow: var(--app-shadow-soft);
 }
@@ -177,5 +178,111 @@
 @media (max-width: 760px) {
   .app-search-fields {
     grid-template-columns: 1fr;
+  }
+}
+
+// redesign
+.app-home-intro {
+  background: linear-gradient(
+    to bottom,
+    var(--app-color-soft) calc(100% - var(--app-home-overview-overlap)),
+    var(--app-color-paper) 0
+  );
+}
+
+.app-home-hero {
+  display: grid;
+  grid-template-columns: minmax(280px, .85fr) minmax(360px, 1.15fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: center;
+  padding: 42px var(--app-home-inline-padding) 32px;
+}
+
+.app-home-copy {
+  min-width: 0;
+  max-width: 720px;
+
+  h1 {
+    margin: 10px 0 16px;
+    font-size: clamp(38px, 5.2vw, 62px);
+    line-height: .98;
+    overflow-wrap: break-word;
+  }
+}
+
+.app-home-eyebrow {
+  margin: 0;
+  color: var(--app-color-primary-strong);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.app-home-lede {
+  max-width: 600px;
+  margin: 0;
+  color: var(--app-color-muted);
+  font-size: clamp(17px, 2vw, 21px);
+  line-height: 1.55;
+}
+
+.app-home-overview {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0 var(--app-home-inline-padding);
+  border: 1px solid var(--app-color-line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--app-color-line);
+}
+
+.app-home-stat {
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  min-width: 0;
+  min-height: 112px;
+  padding: 20px;
+  background: var(--app-color-paper);
+
+  strong {
+    font-size: 30px;
+  }
+
+  span {
+    color: var(--app-color-muted);
+  }
+}
+
+// redesign
+@media (max-width: 1100px) {
+  .app-home-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .app-home-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-home-stat:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+// redesign
+@media (max-width: 760px) {
+  .app-home-hero {
+    padding-top: 34px;
+  }
+
+  .app-home-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .app-home-stat:first-child {
+    grid-column: auto;
   }
 }

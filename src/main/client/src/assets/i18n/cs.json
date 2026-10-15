@@ -27,6 +27,17 @@
     "license": "Vývoj probíhá pod licencí"
   },
   "home": {
+    "intro": {
+      "eyebrow": "Network of Letters",
+      "title": "Analýza korespondenčních sítí",
+      "text": "Korespondence intelektuálních elit v přelomových dobách českých dějin z digitální perspektivy."
+    },
+    "overview": {
+      "label": "Přehled aplikace",
+      "catalogs": "katalogů",
+      "time_range": "časový rozsah",
+      "active_views": "aktivních zobrazení"
+    },
     "centrality": {
       "header": "Centralita",
       "text": "Centralita aktérů korespondence v dané korespondenční síti"

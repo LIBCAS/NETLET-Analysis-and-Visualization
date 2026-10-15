@@ -34,6 +34,16 @@ export class HomeComponent {
 
   readonly dateAdapter = inject(DateAdapter);
 
+  readonly activeViewsCount = computed(() => this.state.views.filter(view => view.route).length);
+  readonly timeRange = computed(() => {
+    const tenants = this.state.tenants();
+    const firstYears = tenants.map(tenant => tenant.date_year_min).filter(Number.isFinite);
+    const lastYears = tenants.map(tenant => tenant.date_year_max).filter(Number.isFinite);
+    return firstYears.length && lastYears.length
+      ? `${Math.min(...firstYears)}–${Math.max(...lastYears)}`
+      : '—';
+  });
+
   year_min = this.dateAdapter.today();
   year_max = this.dateAdapter.today();
   date_from: unknown;

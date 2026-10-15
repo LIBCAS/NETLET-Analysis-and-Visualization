@@ -27,6 +27,17 @@
     "license": "Developed under the license"
   },
   "home": {
+    "intro": {
+      "eyebrow": "Network of Letters",
+      "title": "Correspondence network analysis",
+      "text": "Correspondence of intellectual elites during pivotal periods of Czech history from a digital perspective."
+    },
+    "overview": {
+      "label": "Application overview",
+      "catalogs": "catalogs",
+      "time_range": "time range",
+      "active_views": "active views"
+    },
     "centrality": {
       "header": "Centrality",
       "text": "Centrality of correspondence participants in a given correspondence network"
