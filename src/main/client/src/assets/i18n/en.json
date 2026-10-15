@@ -2,39 +2,106 @@
   "tenant": "Catalog",
   "tenants": "Catalogs",
   "view": "View",
-  "views": "Views",
+  "views": "View types",
   "clearSelection": "Clear selection",
-  "usedFilters": "Used filters",
-  "identities_to_show": "Identities to show",
+  "usedFilters": "Selected filters",
+  "identities_to_show": "Show identities",
   "keywords_by_category" : "Keywords by categories",
-  
-  "professions by letter":"Professions by letter",
-  "professions by identity":"Profession by identity",
+  "line" : "line",
+  "bar":"bars",
+  "professions by letter":"Professions by number of letters",
+  "professions by identity":"Professions by number of people",
   "letters_count": "Number of letters",
   "letters_count_by_year": "Number of letters by year",
+  "navbar": {
+    "search": "Search",
+    "main_navigation": "Main navigation",
+    "brand_description": "Analysis & Visualization",
+    "conversion_editor": "Conversion Editor",
+    "project": "NETLET Project",
+    "language": "Change language",
+    "czech": "Čeština",
+    "english": "English"
+  },
+  "footer": {
+    "license": "Developed under the license"
+  },
+  "home": {
+    "intro": {
+      "eyebrow": "Network of Letters",
+      "title": "Correspondence network analysis",
+      "text": "Correspondence of intellectual elites during pivotal periods of Czech history from a digital perspective."
+    },
+    "overview": {
+      "label": "Application overview",
+      "catalogs": "catalogs",
+      "time_range": "time range",
+      "active_views": "active views"
+    },
+    "centrality": {
+      "header": "Centrality",
+      "text": "Centrality of correspondence participants in a given correspondence network"
+    },
+    "relation": {
+      "header": "Relationship between two networks",
+      "text": "The extent of their intermediary role between two networks"
+    },
+    "keywords": {
+      "header": "Keywords",
+      "text": "Co-citation networks mapping people mentioned in letters in relation to specific topics or debates."
+    },
+    "map": {
+      "header": "Map",
+      "text": "Digital visualizations focused on the geographical scope of individual personal correspondence collections."
+    },
+    "periods": {
+      "header": "Periods",
+      "text": "Comparative visualizations across three main periods"
+    },
+    "catalogs_in_time": {
+      "header": "Catalog dynamics",
+      "text": "Statistical charts and timelines comparing the evolution of individual correspondence collections over time"
+    },
+    "identities": {
+      "header": "Relationships between people",
+      "text": "Diagrams showing relationships between individual letter writers and recipients"
+    },
+    "professions": {
+      "header": "Professions",
+      "text": "Diagrams showing correspondence relationships between different professional groups"
+    },
+    "themes": {
+      "header": "Themes",
+      "text": "Diagrams showing thematic connections between letters and correspondence collections"
+    },
+    "timeline": {
+      "header": "Timeline",
+      "text": "Letters displayed in chronological order on a timeline"
+    }
+  },
   "field": {
-  "tenant": "Catalog",
-    "letter_id": "Id",
-    "author": "Autor",
+    "tenant": "Catalog",
+    "letter_id": "Id.",
+    "author": "Author",
     "identities": "People",
-    "identity_author": "Autor",
+    "identity_author": "Author",
     "authors": "Authors",
     "recipient": "Recipient",
     "identity_recipient": "Recipient",
     "recipients": "Recipients",
     "identity_main": "Author or recipient",
-    "mentioned": "Mentioned",
+    "mentioned": "Mentioned people",
     "origin": "Place of origin",
     "origin_name": "Place of origin",
     "origins": "Places of origin",
     "destination": "Place of destination",
     "destination_name": "Place of destination",
     "destinations": "Places of destination",
-    "professions": "Profese",
+    "professions": "Professions",
     "keywords": "Keywords",
     "keyword_categories": "Keyword categories",
-    "categories": "Categories",
-    "relation_tenants": "Catalogs for comparition",
+    "categories": "Keyword categories",
+    "relation_tenants": "Catalogs for comparison",
     "date": "Date",
     "dates": "Dates",
     "detail": "Details",
@@ -44,29 +111,29 @@
     "explicit": "Explicit",
     "content": "Content",
     "abstract": "Abstract",
-    "latitude": "latitude",
-    "longitude": "longitude",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
     "letters": "Letters",
     "letters_from": "Letters from here",
     "letters_to": "Letters to here",
     "places": "Places",
     "position": "Position",
     "stats_mentioned": "Mentioned",
-    "copies": "Repozitáře a verze",
-    "Copy": "Repozitáře",
-    "type": "Typ dokumentu",
-    "preservation": "Dochování",
-    "copy": "Typ kopie",
-    "repository": "Repozitář",
-    "archive": "Archiv",
-    "collection": "Sbírka",
-    "signature": "Signatura",
-    "manifestation_notes": "Poznámka k manifestaci",
-    "location_note": "Poznámka k uložení",
-    "birth_year": "birth_year",
-    "death_year": "death_year",
-    "identity_type": "identity_type",
-    "nationality": "nationality",
+    "copies": "Repositories and versions",
+    "Copy": "Repositories",
+    "type": "Document type",
+    "preservation": "Preservation",
+    "copy": "Copy type",
+    "repository": "Repository",
+    "archive": "Archive",
+    "collection": "Collection",
+    "signature": "Shelf mark",
+    "manifestation_notes": "Manifestation note",
+    "location_note": "Storage note",
+    "birth_year": "Year of birth",
+    "death_year": "Year of death",
+    "identity_type": "Type",
+    "nationality": "Nationality",
     "stats": "Statistics",
     "year_from": "From year",
     "year_to": "To year",
@@ -75,12 +142,12 @@
   },
   "action": {
     "search": "Search",
-    "view_in_hiko": "View in HIKO DB",
-    "letter_details": "Letter details",
+    "view_in_hiko": "View in HIKO",
+    "letter_details": "View letter",
     "selectAll": "Select all",
     "showLinks": "Show links"
   },
-  "invalidTenant": "There is no available data for this Catalog",
+  "invalidTenant": "No data is available for this catalog",
   "catalog": {
     "brezina": "Březina",
     "deml": "Deml",
@@ -90,12 +157,13 @@
     "marci": "Marci",
     "musil": "Musil",
     "neumann": "Neumann",
-    "pamatky": "Památky",
+    "pamatky": "Monuments",
     "patocka": "Patočka",
     "polanus": "Polanus",
     "sachs": "Sachs",
-    "studenti": "Studenti",
+    "studenti": "Students",
     "tgm": "TGM",
-    "ucenci": "Učenci"
+    "ucenci": "Scholars",
+    "both": "Both catalogs"
   }
 }

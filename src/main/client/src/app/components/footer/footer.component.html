@@ -1,8 +1,22 @@
-<div class="app-topbar app-fxLayout app-row app-center-v app-pl-4 app-pr-4 app-footer">
-    <div class="app-left app-fxFlex">
-      NETLET Analysis & Visualization © 2023 - {{ currentYear }}
-    </div>
-    <div class="app-right">
-      Vývoj probíhá pod licencí <a href="http://www.gnu.org/licenses/gpl.html" target="_blank">GNU GPL v3.</a>
+<!-- redesign -->
+<footer class="app-footer">
+  <div>
+    <strong>NETLET {{ 'navbar.brand_description' | translate }}</strong>
+    <div class="app-footer-license">
+      {{ 'footer.license' | translate }}
+      <a href="http://www.gnu.org/licenses/gpl.html" target="_blank" rel="noreferrer">GNU GPL v3</a>
+      © 2023 - {{ currentYear }}
     </div>
   </div>
+
+  <div class="app-footer-links">
+    <a href="https://netlet-conversion-editor.inovatika.dev/" target="_blank" rel="noreferrer">
+      <span>{{ 'navbar.conversion_editor' | translate }}</span>
+      <mat-icon aria-hidden="true">open_in_new</mat-icon>
+    </a>
+    <a href="https://netlet.lib.cas.cz/" target="_blank" rel="noreferrer">
+      <span>{{ 'navbar.project' | translate }}</span>
+      <mat-icon aria-hidden="true">open_in_new</mat-icon>
+    </a>
+  </div>
+</footer>

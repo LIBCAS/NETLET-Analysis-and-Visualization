@@ -4,9 +4,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { Router, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { AppState } from '../../app-state';
+import { AppState, Tenant } from '../../app-state';
 import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatSelectModule } from "@angular/material/select";
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { DateAdapter } from '@angular/material/core';
 import { MatIconModule } from "@angular/material/icon";
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -23,7 +24,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
   selector: 'app-home',
   imports: [RouterModule, TranslateModule, FormsModule, FormField, MatDatepickerModule,
     MatCardModule, MatButtonModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatIconModule, MatAutocompleteModule],
+    MatCheckboxModule, MatIconModule, MatAutocompleteModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -31,13 +32,25 @@ export class HomeComponent {
 
   readonly router = inject(Router);
 
-  year_min: Date = new Date();
-  year_max: Date = new Date();
-  date_from: Date;
-  date_to: Date;
+  readonly dateAdapter = inject(DateAdapter);
+
+  readonly activeViewsCount = computed(() => this.state.views.filter(view => view.route).length);
+  readonly timeRange = computed(() => {
+    const tenants = this.state.tenants();
+    const firstYears = tenants.map(tenant => tenant.date_year_min).filter(Number.isFinite);
+    const lastYears = tenants.map(tenant => tenant.date_year_max).filter(Number.isFinite);
+    return firstYears.length && lastYears.length
+      ? `${Math.min(...firstYears)}–${Math.max(...lastYears)}`
+      : '—';
+  });
+
+  year_min = this.dateAdapter.today();
+  year_max = this.dateAdapter.today();
+  date_from: unknown;
+  date_to: unknown;
 
   searchModel = signal({
-    tenants: [],
+    tenants: [] as Tenant[],
     year_from: '',
     year_to: '',
     identities: '',
@@ -84,17 +97,35 @@ export class HomeComponent {
     this.state.tenants().forEach(t => {t.available = true});
     const mins: number[] = this.state.tenants().map(t => t.date_year_min);
     const maxs: number[] = this.state.tenants().map(t => t.date_year_max);
-    this.year_min = new Date(Math.min(...mins), 0, 1);
-    this.year_max = new Date(Math.max(...maxs), 0, 1);
+    if (mins.length) {
+      this.year_min = this.dateAdapter.createDate(Math.min(...mins), 0, 1);
+      this.year_max = this.dateAdapter.createDate(Math.max(...maxs), 0, 1);
+    }
     this.searchForm().reset();
   }
 
-  doDateFromByYear(e: any) {
-    this.date_from = new Date(e.c.year+'-01-01');
+  isTenantSelected(tenant: Tenant): boolean {
+    return this.searchModel().tenants.some(t => t.val === tenant.val);
   }
 
-  doDateToByYear(e: any) {
-    this.date_to = new Date(e.c.year+'-01-01');
+  toggleTenant(tenant: Tenant, checked: boolean) {
+    this.searchModel.update(model => ({
+      ...model,
+      tenants: checked
+        ? [...model.tenants.filter(t => t.val !== tenant.val), tenant]
+        : model.tenants.filter(t => t.val !== tenant.val)
+    }));
+    this.searchForm().markAsDirty();
+  }
+
+  doDateFromByYear(date: unknown) {
+    this.date_from = this.dateAdapter.createDate(this.dateAdapter.getYear(date), 0, 1);
+    this.searchForm().markAsDirty();
+  }
+
+  doDateToByYear(date: unknown) {
+    this.date_to = this.dateAdapter.createDate(this.dateAdapter.getYear(date), 0, 1);
+    this.searchForm().markAsDirty();
   }
 
   // checkIdentities(val: any) {
@@ -129,6 +160,7 @@ export class HomeComponent {
 
   setLanguage(e: any) {
     this.selectedLanguage = e.option.value;
+    this.searchForm().markAsDirty();
   }
 
 
@@ -142,13 +174,14 @@ export class HomeComponent {
   }
 
   setKeyword(e: any) {
-    this.selectedKeyword = {type: e.option.value.type, value: e.option.value.value}
+    this.selectedKeyword = {type: e.option.value.type, value: e.option.value.value};
+    this.searchForm().markAsDirty();
   }
 
   setFilters() {
 
-    this.searchModel().tenants.forEach(t => {
-      this.state.tenants().find(st => st.val === t.val).selected = true;
+    this.state.tenants().forEach(t => {
+      t.selected = this.isTenantSelected(t);
     });
 
     const usedFacets: {field: string, value: string, op: string}[] = [];
@@ -178,10 +211,10 @@ export class HomeComponent {
     }
     
     if(this.date_from) {
-      usedFacets.push({field: 'date_from', value: this.date_from.toISOString().substring(0,10), op: ''});
+      usedFacets.push({field: 'date_from', value: this.dateAdapter.toIso8601(this.date_from).substring(0, 10), op: ''});
     }
     if(this.date_to) {
-      usedFacets.push({field: 'date_to', value: this.date_to.toISOString().substring(0,10), op: ''});
+      usedFacets.push({field: 'date_to', value: this.dateAdapter.toIso8601(this.date_to).substring(0, 10), op: ''});
     }
 
     this.state.usedFacets.set([...usedFacets]);
