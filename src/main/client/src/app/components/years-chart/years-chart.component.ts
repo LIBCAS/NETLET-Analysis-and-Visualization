@@ -125,12 +125,20 @@ export class YearsChartComponent {
   onChartRokInit(e: any) {
     this.chartRok = e;
 
+    this.chartRok.on('restore', (params: any) => {
+
+      const l = this.state.getTenantsRange();
+      this.limits = [l[0].getFullYear(), l[1].getFullYear(),];
+
+      this.fireChangeLimits();
+    });
+
     this.chartRok.on('dataZoom', (params: any) => {
+
       var option: any = this.chartRok.getOption();
-      //console.log(option)
-      
+
       this.limits = [
-        parseInt(this.rokAxis[option.dataZoom[0].startValue]), 
+        parseInt(this.rokAxis[option.dataZoom[0].startValue]),
         parseInt(this.rokAxis[option.dataZoom[0].endValue])
       ];
       this.fireChangeLimits();
@@ -181,7 +189,7 @@ export class YearsChartComponent {
             itemStyle: {
               color: 'rgba(255,255,255,0)',
               //opacity: 0,
-              
+
             },
           },
           {
@@ -461,7 +469,7 @@ export class YearsChartComponent {
     this.chartRok.on('click', (params: any) => {
       const year = parseInt(params.name);
       this.limits = [year, year];
-      
+
       this.setChartTitle();
 
       this._ngZone.run(() => {
@@ -469,7 +477,7 @@ export class YearsChartComponent {
       });
     })
 
-    
+
 
   }
 

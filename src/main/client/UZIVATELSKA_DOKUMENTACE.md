@@ -22,17 +22,27 @@ Výběr katalogů a filtrů se promítá do adresy stránky. Odkaz na aktuální
 
 ### Úvodní stránka (`/` a `/home`)
 
+![Úvodní stránka s vyhledávacím formulářem a kartami vizualizací](docs/screenshots/home.png)
+
 Úvodní stránka obsahuje vyhledávací formulář a karty dostupných vizualizací. Slouží k vytvoření výchozího výběru katalogů, dat, osob, míst, klíčových slov a jazyků. Po odeslání vyhledávání se otevře **Časová osa**. Volbou karty přejdete přímo na vybranou vizualizaci.
 
 ### Časová osa (`/timeline`)
+
+![Časová osa s ročním grafem a tabulkou dopisů v katalogu TGM](docs/screenshots/timeline.png)
 
 Stránka zobrazuje počty dopisů v čase a pod grafem tabulku jednotlivých dopisů. Přepínačem **křivka / sloupce** změníte podobu grafu; volba **dva grafy** zobrazí oddělené grafy. Časový výřez lze upravit přímo v grafu. Tabulka má stránkování a obsahuje katalog, autora, adresáta, místa odeslání a určení i datum. Jména a místa vedou na jejich detaily. Ikona informací otevře detail dopisu, ikona šipky jeho záznam v HIKO.
 
 ### Mapa (`/map`)
 
+![Mapa míst a spojnic korespondence v katalogu TGM](docs/screenshots/map.png)
+
+*Na mapových snímcích nejsou dostupné podkladové dlaždice; značky a trasy zůstávají viditelné.*
+
 Mapa ukazuje místa spojená s korespondencí a spojnice mezi místy odeslání a určení. Velikost značek odpovídá počtu záznamů podle legendy na stránce. Volbou **Zobrazit spojnice** lze spojnice skrýt nebo znovu ukázat. Kliknutí na místo nebo spojnici otevře panel s odpovídajícími dopisy; z něj lze přejít na detail dopisu. Výběr v levém panelu a časový graf omezují zobrazená data. Mapu lze přibližovat a posouvat.
 
 ### Alternativní mapa (`/map-view`)
+
+![Alternativní mapa s dopisovými trasami v katalogu TGM](docs/screenshots/map-view.png)
 
 Tato stránka nabízí další mapové zobrazení dostupné přímou adresou. Místa jsou vyznačena body a dopisové trasy křivkami. Kliknutí na bod ukáže počty dopisů z daného místa a do něj; kliknutí na křivku zobrazí přehled dopisů na trase. V levém panelu jsou filtry a seznamy adresátů a zmíněných osob, jejichž výběrem lze zvýraznit související trasy. Časový graf omezuje období zobrazení.
 
