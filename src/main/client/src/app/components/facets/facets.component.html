@@ -1,114 +1,187 @@
+<!-- redesign -->
 @if (showTenants()) {
-<div>
-  <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
+  <mat-expansion-panel class="app-facet-group app-facet-catalogs" [expanded]="true">
     <mat-expansion-panel-header>
-      <mat-panel-title> {{ 'tenants' | translate}} </mat-panel-title>
+      <mat-panel-title>{{ 'tenants' | translate }}</mat-panel-title>
     </mat-expansion-panel-header>
-    <mat-list>
-      <mat-list-item (click)="toggleAll()" style="border-bottom: 1px solid;">
-        <mat-checkbox [(ngModel)]="allSelected" [indeterminate]="someSelected()" >{{ 'action.selectAll' | translate}}</mat-checkbox>
+
+    <mat-list class="app-facet-list">
+      <mat-list-item class="app-facet-select-all">
+        <mat-checkbox [checked]="allSelected" [indeterminate]="someSelected()" (change)="toggleAll($event.checked)">
+          {{ 'action.selectAll' | translate }}
+        </mat-checkbox>
       </mat-list-item>
-      @for(k of state.tenants(); track $index; let idx = $index;){
-        <mat-list-item (click)="clickTenantThrottled()">
-          <mat-checkbox [(ngModel)]="k.selected">
+
+      @for (k of state.tenants(); track k.val) {
+        <mat-list-item
+          class="app-facet-catalog"
+          [class.app-colored]="colored()"
+          [class.app-selected]="k.selected"
+          [style.--app-facet-color]="colored() ? config.tenant_colors[k.val] : null">
+          <mat-checkbox [(ngModel)]="k.selected" (change)="clickTenantThrottled()">
             @if (colored()) {
-              <span [style.color]="config.tenant_colors[k.val]">{{'catalog.'+ k.val | translate }} ({{k.count}}) </span>
-            } @else{{{ 'catalog.'+ k.val | translate}} ({{k.count}})}</mat-checkbox>
+              <span [style.color]="'color-mix(in srgb, ' + config.tenant_colors[k.val] + ' 70%, #2f3136)'">
+                {{ 'catalog.' + k.val | translate }} ({{ k.count }})
+              </span>
+            } @else {
+              {{ 'catalog.' + k.val | translate }} ({{ k.count }})
+            }
+          </mat-checkbox>
+          @if (colored()) {
+            <span class="app-facet-color-dot" aria-hidden="true"></span>
+          }
         </mat-list-item>
       }
     </mat-list>
   </mat-expansion-panel>
-</div>
-}        
-@if(hasUsedFacets) {
-<div>
-  <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true">
-    <mat-expansion-panel-header>
-      <mat-panel-title> {{ 'usedFilters' | translate}} </mat-panel-title>
-    </mat-expansion-panel-header>
-    <mat-list class="app-facet">
-      @for(k of usedFacets; track $index; let idx = $index){
-      <mat-list-item (click)="unfilter(k.field, k.value)" [class.app-excluded]="k.op === '-'">
-        <mat-icon>delete_forever</mat-icon>
-         {{ 'field.' + k.field | translate}}: {{ k.value }}
-      </mat-list-item>
-      }
-    </mat-list>
-  </mat-expansion-panel>
-</div>
 }
 
-@for(f of fields(); track $index; let idx = $index){
-@if (facets()[f]?.buckets.length > 0) {
-<div>
-  <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="false">
+@if (hasUsedFacets) {
+  <mat-expansion-panel class="app-facet-group app-facet-used" [expanded]="true">
     <mat-expansion-panel-header>
-      <mat-panel-title> {{ 'field.' + f | translate}} </mat-panel-title>
+      <mat-panel-title>{{ 'usedFilters' | translate }}</mat-panel-title>
     </mat-expansion-panel-header>
 
-        <mat-form-field class="app-fill-w" appearance="outline">
-        <input type="text"
-              placeholder=""
-              attr.aria-label="{{ 'field.' + f | translate}}"
-              matInput
-              (click)="clearAuto(f)"
-              [formControl]="controls[f]"
-              >
-              
-          <!-- <div matAutocompleteOrigin #origin="matAutocompleteOrigin">
-                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectAuto($event, f)">
-                  @for (option of filteredOptions; track option) {
-                    <mat-option [value]="option">{{option}}</mat-option>
-                  }
-                </mat-autocomplete>
-          </div> -->
-      </mat-form-field>
-    
-      
-    <mat-list class="app-facet">
-      @for(k of facetsFiltered()[f].buckets; track $index; let idx = $index){
-      @if (sub_fields()[f]) {
-      <mat-expansion-panel class="mat-mdc-elevation-specific mat-elevation-z0" [expanded]="true"
-        [togglePosition]="'before'">
-        <mat-expansion-panel-header>
-          <mat-panel-title><span style="font-size: var(--mat-sys-body-medium-size); font-weight: normal;"
-              (click)="clickHeader($event, f, k.val, '')">{{ k.val}} ({{k.count}}) </span> </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-list>
-          @for(k2 of k[sub_fields()[f]].buckets; track $index; let idx = $index){
-          <mat-list-item title="{{ k2.val}} ({{k2.count}})"
-            (mouseover)="fireMouserOver(f, k2.val)" (mouseout)="fireMouseOut(f, k2.val)">
-            
-            <button (click)="filter(f, k2.val, '-')" class="app-small-icon-button" mat-icon-button><mat-icon>block</mat-icon></button>
-            <span (click)="filter(f, k2.val, '')">{{ k2.val}} ({{k2.count}}) </span>
-            @if (isUsed(f, k2.val)) {
-              <button class="app-small-icon-button" mat-icon-button><mat-icon>check</mat-icon></button>
-            }
-          </mat-list-item>
-          }
-        </mat-list>
-      </mat-expansion-panel>
-      } @else {
-
-      <mat-list-item title="{{ k.val}} ({{k.count}})" (mouseover)="fireMouserOver(f, k.val)"
-        (mouseout)="fireMouseOut(f, k.val)">
-        <button (click)="filter(f, k.val, '-')" class="app-small-icon-button" mat-icon-button><mat-icon>block</mat-icon></button>
-        @if(f==='authors' || f === 'recipients') {
-          <button (click)="filter('identity_main', k.val, '')" class="app-small-icon-button app-small2" mat-icon-button [title]="'field.identity_main' | translate">
-            <mat-icon>group</mat-icon>
+    <mat-list class="app-facet app-facet-list">
+      @for (k of usedFacets; track $index) {
+        <mat-list-item class="app-facet-item">
+          <button
+            type="button"
+            matListItemTitle
+            class="app-facet-used-filter"
+            [class.app-excluded]="k.op === '-'"
+            [title]="('action.remove_filter' | translate) + ': ' + ('field.' + k.field | translate) + ': ' + k.value"
+            (click)="unfilter(k.field, k.value)">
+            <mat-icon aria-hidden="true">delete_outline</mat-icon>
+            <span class="app-facet-label">{{ 'field.' + k.field | translate }}: {{ k.value }}</span>
           </button>
-        }
-        <span (click)="filter(f, k.val, '')">{{ k.val}} ({{k.count}}) </span>
-        @if (isUsed(f, k.val)) {
-          <button class="app-small-icon-button" mat-icon-button><mat-icon>check</mat-icon></button>
-        }
-            
-      </mat-list-item>
-      }
+        </mat-list-item>
       }
     </mat-list>
-    
   </mat-expansion-panel>
-</div>
 }
+
+@for (f of fields(); track f) {
+  @if (facets()[f]?.buckets.length > 0) {
+    <mat-expansion-panel
+      class="app-facet-group"
+      [attr.data-field]="f"
+      [expanded]="colored() && (f === 'authors' || f === 'recipients' || f === 'mentioned')">
+      <mat-expansion-panel-header>
+        <mat-panel-title>{{ 'field.' + f | translate }}</mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <mat-form-field class="app-facet-search" appearance="outline" subscriptSizing="dynamic">
+        <span matTextPrefix class="app-facet-search-icon"><mat-icon aria-hidden="true">search</mat-icon></span>
+        <input
+          type="text"
+          matInput
+          [attr.aria-label]="('action.search' | translate) + ': ' + ('field.' + f | translate)"
+          (click)="clearAuto(f)"
+          [formControl]="controls[f]">
+      </mat-form-field>
+
+      <!--
+      <div matAutocompleteOrigin #origin="matAutocompleteOrigin">
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectAuto($event, f)">
+          @for (option of filteredOptions; track option) {
+            <mat-option [value]="option">{{ option }}</mat-option>
+          }
+        </mat-autocomplete>
+      </div>
+      -->
+
+      <mat-list class="app-facet app-facet-list app-facet-values">
+        @for (k of facetsFiltered()[f].buckets; track $index) {
+          @if (sub_fields()[f]) {
+            <mat-expansion-panel class="app-facet-subgroup" [expanded]="true" togglePosition="before">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <span class="app-facet-label" (click)="clickHeader($event, f, k.val, '')">{{ k.val }}</span>
+                  <strong class="app-facet-count">{{ k.count }}</strong>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <mat-list class="app-facet-list">
+                @for (k2 of k[sub_fields()[f]].buckets; track $index) {
+                  <mat-list-item
+                    class="app-facet-item"
+                    [title]="k2.val + ' (' + k2.count + ')'"
+                    (mouseover)="fireMouserOver(f, k2.val)"
+                    (mouseout)="fireMouseOut(f, k2.val)">
+                    <div matListItemTitle class="app-facet-row">
+                      <span class="app-facet-actions">
+                        <button
+                          type="button"
+                          mat-icon-button
+                          class="app-facet-exclude"
+                          [title]="'action.exclude_filter' | translate"
+                          [attr.aria-label]="('action.exclude_filter' | translate) + ': ' + k2.val"
+                          (click)="filter(f, k2.val, '-')">
+                          <mat-icon aria-hidden="true">block</mat-icon>
+                        </button>
+                      </span>
+                      <button
+                        type="button"
+                        class="app-facet-value"
+                        [attr.aria-label]="('action.include_filter' | translate) + ': ' + k2.val"
+                        (click)="filter(f, k2.val, '')">
+                        <span class="app-facet-label">{{ k2.val }}</span>
+                        <strong class="app-facet-count">{{ k2.count }}</strong>
+                        @if (isUsed(f, k2.val)) {
+                          <mat-icon class="app-facet-check" [attr.aria-label]="'usedFilters' | translate">check</mat-icon>
+                        }
+                      </button>
+                    </div>
+                  </mat-list-item>
+                }
+              </mat-list>
+            </mat-expansion-panel>
+          } @else {
+            <mat-list-item
+              class="app-facet-item"
+              [title]="k.val + ' (' + k.count + ')'"
+              (mouseover)="fireMouserOver(f, k.val)"
+              (mouseout)="fireMouseOut(f, k.val)">
+              <div matListItemTitle class="app-facet-row">
+                <span class="app-facet-actions">
+                  <button
+                    type="button"
+                    mat-icon-button
+                    class="app-facet-exclude"
+                    [title]="'action.exclude_filter' | translate"
+                    [attr.aria-label]="('action.exclude_filter' | translate) + ': ' + k.val"
+                    (click)="filter(f, k.val, '-')">
+                    <mat-icon aria-hidden="true">block</mat-icon>
+                  </button>
+                  @if (f === 'authors' || f === 'recipients') {
+                    <button
+                      type="button"
+                      mat-icon-button
+                      class="app-facet-identity"
+                      [title]="'field.identity_main' | translate"
+                      [attr.aria-label]="('field.identity_main' | translate) + ': ' + k.val"
+                      (click)="filter('identity_main', k.val, '')">
+                      <mat-icon aria-hidden="true">person_outline</mat-icon>
+                    </button>
+                  }
+                </span>
+                <button
+                  type="button"
+                  class="app-facet-value"
+                  [attr.aria-label]="('action.include_filter' | translate) + ': ' + k.val"
+                  (click)="filter(f, k.val, '')">
+                  <span class="app-facet-label">{{ k.val }}</span>
+                  <strong class="app-facet-count">{{ k.count }}</strong>
+                  @if (isUsed(f, k.val)) {
+                    <mat-icon class="app-facet-check" [attr.aria-label]="'usedFilters' | translate">check</mat-icon>
+                  }
+                </button>
+              </div>
+            </mat-list-item>
+          }
+        }
+      </mat-list>
+    </mat-expansion-panel>
+  }
 }

@@ -47,7 +47,10 @@ export class FacetsComponent {
   filteredOptions: string[];
   controls: { [name: string]: FormControl<string> } = {};
 
-  allSelected: undefined;
+  get allSelected(): boolean {
+    const tenants = this.state.tenants();
+    return tenants.length > 0 && tenants.every(tenant => tenant.selected);
+  }
   facetsFiltered = signal<FacetFields>({});
 
   destroy$ = new Subject<void>();
@@ -66,22 +69,28 @@ export class FacetsComponent {
 
     effect(() => {
       const fs = this.fields();
-      this.facetsFiltered.set({...this.facets()});
-      if (fs && this.facets()) {
+      const facets = this.facets();
+      this.facetsFiltered.set({...facets});
+      if (facets) {
         fs.forEach(f => {
-          if (this.facets()[f]) {
-            const c = new FormControl();
-            c.valueChanges.subscribe(v => {
-              //this.filteredOptions = this._filter(v, f);
-              const filteredOptions: JSONFacet[] = this._filter(v, f);
-              this.facetsFiltered.update((ff: FacetFields) => ({
+          if (!facets[f]) {
+            return;
+          }
+          if (!this.controls[f]) {
+            const control = new FormControl('', {nonNullable: true});
+            control.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
+              this.facetsFiltered.update(ff => ({
                 ...ff,
-                [f]: {buckets : filteredOptions}
+                [f]: {buckets: this._filter(value, f)}
               }));
             });
-            this.controls[f] = c;
+            this.controls[f] = control;
           }
-        })
+          this.facetsFiltered.update(ff => ({
+            ...ff,
+            [f]: {buckets: this._filter(this.controls[f].value, f)}
+          }));
+        });
       }
 
     })
@@ -126,8 +135,8 @@ export class FacetsComponent {
     return sel > 0 && sel < this.state.tenants().length;
   }
 
-  toggleAll() {
-    this.state.tenants().forEach(t => t.selected = this.allSelected);
+  toggleAll(checked: boolean) {
+    this.state.tenants().forEach(t => t.selected = checked);
     this.router.navigate([], { queryParams: { s: this.state.encodeState() } });
   }
 

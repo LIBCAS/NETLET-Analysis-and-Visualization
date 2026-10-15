@@ -149,6 +149,9 @@
     "date_to": "To"
   },
   "action": {
+    "exclude_filter": "Exclude from filter",
+    "include_filter": "Include in filter",
+    "remove_filter": "Remove filter",
     "search": "Search",
     "view_in_hiko": "View in HIKO",
     "letter_details": "View letter",
