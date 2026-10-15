@@ -38,6 +38,14 @@
       "time_range": "time range",
       "active_views": "active views"
     },
+    "views": {
+      "title": "Choose the next step in your analysis",
+      "coming_soon": "Coming soon"
+    },
+    "context": {
+      "title": "From catalogs to network interpretation",
+      "text": "The application connects letters, people, places, time and thematic layers into clear analytical views. It helps researchers move quickly from finding specific correspondence to maps, timelines and network visualizations."
+    },
     "centrality": {
       "header": "Centrality",
       "text": "Centrality of correspondence participants in a given correspondence network"

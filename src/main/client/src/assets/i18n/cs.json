@@ -38,6 +38,14 @@
       "time_range": "časový rozsah",
       "active_views": "aktivních zobrazení"
     },
+    "views": {
+      "title": "Vyberte další krok analýzy",
+      "coming_soon": "Připravuje se"
+    },
+    "context": {
+      "title": "Od katalogu k síťové interpretaci",
+      "text": "Aplikace propojuje dopisy, osoby, místa, čas a tematické vrstvy do přehledných analytických pohledů. Pomáhá badatelům rychle přejít od vyhledání konkrétní korespondence k mapám, časovým osám a síťovým vizualizacím."
+    },
     "centrality": {
       "header": "Centralita",
       "text": "Centralita aktérů korespondence v dané korespondenční síti"
@@ -71,7 +79,7 @@
       "text": "Schémata zobrazující korespondenční vztahy mezi různými profesními skupinami"
     },
     "themes": {
-      "header": "Temata",
+      "header": "Témata",
       "text": "Schémata zobrazující tematická propojení dopisů a korespondenčních celků"
     },
     "timeline": {

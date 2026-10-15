@@ -119,20 +119,47 @@
 </div>
 
 
-<!-- <div class="app-home-layout app-fxLayout app-row">
-	@for(card of state.views; track $index) {
-		<mat-card >
-			<mat-card-header>
-				<mat-card-title> {{ 'home.' + card.header + '.header' | translate }} </mat-card-title>
-			</mat-card-header>
-			<mat-card-content>
-				<p>
-					{{ 'home.' + card.header + '.text' | translate }}
-				</p>
-			</mat-card-content>
-			<mat-card-actions align="end" class="app-mat-card-actions">
-				<a (click)="gotoView(card.route)"  [disabled]="card.route === '' || !searchForm().dirty()" mat-raised-button>{{ 'View' | translate }}</a>
-			</mat-card-actions>
-		</mat-card>
-	}
-</div> -->
+<!-- redesign -->
+<section class="app-home-views" aria-labelledby="app-home-views-heading">
+  <div class="app-home-section-heading">
+    <p class="app-home-eyebrow">{{ 'views' | translate }}</p>
+    <h2 id="app-home-views-heading">{{ 'home.views.title' | translate }}</h2>
+  </div>
+
+  <div class="app-home-view-grid">
+    @for (card of state.views; track card.header) {
+      <mat-card appearance="outlined" class="app-home-view-card" [class.app-disabled]="!card.route" [style.--app-view-accent]="viewAppearance[card.header].color">
+        <!-- redesign: Karty jsou dostupné pouze s vybraným katalogem. -->
+        <a
+          class="app-home-view-link"
+          role="link"
+          [attr.href]="card.route && searchModel().tenants.length ? '/' + card.route : null"
+          [attr.aria-disabled]="!card.route || !searchModel().tenants.length"
+          [attr.tabindex]="card.route && searchModel().tenants.length ? 0 : -1"
+          (click)="$event.preventDefault(); card.route && searchModel().tenants.length && gotoView(card.route)">
+          <span class="app-home-view-icon">
+            <mat-icon [svgIcon]="'app-home:' + viewAppearance[card.header].icon" aria-hidden="true"></mat-icon>
+          </span>
+          <div class="app-home-view-copy">
+            <mat-card-title>{{ 'home.' + card.header + '.header' | translate }}</mat-card-title>
+            <p>{{ 'home.' + card.header + '.text' | translate }}</p>
+          </div>
+          @if (card.route) {
+            <mat-icon class="app-home-view-arrow" svgIcon="app-home:arrow" aria-hidden="true"></mat-icon>
+          } @else {
+            <span class="app-home-view-soon">{{ 'home.views.coming_soon' | translate }}</span>
+          }
+        </a>
+      </mat-card>
+    }
+  </div>
+</section>
+
+<!-- redesign -->
+<section class="app-home-context" aria-labelledby="app-home-context-heading">
+  <div>
+    <mat-icon svgIcon="app-home:badge-info" aria-hidden="true"></mat-icon>
+    <h2 id="app-home-context-heading">{{ 'home.context.title' | translate }}</h2>
+    <p>{{ 'home.context.text' | translate }}</p>
+  </div>
+</section>
