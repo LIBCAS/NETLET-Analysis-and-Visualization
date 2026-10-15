@@ -9,7 +9,6 @@ import { DataZoomComponent, LegendComponent, MarkAreaComponent, MarkLineComponen
 import { TooltipComponent } from 'echarts/components';
 import { GridComponent } from 'echarts/components';
 import { TitleComponent } from 'echarts/components';
-import { BrushComponent } from 'echarts/components';
 import { ToolboxComponent } from 'echarts/components';
 import { JSONFacet } from '../../shared/facet';
 
@@ -19,7 +18,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { DomSanitizer } from '@angular/platform-browser';
 echarts.use([BarChart, CanvasRenderer, LegendComponent, MarkLineComponent,
-  TooltipComponent, GridComponent, TitleComponent, BrushComponent, DataZoomComponent,
+  TooltipComponent, GridComponent, TitleComponent, DataZoomComponent,
   ToolboxComponent, MarkAreaComponent]);
 
 const EXPAND_ICON =
@@ -126,16 +125,28 @@ export class YearsChartComponent {
   onChartRokInit(e: any) {
     this.chartRok = e;
 
-    this.chartRok.on('brushSelected', (params: any) => {
-      // Triggers a shallow update forcing ECharts to repaint the elements 
-      // and handle the object interpolation safely
-      this.chartRok.setOption({
-        brush: {}
-      });
+    this.chartRok.on('dataZoom', (params: any) => {
+      var option: any = this.chartRok.getOption();
+      //console.log(option)
+      
+      this.limits = [
+        parseInt(this.rokAxis[option.dataZoom[0].startValue]), 
+        parseInt(this.rokAxis[option.dataZoom[0].endValue])
+      ];
+      this.fireChangeLimits();
     });
 
-
-
+    // this.chartRok.on('click', (params: any) => {
+    //   if (params.componentType === 'xAxis') {
+    //     const year = parseInt(params.value.split('-')[0]);
+    //     this.getData(false);
+    //     this.chartRok.dispatchAction({
+    //       type: 'dataZoom',
+    //       startValue: new Date(year + '-01-01').getTime(),
+    //       endValue: new Date(year + '-12-31').getTime()
+    //     });
+    //   }
+    // })
 
     this.setYearsChart(this.dateYearFacet());
   }
@@ -151,29 +162,6 @@ export class YearsChartComponent {
     this.limits = [parseInt(this.rokAxis[e.areas[0].coordRange[0]]), parseInt(this.rokAxis[e.areas[0].coordRange[1]])];
     this.fireChangeLimits();
     this.setChartTitle();
-  }
-
-  onClearSelection(e: any) {
-    if (e.batch[0].areas.length === 0) {
-
-      const l = this.state.getTenantsRange();
-      this.limits = [l[0].getFullYear(), l[1].getFullYear(),];
-      this.fireChangeLimits();
-      this.setChartTitle();
-    }
-  }
-
-  setSelection(minWithValue: string, maxWithValue: string) {
-    this.chartRok.dispatchAction({
-      type: 'brush',
-      areas: [
-        {
-          brushType: 'lineX',
-          coordRange: [minWithValue, maxWithValue],
-          xAxisIndex: 0
-        }
-      ]
-    });
   }
 
   setMarkAreas() {
@@ -366,26 +354,12 @@ export class YearsChartComponent {
       dataZoom: [
         {
           type: 'slider',
+          realtime: false,
           start: 0,
           end: 100,
-          xAxisIndex: [0, 1]
+          //xAxisIndex: [0, 1]
         }
       ],
-      // brush: {
-      //   toolbox: ['clear'],
-      //   brushType: 'lineX',
-      //   brushMode: 'single',
-      //   removeOnClick: true,
-      //   xAxisIndex: 0,
-      //   z: 1,
-      //   brushLink: 'all',
-      //   inBrush: {
-      //     //colorAlpha: 1
-      //   },
-      //   outOfBrush: {
-      //     colorAlpha: 0
-      //   }
-      // },
       tooltip: {
         trigger: 'axis',
         position: function (point, params, dom, rect, size) {
@@ -487,16 +461,7 @@ export class YearsChartComponent {
     this.chartRok.on('click', (params: any) => {
       const year = parseInt(params.name);
       this.limits = [year, year];
-      this.chartRok.dispatchAction({
-        type: 'brush',
-        areas: [
-          {
-            brushType: 'lineX',
-            coordRange: [params.name, params.name],
-            xAxisIndex: 0
-          }
-        ]
-      });
+      
       this.setChartTitle();
 
       this._ngZone.run(() => {
@@ -504,43 +469,10 @@ export class YearsChartComponent {
       });
     })
 
-    setTimeout(() => {
-      // this.chartRok.dispatchAction({
-      //   type: 'brush',
-      //   areas: [
-      //     {
-      //       brushType: 'lineX',
-      //       coordRange: [minRokWithValue, maxRokWithValue],
-      //       xAxisIndex: 0
-      //     }
-      //   ]
-      // });
-
-      // this.chartRok.dispatchAction({
-      //   type: 'takeGlobalCursor',
-      //   key: 'brush',
-      //   brushOption: {
-      //     brushType: 'lineX',
-      //     brushMode: 'single'
-      //   }
-      // });
-    }, 50);
+    
 
   }
 
-
-  run2() {
-    this.chartRok.dispatchAction({
-      type: 'brush',
-      areas: [
-        {
-          brushType: 'lineX',
-          coordRange: ['1900', '1903'],
-          xAxisIndex: 0
-        }
-      ]
-    });
-  }
 
   run() {
     const startRok = this.state.getTenantsRange()[0].getFullYear();
@@ -552,16 +484,16 @@ export class YearsChartComponent {
       this.onChangeRunning.emit(true);
       this.setChartTitle();
 
-      this.chartRok.dispatchAction({
-        type: 'brush',
-        areas: [
-          {
-            brushType: 'lineX',
-            coordRange: [startRok + '', endRok + ''],
-            xAxisIndex: 0
-          }
-        ]
-      });
+      // this.chartRok.dispatchAction({
+      //   type: 'brush',
+      //   areas: [
+      //     {
+      //       brushType: 'lineX',
+      //       coordRange: [startRok + '', endRok + ''],
+      //       xAxisIndex: 0
+      //     }
+      //   ]
+      // });
 
       if (endRok >= maxRok) {
         clearInterval(this.animation);
@@ -581,16 +513,16 @@ export class YearsChartComponent {
       this.onChangeRunning.emit(this.running);
       this.setChartTitle();
 
-      this.chartRok.dispatchAction({
-        type: 'brush',
-        areas: [
-          {
-            brushType: 'lineX',
-            coordRange: [startRok + '', endRok + ''],
-            xAxisIndex: 0
-          }
-        ]
-      });
+      // this.chartRok.dispatchAction({
+      //   type: 'brush',
+      //   areas: [
+      //     {
+      //       brushType: 'lineX',
+      //       coordRange: [startRok + '', endRok + ''],
+      //       xAxisIndex: 0
+      //     }
+      //   ]
+      // });
 
       if (endRok >= maxRok) {
         clearInterval(this.animation);
