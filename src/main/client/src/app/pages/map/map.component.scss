@@ -30,3 +30,23 @@
     align-content: center;
     margin-left: 20px;
 }
+// redesign
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+as-split {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+
+.app-years {
+  flex-shrink: 0;
+}
+
+#echarts-lmap {
+  min-height: 250px;
+}

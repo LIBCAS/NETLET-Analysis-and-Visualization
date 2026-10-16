@@ -22,3 +22,12 @@ app-footer {
   display: block;
   flex-shrink: 0;
 }
+
+// redesign
+main {
+  display: grid;
+
+  > router-outlet {
+    display: none;
+  }
+}
