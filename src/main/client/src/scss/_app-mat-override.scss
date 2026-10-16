@@ -206,3 +206,48 @@
     background-color: transparent;
   }
 }
+
+// redesign
+:root {
+  @include mat.menu-overrides((
+    container-color: var(--app-color-paper),
+    container-shape: 8px,
+    container-elevation-shadow: var(--app-shadow-soft),
+    item-label-text-color: var(--app-color-ink),
+    item-icon-color: var(--app-color-muted),
+    item-label-text-size: 14px,
+    item-label-text-weight: 500,
+    item-hover-state-layer-color: var(--app-color-gray-1),
+    item-focus-state-layer-color: var(--app-color-gray-2)
+  ));
+
+  @include mat.select-overrides((
+    panel-background-color: var(--app-color-paper),
+    container-elevation-shadow: var(--app-shadow-soft)
+  ));
+
+  @include mat.autocomplete-overrides((
+    background-color: var(--app-color-paper),
+    container-shape: 8px,
+    container-elevation-shadow: var(--app-shadow-soft)
+  ));
+
+  @include mat.option-overrides((
+    label-text-color: var(--app-color-ink),
+    selected-state-label-text-color: var(--app-color-primary-strong),
+    selected-state-layer-color: var(--app-color-gray-2),
+    hover-state-layer-color: var(--app-color-gray-1),
+    focus-state-layer-color: var(--app-color-gray-2)
+  ));
+}
+
+.mat-mdc-menu-panel,
+.mat-mdc-select-panel,
+.mat-mdc-autocomplete-panel {
+  border: 1px solid var(--app-color-line);
+}
+
+// Angular Material neposkytuje override tvaru panelu selectu.
+.cdk-overlay-pane .mat-mdc-select-panel[role="listbox"] {
+  border-radius: 8px;
+}

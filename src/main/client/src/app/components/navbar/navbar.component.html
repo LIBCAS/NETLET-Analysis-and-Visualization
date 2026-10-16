@@ -9,17 +9,33 @@
   <!-- redesign -->
   <nav class="app-navbar-nav" [attr.aria-label]="'navbar.main_navigation' | translate">
     <!-- redesign -->
-    <a mat-button class="app-navbar-link" [routerLink]="['/']" queryParamsHandling="replace" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-      {{ 'navbar.search' | translate }}
-    </a>
-
-    <!-- redesign -->
     @if (showViews()) {
       <button mat-button class="app-navbar-link" [matMenuTriggerFor]="views" (menuOpened)="op()">{{ 'views' | translate }}</button>
       <mat-menu #views="matMenu" class="app-views">
         @for (t of state.views; track t) {
           @if (t.route) {
-            <a mat-menu-item [class.app-active]="state.currentView?.route === t.route" [routerLink]="[t.route]" queryParamsHandling="preserve" [title]="'home.' + t.header + '.text' | translate" (click)="state.currentView = t">{{ 'home.' + t.header + '.header' | translate }}</a>
+            <a
+              mat-menu-item
+              class="app-navbar-view-item"
+              [routerLink]="[t.route]"
+              queryParamsHandling="preserve"
+              routerLinkActive="app-active"
+              [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' }"
+              #viewLink="routerLinkActive"
+              [attr.aria-current]="viewLink.isActive ? 'page' : null"
+              [style.--app-view-accent]="viewAppearance[t.header].color"
+              [title]="'home.' + t.header + '.text' | translate"
+              (click)="state.currentView = t">
+              <span class="app-navbar-view-content">
+                <span class="app-navbar-view-icon">
+                  <mat-icon [svgIcon]="'app-navbar:' + viewAppearance[t.header].icon" aria-hidden="true"></mat-icon>
+                </span>
+                <span class="app-navbar-view-label">{{ 'home.' + t.header + '.header' | translate }}</span>
+                @if (viewLink.isActive) {
+                  <mat-icon class="app-navbar-view-check" aria-hidden="true">check</mat-icon>
+                }
+              </span>
+            </a>
           }
         }
       </mat-menu>
@@ -38,10 +54,26 @@
     </a>
 
     <!-- redesign -->
-    <button mat-button class="app-navbar-lang" [matMenuTriggerFor]="menu" [attr.aria-label]="'navbar.language' | translate" (menuOpened)="op()">{{ translator.currentLang }}</button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item (click)="onLanguageChanged('cs')">{{ 'navbar.czech' | translate }}</button>
-      <button mat-menu-item (click)="onLanguageChanged('en')">{{ 'navbar.english' | translate }}</button>
-    </mat-menu>
+    <div class="app-navbar-language" role="group" [attr.aria-label]="'navbar.language' | translate">
+      <button
+        type="button"
+        lang="cs"
+        [class.app-active]="translator.currentLang === 'cs'"
+        [attr.aria-pressed]="translator.currentLang === 'cs'"
+        [attr.aria-label]="'navbar.czech' | translate"
+        (click)="onLanguageChanged('cs')">
+        CS
+      </button>
+      <span aria-hidden="true">/</span>
+      <button
+        type="button"
+        lang="en"
+        [class.app-active]="translator.currentLang === 'en'"
+        [attr.aria-pressed]="translator.currentLang === 'en'"
+        [attr.aria-label]="'navbar.english' | translate"
+        (click)="onLanguageChanged('en')">
+        EN
+      </button>
+    </div>
   </nav>
 </mat-toolbar>

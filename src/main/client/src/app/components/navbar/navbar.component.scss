@@ -175,3 +175,106 @@
     }
   }
 }
+
+// redesign
+// Rozbalovací nabídka se vykresluje mimo hostitele navbaru.
+::ng-deep .mat-mdc-menu-panel.app-views {
+  min-width: min(340px, calc(100vw - 24px));
+  max-width: min(420px, calc(100vw - 24px));
+
+  .app-navbar-view-item {
+    --mat-menu-item-icon-color: var(--app-view-accent);
+    min-height: 52px;
+    padding-inline: 12px;
+    border-left: 3px solid transparent;
+
+    &.app-active {
+      --mat-menu-item-label-text-weight: 700;
+      border-left-color: var(--app-view-accent);
+      background: var(--app-color-gray-1);
+      color: var(--app-color-ink);
+      font-weight: 700;
+    }
+  }
+
+  .app-navbar-view-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-block: 6px;
+  }
+
+  .app-navbar-view-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 34px;
+    height: 34px;
+    border-radius: 8px;
+    color: var(--app-view-accent);
+    background: color-mix(in srgb, var(--app-view-accent), #ffffff 86%);
+
+    mat-icon {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      color: inherit;
+    }
+  }
+
+  .app-navbar-view-label {
+    flex: 1;
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  .app-navbar-view-check {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    color: var(--app-view-accent);
+    font-size: 18px;
+  }
+}
+
+// redesign
+.app-navbar-language {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 6px;
+  min-height: 36px;
+  margin-left: 8px;
+  padding: 0 8px;
+  border: 1px solid var(--app-color-line);
+  border-radius: 8px;
+  background: var(--app-color-paper);
+  color: var(--app-color-muted);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+
+  button {
+    padding: 6px 2px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+
+    &:hover,
+    &.app-active {
+      color: var(--app-color-primary-strong);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--app-color-primary);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
+
+  > span {
+    color: var(--app-color-gray-5);
+  }
+}
