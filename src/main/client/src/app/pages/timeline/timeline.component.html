@@ -1,97 +1,123 @@
-<div class="app-loading">@if(loading){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
+<div class="app-loading">
+  @if (loading) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>
+
 <as-split direction="horizontal" [unit]="'pixel'">
   <as-split-area [size]="320">
-    <div style="flex: 1 30%;" class="app-filters">
+    <div>
       <app-facets
         [fields]="['authors', 'recipients', 'mentioned', 'identities', 'keyword_categories', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
         [renderLists]="true"
-        [facets]="facets()" (onFiltersChanged)="onFiltersChanged($event)"></app-facets>
+        [facets]="facets()"
+        (onFiltersChanged)="onFiltersChanged($event)">
+      </app-facets>
     </div>
   </as-split-area>
   <as-split-area>
-    <div class="app-content app-fill-w app-fill-h">
+    <div>
       <div class="app-timeline">
-        <h3 class="app-fill-w app-text-center">Zobrazení dopisů v chronologickém pořadí</h3>
+        <h3>Zobrazení dopisů v chronologickém pořadí</h3>
         <div>
           <mat-radio-group [(ngModel)]="chartType" (change)="changeChartType()">
-            <mat-radio-button value="line">{{ 'line' | translate}}</mat-radio-button>
-            <mat-radio-button value="bar">{{ 'bar' | translate}}</mat-radio-button>
+            <mat-radio-button value="line">{{ 'line' | translate }}</mat-radio-button>
+            <mat-radio-button value="bar">{{ 'bar' | translate }}</mat-radio-button>
           </mat-radio-group>
-          <mat-checkbox [(ngModel)]="gridInverse" (change)="processResponse()" >dva grafy</mat-checkbox>
+          <mat-checkbox [(ngModel)]="gridInverse" (change)="processResponse()">dva grafy</mat-checkbox>
         </div>
-        <div echarts style="height: 100%; width: 100%;" [initOpts]="{ locale: 'CZ' }" [options]="chartOptions"
+        <div
+          echarts
+          style="height: 100%; width: 100%;"
+          [initOpts]="{ locale: 'CZ' }"
+          [options]="chartOptions"
           (chartInit)="onChartInit($event)">
         </div>
-        <div class="app-fxLayout app-row">
-          <div style="flex: 1 30%;">
-            <h4>Počet dopisů ({{ this.limits[0] | date : 'dd. M. yyyy'}} – {{ this.limits[1] | date : 'dd. M. yyyy'}}): {{
-              numFound }} </h4>
+        <div>
+          <div>
+            <h4>
+              Počet dopisů ({{ this.limits[0] | date : 'dd. M. yyyy' }} – {{ this.limits[1] | date : 'dd. M. yyyy' }}): {{ numFound }}
+            </h4>
           </div>
 
-          <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)"
-           [length]="numFound"
-            [pageSize]="rows" [showFirstLastButtons]="false" [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageIndex"
+          <mat-paginator
+            #paginator
+            (page)="handlePageEvent($event)"
+            [length]="numFound"
+            [pageSize]="rows"
+            [showFirstLastButtons]="false"
+            [pageSizeOptions]="pageSizeOptions"
+            [pageIndex]="pageIndex"
             aria-label="Select page">
           </mat-paginator>
-
-
         </div>
-        <div style="height: 400px; max-width: 100%;  overflow: auto;">
-          @if (letters().length > 0){
-          }
+        <div style="height: 400px; max-width: 100%; overflow: auto;">
           <table mat-table [dataSource]="letters()">
-
             <ng-container matColumnDef="id">
               <th mat-header-cell *matHeaderCellDef> Id </th>
-              <td mat-cell *matCellDef="let element"> {{element.letter_id}} </td>
+              <td mat-cell *matCellDef="let element"> {{ element.letter_id }} </td>
             </ng-container>
 
             <ng-container matColumnDef="tenant">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.tenant' | translate}} </th>
-              <td mat-cell *matCellDef="let element"> 
-                <a class="app-link" [routerLink]="'/catalog/'+ element.tenant">{{ 'catalog.' + element.tenant | translate }}</a>
+              <th mat-header-cell *matHeaderCellDef> {{ 'field.tenant' | translate }} </th>
+              <td mat-cell *matCellDef="let element">
+                <a [routerLink]="'/catalog/' + element.tenant">
+                  {{ 'catalog.' + element.tenant | translate }}
+                </a>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="author">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.author' | translate}} </th>
+              <th mat-header-cell *matHeaderCellDef> {{ 'field.author' | translate }} </th>
               <td mat-cell *matCellDef="let element">
                 @for (a of letterIdentities(element, 'author'); track a) {
-                  <div><a class="app-link" [routerLink]="'/identity/'+ (a.global_identity ? ('global_'+ a.global_identity.id) : a.id)">{{ a.name }}</a></div>
-                }  </td>
+                  <div>
+                    <a [routerLink]="'/identity/' + (a.global_identity ? ('global_' + a.global_identity.id) : a.id)">{{ a.name }}</a>
+                  </div>
+                }
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="recipient">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.recipient' | translate}} </th>
+              <th mat-header-cell *matHeaderCellDef> {{ 'field.recipient' | translate }} </th>
               <td mat-cell *matCellDef="let element">
                 @for (a of letterIdentities(element, 'recipient'); track a) {
-                  <div><a class="app-link" [routerLink]="'/identity/'+ (a.global_identity ? ('global_'+ a.global_identity.id) : a.id)">{{ a.name }}</a></div>
-                } </td>
+                  <div>
+                    <a [routerLink]="'/identity/' + (a.global_identity ? ('global_' + a.global_identity.id) : a.id)">{{ a.name }}</a>
+                  </div>
+                }
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="origin">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.origin' | translate}} </th>
+              <th mat-header-cell *matHeaderCellDef> {{ 'field.origin' | translate }} </th>
               <td mat-cell *matCellDef="let element">
                 @for (p of letterPlaces(element, 'origin'); track p) {
-                  <div><a class="app-link" [routerLink]="'/place/'+p.id">{{ p.name }}</a></div>
-                } </td>
+                  <div>
+                    <a [routerLink]="'/place/' + p.id">{{ p.name }}</a>
+                  </div>
+                }
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="destination">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.destination' | translate}} </th>
+              <th mat-header-cell *matHeaderCellDef> {{ 'field.destination' | translate }} </th>
               <td mat-cell *matCellDef="let element">
                 @for (p of letterPlaces(element, 'destination'); track p) {
-                  <div><a class="app-link" [routerLink]="'/place/'+p.id">{{ p.name }}</a></div>
-                }  </td>
+                  <div>
+                    <a [routerLink]="'/place/' + p.id">{{ p.name }}</a>
+                  </div>
+                }
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="date">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.date' | translate}} </th>
+              <th mat-header-cell *matHeaderCellDef> {{ 'field.date' | translate }} </th>
               <td mat-cell *matCellDef="let element">
                 @if (element.date_computed) {
-                  {{ element.date_computed | date : 'd. M. yyyy'}}
+                  {{ element.date_computed | date : 'd. M. yyyy' }}
                 } @else {
-                  <mat-icon style="color:red;">warning</mat-icon>
+                  <mat-icon style="color: red;">warning</mat-icon>
                 }
               </td>
             </ng-container>
@@ -99,12 +125,18 @@
             <ng-container matColumnDef="action" stickyEnd>
               <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
               <td mat-cell *matCellDef="let element">
-                <button class="app-hiko app-small-icon-button" mat-icon-button
+                <button
+                  mat-icon-button
                   (click)="viewLetter(element.id, element.tenant)"
-                  [matTooltip]="'action.letter_details' | translate"><mat-icon>info</mat-icon></button>
-                <button class="app-hiko app-small-icon-button" mat-icon-button
+                  [matTooltip]="'action.letter_details' | translate">
+                  <mat-icon>info</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
                   (click)="viewLetterInHIKO(element.letter_id, element.tenant)"
-                  [matTooltip]="'action.view_in_hiko' | translate"><mat-icon>arrow_outward</mat-icon></button>
+                  [matTooltip]="'action.view_in_hiko' | translate">
+                  <mat-icon>arrow_outward</mat-icon>
+                </button>
               </td>
             </ng-container>
 
@@ -112,7 +144,6 @@
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
           </table>
         </div>
-
       </div>
     </div>
   </as-split-area>
