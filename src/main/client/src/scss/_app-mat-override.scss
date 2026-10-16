@@ -251,3 +251,31 @@
 .cdk-overlay-pane .mat-mdc-select-panel[role="listbox"] {
   border-radius: 8px;
 }
+
+// redesign
+:root {
+  @include mat.checkbox-overrides((
+    state-layer-size: 28px,
+    touch-target-size: 28px
+  ));
+
+  @include mat.radio-overrides((
+    state-layer-size: 28px,
+    touch-target-size: 28px
+  ));
+}
+
+// Material nemá override pro velikost samotného symbolu; přebíráme 15 px z facetů.
+.mat-mdc-checkbox .mdc-checkbox__background,
+.mat-mdc-radio-button .mdc-radio .mdc-radio__background {
+  position: absolute;
+  top: calc(50% - 7.5px);
+  left: calc(50% - 7.5px);
+  width: 15px;
+  height: 15px;
+}
+
+.mat-mdc-radio-button .mdc-radio .mdc-radio__background::before {
+  top: calc((100% - var(--mat-radio-state-layer-size)) / 2);
+  left: calc((100% - var(--mat-radio-state-layer-size)) / 2);
+}
