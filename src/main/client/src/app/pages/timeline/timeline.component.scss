@@ -358,3 +358,14 @@ as-split-area:last-child > div {
   --mat-checkbox-label-text-weight: 700;
   --mat-checkbox-label-text-color: var(--app-color-gray-8);
 }
+
+// redesign
+.app-timeline-table {
+  th.mat-column-action {
+    background: var(--app-color-gray-0);
+  }
+
+  button {
+    color: var(--app-color-accent);
+  }
+}
