@@ -1,10 +1,62 @@
-<div style="height: 100%; width: 100%;">
-  @if (withAnimation()){
-  <!-- <button mat-icon-button (click)="run()"><mat-icon svgIcon="expand-icon"></mat-icon></button> -->
-  <!-- <button mat-icon-button (click)="move()"><mat-icon svgIcon="move-icon"></mat-icon></button> -->
-  <!-- <button mat-icon-button (click)="stop()"><mat-icon>pause</mat-icon></button> -->
+<div class="app-years-chart" [class.app-years-chart-redesign]="redesignedControls()">
+  @if (redesignedControls()) {
+    <div class="app-years-chart-tools" role="group" [attr.aria-label]="'map.chart_controls' | translate">
+      <button
+        mat-icon-button
+        type="button"
+        [disabled]="!chartRok"
+        [attr.aria-label]="'timeline.reset' | translate"
+        [matTooltip]="'timeline.reset' | translate"
+        (click)="resetChart()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 7v5h-5M4 17v-5h5M6.1 6.1A8 8 0 0 1 19.5 10M4.5 14A8 8 0 0 0 17.9 17.9" />
+        </svg>
+      </button>
+      @if (withAnimation()) {
+        <button
+          mat-icon-button
+          type="button"
+          [disabled]="!chartRok || running"
+          [attr.aria-label]="'map.play' | translate"
+          [matTooltip]="'map.play' | translate"
+          (click)="run()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="m10 8 6 4-6 4z" />
+          </svg>
+        </button>
+        <button
+          mat-icon-button
+          type="button"
+          [disabled]="!chartRok || running"
+          [attr.aria-label]="'map.move' | translate"
+          [matTooltip]="'map.move' | translate"
+          (click)="move()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 4v16M20 4v16M7 12h10m-4-4 4 4-4 4" />
+          </svg>
+        </button>
+        <button
+          mat-icon-button
+          type="button"
+          [disabled]="!chartRok || !running"
+          [attr.aria-label]="'map.pause' | translate"
+          [matTooltip]="'map.pause' | translate"
+          (click)="stop()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M9 8v8M15 8v8" />
+          </svg>
+        </button>
+      }
+    </div>
   }
-<div echarts style="height: 100%; width: 100%;" [options]="chartOptionsRok" (chartInit)="onChartRokInit($event)"
-        (chartBrushEnd)="onSetYears($event)" >
-</div>
+
+  <div
+    echarts
+    class="app-years-chart-canvas"
+    [options]="chartOptionsRok"
+    (chartInit)="onChartRokInit($event)"
+    (chartBrushEnd)="onSetYears($event)">
+  </div>
 </div>

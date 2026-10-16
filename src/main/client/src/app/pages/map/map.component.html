@@ -1,40 +1,106 @@
-<div class="app-loading">@if(loading && !running){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
+<div class="app-loading">
+  @if (loading && !running) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>
+
 <as-split direction="horizontal" [unit]="'pixel'" (gutterClick)="state.gutterClick($event)">
-  <as-split-area [size]="state.facetsSize" >
-    <div style="flex: 1 30%;" class="app-filters">
-       @if(solrResponse?.facets) {
-        <app-facets [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
+  <as-split-area [size]="state.facetsSize">
+    <div class="app-filters">
+      @if (solrResponse?.facets) {
+        <app-facets
+          [fields]="['authors', 'recipients', 'mentioned', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
           [colored]="true"
-          [facets]="facets()" (onFiltersChanged)="onFiltersChanged($event)" (onMouserOver)="showNodeExt($event)"
-          (onMouseOut)="hideNode()"></app-facets> }
+          [facets]="facets()"
+          (onFiltersChanged)="onFiltersChanged($event)"
+          (onMouserOver)="showNodeExt($event)"
+          (onMouseOut)="hideNode()">
+        </app-facets>
+      }
     </div>
   </as-split-area>
+
   <as-split-area>
-    <div class="app-content app-fill-w app-fill-h">
-      <div class="app-years">
+    <div class="app-map-content">
+      <nav class="app-map-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+        <ol>
+          <li><a routerLink="/" queryParamsHandling="preserve">{{ 'navbar.search' | translate }}</a></li>
+          <li aria-current="page">
+            <mat-icon aria-hidden="true">chevron_right</mat-icon>
+            {{ 'home.map.header' | translate }}
+          </li>
+        </ol>
+      </nav>
+
+      <header class="app-map-header">
+        <p>{{ 'home.map.header' | translate }}</p>
+        <h1>{{ 'map.title' | translate }}</h1>
+        <div>{{ 'home.map.text' | translate }}</div>
+      </header>
+
+      <section class="app-map-chart" [attr.aria-label]="'map.year_chart' | translate">
         @if (solrResponse?.facets.years) {
-          <app-years-chart [dateYearFacet]="solrResponse.facets.years"
-          (onChangeLimits)="changeLimits($event)" [withAnimation]="true" (onChangeRunning)="changeRunning($event)"></app-years-chart>
+          <app-years-chart
+            [dateYearFacet]="solrResponse.facets.years"
+            [withAnimation]="true"
+            [redesignedControls]="true"
+            (onChangeLimits)="changeLimits($event)"
+            (onChangeRunning)="changeRunning($event)">
+          </app-years-chart>
         }
-      </div>
-      <div>
-        <mat-checkbox [(ngModel)]="showLinks" (change)="toggleLinks()">{{ 'action.showLinks' | translate}}</mat-checkbox>
-        @if(!loading) {
-        <div style="margin-left: 60%;display: inline-block;"></div>
-        <div class="dot" [style.width]="(maxSize+minSize)+'px'" [style.height]="(maxSize+minSize)+'px'" [style.backgroundColor]="'rgb(255, 80, 80)'"></div>&#160;<span>{{ maxCount() }}</span>
-        <div class="dot" [style.width]="((maxSize+minSize)/2)+'px'" [style.height]="((maxSize+minSize)/2)+'px'" [style.backgroundColor]="'rgb(192, 80, 80)'"></div>&#160;<span>{{ halfCount() }}</span>
-        <div class="dot" [style.width]="(minSize)+'px'" [style.height]="(minSize)+'px'" [style.backgroundColor]="'rgb(127, 80, 80)'"></div>&#160;<span>1</span>
-        
-        }
-        
-      </div>
-      <div style="height: 100%; width: 100%;" id="echarts-lmap" class="app-fxFlex"></div>
-</div>
+      </section>
+
+      <section class="app-map-card" [attr.aria-label]="'home.map.header' | translate">
+        <div class="app-map-toolbar">
+          <mat-checkbox [(ngModel)]="showLinks" (change)="toggleLinks()" [disabled]="!graphChart">
+            {{ 'action.showLinks' | translate }}
+          </mat-checkbox>
+
+          @if (!loading) {
+            <div class="app-map-size-legend" [attr.aria-label]="'map.size_legend' | translate">
+              <span>
+                <span
+                  class="app-map-size-dot"
+                  [style.width]="(maxSize + minSize) + 'px'"
+                  [style.height]="(maxSize + minSize) + 'px'"
+                  [style.backgroundColor]="'rgb(255, 80, 80)'"></span>
+                {{ maxCount() }}
+              </span>
+              <span>
+                <span
+                  class="app-map-size-dot"
+                  [style.width]="((maxSize + minSize) / 2) + 'px'"
+                  [style.height]="((maxSize + minSize) / 2) + 'px'"
+                  [style.backgroundColor]="'rgb(192, 80, 80)'"></span>
+                {{ halfCount() }}
+              </span>
+              <span>
+                <span
+                  class="app-map-size-dot"
+                  [style.width]="minSize + 'px'"
+                  [style.height]="minSize + 'px'"
+                  [style.backgroundColor]="'rgb(127, 80, 80)'"></span>
+                1
+              </span>
+            </div>
+          }
+        </div>
+
+        <div id="echarts-lmap"></div>
+      </section>
+    </div>
   </as-split-area>
 </as-split>
+
 @if (infoHeader) {
   <div class="app-letters-info">
-    <app-letters-info [header]="infoHeader" [fields]="infoFields" [data]="infoData" [type]="infoType" [typeData]="infoTypeData"
-     (onClose)="closeInfo()"></app-letters-info>
+    <app-letters-info
+      [header]="infoHeader"
+      [fields]="infoFields"
+      [data]="infoData"
+      [type]="infoType"
+      [typeData]="infoTypeData"
+      (onClose)="closeInfo()">
+    </app-letters-info>
   </div>
 }

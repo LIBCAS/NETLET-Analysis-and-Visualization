@@ -33,6 +33,16 @@
     "next_page": "Další stránka",
     "previous_page": "Předchozí stránka"
   },
+  "map": {
+    "title": "Korespondence v geografických souvislostech",
+    "year_chart": "Počet dopisů v čase",
+    "chart_controls": "Ovládání časového grafu",
+    "play": "Přehrát vývoj od začátku",
+    "move": "Posouvat časový výběr",
+    "pause": "Pozastavit přehrávání",
+    "size_legend": "Velikost bodu podle počtu dopisů",
+    "boundaries": "Zobrazení státních hranic podle roku"
+  },
   "navbar": {
     "search": "Vyhledávání",
     "main_navigation": "Hlavní navigace",

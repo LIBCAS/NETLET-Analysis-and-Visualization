@@ -1,4 +1,4 @@
-import { Component, effect, Inject, NgZone, DOCUMENT, signal, computed } from '@angular/core';
+import { Component, effect, Inject, NgZone, DOCUMENT, signal, computed, inject, DestroyRef } from '@angular/core';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 
@@ -14,7 +14,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HttpParams } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Tenant, AppState } from '../../app-state';
 import { AppService } from '../../app.service';
 import { FacetFields, JSONFacet } from '../../shared/facet';
@@ -57,7 +58,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Titl
 
 @Component({
   selector: 'app-map',
-  imports: [TranslateModule, FormsModule, LeafletModule,
+  imports: [TranslateModule, FormsModule, LeafletModule, RouterModule,
     MatCardModule, MatExpansionModule, MatCheckboxModule, MatFormFieldModule,
     MatSelectModule, MatInputModule, MatListModule, MatIconModule,
     MatProgressBarModule, YearsChartComponent, LettersInfoComponent, FacetsComponent, AngularSplitModule],
@@ -66,6 +67,11 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Titl
 })
 export class MapComponent {
 
+
+  private destroyRef = inject(DestroyRef);
+  private mapResizeObserver: ResizeObserver;
+  private mapResizeFrame: number;
+  private destroyed = false;
 
   loading: boolean;
   running: boolean;
@@ -136,6 +142,18 @@ export class MapComponent {
   ngOnInit(): void {
     this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'map');
+    this.translation.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      if (this.graphChart && !this.graphChart.isDisposed()) {
+        this.addControl(this.map);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed = true;
+    this.mapResizeObserver?.disconnect();
+    cancelAnimationFrame(this.mapResizeFrame);
+    this.graphChart?.dispose();
   }
 
   onMapReady(map: Map) {
@@ -183,7 +201,7 @@ export class MapComponent {
     this.filterGeos();
 
     this.service.getMap(p as HttpParams).subscribe((resp: any) => {
-      if (!resp) {
+      if (this.destroyed || !resp) {
         return;
       }
       const ts: JSONFacet[] = resp.facets.tenants.buckets;
@@ -518,8 +536,19 @@ export class MapComponent {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const lmap = lmapComponent.getLeaflet();
+    this.map = lmap;
 
     //LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OpenStreetMaps' }).addTo(lmap);
+
+    this.mapResizeObserver = new ResizeObserver(() => {
+      cancelAnimationFrame(this.mapResizeFrame);
+      this.mapResizeFrame = requestAnimationFrame(() => {
+        if (this.graphChart.isDisposed()) return;
+        lmap.invalidateSize({ animate: false });
+        this.graphChart.resize();
+      });
+    });
+    this.mapResizeObserver.observe(d);
 
     const osm = LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OpenStreetMaps' });
     //const carto = LtileLayer('https://basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png?key=cb1_44kb_1_fcb333c51ecf506f887c03b7', { attribution: 'OpenStreetMaps, CARTO' });
@@ -558,6 +587,8 @@ export class MapComponent {
   }
 
   fitBounds() {
+    if (this.destroyed || !this.graphChart || this.graphChart.isDisposed()) return;
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const lmapComponent = this.graphChart.getModel().getComponent("lmap");
@@ -565,7 +596,12 @@ export class MapComponent {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const lmap = lmapComponent.getLeaflet();
-    lmap.fitBounds(this.getBounds(), { paddingBottomRight: [500, 100] });
+    const size = lmap.getSize();
+    lmap.fitBounds(this.getBounds(), {
+      paddingTopLeft: [24, 24],
+      paddingBottomRight: [Math.min(280, size.x * 0.25), Math.min(160, size.y * 0.2)],
+      animate: false
+    });
   }
 
   getBounds() {
@@ -671,29 +707,32 @@ export class MapComponent {
 
     this.geoJsonControl.onAdd = (map: any) => {
 
-      const div = L.DomUtil.create('div', 'info legend');
-      const label = L.DomUtil.create('label', 'title');
-      label.textContent = 'Zobrazení státních hranic podle roku';
+      const div = L.DomUtil.create('div', 'info legend app-map-boundaries');
+      const label = L.DomUtil.create('strong', 'app-map-boundaries-title');
+      label.textContent = this.translation.instant('map.boundaries');
       div.appendChild(label);
+      L.DomEvent.disableClickPropagation(div);
+      L.DomEvent.disableScrollPropagation(div);
+
+      const years = L.DomUtil.create('div', 'app-map-boundaries-years');
+      div.appendChild(years);
       this.geojsonsFiltered().forEach((rok: string) => {
-        const r = L.DomUtil.create('div', 'rok');
-        r.id = 'geo_rok_' + rok;
-        r.innerHTML = rok;
-        r.onclick = (e: any) => {
-          const els = this.document.getElementsByClassName('rok');
-          Array.from(els).forEach((element: any) => {
-            element.classList = 'rok';
+        const button = this.document.createElement('button');
+        button.type = 'button';
+        button.className = 'rok';
+        button.classList.toggle('selected', this.selectedGeo() === rok);
+        button.setAttribute('aria-pressed', String(this.selectedGeo() === rok));
+        button.textContent = rok;
+        button.onclick = () => {
+          this.selectedGeo.set(this.selectedGeo() === rok ? '' : rok);
+          years.querySelectorAll('button').forEach(item => {
+            const selected = item.textContent === this.selectedGeo();
+            item.classList.toggle('selected', selected);
+            item.setAttribute('aria-pressed', String(selected));
           });
-          if (this.selectedGeo() === rok) {
-            this.selectedGeo.set('')
-          } else {
-            this.selectedGeo.set(rok);
-          r.classList = 'rok selected';
-          }
           this.getGeos(this.selectedGeo());
         };
-
-        div.appendChild(r);
+        years.appendChild(button);
       });
 
       return div;
@@ -727,6 +766,7 @@ export class MapComponent {
     }
 
     this.service.getGeos(year).subscribe((resp: any) => {
+      if (this.destroyed || this.selectedGeo() !== year) return;
 
       if (this.geoJsonLayer) {
         this.geoJsonLayer.removeFrom(lmap);

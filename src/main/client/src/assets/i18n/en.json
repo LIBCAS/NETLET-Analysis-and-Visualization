@@ -33,6 +33,16 @@
     "next_page": "Next page",
     "previous_page": "Previous page"
   },
+  "map": {
+    "title": "Correspondence in its geographical context",
+    "year_chart": "Number of letters over time",
+    "chart_controls": "Time chart controls",
+    "play": "Play from the beginning",
+    "move": "Move the time selection",
+    "pause": "Pause playback",
+    "size_legend": "Point size by number of letters",
+    "boundaries": "National borders by year"
+  },
   "navbar": {
     "search": "Search",
     "main_navigation": "Main navigation",

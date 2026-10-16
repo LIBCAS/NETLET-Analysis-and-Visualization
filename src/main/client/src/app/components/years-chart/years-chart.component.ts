@@ -14,8 +14,9 @@ import { JSONFacet } from '../../shared/facet';
 
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { AppState } from '../../app-state';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DomSanitizer } from '@angular/platform-browser';
 echarts.use([BarChart, CanvasRenderer, LegendComponent, MarkLineComponent,
   TooltipComponent, GridComponent, TitleComponent, DataZoomComponent,
@@ -68,7 +69,7 @@ const MOVE_ICON =
 
 @Component({
   selector: 'app-years-chart',
-  imports: [NgxEchartsDirective, MatIconModule, MatButtonModule],
+  imports: [NgxEchartsDirective, MatIconModule, MatButtonModule, MatTooltipModule, TranslateModule],
   templateUrl: './years-chart.component.html',
   styleUrl: './years-chart.component.scss',
   providers: [
@@ -81,6 +82,7 @@ export class YearsChartComponent {
   onChangeLimits = output<[Date, Date]>();
 
   withAnimation = input<boolean>(false);
+  redesignedControls = input<boolean>(false);
   onChangeRunning = output<boolean>();
   limits: [number, number];
 
@@ -288,7 +290,7 @@ export class YearsChartComponent {
         text: this.limits[0] + '–' + this.limits[1]
       },
       toolbox: {
-        show: true,
+        show: !this.redesignedControls(),
         showTitle: false,
         tooltip: {
           show: true,
@@ -482,7 +484,19 @@ export class YearsChartComponent {
   }
 
 
+  resetChart() {
+    this.stop();
+    this.chartRok.dispatchAction({ type: 'restore' });
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.animation);
+  }
+
   run() {
+    clearInterval(this.animation);
+    this.running = true;
+    this.onChangeRunning.emit(true);
     const startRok = this.state.getTenantsRange()[0].getFullYear();
     let endRok = startRok;
     const maxRok = this.state.getTenantsRange()[1].getFullYear();
@@ -504,13 +518,15 @@ export class YearsChartComponent {
       // });
 
       if (endRok >= maxRok) {
-        clearInterval(this.animation);
-        this.onChangeRunning.emit(false);
+        this.stop();
       }
     }, 500);
   }
 
   move() {
+    clearInterval(this.animation);
+    this.running = true;
+    this.onChangeRunning.emit(true);
     let startRok = this.limits[0];
     let endRok = this.limits[1];
     const maxRok = this.state.getTenantsRange()[1].getFullYear();
