@@ -18,132 +18,208 @@
   <as-split-area>
     <div>
       <div class="app-timeline">
-        <h3>Zobrazení dopisů v chronologickém pořadí</h3>
-        <div>
-          <mat-radio-group [(ngModel)]="chartType" (change)="changeChartType()">
-            <mat-radio-button value="line">{{ 'line' | translate }}</mat-radio-button>
-            <mat-radio-button value="bar">{{ 'bar' | translate }}</mat-radio-button>
-          </mat-radio-group>
-          <mat-checkbox [(ngModel)]="gridInverse" (change)="processResponse()">dva grafy</mat-checkbox>
-        </div>
-        <div
-          echarts
-          style="height: 100%; width: 100%;"
-          [initOpts]="{ locale: 'CZ' }"
-          [options]="chartOptions"
-          (chartInit)="onChartInit($event)">
-        </div>
-        <div>
-          <div>
-            <h4>
-              Počet dopisů ({{ this.limits[0] | date : 'dd. M. yyyy' }} – {{ this.limits[1] | date : 'dd. M. yyyy' }}): {{ numFound }}
-            </h4>
+        <nav class="app-timeline-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+          <ol>
+            <li>
+              <a routerLink="/" queryParamsHandling="preserve">{{ 'navbar.search' | translate }}</a>
+            </li>
+            <li aria-current="page">
+              <mat-icon aria-hidden="true">chevron_right</mat-icon>
+              {{ 'home.timeline.header' | translate }}
+            </li>
+          </ol>
+        </nav>
+
+        <header class="app-timeline-header">
+          <p>{{ 'home.timeline.header' | translate }}</p>
+          <h1>{{ 'timeline.title' | translate }}</h1>
+        </header>
+
+        <section class="app-timeline-chart" [attr.aria-label]="'home.timeline.header' | translate">
+          <div class="app-timeline-controls">
+            <mat-radio-group
+              [(ngModel)]="chartType"
+              (change)="changeChartType()"
+              [disabled]="loading || !solrResponse"
+              [attr.aria-label]="'timeline.chart_type' | translate">
+              <mat-radio-button value="line">{{ 'line' | translate }}</mat-radio-button>
+              <mat-radio-button value="bar">{{ 'bar' | translate }}</mat-radio-button>
+            </mat-radio-group>
+            <mat-checkbox
+              [(ngModel)]="gridInverse"
+              (change)="processResponse()"
+              [disabled]="loading || !solrResponse">
+              {{ 'timeline.two_charts' | translate }}
+            </mat-checkbox>
           </div>
 
-          <mat-paginator
-            #paginator
-            (page)="handlePageEvent($event)"
-            [length]="numFound"
-            [pageSize]="rows"
-            [showFirstLastButtons]="false"
-            [pageSizeOptions]="pageSizeOptions"
-            [pageIndex]="pageIndex"
-            aria-label="Select page">
-          </mat-paginator>
-        </div>
-        <div style="height: 400px; max-width: 100%; overflow: auto;">
-          <table mat-table [dataSource]="letters()">
-            <ng-container matColumnDef="id">
-              <th mat-header-cell *matHeaderCellDef> Id </th>
-              <td mat-cell *matCellDef="let element"> {{ element.letter_id }} </td>
-            </ng-container>
+          <div class="app-timeline-chart-tools" role="group" [attr.aria-label]="'timeline.chart_controls' | translate">
+            <button
+              mat-icon-button
+              type="button"
+              [disabled]="loading || !chart || !solrResponse"
+              [attr.aria-label]="'timeline.zoom_in' | translate"
+              [matTooltip]="'timeline.zoom_in' | translate"
+              (click)="zoomTimeline(0.5)">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="10.5" cy="10.5" r="7.5" />
+                <path d="m16 16 5 5M7.5 10.5h6m-3-3v6" />
+              </svg>
+            </button>
+            <button
+              mat-icon-button
+              type="button"
+              [disabled]="loading || !chart || !solrResponse"
+              [attr.aria-label]="'timeline.zoom_out' | translate"
+              [matTooltip]="'timeline.zoom_out' | translate"
+              (click)="zoomTimeline(2)">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="10.5" cy="10.5" r="7.5" />
+                <path d="m16 16 5 5M7.5 10.5h6" />
+              </svg>
+            </button>
+            <button
+              mat-icon-button
+              type="button"
+              [disabled]="loading || !chart || !solrResponse"
+              [attr.aria-label]="'timeline.reset' | translate"
+              [matTooltip]="'timeline.reset' | translate"
+              (click)="resetTimeline()">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 7v5h-5M4 17v-5h5M6.1 6.1A8 8 0 0 1 19.5 10M4.5 14A8 8 0 0 0 17.9 17.9" />
+              </svg>
+            </button>
+          </div>
 
-            <ng-container matColumnDef="tenant">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.tenant' | translate }} </th>
-              <td mat-cell *matCellDef="let element">
-                <a [routerLink]="'/catalog/' + element.tenant">
-                  {{ 'catalog.' + element.tenant | translate }}
-                </a>
-              </td>
-            </ng-container>
+          <div
+            echarts
+            class="app-timeline-canvas"
+            [initOpts]="{ locale: 'CZ' }"
+            [options]="chartOptions"
+            (chartInit)="onChartInit($event)">
+          </div>
+        </section>
 
-            <ng-container matColumnDef="author">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.author' | translate }} </th>
-              <td mat-cell *matCellDef="let element">
-                @for (a of letterIdentities(element, 'author'); track a) {
-                  <div>
-                    <a [routerLink]="'/identity/' + (a.global_identity ? ('global_' + a.global_identity.id) : a.id)">{{ a.name }}</a>
-                  </div>
-                }
-              </td>
-            </ng-container>
+        <section class="app-timeline-letters" [attr.aria-label]="'letters_count' | translate">
+          <header>
+            <div>
+              <h2>
+                {{ 'letters_count' | translate }}
+                ({{ limits[0] | date : 'dd. M. yyyy' }} – {{ limits[1] | date : 'dd. M. yyyy' }}): {{ numFound }}
+              </h2>
+              <p>{{ 'timeline.results_description' | translate }}</p>
+            </div>
 
-            <ng-container matColumnDef="recipient">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.recipient' | translate }} </th>
-              <td mat-cell *matCellDef="let element">
-                @for (a of letterIdentities(element, 'recipient'); track a) {
-                  <div>
-                    <a [routerLink]="'/identity/' + (a.global_identity ? ('global_' + a.global_identity.id) : a.id)">{{ a.name }}</a>
-                  </div>
-                }
-              </td>
-            </ng-container>
+            <mat-paginator
+              #paginator
+              (page)="handlePageEvent($event)"
+              [length]="numFound"
+              [pageSize]="rows"
+              [showFirstLastButtons]="false"
+              [pageSizeOptions]="pageSizeOptions"
+              [pageIndex]="pageIndex"
+              [attr.aria-label]="'timeline.pagination' | translate">
+            </mat-paginator>
+          </header>
 
-            <ng-container matColumnDef="origin">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.origin' | translate }} </th>
-              <td mat-cell *matCellDef="let element">
-                @for (p of letterPlaces(element, 'origin'); track p) {
-                  <div>
-                    <a [routerLink]="'/place/' + p.id">{{ p.name }}</a>
-                  </div>
-                }
-              </td>
-            </ng-container>
+          <div class="app-timeline-table" tabindex="0" role="region" [attr.aria-label]="'timeline.results_table' | translate">
+            <table mat-table [dataSource]="letters()">
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef> Id </th>
+                <td mat-cell *matCellDef="let element"> {{ element.letter_id }} </td>
+              </ng-container>
 
-            <ng-container matColumnDef="destination">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.destination' | translate }} </th>
-              <td mat-cell *matCellDef="let element">
-                @for (p of letterPlaces(element, 'destination'); track p) {
-                  <div>
-                    <a [routerLink]="'/place/' + p.id">{{ p.name }}</a>
-                  </div>
-                }
-              </td>
-            </ng-container>
+              <ng-container matColumnDef="tenant">
+                <th mat-header-cell *matHeaderCellDef> {{ 'field.tenant' | translate }} </th>
+                <td mat-cell *matCellDef="let element">
+                  <a [routerLink]="'/catalog/' + element.tenant">
+                    {{ 'catalog.' + element.tenant | translate }}
+                  </a>
+                </td>
+              </ng-container>
 
-            <ng-container matColumnDef="date">
-              <th mat-header-cell *matHeaderCellDef> {{ 'field.date' | translate }} </th>
-              <td mat-cell *matCellDef="let element">
-                @if (element.date_computed) {
-                  {{ element.date_computed | date : 'd. M. yyyy' }}
-                } @else {
-                  <mat-icon style="color: red;">warning</mat-icon>
-                }
-              </td>
-            </ng-container>
+              <ng-container matColumnDef="author">
+                <th mat-header-cell *matHeaderCellDef> {{ 'field.author' | translate }} </th>
+                <td mat-cell *matCellDef="let element">
+                  @for (a of letterIdentities(element, 'author'); track a) {
+                    <div>
+                      <a [routerLink]="'/identity/' + (a.global_identity ? ('global_' + a.global_identity.id) : a.id)">{{ a.name }}</a>
+                    </div>
+                  }
+                </td>
+              </ng-container>
 
-            <ng-container matColumnDef="action" stickyEnd>
-              <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
-              <td mat-cell *matCellDef="let element">
-                <button
-                  mat-icon-button
-                  (click)="viewLetter(element.id, element.tenant)"
-                  [matTooltip]="'action.letter_details' | translate">
-                  <mat-icon>info</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  (click)="viewLetterInHIKO(element.letter_id, element.tenant)"
-                  [matTooltip]="'action.view_in_hiko' | translate">
-                  <mat-icon>arrow_outward</mat-icon>
-                </button>
-              </td>
-            </ng-container>
+              <ng-container matColumnDef="recipient">
+                <th mat-header-cell *matHeaderCellDef> {{ 'field.recipient' | translate }} </th>
+                <td mat-cell *matCellDef="let element">
+                  @for (a of letterIdentities(element, 'recipient'); track a) {
+                    <div>
+                      <a [routerLink]="'/identity/' + (a.global_identity ? ('global_' + a.global_identity.id) : a.id)">{{ a.name }}</a>
+                    </div>
+                  }
+                </td>
+              </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          </table>
-        </div>
+              <ng-container matColumnDef="origin">
+                <th mat-header-cell *matHeaderCellDef> {{ 'field.origin' | translate }} </th>
+                <td mat-cell *matCellDef="let element">
+                  @for (p of letterPlaces(element, 'origin'); track p) {
+                    <div>
+                      <a [routerLink]="'/place/' + p.id">{{ p.name }}</a>
+                    </div>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="destination">
+                <th mat-header-cell *matHeaderCellDef> {{ 'field.destination' | translate }} </th>
+                <td mat-cell *matCellDef="let element">
+                  @for (p of letterPlaces(element, 'destination'); track p) {
+                    <div>
+                      <a [routerLink]="'/place/' + p.id">{{ p.name }}</a>
+                    </div>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef> {{ 'field.date' | translate }} </th>
+                <td mat-cell *matCellDef="let element">
+                  @if (element.date_computed) {
+                    {{ element.date_computed | date : 'd. M. yyyy' }}
+                  } @else {
+                    <mat-icon style="color: red;">warning</mat-icon>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="action" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef [attr.aria-label]="'timeline.row_actions' | translate">&nbsp;</th>
+                <td mat-cell *matCellDef="let element">
+                  <button
+                    type="button"
+                    mat-icon-button
+                    (click)="viewLetter(element.id, element.tenant)"
+                    [attr.aria-label]="'action.letter_details' | translate"
+                    [matTooltip]="'action.letter_details' | translate">
+                    <mat-icon>info</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    (click)="viewLetterInHIKO(element.letter_id, element.tenant)"
+                    [attr.aria-label]="'action.view_in_hiko' | translate"
+                    [matTooltip]="'action.view_in_hiko' | translate">
+                    <mat-icon>arrow_outward</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        </section>
       </div>
     </div>
   </as-split-area>

@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
-import { Component, effect, Inject, NgZone, signal, DOCUMENT, Injectable } from '@angular/core';
+import { Component, effect, Inject, NgZone, signal, DOCUMENT, Injectable, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -51,23 +52,23 @@ echarts.registerLocale("CZ", langCZ);
 export class MyCustomPaginatorIntl implements MatPaginatorIntl {
   changes = new Subject<void>();
 
-  // For internationalization, the `$localize` function from
-  // the `@angular/localize` package can be used.
-  firstPageLabel = `First page`;
-  itemsPerPageLabel = `Počet dopisů na stránku:`;
-  lastPageLabel = `Last page`;
+  private translation = inject(TranslateService);
 
-  // You can set labels to an arbitrary string too, or dynamically compute
-  // it through other third-party internationalization libraries.
-  nextPageLabel = 'Next page';
-  previousPageLabel = 'Previous page';
+  constructor() {
+    this.translation.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => this.changes.next());
+  }
+
+  get firstPageLabel() { return this.translation.instant('timeline.first_page'); }
+  get itemsPerPageLabel() { return this.translation.instant('timeline.items_per_page'); }
+  get lastPageLabel() { return this.translation.instant('timeline.last_page'); }
+  get nextPageLabel() { return this.translation.instant('timeline.next_page'); }
+  get previousPageLabel() { return this.translation.instant('timeline.previous_page'); }
 
   getRangeLabel(page: number, pageSize: number, length: number): string {
-    if (length === 0) {
-      return `Stránka 1 z 1`;
-    }
-    const amountPages = Math.ceil(length / pageSize);
-    return `Stránka ${page + 1} z ${amountPages}`;
+    return this.translation.instant('timeline.page_of', {
+      page: length === 0 ? 1 : page + 1,
+      total: pageSize > 0 ? Math.max(1, Math.ceil(length / pageSize)) : 1
+    });
   }
 }
 
@@ -308,6 +309,7 @@ export class TimelineComponent {
 
 
       toolbox: {
+        show: false,
         orient: 'vertical',
         left: 'right',
         rigth: '50px',
@@ -417,6 +419,28 @@ export class TimelineComponent {
       ]
 
     };
+  }
+
+  zoomTimeline(factor: number) {
+    if (!this.chart || !this.solrResponse || this.loading) return;
+
+    const option = this.chart.getOption();
+    const zoom = (option['dataZoom'] as { start: number; end: number }[])[1];
+    const center = (zoom.start + zoom.end) / 2;
+    const span = Math.min(100, Math.max(0.01, (zoom.end - zoom.start) * factor));
+    const start = Math.max(0, Math.min(100 - span, center - span / 2));
+
+    this.chart.dispatchAction({ type: 'dataZoom', start, end: start + span });
+  }
+
+  resetTimeline() {
+    if (!this.chart || !this.solrResponse || this.loading) return;
+
+    this.chart.dispatchAction({ type: 'restore' });
+    this.excludeDate = true;
+    this.limits = this.state.getTenantsRange();
+    this.pageIndex = 0;
+    this.getData(true);
   }
 
   changeChartType() {
