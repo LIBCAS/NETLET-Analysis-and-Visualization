@@ -202,7 +202,8 @@ export class CatalogComponent {
         type: 'bar',
         data: this.rokSeries,
         barCategoryGap: 0,
-        color: this.barColor,
+        //color: this.barColor,
+        itemStyle: this.state.getBarItemStyle(),
 
       }]
     }

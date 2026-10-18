@@ -17,6 +17,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AppState } from '../../app-state';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { AppConfiguration } from '../../app-configuration';
 
 
 echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent, PieChart, DatasetComponent,
@@ -38,6 +39,7 @@ export class IdentityComponent {
   readonly router = inject(Router);
   private translation = inject(TranslateService);
   private activatedRoute = inject(ActivatedRoute);
+  private config = inject(AppConfiguration);
   private state = inject(AppState);
 
   identityRes: any = httpResource(() => ({
@@ -159,7 +161,7 @@ export class IdentityComponent {
         data.push({
           id: p.val,
           name: p.val,
-          value: p.count
+          value: p.count,
         });
       }
     });
@@ -232,6 +234,7 @@ export class IdentityComponent {
         type: this.yearsChartType + '',
         smooth: true,
         symbol: 'none',
+        color: this.config.colors['author'],
         data: d.map((c: any) => {
           if (c.count === 0) {
             return [c.val, c.count]
@@ -249,6 +252,7 @@ export class IdentityComponent {
         name: 'Recipient',
         type: this.yearsChartType + '',
         smooth: true,
+        color: this.config.colors['recipient'],
         symbol: 'none',
         data: d.map((c: any) => {
           if (c.count === 0) {
@@ -267,6 +271,7 @@ export class IdentityComponent {
         name: 'Mentioned',
         type: this.yearsChartType + '',
         smooth: true,
+        color: this.config.colors['mentioned'],
         symbol: 'none',
         data: d.map((c: any) => {
           if (c.count === 0) {
@@ -366,7 +371,15 @@ export class IdentityComponent {
     this.identitiesBarOptions = {
 
       dataset: dataset,
-      series: [{ type: 'bar', seriesLayoutBy: 'row' }, { type: 'bar', seriesLayoutBy: 'row' }],
+      series: [{ 
+        type: 'bar', seriesLayoutBy: 'row', 
+          itemStyle: this.state.getBarItemStyle(this.config.colors['author'], this.config.colors['author1'], true)
+        },
+           { 
+            type: 'bar', seriesLayoutBy: 'row' , 
+          itemStyle: this.state.getBarItemStyle(this.config.colors['recipient'], this.config.colors['recipient1'], true)
+          }
+          ],
 
       // series: [
       //   {
@@ -428,6 +441,7 @@ export class IdentityComponent {
       series.push({
         name: 'jako adresat',
         type: 'line',
+        color: this.config.colors['recipient'],
         smooth: true,
         symbol: 'none',
         data: d.map((c: JSONFacet) => [c.val, c.count])
@@ -438,6 +452,7 @@ export class IdentityComponent {
       series.push({
         name: 'jako autor',
         type: 'line',
+        color: this.config.colors['author'],
         smooth: true,
         symbol: 'none',
         data: d.map((c: JSONFacet) => [c.val, c.count])

@@ -1,4 +1,5 @@
 import { Injectable, signal } from "@angular/core";
+import * as echarts from 'echarts/core';
 
 
 export interface Tenant {
@@ -149,7 +150,7 @@ export interface Tenant {
     this.addFilter(p, 'destination', 'destinations');
     this.addFilter(p, 'places', 'places');
     this.addFilter(p, 'languages', 'languages');
-    
+
     p.year_from = this.usedFacets().filter(k => k.field === 'year_from').map(k => k.value);
     p.year_to = this.usedFacets().filter(k => k.field === 'year_to').map(k => k.value);
     p.date_from = this.usedFacets().filter(k => k.field === 'date_from').map(k => k.value);
@@ -166,9 +167,9 @@ export interface Tenant {
 
   unselectTenants() {
     this.tenants.update(ts => {
-        ts.forEach(t => {t.selected = false});
-        return [...ts]
-      })
+      ts.forEach(t => { t.selected = false });
+      return [...ts]
+    })
   }
 
   hasStateInUrl() {
@@ -176,7 +177,7 @@ export interface Tenant {
   }
 
   encodeState() {
-    const obj = { q: this.q, f: this.usedFacets(), t: this.tenants().filter(t => t.selected).map(t => t.val)};
+    const obj = { q: this.q, f: this.usedFacets(), t: this.tenants().filter(t => t.selected).map(t => t.val) };
     //console.log(obj)
     return btoa(encodeURIComponent(JSON.stringify(obj)));
   }
@@ -190,13 +191,13 @@ export interface Tenant {
       //this.tenants().forEach(t => {t.selected = false});
       this.unselectTenants();
       if (obj.t) {
-        obj.t.forEach((tenant: string) =>  {
+        obj.t.forEach((tenant: string) => {
           const st = this.tenants().find(t => t.val === tenant);
           if (st) {
             st.selected = true;
           }
         });
-      } 
+      }
       // this.setSelectedTenants();
 
     } else {
@@ -209,8 +210,20 @@ export interface Tenant {
 
   facetsVisible = true;
   facetsSize = 320;
-  gutterClick(e: any){
+  gutterClick(e: any) {
     this.facetsVisible = !this.facetsVisible;
     this.facetsSize = this.facetsVisible ? 320 : 0;
+  }
+
+  //Graph common options
+  getBarItemStyle(color0?: string, color1?: string, horizontal?: boolean) {
+    
+    return {
+      borderRadius: [2, 2, 0, 0],
+      color: new echarts.graphic.LinearGradient( horizontal?1:0, 0, 0,horizontal?0:1, [
+        { offset: 0, color: color0 ?? 'rgb(24, 141, 240)' },
+        { offset: 1, color: color1 ?? 'rgb(131, 191, 246)' }
+      ])
+    };
   }
 }

@@ -42,8 +42,11 @@
     },
     "colors": {
         "author": "rgb(6, 120, 0)",
+        "author1": "rgb(56, 176, 50)",
         "recipient": "rgb(255,160, 10)",
-        "mentioned": "rgb(152, 156, 223)"
+        "recipient1": "rgb(255,210, 60)",
+        "mentioned": "rgb(152, 156, 223)",
+        "mentioned1": "rgb(202, 206, 255)"
     },
   "tenant_colors": {
     "brezina": "#3531a2",

@@ -411,14 +411,7 @@ export class YearsChartComponent {
         barCategoryGap: 0,
         //color: this.barColor,
 
-        itemStyle: {
-          borderRadius: [2, 2, 0, 0],
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#188df0' },
-            //{ offset: 0.5, color: '#188df0' },
-            { offset: 1, color: '#83bff6' }
-          ])
-        },
+        itemStyle: this.state.getBarItemStyle(),
 
         markLine: {
           symbol: 'none',

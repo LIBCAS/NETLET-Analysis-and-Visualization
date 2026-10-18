@@ -388,10 +388,11 @@ export class TimelineComponent {
           //triggerLineEvent: true,
           barCategoryGap: 0,
           barGap: '-100%',
-          itemStyle: {
-            opacity: .5,
-            color: '#f80'
-          },
+          itemStyle: this.state.getBarItemStyle('#f80', 'rgb(237, 171, 95)'),
+          // itemStyle: {
+          //   opacity: .5,
+          //   color: '#f80'
+          // },
 
           smooth: true,
           symbol: 'none',
@@ -402,9 +403,7 @@ export class TimelineComponent {
           name: 'Počet dopisů za den',
           type: this.chartType + '',
           
-          itemStyle: {
-            color: '#00c'
-          },
+          itemStyle: this.state.getBarItemStyle('#83bff6', '#188df0'),
           barWidth: '3px',
           xAxisIndex: 1,
           yAxisIndex: 1,
