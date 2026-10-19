@@ -329,3 +329,45 @@ as-split-area:first-child {
     padding: 14px;
   }
 }
+
+// redesign: Přichycení pracovní části mapy při procházení facetů.
+.app-map-workspace {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-width: 0;
+}
+
+@media (min-width: 1081px) and (min-height: 740px) {
+  .app-map-content {
+    height: 100%;
+    grid-template-rows: auto auto 1fr;
+  }
+
+  .app-map-workspace {
+    position: sticky;
+    top: calc(var(--app-topbar-height) + 16px);
+    align-self: start;
+    grid-template-rows: auto minmax(0, 1fr);
+    height: calc(100dvh - var(--app-topbar-height) - 32px);
+  }
+
+  .app-map-chart app-years-chart {
+    height: clamp(180px, 24dvh, 240px);
+  }
+
+  .app-map-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .app-map-toolbar {
+    flex-shrink: 0;
+  }
+
+  #echarts-lmap {
+    flex: 1;
+    height: auto;
+  }
+}

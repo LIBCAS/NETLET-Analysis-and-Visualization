@@ -38,56 +38,58 @@
         <div>{{ 'home.map.text' | translate }}</div>
       </header>
 
-      <section class="app-map-chart" [attr.aria-label]="'map.year_chart' | translate">
-        @if (solrResponse?.facets.years) {
-          <app-years-chart
-            [dateYearFacet]="solrResponse.facets.years"
-            [withAnimation]="true"
-            [redesignedControls]="true"
-            (onChangeLimits)="changeLimits($event)"
-            (onChangeRunning)="changeRunning($event)">
-          </app-years-chart>
-        }
-      </section>
-
-      <section class="app-map-card" [attr.aria-label]="'home.map.header' | translate">
-        <div class="app-map-toolbar">
-          <mat-checkbox [(ngModel)]="showLinks" (change)="toggleLinks()" [disabled]="!graphChart">
-            {{ 'action.showLinks' | translate }}
-          </mat-checkbox>
-
-          @if (!loading) {
-            <div class="app-map-size-legend" [attr.aria-label]="'map.size_legend' | translate">
-              <span>
-                <span
-                  class="app-map-size-dot"
-                  [style.width]="(maxSize + minSize) + 'px'"
-                  [style.height]="(maxSize + minSize) + 'px'"
-                  [style.backgroundColor]="'rgb(255, 80, 80)'"></span>
-                {{ maxCount() }}
-              </span>
-              <span>
-                <span
-                  class="app-map-size-dot"
-                  [style.width]="((maxSize + minSize) / 2) + 'px'"
-                  [style.height]="((maxSize + minSize) / 2) + 'px'"
-                  [style.backgroundColor]="'rgb(192, 80, 80)'"></span>
-                {{ halfCount() }}
-              </span>
-              <span>
-                <span
-                  class="app-map-size-dot"
-                  [style.width]="minSize + 'px'"
-                  [style.height]="minSize + 'px'"
-                  [style.backgroundColor]="'rgb(127, 80, 80)'"></span>
-                1
-              </span>
-            </div>
+      <div class="app-map-workspace">
+        <section class="app-map-chart" [attr.aria-label]="'map.year_chart' | translate">
+          @if (solrResponse?.facets.years) {
+            <app-years-chart
+              [dateYearFacet]="solrResponse.facets.years"
+              [withAnimation]="true"
+              [redesignedControls]="true"
+              (onChangeLimits)="changeLimits($event)"
+              (onChangeRunning)="changeRunning($event)">
+            </app-years-chart>
           }
-        </div>
+        </section>
 
-        <div id="echarts-lmap"></div>
-      </section>
+        <section class="app-map-card" [attr.aria-label]="'home.map.header' | translate">
+          <div class="app-map-toolbar">
+            <mat-checkbox [(ngModel)]="showLinks" (change)="toggleLinks()" [disabled]="!graphChart">
+              {{ 'action.showLinks' | translate }}
+            </mat-checkbox>
+
+            @if (!loading) {
+              <div class="app-map-size-legend" [attr.aria-label]="'map.size_legend' | translate">
+                <span>
+                  <span
+                    class="app-map-size-dot"
+                    [style.width]="(maxSize + minSize) + 'px'"
+                    [style.height]="(maxSize + minSize) + 'px'"
+                    [style.backgroundColor]="'rgb(255, 80, 80)'"></span>
+                  {{ maxCount() }}
+                </span>
+                <span>
+                  <span
+                    class="app-map-size-dot"
+                    [style.width]="((maxSize + minSize) / 2) + 'px'"
+                    [style.height]="((maxSize + minSize) / 2) + 'px'"
+                    [style.backgroundColor]="'rgb(192, 80, 80)'"></span>
+                  {{ halfCount() }}
+                </span>
+                <span>
+                  <span
+                    class="app-map-size-dot"
+                    [style.width]="minSize + 'px'"
+                    [style.height]="minSize + 'px'"
+                    [style.backgroundColor]="'rgb(127, 80, 80)'"></span>
+                  1
+                </span>
+              </div>
+            }
+          </div>
+
+          <div id="echarts-lmap"></div>
+        </section>
+      </div>
     </div>
   </as-split-area>
 </as-split>
