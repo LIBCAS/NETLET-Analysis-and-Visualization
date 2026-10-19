@@ -51,9 +51,19 @@
   },
   "centrality": {
     "title": "Postavení osob v korespondenční síti",
-    "controls": "Nastavení centrality",
+    "controls": "Nastavení centrality"
+  },
+  "network": {
     "include_main": "Včetně hlavních aktérů",
     "show_names": "Zobrazit všechna jména"
+  },
+  "relation": {
+    "title": "Propojení korespondenčních sítí",
+    "controls": "Nastavení porovnání sítí",
+    "comparison_hint": "Vyberte druhý katalog se společným časovým rozsahem.",
+    "primary_catalog": "Výchozí katalog",
+    "compared_catalog": "Porovnávaný katalog",
+    "recipient_letters": "Dopisy pro příjemce {{identity}} ({{count}})"
   },
   "navbar": {
     "search": "Vyhledávání",

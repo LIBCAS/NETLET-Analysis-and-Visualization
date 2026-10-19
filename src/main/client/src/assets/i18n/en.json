@@ -51,9 +51,19 @@
   },
   "centrality": {
     "title": "People in the correspondence network",
-    "controls": "Centrality settings",
+    "controls": "Centrality settings"
+  },
+  "network": {
     "include_main": "Include principal correspondents",
     "show_names": "Show all names"
+  },
+  "relation": {
+    "title": "Connections between correspondence networks",
+    "controls": "Network comparison settings",
+    "comparison_hint": "Select a second catalog with an overlapping time range.",
+    "primary_catalog": "Primary catalog",
+    "compared_catalog": "Comparison catalog",
+    "recipient_letters": "Letters with {{identity}} as recipient ({{count}})"
   },
   "navbar": {
     "search": "Search",

@@ -60,19 +60,19 @@
         <section
           class="app-view-network app-view-card app-view-card-clip app-analysis-graph-body"
           [attr.aria-label]="'home.centrality.header' | translate">
-          <div class="app-centrality-controls" role="group" [attr.aria-label]="'centrality.controls' | translate">
+          <div class="app-view-controls" role="group" [attr.aria-label]="'centrality.controls' | translate">
             <mat-checkbox
               [(ngModel)]="allIncluded"
               (change)="processResponse()"
               [disabled]="loading || !graphChart || !graphData"
               [title]="config.excluded_identities()">
-              {{ 'centrality.include_main' | translate }}
+              {{ 'network.include_main' | translate }}
             </mat-checkbox>
             <mat-checkbox
               [(ngModel)]="showOverlap"
               (change)="toggleOverlap()"
               [disabled]="loading || !graphChart || !graphData">
-              {{ 'centrality.show_names' | translate }}
+              {{ 'network.show_names' | translate }}
             </mat-checkbox>
           </div>
 

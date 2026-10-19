@@ -1,6 +1,7 @@
 
 import { HttpParams } from '@angular/common/http';
 import { Component, effect, Inject, NgZone, DOCUMENT, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,7 +11,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EChartsOption, ECharts } from 'echarts';
 import { GraphChart } from 'echarts/charts';
@@ -33,7 +34,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Grid
 
 @Component({
   selector: 'app-relation',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent, AngularSplitModule],
+  imports: [RouterLink, TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent, AngularSplitModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -93,6 +94,17 @@ export class RelationComponent {
         this.facets.set({});
       }
     });
+
+    this.translation.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.graphChart && this.graphData) {
+        this.graphChart.setOption({
+          legend: [{ formatter: (name: string) => this.translation.instant('catalog.' + name) }]
+        });
+      }
+      if (this.infoIdentity) {
+        this.updateInfoHeader();
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -109,9 +121,11 @@ export class RelationComponent {
   infoHeader: string;
   infoData: any[];
   infoFields: string[];
+  private infoIdentity: string;
   closeInfo() {
     this.infoHeader = null;
     this.infoContent = null;
+    this.infoIdentity = null;
   }
 
   onGraphChartInit(e: any) {
@@ -138,7 +152,8 @@ export class RelationComponent {
             this.infoContent = '';
             this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
             this.infoData = resp.response.docs;
-            this.infoHeader = 'Letters with ' + identity + ' as recipient (' + this.infoData.length + ')';
+            this.infoIdentity = identity;
+            this.updateInfoHeader();
             this.state.showInfo.set(true);
 
 
@@ -146,9 +161,12 @@ export class RelationComponent {
         });
 
       }
-    })
+    });
 
-  } 
+    if (this.solrResponse && this.recipients && this.mentioned) {
+      this.processResponse();
+    }
+  }
   
   changeTenant() {
     this.limits = [this.tenant.date_computed_min, this.tenant.date_computed_max];
@@ -162,6 +180,10 @@ export class RelationComponent {
   }
 
   clickTenant(k: Tenant) {
+    if (this.loading || !this.tenant || k.val === this.tenant.val || k.selected || this.intersection(k).start === 0) {
+      return;
+    }
+
     this.closeInfo();
     this.state.tenants().forEach(t => {
       if (this.tenant.val !== t.val)
@@ -222,7 +244,9 @@ export class RelationComponent {
       //this.authors = resp.facets.authors.buckets;
       this.recipients = resp.facets.recipients.buckets;
       this.mentioned = resp.facets.mentioned.buckets;
-      this.processResponse();
+      if (this.graphChart) {
+        this.processResponse();
+      }
       this.loading = false;
     });
   }
@@ -388,7 +412,7 @@ export class RelationComponent {
             formatter: '{b}'
           },
           labelLayout: {
-            hideOverlap: true
+            hideOverlap: !this.showOverlap
           },
           scaleLimit: {
             min: 0.4,
@@ -410,7 +434,7 @@ export class RelationComponent {
     };
   }
 
-toggleOverlap() {
+  toggleOverlap() {
     this.graphChart.setOption({
       series: [
         {
@@ -422,4 +446,10 @@ toggleOverlap() {
     });
   }
 
+  private updateInfoHeader() {
+    this.infoHeader = this.translation.instant('relation.recipient_letters', {
+      identity: this.infoIdentity,
+      count: this.infoData.length
+    });
+  }
 }
