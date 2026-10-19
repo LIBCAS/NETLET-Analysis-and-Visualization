@@ -65,6 +65,10 @@
     "compared_catalog": "Porovnávaný katalog",
     "recipient_letters": "Dopisy pro příjemce {{identity}} ({{count}})"
   },
+  "professions": {
+    "title": "Profesní skupiny v korespondenci",
+    "network": "Korespondenční vztahy mezi profesními skupinami"
+  },
   "navbar": {
     "search": "Vyhledávání",
     "main_navigation": "Hlavní navigace",

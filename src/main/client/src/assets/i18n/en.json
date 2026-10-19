@@ -65,6 +65,10 @@
     "compared_catalog": "Comparison catalog",
     "recipient_letters": "Letters with {{identity}} as recipient ({{count}})"
   },
+  "professions": {
+    "title": "Professional groups in correspondence",
+    "network": "Correspondence between professional groups"
+  },
   "navbar": {
     "search": "Search",
     "main_navigation": "Main navigation",

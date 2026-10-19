@@ -1,6 +1,7 @@
 
 import { HttpParams } from '@angular/common/http';
 import { Component, effect, Inject, DOCUMENT, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,7 +10,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Tenant, AppState } from '../../app-state';
 import { AppService } from '../../app.service';
@@ -18,7 +19,8 @@ import { FacetFields, JSONFacet } from '../../shared/facet';
 import { Letter } from '../../shared/letter';
 
 import * as echarts from 'echarts/core';
-import { EChartsOption, ECharts } from 'echarts'; import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
+import { EChartsOption, ECharts } from 'echarts';
+import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { GraphChart, PieChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
@@ -32,7 +34,7 @@ echarts.use([CanvasRenderer, PieChart, GraphChart, LegendComponent, TooltipCompo
 
 @Component({
   selector: 'app-professions',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, AngularSplitModule],
+  imports: [RouterLink, TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, AngularSplitModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -95,10 +97,15 @@ export class ProfessionsComponent {
         this.facets.set({});
       }
     });
+
+    this.translation.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.limits && this.state.selectedTenants().length) {
+        this.getData(true);
+      }
+    });
   }
 
   ngOnInit(): void {
-    // this.translation.onLangChange.subscribe(() => { this.getData(true) });
     this.state.currentView = this.state.views.find(v => v.route === 'professions');
     if (this.tenants.length > 0) {
       this.limits = this.state.getTenantsRange();
@@ -108,14 +115,17 @@ export class ProfessionsComponent {
 
   onGraphChartInit(e: any) {
     this.graphChart = e;
+    this.processResponse(false);
   }
 
   onPieChartInit(e: any) {
     this.pieChart = e;
+    this.processResponse(false);
   }
 
   onPie2ChartInit(e: any) {
     this.pie2Chart = e;
+    this.processResponse(false);
   }
 
   clickTenant(t: Tenant) {
@@ -133,7 +143,7 @@ export class ProfessionsComponent {
   }
 
   showNode(e: {field: string, value: string}) {
-    if (e.field !== 'authors' && e.field !== 'recipients') {
+    if (!this.graphChart || !this.graphData || (e.field !== 'authors' && e.field !== 'recipients')) {
       return;
     }
     const idx = this.graphData.nodes.findIndex(n => n.id === e.value + '_' + e.field);
@@ -165,6 +175,9 @@ export class ProfessionsComponent {
   }
 
   hideNode() {
+    if (!this.graphChart) {
+      return;
+    }
     this.graphChart.dispatchAction({
       type: 'hideTip'
     });
@@ -205,8 +218,8 @@ export class ProfessionsComponent {
         this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
         this.solrResponse = resp;
       }
-      this.professions_author = resp.facets.chart_authors ? resp.facets.chart_authors.buckets : null;
-      this.professions_recipient = resp.facets.chart_recipients ? resp.facets.chart_recipients.buckets : null;
+      this.professions_author = resp.facets.chart_authors?.buckets ?? [];
+      this.professions_recipient = resp.facets.chart_recipients?.buckets ?? [];
       // this.professions_mentioned = resp.facets.professions_mentioned.buckets;
       this.processResponse(false);
       this.loading = false;
@@ -249,10 +262,9 @@ export class ProfessionsComponent {
         right: 10,
         data: data.map(a => a.name),
         formatter: name => {
-          var series: any = this.pieChart.getOption()['series'];
-          var value = series[0].data.filter((row:any) => row.name === name)[0].value
+          const value = data.find(row => row.name === name)?.value ?? 0;
           return name + ' – ' + value;
-},
+        },
       },
       tooltip: {
         // formatter: (params: any) => {
@@ -311,10 +323,9 @@ export class ProfessionsComponent {
         right: 10,
         data: data.map(a => a.name),
         formatter: name => {
-          var series: any = this.pie2Chart.getOption()['series'];
-          var value = series[0].data.filter((row:any) => row.name === name)[0].value
+          const value = data.find(row => row.name === name)?.value ?? 0;
           return name + ' – ' + value;
-},
+        },
       },
       tooltip: {
         // formatter: (params: any) => {
@@ -337,7 +348,7 @@ export class ProfessionsComponent {
 
   processResponse(skipLinks: boolean) {
 
-    if (this.solrResponse.response.numFound === 0) {
+    if (!this.solrResponse || this.invalidTenant || !this.graphChart || !this.pieChart || !this.pie2Chart || !this.professions_author || !this.professions_recipient) {
       return;
     }
     this.setPieChart();
@@ -351,8 +362,9 @@ export class ProfessionsComponent {
     const maxSize = 60;
     const minSize = 10;
     const maxCount: number = Math.max(
-      this.professions_author[0].count,
-      this.professions_recipient[0].count);
+      this.professions_author[0]?.count ?? 0,
+      this.professions_recipient[0]?.count ?? 0,
+      1);
     //if (this.includeAuthors){
       this.professions_author.forEach((identity: JSONFacet) => {
         nodes.push({
@@ -393,14 +405,16 @@ export class ProfessionsComponent {
             a.forEach(pa => {
               r.forEach(pr => {
                 //const id = pa.id + '_' + pr.id;
-                const id = pa.name.cs + '_' + pr.name.cs;
+                const author = this.translation.currentLang === 'en' ? pa.name.en || pa.name.cs : pa.name.cs;
+                const recipient = this.translation.currentLang === 'en' ? pr.name.en || pr.name.cs : pr.name.cs;
+                const id = author + '_' + recipient;
                 const link = links.find(l => l.id === id);
                 if (!link) {
                   links.push({
                     id: id,
-                    source: pa.name.cs + '_authors',
-                    target: pr.name.cs + '_recipients',
-                    label: pa.name.cs + ' > ' + pr.name.cs,
+                    source: author + '_authors',
+                    target: recipient + '_recipients',
+                    label: author + ' > ' + recipient,
                     count: 1
                   });
                 } else {
@@ -422,8 +436,8 @@ export class ProfessionsComponent {
     // console.log(this.graphData)
     this.graphOptions = {
       title: {
-        show: true,
-        text: 'Korespondenční vztahy mezi různými profesními skupinami',
+        show: false,
+        text: this.translation.instant('professions.network'),
         left: 'center'
       },
       tooltip: {
