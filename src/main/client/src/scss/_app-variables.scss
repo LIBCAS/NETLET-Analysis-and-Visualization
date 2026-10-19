@@ -156,3 +156,12 @@ $alerts: (
   --app-home-inline-padding: clamp(18px, 4vw, 64px);
   --app-home-overview-overlap: 22px;
 }
+
+// redesign
+:root {
+  --app-analysis-gap: 16px;
+  --app-analysis-padding: 20px;
+  --app-analysis-chart-height: 280px; // redesign: Původní výška časového grafu mapy.
+  --app-analysis-timeline-chart-height: 400px; // redesign: Původní výška grafu timeline.
+  --app-analysis-workspace-height: calc(100dvh - var(--app-topbar-height) - 2 * var(--app-analysis-gap));
+}

@@ -4,9 +4,9 @@
   }
 </div>
 
-<as-split direction="horizontal" [unit]="'pixel'">
-  <as-split-area [size]="320">
-    <div>
+<as-split class="app-analysis-layout" direction="horizontal" [unit]="'pixel'">
+  <as-split-area class="app-analysis-facets" [size]="320">
+    <div class="app-filters">
       <app-facets
         [fields]="['authors', 'recipients', 'mentioned', 'identities', 'keyword_categories', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
         [renderLists]="true"
@@ -15,26 +15,26 @@
       </app-facets>
     </div>
   </as-split-area>
-  <as-split-area>
-    <div>
-      <div class="app-timeline">
-        <nav class="app-timeline-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
-          <ol>
-            <li>
-              <a routerLink="/" queryParamsHandling="preserve">{{ 'navbar.search' | translate }}</a>
-            </li>
-            <li aria-current="page">
-              <mat-icon aria-hidden="true">chevron_right</mat-icon>
-              {{ 'home.timeline.header' | translate }}
-            </li>
-          </ol>
-        </nav>
+  <as-split-area class="app-analysis-results">
+    <div class="app-timeline app-analysis-content">
+      <nav class="app-timeline-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+        <ol>
+          <li>
+            <a routerLink="/" queryParamsHandling="preserve">{{ 'navbar.search' | translate }}</a>
+          </li>
+          <li aria-current="page">
+            <mat-icon aria-hidden="true">chevron_right</mat-icon>
+            {{ 'home.timeline.header' | translate }}
+          </li>
+        </ol>
+      </nav>
 
-        <header class="app-timeline-header">
-          <p>{{ 'home.timeline.header' | translate }}</p>
-          <h1>{{ 'timeline.title' | translate }}</h1>
-        </header>
+      <header class="app-timeline-header">
+        <p>{{ 'home.timeline.header' | translate }}</p>
+        <h1>{{ 'timeline.title' | translate }}</h1>
+      </header>
 
+      <div class="app-analysis-workspace">
         <section class="app-timeline-chart" [attr.aria-label]="'home.timeline.header' | translate">
           <div class="app-timeline-controls">
             <mat-radio-group

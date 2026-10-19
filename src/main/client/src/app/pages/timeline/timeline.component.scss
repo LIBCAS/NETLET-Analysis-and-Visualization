@@ -1,49 +1,8 @@
-
-
-.app-timeline {
-  height: 400px; 
-  width: 100%;
-  padding: 20px;
-}
-
 // redesign
 :host {
   display: block;
   min-width: 0;
   background: var(--app-color-gray-1);
-}
-
-as-split-area > div {
-  width: 100%;
-  min-width: 0;
-}
-
-as-split-area:first-child > div {
-  flex: 1 30%;
-  padding: 2px;
-  overflow-y: auto;
-}
-
-as-split-area:last-child > div {
-  display: flex;
-  flex-direction: column;
-  align-content: flex-start;
-  position: relative;
-  height: 100%;
-}
-
-.app-timeline > h3 {
-  width: 100%;
-  text-align: center;
-}
-
-.app-timeline > div:has(> mat-paginator) {
-  display: flex;
-  flex-wrap: wrap;
-
-  > div {
-    flex: 1 30%;
-  }
 }
 
 // redesign
@@ -53,39 +12,6 @@ as-split-area:last-child > div {
   --app-timeline-tool-color: #33437f;
   --as-gutter-background-color: var(--app-color-line);
   position: relative;
-}
-
-as-split {
-  height: auto;
-  min-height: calc(100dvh - var(--app-topbar-height));
-  overflow: visible;
-}
-
-as-split-area {
-  height: auto;
-  overflow: visible;
-}
-
-as-split-area:first-child {
-  background: var(--app-color-gray-0);
-}
-
-as-split-area:first-child > div {
-  overflow: visible;
-}
-
-as-split-area:last-child > div {
-  display: block;
-  height: auto;
-}
-
-.app-timeline {
-  display: grid;
-  gap: 16px;
-  height: auto;
-  min-width: 0;
-  padding: 20px;
-  box-sizing: border-box;
 }
 
 .app-timeline-breadcrumbs {
@@ -314,26 +240,7 @@ as-split-area:last-child > div {
   }
 }
 
-@media (max-width: 1080px) {
-  as-split {
-    display: flex;
-    flex-direction: column;
-  }
-
-  as-split-area:first-child {
-    border-bottom: 1px solid var(--app-color-line);
-  }
-
-  :host ::ng-deep as-split > .as-split-gutter {
-    display: none;
-  }
-}
-
 @media (max-width: 700px) {
-  .app-timeline {
-    padding: 14px;
-  }
-
   .app-timeline-chart {
     padding: 14px;
   }

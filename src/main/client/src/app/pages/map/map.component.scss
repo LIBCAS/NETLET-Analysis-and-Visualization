@@ -1,48 +1,3 @@
-// redesign
-:host {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-as-split {
-  flex: 1;
-  height: auto;
-  min-height: 0;
-}
-
-.app-map-content {
-  display: flex;
-  flex-direction: column;
-  align-content: flex-start;
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.app-years {
-  flex-shrink: 0;
-}
-
-.app-map-legend-spacer {
-  display: inline-block;
-  margin-left: 60%;
-}
-
-.app-map-size-dot {
-  display: inline-block;
-  margin-left: 20px;
-  border-radius: 50%;
-  vertical-align: middle;
-}
-
-#echarts-lmap {
-  flex: 1 1 1e-09px;
-  width: 100%;
-  height: 100%;
-  min-height: 250px;
-}
-
 // Prvky vytvářené Leafletem a ECharts nemají atributy zapouzdření Angularu.
 :host ::ng-deep #echarts-lmap {
   .lmap-ec-layer {
@@ -75,34 +30,6 @@ as-split {
   min-width: 0;
   background: var(--app-color-gray-1);
   --as-gutter-background-color: var(--app-color-line);
-}
-
-as-split {
-  min-height: 100%;
-  overflow: visible;
-}
-
-as-split-area {
-  height: auto;
-  min-width: 0;
-  overflow: visible;
-}
-
-as-split-area:first-child {
-  background: var(--app-color-gray-0);
-}
-
-.app-filters {
-  overflow: visible;
-}
-
-.app-map-content {
-  display: grid;
-  align-content: start;
-  gap: 16px;
-  height: auto;
-  min-width: 0;
-  padding: 20px;
 }
 
 .app-map-breadcrumbs {
@@ -305,69 +232,19 @@ as-split-area:first-child {
   }
 }
 
-@media (max-width: 1080px) {
-  as-split {
-    display: flex;
-    flex-direction: column;
-  }
-
-  as-split-area:first-child {
-    border-bottom: 1px solid var(--app-color-line);
-  }
-
-  :host ::ng-deep as-split > .as-split-gutter {
-    display: none;
-  }
-}
-
 @media (max-width: 700px) {
-  .app-map-content {
-    padding: 14px;
-  }
-
   .app-map-chart {
     padding: 14px;
   }
 }
 
-// redesign: Přichycení pracovní části mapy při procházení facetů.
-.app-map-workspace {
-  display: grid;
-  align-content: start;
-  gap: 16px;
-  min-width: 0;
+// redesign
+.app-map-size-dot {
+  display: inline-block;
+  border-radius: 50%;
+  vertical-align: middle;
 }
 
-@media (min-width: 1081px) and (min-height: 740px) {
-  .app-map-content {
-    height: 100%;
-    grid-template-rows: auto auto 1fr;
-  }
-
-  .app-map-workspace {
-    position: sticky;
-    top: calc(var(--app-topbar-height) + 16px);
-    align-self: start;
-    grid-template-rows: auto minmax(0, 1fr);
-    height: calc(100dvh - var(--app-topbar-height) - 32px);
-  }
-
-  .app-map-chart app-years-chart {
-    height: clamp(180px, 24dvh, 240px);
-  }
-
-  .app-map-card {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-  }
-
-  .app-map-toolbar {
-    flex-shrink: 0;
-  }
-
-  #echarts-lmap {
-    flex: 1;
-    height: auto;
-  }
+#echarts-lmap {
+  width: 100%;
 }

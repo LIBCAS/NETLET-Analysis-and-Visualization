@@ -4,8 +4,8 @@
   }
 </div>
 
-<as-split direction="horizontal" [unit]="'pixel'" (gutterClick)="state.gutterClick($event)">
-  <as-split-area [size]="state.facetsSize">
+<as-split class="app-analysis-layout" direction="horizontal" [unit]="'pixel'" (gutterClick)="state.gutterClick($event)">
+  <as-split-area class="app-analysis-facets" [size]="state.facetsSize">
     <div class="app-filters">
       @if (solrResponse?.facets) {
         <app-facets
@@ -20,8 +20,8 @@
     </div>
   </as-split-area>
 
-  <as-split-area>
-    <div class="app-map-content">
+  <as-split-area class="app-analysis-results">
+    <div class="app-map-content app-analysis-content">
       <nav class="app-map-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
         <ol>
           <li><a routerLink="/" queryParamsHandling="preserve">{{ 'navbar.search' | translate }}</a></li>
@@ -38,7 +38,7 @@
         <div>{{ 'home.map.text' | translate }}</div>
       </header>
 
-      <div class="app-map-workspace">
+      <div class="app-analysis-workspace">
         <section class="app-map-chart" [attr.aria-label]="'map.year_chart' | translate">
           @if (solrResponse?.facets.years) {
             <app-years-chart
