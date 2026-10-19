@@ -21,8 +21,8 @@
   </as-split-area>
 
   <as-split-area class="app-analysis-results">
-    <div class="app-map-content app-analysis-content">
-      <nav class="app-map-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+    <div class="app-view-content app-analysis-content">
+      <nav class="app-view-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
         <ol>
           <li><a routerLink="/" queryParamsHandling="preserve">{{ 'navbar.search' | translate }}</a></li>
           <li aria-current="page">
@@ -32,14 +32,14 @@
         </ol>
       </nav>
 
-      <header class="app-map-header">
+      <header class="app-view-header app-view-card">
         <p>{{ 'home.map.header' | translate }}</p>
         <h1>{{ 'map.title' | translate }}</h1>
         <div>{{ 'home.map.text' | translate }}</div>
       </header>
 
       <div class="app-analysis-workspace">
-        <section class="app-map-chart" [attr.aria-label]="'map.year_chart' | translate">
+        <section class="app-map-chart app-view-card app-view-chart" [attr.aria-label]="'map.year_chart' | translate">
           @if (solrResponse?.facets.years) {
             <app-years-chart
               [dateYearFacet]="solrResponse.facets.years"
@@ -51,7 +51,7 @@
           }
         </section>
 
-        <section class="app-map-card" [attr.aria-label]="'home.map.header' | translate">
+        <section class="app-map-card app-view-card app-view-card-clip" [attr.aria-label]="'home.map.header' | translate">
           <div class="app-map-toolbar">
             <mat-checkbox [(ngModel)]="showLinks" (change)="toggleLinks()" [disabled]="!graphChart">
               {{ 'action.showLinks' | translate }}

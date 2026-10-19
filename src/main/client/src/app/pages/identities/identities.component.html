@@ -23,8 +23,8 @@
   </as-split-area>
 
   <as-split-area class="app-analysis-results">
-    <div class="app-identities-content app-analysis-content">
-      <nav class="app-identities-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+    <div class="app-view-content app-analysis-content">
+      <nav class="app-view-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
         <ol>
           <li>
             <a routerLink="/" queryParamsHandling="preserve">{{ 'navbar.search' | translate }}</a>
@@ -36,14 +36,14 @@
         </ol>
       </nav>
 
-      <header class="app-identities-header">
+      <header class="app-view-header app-view-card">
         <p>{{ 'home.identities.header' | translate }}</p>
         <h1>{{ 'identities.title' | translate }}</h1>
         <div>{{ 'home.identities.text' | translate }}</div>
       </header>
 
       <div class="app-identities-workspace app-analysis-workspace app-analysis-graph">
-        <section class="app-identities-chart" [attr.aria-label]="'map.year_chart' | translate">
+        <section class="app-identities-chart app-view-card app-view-chart" [attr.aria-label]="'map.year_chart' | translate">
           <div class="app-years">
             @if (solrResponse?.facets.years) {
               <app-years-chart
@@ -58,7 +58,7 @@
         </section>
 
         <section
-          class="app-identities-network app-analysis-graph-body"
+          class="app-identities-network app-view-card app-view-card-clip app-analysis-graph-body"
           [attr.aria-label]="'identities.title' | translate">
           <div
             echarts

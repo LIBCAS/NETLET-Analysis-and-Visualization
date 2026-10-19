@@ -165,3 +165,16 @@ $alerts: (
   --app-analysis-timeline-chart-height: 400px; // redesign: Původní výška grafu timeline.
   --app-analysis-workspace-height: calc(100dvh - var(--app-topbar-height) - 2 * var(--app-analysis-gap));
 }
+
+// redesign
+:root {
+  --app-view-radius: 8px;
+  --app-view-card-shadow: var(--app-shadow-soft);
+  --app-view-chart-padding: 18px;
+}
+
+@media (max-width: 700px) {
+  :root {
+    --app-view-chart-padding: 14px;
+  }
+}

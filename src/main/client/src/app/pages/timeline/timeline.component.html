@@ -16,8 +16,8 @@
     </div>
   </as-split-area>
   <as-split-area class="app-analysis-results">
-    <div class="app-timeline app-analysis-content">
-      <nav class="app-timeline-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+    <div class="app-timeline app-view-content app-analysis-content">
+      <nav class="app-view-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
         <ol>
           <li>
             <a routerLink="/" queryParamsHandling="preserve">{{ 'navbar.search' | translate }}</a>
@@ -29,13 +29,13 @@
         </ol>
       </nav>
 
-      <header class="app-timeline-header">
+      <header class="app-view-header app-view-card">
         <p>{{ 'home.timeline.header' | translate }}</p>
         <h1>{{ 'timeline.title' | translate }}</h1>
       </header>
 
       <div class="app-analysis-workspace">
-        <section class="app-timeline-chart" [attr.aria-label]="'home.timeline.header' | translate">
+        <section class="app-timeline-chart app-view-card app-view-chart" [attr.aria-label]="'home.timeline.header' | translate">
           <div class="app-timeline-controls">
             <mat-radio-group
               [(ngModel)]="chartType"
@@ -100,7 +100,7 @@
           </div>
         </section>
 
-        <section class="app-timeline-letters" [attr.aria-label]="'letters_count' | translate">
+        <section class="app-timeline-letters app-view-card app-view-card-clip" [attr.aria-label]="'letters_count' | translate">
           <header>
             <div>
               <h2>

@@ -67,8 +67,7 @@ main:is(.app-scroll-page, .app-scroll-panels) {
       height: 100%;
     }
 
-    .app-map-content,
-    .app-timeline {
+    .app-view-content {
       display: grid;
       grid-template-rows: auto auto 1fr;
       align-content: start;
@@ -84,6 +83,11 @@ main:is(.app-scroll-page, .app-scroll-panels) {
       width: 100%;
       min-width: 0;
       min-height: 0;
+    }
+
+    // redesign: Mezery mezi kartami všech již redesignovaných pohledů.
+    .app-view-content .app-analysis-workspace {
+      gap: var(--app-analysis-gap);
     }
 
     .app-analysis-graph {
