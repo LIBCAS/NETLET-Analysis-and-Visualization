@@ -1,0 +1,10 @@
+// redesign
+.app-centrality-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 8px var(--app-analysis-gap);
+  padding: 12px var(--app-view-chart-padding);
+  border-bottom: 1px solid var(--app-color-line);
+}

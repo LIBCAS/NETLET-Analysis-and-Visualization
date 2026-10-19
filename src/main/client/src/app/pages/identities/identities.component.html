@@ -42,8 +42,8 @@
         <div>{{ 'home.identities.text' | translate }}</div>
       </header>
 
-      <div class="app-identities-workspace app-analysis-workspace app-analysis-graph">
-        <section class="app-identities-chart app-view-card app-view-chart" [attr.aria-label]="'map.year_chart' | translate">
+      <div class="app-view-network-workspace app-analysis-workspace app-analysis-graph">
+        <section class="app-view-card app-view-chart" [attr.aria-label]="'map.year_chart' | translate">
           <div class="app-years">
             @if (solrResponse?.facets.years) {
               <app-years-chart
@@ -58,7 +58,7 @@
         </section>
 
         <section
-          class="app-identities-network app-view-card app-view-card-clip app-analysis-graph-body"
+          class="app-view-network app-view-card app-view-card-clip app-analysis-graph-body"
           [attr.aria-label]="'identities.title' | translate">
           <div
             echarts

@@ -256,3 +256,31 @@ main:is(.app-scroll-page, .app-scroll-panels) {
 main:is(.app-scroll-page, .app-scroll-panels) .app-analysis-layout .app-map-chart {
   flex-shrink: 0;
 }
+
+// redesign: Společné rozložení síťové vizualizace a jejího případného ovládání.
+main:is(.app-scroll-page, .app-scroll-panels) .app-analysis-layout .app-view-network-workspace > .app-view-chart {
+  flex-shrink: 0;
+}
+
+main:is(.app-scroll-page, .app-scroll-panels) .app-analysis-layout .app-view-network {
+  display: flex;
+  flex-direction: column;
+
+  > .app-analysis-graph-fill {
+    flex: 1;
+    height: auto;
+  }
+}
+
+@media (max-width: 1080px), (max-height: 739px) {
+  main:is(.app-scroll-page, .app-scroll-panels) .app-analysis-layout {
+    .app-view-network-workspace {
+      height: auto;
+    }
+
+    .app-view-network {
+      flex: none;
+      height: 500px;
+    }
+  }
+}

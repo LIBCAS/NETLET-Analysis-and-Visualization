@@ -516,3 +516,10 @@ main > :has(> .app-analysis-layout .app-view-content) {
     display: block;
   }
 }
+
+// redesign: Karta časového grafu použitá v síťových pohledech.
+.app-view-chart {
+  .app-years app-years-chart {
+    height: 100%;
+  }
+}

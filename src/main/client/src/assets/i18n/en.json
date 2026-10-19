@@ -49,6 +49,12 @@
     "recipient_letters": "{{identity}} — received letters",
     "mentioned_letters": "{{identity}} — mentions in letters"
   },
+  "centrality": {
+    "title": "People in the correspondence network",
+    "controls": "Centrality settings",
+    "include_main": "Include principal correspondents",
+    "show_names": "Show all names"
+  },
   "navbar": {
     "search": "Search",
     "main_navigation": "Main navigation",

@@ -49,6 +49,12 @@
     "recipient_letters": "{{identity}} — přijaté dopisy",
     "mentioned_letters": "{{identity}} — zmínky v dopisech"
   },
+  "centrality": {
+    "title": "Postavení osob v korespondenční síti",
+    "controls": "Nastavení centrality",
+    "include_main": "Včetně hlavních aktérů",
+    "show_names": "Zobrazit všechna jména"
+  },
   "navbar": {
     "search": "Vyhledávání",
     "main_navigation": "Hlavní navigace",
