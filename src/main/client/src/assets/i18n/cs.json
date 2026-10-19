@@ -43,6 +43,12 @@
     "size_legend": "Velikost bodu podle počtu dopisů",
     "boundaries": "Zobrazení státních hranic podle roku"
   },
+  "identities": {
+    "title": "Korespondenční síť osob",
+    "author_letters": "{{identity}} — odeslané dopisy",
+    "recipient_letters": "{{identity}} — přijaté dopisy",
+    "mentioned_letters": "{{identity}} — zmínky v dopisech"
+  },
   "navbar": {
     "search": "Vyhledávání",
     "main_navigation": "Hlavní navigace",

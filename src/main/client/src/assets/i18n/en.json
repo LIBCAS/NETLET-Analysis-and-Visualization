@@ -43,6 +43,12 @@
     "size_legend": "Point size by number of letters",
     "boundaries": "National borders by year"
   },
+  "identities": {
+    "title": "Network of correspondents",
+    "author_letters": "{{identity}} — sent letters",
+    "recipient_letters": "{{identity}} — received letters",
+    "mentioned_letters": "{{identity}} — mentions in letters"
+  },
   "navbar": {
     "search": "Search",
     "main_navigation": "Main navigation",

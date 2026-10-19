@@ -1,9 +1,14 @@
 <div class="app-loading">
-  @if(loading && !running){
+  @if (loading && !running) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   }
 </div>
-<as-split class="app-analysis-layout" direction="horizontal" [unit]="'pixel'" (gutterClick)="state.gutterClick($event)">
+
+<as-split
+  class="app-analysis-layout"
+  direction="horizontal"
+  [unit]="'pixel'"
+  (gutterClick)="state.gutterClick($event)">
   <as-split-area class="app-analysis-facets" [size]="state.facetsSize">
     <div class="app-filters">
       <app-facets
@@ -12,36 +17,68 @@
         [facets]="facets()"
         (onFiltersChanged)="onFiltersChanged($event)"
         (onMouserOver)="showNode($event)"
-        (onMouseOut)="hideNode()"></app-facets>
+        (onMouseOut)="hideNode()">
+      </app-facets>
     </div>
   </as-split-area>
+
   <as-split-area class="app-analysis-results">
-    <div class="app-content app-analysis-content">
-      <div class="app-analysis-workspace app-analysis-graph">
-        <div class="app-years">
-          @if (solrResponse?.facets.years) {
-            <app-years-chart
-              [dateYearFacet]="solrResponse.facets.years"
-              (onChangeLimits)="changeLimits($event)"
-              [withAnimation]="false"
-              (onChangeRunning)="changeRunning($event)"></app-years-chart>
-          }
-        </div>
-        <div class="app-analysis-graph-body">
-          <div class="app-analysis-graph-fill">
-            <div
-              echarts
-              class="app-analysis-graph-fill"
-              [options]="graphOptions"
-              (chartInit)="onGraphChartInit($event)"></div>
+    <div class="app-identities-content app-analysis-content">
+      <nav class="app-identities-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+        <ol>
+          <li>
+            <a routerLink="/" queryParamsHandling="preserve">{{ 'navbar.search' | translate }}</a>
+          </li>
+          <li aria-current="page">
+            <mat-icon aria-hidden="true">chevron_right</mat-icon>
+            {{ 'home.identities.header' | translate }}
+          </li>
+        </ol>
+      </nav>
+
+      <header class="app-identities-header">
+        <p>{{ 'home.identities.header' | translate }}</p>
+        <h1>{{ 'identities.title' | translate }}</h1>
+        <div>{{ 'home.identities.text' | translate }}</div>
+      </header>
+
+      <div class="app-identities-workspace app-analysis-workspace app-analysis-graph">
+        <section class="app-identities-chart" [attr.aria-label]="'map.year_chart' | translate">
+          <div class="app-years">
+            @if (solrResponse?.facets.years) {
+              <app-years-chart
+                [dateYearFacet]="solrResponse.facets.years"
+                [withAnimation]="false"
+                [redesignedControls]="true"
+                (onChangeLimits)="changeLimits($event)"
+                (onChangeRunning)="changeRunning($event)">
+              </app-years-chart>
+            }
           </div>
-        </div>
+        </section>
+
+        <section
+          class="app-identities-network app-analysis-graph-body"
+          [attr.aria-label]="'identities.title' | translate">
+          <div
+            echarts
+            class="app-analysis-graph-fill"
+            [options]="graphOptions"
+            (chartInit)="onGraphChartInit($event)">
+          </div>
+        </section>
       </div>
     </div>
   </as-split-area>
 </as-split>
+
 @if (infoHeader) {
   <div class="app-letters-info">
-    <app-letters-info [header]="infoHeader" [fields]="infoFields" [data]="infoData" (onClose)="closeInfo()"></app-letters-info>
+    <app-letters-info
+      [header]="infoHeader"
+      [fields]="infoFields"
+      [data]="infoData"
+      (onClose)="closeInfo()">
+    </app-letters-info>
   </div>
 }

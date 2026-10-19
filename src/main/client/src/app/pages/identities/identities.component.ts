@@ -1,6 +1,7 @@
 
 import { HttpParams } from '@angular/common/http';
 import { Component, effect, Inject, NgZone, DOCUMENT, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,7 +10,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Tenant, AppState } from '../../app-state';
 import { AppService } from '../../app.service';
@@ -35,7 +36,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Grid
 
 @Component({
   selector: 'app-identities',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, LettersInfoComponent, AngularSplitModule],
+  imports: [RouterLink, TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, LettersInfoComponent, AngularSplitModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -95,6 +96,15 @@ export class IdentitiesComponent {
         this.facets.set({});
       }
     });
+
+    this.translation.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.graphData && this.solrResponse) {
+        this.processResponse();
+      }
+      if (this.infoHeaderKey) {
+        this.infoHeader = this.translation.instant(this.infoHeaderKey, { identity: this.infoIdentity });
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -120,6 +130,10 @@ export class IdentitiesComponent {
         } 
       }
     })
+
+    if (this.solrResponse && this.authors && this.recipients) {
+      this.processResponse();
+    }
   }
 
   
@@ -127,17 +141,27 @@ export class IdentitiesComponent {
   infoHeader: string;
   infoData: any[];
   infoFields: string[];
+  private infoHeaderKey: string;
+  private infoIdentity: string;
+
+  private setInfoHeader(key: string, identity: string) {
+    this.infoHeaderKey = key;
+    this.infoIdentity = identity;
+    this.infoHeader = this.translation.instant(key, { identity });
+  }
 
   closeInfo() {
     this.infoContent = null;
     this.infoHeader = null;
+    this.infoHeaderKey = null;
+    this.infoIdentity = null;
   }
 
   authorLabel(identity: string) {
     this._ngZone.run(() => {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
       this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
-      this.infoHeader = `${identity} wrote letters to:`;
+      this.setInfoHeader('identities.author_letters', identity);
       this.state.showInfo.set(true);
     });
   }
@@ -146,7 +170,7 @@ export class IdentitiesComponent {
     this._ngZone.run(() => {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
       this.infoFields = ['letter_id', 'identity_author', 'date_year', 'action'];
-      this.infoHeader = `${identity} received letters from:`;
+      this.setInfoHeader('identities.recipient_letters', identity);
       this.state.showInfo.set(true);
     });
   }
@@ -155,7 +179,7 @@ export class IdentitiesComponent {
     this._ngZone.run(() => {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
       this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'action'];
-      this.infoHeader = `${identity} is mentioned in:`;
+      this.setInfoHeader('identities.mentioned_letters', identity);
       this.state.showInfo.set(true);
     });
   }
@@ -241,7 +265,9 @@ export class IdentitiesComponent {
       this.authors = resp.facets.authors.buckets;
       this.recipients = resp.facets.recipients.buckets;
       this.mentioned = resp.facets.mentioned.buckets;
-      this.processResponse();
+      if (this.graphChart) {
+        this.processResponse();
+      }
       this.loading = false;
     });
   }
@@ -305,7 +331,7 @@ export class IdentitiesComponent {
         name: identity.val,
         value: identity.count,
         authorCount: identity.count,
-        label: identity.val + '<br/>author: ' + identity.count,
+        label: identity.val + '<br/>' + this.translation.instant('field.author') + ': ' + identity.count,
         category: 'authors',
         symbolSize: maxSize * identity.count / maxCount + minSize,
         x: pos.x,
@@ -329,7 +355,7 @@ export class IdentitiesComponent {
         node.symbolSize = maxSize * (node.value + identity.count) / maxCount + minSize;
         node.symbol = this.getNodeSymbol(dist);
         node.recipientCount = identity.count;
-        node.label = node.label + '<br/>recipient: ' + identity.count;
+        node.label = node.label + '<br/>' + this.translation.instant('field.recipient') + ': ' + identity.count;
       } else {
         nodes.push({
           id: identity.val + '',
@@ -337,7 +363,7 @@ export class IdentitiesComponent {
           name: identity.val,
           value: identity.count,
           recipientCount: identity.count,
-          label: identity.val + '<br/>recipient: ' + identity.count,
+          label: identity.val + '<br/>' + this.translation.instant('field.recipient') + ': ' + identity.count,
           category: 'recipients',
           symbolSize: maxSize * identity.count / maxCount + minSize,
           x: pos.x,
@@ -381,10 +407,7 @@ export class IdentitiesComponent {
     //console.log(this.graphData)
     this.graphOptions = {
       title: {
-        show: true,
-        text: 'Vztahy mezi jednotlivými pisateli a příjemci dopisů',
-        left: 'center',
-        top: 10
+        show: false
       },
       tooltip: {
         formatter: (params: any) => {
@@ -409,7 +432,7 @@ export class IdentitiesComponent {
       animationEasingUpdate: 'quinticInOut',
       series: [
         {
-          name: 'Identities',
+          name: this.translation.instant('home.identities.header'),
           type: 'graph',
           legendHoverLink: false,
           layout: 'none',
