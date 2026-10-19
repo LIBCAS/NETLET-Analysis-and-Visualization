@@ -1,38 +1,46 @@
-import { Component, effect, Inject, input, DOCUMENT, signal } from '@angular/core';
+import { Component, effect, Inject, DOCUMENT, signal } from '@angular/core';
 
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { HttpParams } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../app.service';
 import { AppState, Tenant } from '../../app-state';
-import { Facet, FacetFields, JSONFacet } from '../../shared/facet';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { FacetFields, JSONFacet } from '../../shared/facet';
 import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
-import { EChartsOption, ECharts, color } from 'echarts';
+import { EChartsOption, ECharts } from 'echarts';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
-import { BarChart } from 'echarts/charts';
+import { BarChart, PieChart } from 'echarts/charts';
 import { TreemapChart, TreeChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import * as echarts from 'echarts/core';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 import { MatCardModule } from '@angular/material/card';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { FacetsComponent } from "../../components/facets/facets.component";
 import { AngularSplitModule } from "angular-split";
 
-echarts.use([BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
+echarts.use([PieChart, BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
 
 @Component({
   selector: 'app-keywords',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, AngularSplitModule],
+  imports: [
+    RouterLink,
+    TranslateModule,
+    FormsModule,
+    NgxEchartsDirective,
+    MatProgressBarModule,
+    MatCardModule,
+    MatIconModule,
+    MatCheckboxModule,
+    YearsChartComponent,
+    FacetsComponent,
+    AngularSplitModule
+  ],
   templateUrl: './keywords.component.html',
   styleUrl: './keywords.component.scss',
   providers: [
@@ -63,7 +71,8 @@ export class KeywordsComponent {
   identitiesChart: ECharts;
   barColor: string;
 
-  treeMapOptions: EChartsOption = {};
+  authorsTreeMapOptions: EChartsOption = {};
+  recipientsTreeMapOptions: EChartsOption = {};
   treeMapChartAutors: ECharts;
   treeMapChartRecipients: ECharts;
   colors = [
@@ -107,11 +116,16 @@ export class KeywordsComponent {
         this.facets.set({});
       }
     });
+
+    this.translation.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.limits && this.state.selectedTenants().length) {
+        this.getData(true);
+      }
+    });
   }
 
   ngOnInit(): void {
 
-    //this.translation.onLangChange.subscribe(() => { this.getData(true) });
     this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'keywords');
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
@@ -174,15 +188,14 @@ export class KeywordsComponent {
     p.includeAuthors = this.includeAuthors;
     p.includeRecipients = this.includeRecipients;
     this.state.addFilters(p);
-    if (this.treeMapChartAutors) {
+    if (this.treeMapChartAutors && !this.treeMapChartAutors.isDisposed()) {
       this.treeMapChartAutors.clear();
     }
-    if (this.treeMapChartRecipients) {
+    if (this.treeMapChartRecipients && !this.treeMapChartRecipients.isDisposed()) {
       this.treeMapChartRecipients.clear();
     }
     
     this.service.getKeywords(p as HttpParams).subscribe((resp: any) => {
-      this.translation.onLangChange.subscribe(() => { this.getData(true) });
       if (!resp) {
         return;
       }
@@ -193,6 +206,10 @@ export class KeywordsComponent {
       }
       this.facets.set(resp.facets);
       if (resp.response.numFound === 0) {
+        this.pieOptions = {};
+        this.pieChart?.clear();
+        this.authorsTreeMapOptions = {};
+        this.recipientsTreeMapOptions = {};
         this.loading = false;
         return;
       }
@@ -214,10 +231,10 @@ export class KeywordsComponent {
 
       //const ops = this.setTreeMapChart();
       if (this.includeAuthors) {
-        this.treeMapChartAutors.setOption(this.setTreeMapChart('authors'));
+        this.authorsTreeMapOptions = this.setTreeMapChart('authors');
       }
       if (this.includeRecipients) {
-        this.treeMapChartRecipients.setOption(this.setTreeMapChart('recipients'));
+        this.recipientsTreeMapOptions = this.setTreeMapChart('recipients');
       }
 
       this.loading = false;
@@ -265,8 +282,7 @@ export class KeywordsComponent {
         right: 10,
         data: data.map(a => a.name),
         formatter: name => {
-          var series: any = this.pieChart.getOption()['series'];
-          var value = series[0].data.filter((row: any) => row.name === name)[0].value
+          const value = data.find(row => row.name === name)?.value ?? 0;
           return name + ' – ' + value;
         },
       },

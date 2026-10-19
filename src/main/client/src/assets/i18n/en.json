@@ -69,6 +69,11 @@
     "title": "Professional groups in correspondence",
     "network": "Correspondence between professional groups"
   },
+  "keywords": {
+    "title": "Topics and people in correspondence",
+    "authors": "Authors in relation to topics",
+    "recipients": "Recipients in relation to topics"
+  },
   "navbar": {
     "search": "Search",
     "main_navigation": "Main navigation",

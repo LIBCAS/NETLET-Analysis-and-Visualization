@@ -69,6 +69,11 @@
     "title": "Profesní skupiny v korespondenci",
     "network": "Korespondenční vztahy mezi profesními skupinami"
   },
+  "keywords": {
+    "title": "Témata a osoby v korespondenci",
+    "authors": "Autoři ve vztahu k tématům",
+    "recipients": "Adresáti ve vztahu k tématům"
+  },
   "navbar": {
     "search": "Vyhledávání",
     "main_navigation": "Hlavní navigace",
