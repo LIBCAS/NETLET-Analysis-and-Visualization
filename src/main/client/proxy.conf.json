@@ -1,6 +1,6 @@
 {
     "/api": {
-      "target": "http://localhost:8080/netletanalysis",
+      "target": "http://localhost:8080/netlet-av-redesign",
       "secure": false,
       "logLevel": "debug",
       "changeOrigin": true
