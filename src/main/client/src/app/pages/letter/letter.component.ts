@@ -17,6 +17,7 @@ import { TooltipComponent } from 'echarts/components';
 import { AppConfiguration } from '../../app-configuration';
 import { AppState } from '../../app-state';
 
+import * as echarts from 'echarts/core';
 use([CanvasRenderer, GraphChart, TooltipComponent, LeafletComponent]);
 
 @Component({
@@ -83,6 +84,13 @@ export class LetterComponent {
       const chart = init(element);
       const origin = places.find(place => place.role === 'origin');
       const destination = places.find(place => place.role === 'destination');
+      const itemStyle = {
+        color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [
+          { offset: 0, color: '#ff7e5f' },  // Barva uprostřed
+          { offset: 1, color: '#992509' },   // Barva na okrajích
+        ]),
+      };
+
       chart.setOption({
         lmap: {
           center: [center.lng, center.lat], zoom: 10, resizeEnable: true,
@@ -94,7 +102,7 @@ export class LetterComponent {
         },
         series: [{
           type: 'graph', coordinateSystem: 'lmap',
-          data: unique.map(place => ({ id: String(place.id), name: place.name, value: [Number(place.longitude), Number(place.latitude), 1] })),
+          data: unique.map(place => ({ id: String(place.id), name: place.name, value: [Number(place.longitude), Number(place.latitude), 1], itemStyle })),
           links: origin && destination ? [{
             source: String(origin.id), target: String(destination.id),
             name: `${origin.name} → ${destination.name}`,
@@ -102,7 +110,7 @@ export class LetterComponent {
           edgeSymbol: ['circle', 'arrow'], edgeSymbolSize: [2, 6],
           label: { show: true, position: 'right', formatter: '{b}' },
           labelLayout: { hideOverlap: true },
-          lineStyle: { color: 'source', curveness: 0.3 },
+          lineStyle: { color: this.config.tenant_colors[this.letter().tenant], curveness: 0.3, opacity: 1, width: 2 },
           emphasis: { focus: 'adjacency', lineStyle: { width: 10 } },
         }],
       });

@@ -183,7 +183,7 @@ export class YearsChartComponent {
     const markAreaData: any = [];
     if (this.state.showPeriods) {
 
-      if (this.limits[0] < 1670) {
+      if (this.limits[0] < 1690) {
         markAreaData.push([
           {
             name: '1. období',
@@ -195,7 +195,7 @@ export class YearsChartComponent {
             },
           },
           {
-            xAxis: Math.min(this.limits[1], 1670) + ''
+            xAxis: Math.min(this.limits[1], 1690) + ''
           }
         ]
         )
@@ -205,7 +205,6 @@ export class YearsChartComponent {
         markAreaData.push([
           {
             name: '2. období',
-            //xAxis: '1670',
             xAxis: Math.max(this.limits[0], 1870) + '',
             itemStyle: {
               color: 'rgba(255,255,255,0)',
@@ -252,7 +251,7 @@ export class YearsChartComponent {
   setYearsChart(facet: { buckets: JSONFacet[], after: { count: number } }) {
     let maxCount = 0;
     this.rokSeries = facet.buckets.map(c => {
-      const color = c.val < '1670' ? '#155605' : (c.val < '1939' ? 'rgb(68, 110, 136)' : '#00c');
+      const color = c.val < '1690' ? '#155605' : (c.val < '1939' ? 'rgb(68, 110, 136)' : '#00c');
       maxCount = Math.max(maxCount, c.count)
       return {
         value: c.count, //itemStyle: { color: color }
@@ -286,7 +285,7 @@ export class YearsChartComponent {
       title: {
         show: true,
         left: 'center',
-        top: 8,
+        top: 1,
         text: this.limits[0] + '–' + this.limits[1]
       },
       toolbox: {
@@ -390,7 +389,7 @@ export class YearsChartComponent {
         },
         axisLabel: {
           color: function (value: any, index: number) {
-            const color = value < '1670' ? '#a00' : (value < '1870' ? '#eee' : (value < '1939' ? '#060' : '#00a'));
+            const color = value < '1690' ? '#a00' : (value < '1870' ? '#eee' : (value < '1939' ? '#060' : '#00a'));
             return color;
           }
         }
@@ -429,7 +428,7 @@ export class YearsChartComponent {
                   show: false,
                   formatter: '1. období'
                 },
-                xAxis: '1670'
+                xAxis: '1690'
               },
               {
                 symbol: 'none',

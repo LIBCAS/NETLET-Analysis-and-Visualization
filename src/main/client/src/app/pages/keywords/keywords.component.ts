@@ -116,22 +116,22 @@ export class KeywordsComponent {
         this.facets.set({});
       }
     });
+  }
+
+  ngOnInit(): void {
 
     this.translation.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
       if (this.limits && this.state.selectedTenants().length) {
         this.getData(true);
       }
     });
-  }
-
-  ngOnInit(): void {
 
     this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'keywords');
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
     if (this.tenants.length > 0 && this.identitiesChart) {
-      this.limits = this.state.getTenantsRange();
-      this.getData(true);
+      // this.limits = this.state.getTenantsRange();
+      // this.getData(true);
     }
   }
 
@@ -201,8 +201,8 @@ export class KeywordsComponent {
       }
       if (setResponse) {
         this.solrResponse = resp;
-        const ts: JSONFacet[] = resp.facets.tenants.buckets;
-        this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
+        //const ts: JSONFacet[] = resp.facets.tenants.buckets;
+        //this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
       }
       this.facets.set(resp.facets);
       if (resp.response.numFound === 0) {

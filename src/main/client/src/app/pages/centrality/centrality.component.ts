@@ -139,8 +139,8 @@ export class CentralityComponent {
     // this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'centrality');
     if (this.state.selectedTenants().length > 0 || this.state.usedFacets().length > 0) {
-      this.limits = this.state.getTenantsRange();
-      this.getData(true);
+      // this.limits = this.state.getTenantsRange();
+      // this.getData(true);
     }
   }
 
