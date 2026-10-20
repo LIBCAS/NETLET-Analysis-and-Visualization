@@ -77,6 +77,9 @@
   "periods": {
     "title": "Srovnání témat a profesí napříč obdobími"
   },
+  "catalogs_in_time": {
+    "title": "Vývoj korespondence v jednotlivých katalozích"
+  },
   "navbar": {
     "search": "Vyhledávání",
     "main_navigation": "Hlavní navigace",
