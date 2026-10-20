@@ -1,4 +1,4 @@
-import { Component, effect, Inject, NgZone, DOCUMENT, signal, computed, inject, DestroyRef } from '@angular/core';
+import { Component, effect, Inject, NgZone, DOCUMENT, signal, computed, inject, DestroyRef, untracked } from '@angular/core';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 
@@ -692,7 +692,8 @@ export class MapComponent {
       // @ts-ignore
       const lmap = lmapComponent.getLeaflet();
       this.clearGeos(lmap);
-      this.addControl(lmap)
+      // Výběr hranic nesmí být závislostí efektu, který načítá data mapy.
+      untracked(() => this.addControl(lmap));
     }
   }
 
