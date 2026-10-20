@@ -534,3 +534,14 @@ main > :has(> .app-analysis-layout .app-view-content) {
   padding: 12px var(--app-view-chart-padding);
   border-bottom: 1px solid var(--app-color-line);
 }
+
+// redesign: Dlouhé přehledy grafů sdílejí přirozenou výšku a mohou se zúžit na mobilu.
+main:is(.app-scroll-page, .app-scroll-panels) .app-view-content.app-view-long-content {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: none;
+}
+
+.app-view-pie-chart {
+  width: 100%;
+  height: 350px;
+}

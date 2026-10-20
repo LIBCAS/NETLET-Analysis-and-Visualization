@@ -74,6 +74,9 @@
     "authors": "Autoři ve vztahu k tématům",
     "recipients": "Adresáti ve vztahu k tématům"
   },
+  "periods": {
+    "title": "Srovnání témat a profesí napříč obdobími"
+  },
   "navbar": {
     "search": "Vyhledávání",
     "main_navigation": "Hlavní navigace",

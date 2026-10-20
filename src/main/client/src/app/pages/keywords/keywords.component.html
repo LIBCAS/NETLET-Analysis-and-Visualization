@@ -20,7 +20,7 @@
   </as-split-area>
 
   <as-split-area class="app-analysis-results">
-    <div class="app-view-content app-analysis-content app-keywords-content">
+    <div class="app-view-content app-analysis-content app-view-long-content">
       <nav class="app-view-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
         <ol>
           <li>
@@ -55,7 +55,7 @@
         <mat-card-content>
           <div
             echarts
-            class="app-keywords-pie"
+            class="app-view-pie-chart"
             [options]="pieOptions"
             (chartInit)="onPieChartInit($event)">
           </div>

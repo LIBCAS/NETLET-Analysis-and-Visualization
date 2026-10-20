@@ -74,6 +74,9 @@
     "authors": "Authors in relation to topics",
     "recipients": "Recipients in relation to topics"
   },
+  "periods": {
+    "title": "Comparing topics and professions across periods"
+  },
   "navbar": {
     "search": "Search",
     "main_navigation": "Main navigation",

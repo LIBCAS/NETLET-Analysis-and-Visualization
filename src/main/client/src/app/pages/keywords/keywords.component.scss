@@ -1,14 +1,4 @@
 // redesign
-:host .app-keywords-content {
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: none;
-}
-
-.app-keywords-pie {
-  width: 100%;
-  height: 350px;
-}
-
 .app-keywords-treemap {
   width: 100%;
   height: 500px;

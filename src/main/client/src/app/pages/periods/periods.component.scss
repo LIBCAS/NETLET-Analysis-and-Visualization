@@ -1,13 +1,40 @@
-mat-progress-bar {
-    position: absolute;
+@use '@angular/material' as mat;
+
+// redesign
+.app-periods-keywords {
+  @include mat.expansion-overrides((
+    container-background-color: transparent,
+    container-elevation-shadow: none,
+    header-collapsed-state-height: 42px,
+    header-expanded-state-height: 42px,
+    header-text-size: 14px,
+    header-text-weight: 850
+  ));
+  @include mat.checkbox-overrides((label-text-size: 13px));
+
+  margin: 0 16px 18px;
+  border-bottom: 1px solid var(--app-color-line);
+
+  mat-expansion-panel-header,
+  mat-list {
+    padding: 0;
+  }
+
+  mat-list-item {
+    padding-inline: 2px;
+  }
 }
 
-.app-keyword-color{
-    width:10px; height: 8px; display: inline-block; vertical-align: middle;
+// redesign: Material neposkytuje override pro vnitřní odsazení panelu.
+:host ::ng-deep .app-periods-keywords .mat-expansion-panel-body {
+  padding: 0;
 }
 
-.app-graph {
-    mat-card {
-        margin-bottom: 20px;
-    }
+// redesign: Trojice období se na užších obrazovkách posouvá vodorovně.
+.app-periods-comparison {
+  overflow-x: auto;
+
+  .app-view-pie-chart {
+    min-width: 960px;
+  }
 }
