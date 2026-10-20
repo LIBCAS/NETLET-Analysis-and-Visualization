@@ -67,8 +67,7 @@ main:is(.app-scroll-page, .app-scroll-panels) {
       height: 100%;
     }
 
-    .app-map-content,
-    .app-timeline {
+    .app-view-content {
       display: grid;
       grid-template-rows: auto auto 1fr;
       align-content: start;
@@ -84,6 +83,11 @@ main:is(.app-scroll-page, .app-scroll-panels) {
       width: 100%;
       min-width: 0;
       min-height: 0;
+    }
+
+    // redesign: Mezery mezi kartami všech již redesignovaných pohledů.
+    .app-view-content .app-analysis-workspace {
+      gap: var(--app-analysis-gap);
     }
 
     .app-analysis-graph {
@@ -123,22 +127,9 @@ main:is(.app-scroll-page, .app-scroll-panels) {
   }
 }
 
-// Na desktopu zůstává pracovní plocha při procházení dlouhých facetů na očích.
+// redesign: Výšku pracovní plochy omezuje jen režim oddělených panelů.
 @media (min-width: 1081px) and (min-height: 740px) {
-  main.app-scroll-page .app-analysis-layout {
-    .app-analysis-workspace,
-    .app-analysis-long > .app-years {
-      position: sticky;
-      top: calc(var(--app-topbar-height) + var(--app-analysis-gap));
-    }
-
-    .app-analysis-long > .app-years {
-      z-index: 2;
-      background: var(--app-color-soft);
-    }
-  }
-
-  main:is(.app-scroll-page, .app-scroll-panels) .app-analysis-layout {
+  main.app-scroll-panels .app-analysis-layout {
     .app-analysis-workspace {
       height: var(--app-analysis-workspace-height);
     }
@@ -171,22 +162,6 @@ main:is(.app-scroll-page, .app-scroll-panels) {
       height: var(--app-analysis-timeline-chart-height);
     }
 
-    .app-timeline-letters {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-height: 0;
-
-      > header {
-        flex-shrink: 0;
-      }
-    }
-
-    .app-timeline-table {
-      flex: 1;
-      min-height: 0;
-      max-height: none;
-    }
   }
 
   // Oddělené posuvníky; výšku navbaru a patičky odečte flex layout shellu.
@@ -251,4 +226,39 @@ main:is(.app-scroll-page, .app-scroll-panels) {
 // redesign: Pracovní plocha přizpůsobuje mapu, nikoli výšku jejího časového grafu.
 main:is(.app-scroll-page, .app-scroll-panels) .app-analysis-layout .app-map-chart {
   flex-shrink: 0;
+}
+
+// redesign: Společné rozložení síťové vizualizace a jejího případného ovládání.
+main:is(.app-scroll-page, .app-scroll-panels) .app-analysis-layout .app-view-network-workspace > .app-view-chart {
+  flex-shrink: 0;
+}
+
+main:is(.app-scroll-page, .app-scroll-panels) .app-analysis-layout .app-view-network {
+  display: flex;
+  flex-direction: column;
+
+  > .app-analysis-graph-fill {
+    flex: 1;
+    height: auto;
+  }
+}
+
+@media (max-width: 1080px), (max-height: 739px) {
+  main:is(.app-scroll-page, .app-scroll-panels) .app-analysis-layout {
+    .app-view-network-workspace {
+      height: auto;
+    }
+
+    .app-view-network {
+      flex: none;
+      height: 500px;
+    }
+  }
+}
+
+// redesign: Timeline zachovává přirozenou výšku tabulky i v odděleném panelu.
+@media (min-width: 1081px) and (min-height: 740px) {
+  main.app-scroll-panels .app-analysis-layout .app-analysis-workspace:has(> .app-timeline-letters) {
+    height: auto;
+  }
 }

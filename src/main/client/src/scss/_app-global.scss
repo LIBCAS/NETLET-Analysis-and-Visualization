@@ -431,3 +431,117 @@ fieldset {
   .app-excluded {
     text-decoration: line-through;
   }
+// redesign: Společné vizuální prvky analytických pohledů.
+main > :has(> .app-analysis-layout .app-view-content) {
+  background: var(--app-color-gray-1);
+}
+
+.app-view-breadcrumbs {
+  font-size: 13px;
+  color: var(--app-color-muted);
+
+  ol,
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  ol {
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    color: var(--app-color-primary-strong);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+}
+
+.app-view-card {
+  min-width: 0;
+  border: 1px solid var(--app-color-line);
+  border-radius: var(--app-view-radius);
+  background: var(--app-color-paper);
+  box-shadow: var(--app-view-card-shadow);
+}
+
+.app-view-card-clip {
+  overflow: hidden;
+}
+
+.app-view-header {
+  padding: 18px 20px;
+
+  > p {
+    margin: 0;
+    color: var(--app-color-primary-strong);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  > h1 {
+    margin: 5px 0 0;
+    color: var(--app-color-ink);
+    font-size: clamp(22px, 3vw, 34px);
+    line-height: 1.08;
+  }
+
+  > div {
+    margin-top: 8px;
+    color: var(--app-color-muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
+.app-view-chart {
+  padding: var(--app-view-chart-padding);
+
+  app-years-chart {
+    display: block;
+  }
+}
+
+// redesign: Karta časového grafu použitá v síťových pohledech.
+.app-view-chart {
+  .app-years app-years-chart {
+    height: 100%;
+  }
+}
+
+// redesign
+.app-view-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 8px var(--app-analysis-gap);
+  padding: 12px var(--app-view-chart-padding);
+  border-bottom: 1px solid var(--app-color-line);
+}
+
+// redesign: Dlouhé přehledy grafů sdílejí přirozenou výšku a mohou se zúžit na mobilu.
+main:is(.app-scroll-page, .app-scroll-panels) .app-view-content.app-view-long-content {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: none;
+}
+
+.app-view-pie-chart {
+  width: 100%;
+  height: 350px;
+}

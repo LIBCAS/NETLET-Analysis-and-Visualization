@@ -1,6 +1,7 @@
 
 import { HttpParams } from '@angular/common/http';
 import { Component, effect, Inject, NgZone, DOCUMENT, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,7 +10,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Tenant, AppState } from '../../app-state';
 import { AppService } from '../../app.service';
@@ -36,7 +37,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Grid
 
 @Component({
   selector: 'app-centrality',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent, AngularSplitModule],
+  imports: [RouterLink, TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent, AngularSplitModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -96,6 +97,8 @@ export class CentralityComponent {
   infoHeader: string;
   infoData: any[];
   infoFields: string[];
+  private infoHeaderKey: string;
+  private infoIdentity: string;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -117,6 +120,17 @@ export class CentralityComponent {
         this.loading = false;
         this.graphOptions = {};
         this.facets.set({});
+      }
+    });
+
+    this.translation.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.graphChart && this.graphData) {
+        this.graphChart.setOption({
+          legend: [{ formatter: (name: string) => this.translation.instant('field.' + name) }]
+        });
+      }
+      if (this.infoHeaderKey) {
+        this.infoHeader = this.translation.instant(this.infoHeaderKey, { identity: this.infoIdentity });
       }
     });
   }
@@ -153,7 +167,9 @@ export class CentralityComponent {
       this.hideNode()
     });
 
-
+    if (this.solrResponse && this.authors && this.recipients && this.mentioned) {
+      this.processResponse();
+    }
   }
 
   // clickTenant(t: Tenant) {
@@ -297,7 +313,9 @@ export class CentralityComponent {
 
       this.mentioned = resp.facets.chart_mentioned.buckets;
 
-      this.processResponse();
+      if (this.graphChart) {
+        this.processResponse();
+      }
       this.loading = false;
     });
   }
@@ -346,7 +364,7 @@ export class CentralityComponent {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
       this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
 
-      this.infoHeader = `${identity} wrote letters to:`;
+      this.setInfoHeader('identities.author_letters', identity);
       this.state.showInfo.set(true);
     });
   }
@@ -375,7 +393,7 @@ export class CentralityComponent {
 
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
       this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
-      this.infoHeader = `${identity} received letters from:`;
+      this.setInfoHeader('identities.recipient_letters', identity);
       this.state.showInfo.set(true);
     });
   }
@@ -402,7 +420,7 @@ export class CentralityComponent {
       //   this.infoContent = popup;
       // });
 
-      this.infoHeader = `${identity} is mentioned in:`;
+      this.setInfoHeader('identities.mentioned_letters', identity);
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
       this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
       this.state.showInfo.set(true);
@@ -515,10 +533,7 @@ export class CentralityComponent {
 
     this.graphOptions = {
       title: {
-        show: true,
-        text: this.translation.instant('Centralita aktérů korespondence v dané korespondenční síti'),
-        // top: 'bottom',
-        left: 'center'
+        show: false
       },
       tooltip: {
         formatter: (params: any) => {
@@ -560,7 +575,7 @@ export class CentralityComponent {
             formatter: '{b}'
           },
           labelLayout: {
-            hideOverlap: true
+            hideOverlap: !this.showOverlap
           },
           scaleLimit: {
             min: 0.4,
@@ -611,5 +626,13 @@ export class CentralityComponent {
   closeInfo() {
     this.infoContent = null;
     this.infoHeader = null;
+    this.infoHeaderKey = null;
+    this.infoIdentity = null;
+  }
+
+  private setInfoHeader(key: string, identity: string) {
+    this.infoHeaderKey = key;
+    this.infoIdentity = identity;
+    this.infoHeader = this.translation.instant(key, { identity });
   }
 }

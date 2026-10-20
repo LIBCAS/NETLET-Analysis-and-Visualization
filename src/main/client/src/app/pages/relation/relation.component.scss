@@ -1,0 +1,49 @@
+@use '@angular/material' as mat;
+
+// redesign
+.app-relation-catalogs {
+  @include mat.list-overrides((
+    list-item-one-line-container-height: 28px,
+    list-item-label-text-size: 13px,
+    list-item-container-shape: var(--app-view-radius),
+    list-item-hover-state-layer-opacity: 0
+  ));
+  @include mat.checkbox-overrides((
+    label-text-size: 13px,
+    label-text-weight: 400
+  ));
+
+  margin: 18px 16px 0;
+
+  mat-list {
+    padding: 0;
+  }
+
+  mat-list-item {
+    padding: 0 2px;
+  }
+
+  mat-checkbox {
+    display: block;
+    width: 100%;
+  }
+}
+
+.app-relation-catalog-label {
+  white-space: nowrap;
+}
+
+.app-relation-catalog-range {
+  margin-inline: 4px;
+  opacity: .7;
+}
+
+// redesign: Navazující facety už mají horní odstup z panelu katalogů.
+app-facets {
+  padding-top: 0;
+}
+
+// redesign: Prostor pod porovnávanými katalogy patří pouze rozbalenému panelu.
+.app-relation-catalogs.mat-expanded {
+  padding-bottom: 10px;
+}

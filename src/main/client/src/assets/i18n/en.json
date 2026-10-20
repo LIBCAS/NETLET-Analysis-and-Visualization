@@ -49,6 +49,34 @@
     "recipient_letters": "{{identity}} — received letters",
     "mentioned_letters": "{{identity}} — mentions in letters"
   },
+  "centrality": {
+    "title": "People in the correspondence network",
+    "controls": "Centrality settings"
+  },
+  "network": {
+    "include_main": "Include principal correspondents",
+    "show_names": "Show all names"
+  },
+  "relation": {
+    "title": "Connections between correspondence networks",
+    "controls": "Network comparison settings",
+    "comparison_hint": "Select a second catalog with an overlapping time range.",
+    "primary_catalog": "Primary catalog",
+    "compared_catalog": "Comparison catalog",
+    "recipient_letters": "Letters with {{identity}} as recipient ({{count}})"
+  },
+  "professions": {
+    "title": "Professional groups in correspondence",
+    "network": "Correspondence between professional groups"
+  },
+  "keywords": {
+    "title": "Topics and people in correspondence",
+    "authors": "Authors in relation to topics",
+    "recipients": "Recipients in relation to topics"
+  },
+  "periods": {
+    "title": "Comparing topics and professions across periods"
+  },
   "navbar": {
     "search": "Search",
     "main_navigation": "Main navigation",

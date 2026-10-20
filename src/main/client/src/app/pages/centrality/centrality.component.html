@@ -1,9 +1,14 @@
 <div class="app-loading">
-  @if(loading && !running){
+  @if (loading && !running) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   }
 </div>
-<as-split class="app-analysis-layout" direction="horizontal" [unit]="'pixel'" (gutterClick)="state.gutterClick($event)">
+
+<as-split
+  class="app-analysis-layout"
+  direction="horizontal"
+  [unit]="'pixel'"
+  (gutterClick)="state.gutterClick($event)">
   <as-split-area class="app-analysis-facets" [size]="state.facetsSize">
     <div class="app-filters">
       <app-facets
@@ -12,40 +17,77 @@
         [facets]="facets()"
         (onFiltersChanged)="onFiltersChanged($event)"
         (onMouserOver)="showNodeExt($event)"
-        (onMouseOut)="hideNode()"></app-facets>
+        (onMouseOut)="hideNode()">
+      </app-facets>
     </div>
   </as-split-area>
+
   <as-split-area class="app-analysis-results">
-    <div class="app-content app-analysis-content">
-      <div class="app-analysis-workspace app-analysis-graph">
-        <div class="app-years">
-          @if (solrResponse?.facets.years) {
-            <app-years-chart
-              [dateYearFacet]="solrResponse.facets.years"
-              (onChangeLimits)="changeLimits($event)"
-              [withAnimation]="false"
-              (onChangeRunning)="changeRunning($event)"></app-years-chart>
-          }
-        </div>
-        <div>
-          <mat-checkbox [(ngModel)]="allIncluded" (click)="processResponse()" [title]="config.excluded_identities()">
-            Včetně hlavních aktérů
-          </mat-checkbox>
-          <mat-checkbox [(ngModel)]="showOverlap" (click)="toggleOverlap()">Zobrazit všechna jména</mat-checkbox>
-        </div>
-        <div class="app-analysis-graph-body">
-          <div class="app-analysis-graph-fill">
-            <div
-              echarts
-              class="app-analysis-graph-fill"
-              [options]="graphOptions"
-              (chartInit)="onGraphChartInit($event)"></div>
+    <div class="app-view-content app-analysis-content">
+      <nav class="app-view-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+        <ol>
+          <li>
+            <a routerLink="/" queryParamsHandling="preserve">{{ 'navbar.search' | translate }}</a>
+          </li>
+          <li aria-current="page">
+            <mat-icon aria-hidden="true">chevron_right</mat-icon>
+            {{ 'home.centrality.header' | translate }}
+          </li>
+        </ol>
+      </nav>
+
+      <header class="app-view-header app-view-card">
+        <p>{{ 'home.centrality.header' | translate }}</p>
+        <h1>{{ 'centrality.title' | translate }}</h1>
+        <div>{{ 'home.centrality.text' | translate }}</div>
+      </header>
+
+      <div class="app-view-network-workspace app-analysis-workspace app-analysis-graph">
+        <section class="app-view-card app-view-chart" [attr.aria-label]="'map.year_chart' | translate">
+          <div class="app-years">
+            @if (solrResponse?.facets.years) {
+              <app-years-chart
+                [dateYearFacet]="solrResponse.facets.years"
+                [withAnimation]="false"
+                [redesignedControls]="true"
+                (onChangeLimits)="changeLimits($event)"
+                (onChangeRunning)="changeRunning($event)">
+              </app-years-chart>
+            }
           </div>
-        </div>
+        </section>
+
+        <section
+          class="app-view-network app-view-card app-view-card-clip app-analysis-graph-body"
+          [attr.aria-label]="'home.centrality.header' | translate">
+          <div class="app-view-controls" role="group" [attr.aria-label]="'centrality.controls' | translate">
+            <mat-checkbox
+              [(ngModel)]="allIncluded"
+              (change)="processResponse()"
+              [disabled]="loading || !graphChart || !graphData"
+              [title]="config.excluded_identities()">
+              {{ 'network.include_main' | translate }}
+            </mat-checkbox>
+            <mat-checkbox
+              [(ngModel)]="showOverlap"
+              (change)="toggleOverlap()"
+              [disabled]="loading || !graphChart || !graphData">
+              {{ 'network.show_names' | translate }}
+            </mat-checkbox>
+          </div>
+
+          <div
+            echarts
+            class="app-analysis-graph-fill"
+            [options]="graphOptions"
+            (chartInit)="onGraphChartInit($event)">
+          </div>
+        </section>
       </div>
     </div>
   </as-split-area>
 </as-split>
+
 @if (infoHeader) {
   <div class="app-letters-info">
     <app-letters-info
@@ -53,6 +95,7 @@
       [content]="infoContent"
       [fields]="infoFields"
       [data]="infoData"
-      (onClose)="closeInfo()"></app-letters-info>
+      (onClose)="closeInfo()">
+    </app-letters-info>
   </div>
 }

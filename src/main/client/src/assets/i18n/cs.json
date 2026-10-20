@@ -49,6 +49,34 @@
     "recipient_letters": "{{identity}} — přijaté dopisy",
     "mentioned_letters": "{{identity}} — zmínky v dopisech"
   },
+  "centrality": {
+    "title": "Postavení osob v korespondenční síti",
+    "controls": "Nastavení centrality"
+  },
+  "network": {
+    "include_main": "Včetně hlavních aktérů",
+    "show_names": "Zobrazit všechna jména"
+  },
+  "relation": {
+    "title": "Propojení korespondenčních sítí",
+    "controls": "Nastavení porovnání sítí",
+    "comparison_hint": "Vyberte druhý katalog se společným časovým rozsahem.",
+    "primary_catalog": "Výchozí katalog",
+    "compared_catalog": "Porovnávaný katalog",
+    "recipient_letters": "Dopisy pro příjemce {{identity}} ({{count}})"
+  },
+  "professions": {
+    "title": "Profesní skupiny v korespondenci",
+    "network": "Korespondenční vztahy mezi profesními skupinami"
+  },
+  "keywords": {
+    "title": "Témata a osoby v korespondenci",
+    "authors": "Autoři ve vztahu k tématům",
+    "recipients": "Adresáti ve vztahu k tématům"
+  },
+  "periods": {
+    "title": "Srovnání témat a profesí napříč obdobími"
+  },
   "navbar": {
     "search": "Vyhledávání",
     "main_navigation": "Hlavní navigace",

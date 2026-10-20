@@ -1,3 +1,35 @@
-mat-card {
-    margin: 10px;
+@use '@angular/material' as mat;
+
+// redesign
+.app-professions-charts {
+  display: grid;
+  align-content: start;
+  gap: var(--app-analysis-gap);
+  min-width: 0;
+}
+
+.app-professions-pies {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  mat-card {
+    @include mat.card-overrides((outlined-outline-width: 0));
+    min-width: 0;
+  }
+}
+
+.app-professions-pie {
+  width: 100%;
+  height: 400px;
+}
+
+.app-professions-network {
+  width: 100%;
+  height: 500px;
+}
+
+@media (max-width: 1300px) {
+  .app-professions-pies {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

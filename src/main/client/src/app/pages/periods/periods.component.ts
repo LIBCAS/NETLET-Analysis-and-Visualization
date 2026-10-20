@@ -1,23 +1,21 @@
-import { Component, effect, Inject, input, DOCUMENT, signal } from '@angular/core';
+import { Component, effect, Inject, DOCUMENT, signal } from '@angular/core';
 
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { HttpParams } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../app.service';
 import { AppState, Tenant } from '../../app-state';
 import { FacetFields, JSONFacet } from '../../shared/facet';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { EChartsOption, ECharts } from 'echarts';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
-import { BarChart } from 'echarts/charts';
+import { BarChart, PieChart } from 'echarts/charts';
 import { TreemapChart, TreeChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
@@ -28,11 +26,25 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { FacetsComponent } from "../../components/facets/facets.component";
 import { AngularSplitModule } from "angular-split";
 
-echarts.use([BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
+echarts.use([PieChart, BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
 
 @Component({
-  selector: 'app-keywords',
-  imports: [TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatListModule, MatExpansionModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, AngularSplitModule],
+  selector: 'app-periods',
+  imports: [
+    RouterLink,
+    TranslateModule,
+    FormsModule,
+    NgxEchartsDirective,
+    MatProgressBarModule,
+    MatCardModule,
+    MatListModule,
+    MatExpansionModule,
+    MatIconModule,
+    MatCheckboxModule,
+    YearsChartComponent,
+    FacetsComponent,
+    AngularSplitModule
+  ],
   templateUrl: './periods.component.html',
   styleUrl: './periods.component.scss',
   providers: [
@@ -101,11 +113,16 @@ export class PeriodsComponent {
         this.facets.set({});
       }
     });
+
+    this.translation.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (this.limits && this.state.selectedTenants().length) {
+        this.getData(true);
+      }
+    });
   }
 
   ngOnInit(): void {
 
-    this.translation.onLangChange.subscribe(() => { this.getData(true) });
     this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'periods');
     this.barColor = this.document.body.computedStyleMap().get('--app-color-map-link').toString();
@@ -174,6 +191,12 @@ export class PeriodsComponent {
         this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
       }
       if (resp.response.numFound === 0) {
+        this.invalidTenant = true;
+        this.keyword_categories = [];
+        this.pieOptions = {};
+        this.profOptions = {};
+        this.pieChart?.clear();
+        this.profChart?.clear();
         this.loading = false;
         return;
       }
@@ -263,8 +286,7 @@ export class PeriodsComponent {
         right: 10,
         data: data['1'].map(a => a.name),
         formatter: name => {
-          var series: any = this.pieChart.getOption()['series'];
-          var value = series[0].data.filter((row: any) => row.name === name)[0].value
+          const value = data['1'].find(row => row.name === name)?.value ?? 0;
           return name + ' - ' + value;
         },
       },
