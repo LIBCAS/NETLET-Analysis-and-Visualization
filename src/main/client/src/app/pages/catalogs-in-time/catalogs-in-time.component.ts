@@ -1,4 +1,5 @@
 import { Component, signal, effect, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { HttpParams } from '@angular/common/http';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -7,7 +8,7 @@ import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts/core';
 import { EChartsOption, ECharts } from 'echarts';
 import { FacetFields, JSONFacet } from '../../shared/facet';
-import { BarChart } from 'echarts/charts';
+import { BarChart, LineChart } from 'echarts/charts';
 import { LegendComponent, TooltipComponent, GridComponent, TitleComponent, DataZoomComponent, ToolboxComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { AppConfiguration } from '../../app-configuration';
@@ -16,14 +17,21 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { FacetsComponent } from '../../components/facets/facets.component';
 import { AppService } from '../../app.service';
-echarts.use([BarChart, CanvasRenderer, LegendComponent, ToolboxComponent, DataZoomComponent,
+echarts.use([LineChart, BarChart, CanvasRenderer, LegendComponent, ToolboxComponent, DataZoomComponent,
   TooltipComponent, GridComponent, TitleComponent]);
 
 @Component({
   selector: 'app-catalogs-in-time',
-  imports: [TranslateModule, AngularSplitModule, NgxEchartsDirective,
+  imports: [
+    RouterLink,
+    TranslateModule,
+    AngularSplitModule,
+    NgxEchartsDirective,
     FacetsComponent,
-    MatProgressBarModule, MatIconModule, MatButtonModule],
+    MatProgressBarModule,
+    MatIconModule,
+    MatButtonModule
+  ],
   templateUrl: './catalogs-in-time.component.html',
   styleUrl: './catalogs-in-time.component.scss',
   providers: [
@@ -58,6 +66,7 @@ export class CatalogsInTimeComponent {
   }
 
   ngOnInit(): void {
+    this.state.currentView = this.state.views.find(view => view.route === 'catalogs');
     this.getData();
   }
 
@@ -124,8 +133,9 @@ export class CatalogsInTimeComponent {
     const series: any[] = [];
     //const limits = this.getYearsLimits(facet.buckets);
 
-    let maxCount = 0;facet.buckets.forEach((t: JSONFacet) => {
-      
+    let maxCount = 0;
+    facet.buckets.forEach((t: JSONFacet) => {
+
       t['years'].buckets.forEach((b: JSONFacet) => {
         maxCount = Math.max(maxCount, b.count);
       });
@@ -133,18 +143,15 @@ export class CatalogsInTimeComponent {
 
     //const d = facet.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
     facet.buckets.forEach((t: JSONFacet) => {
-          series.push({
-            name: t.val,
-            //color: this.config.tenant_colors[t.val],
-            type: 'line',
-            smooth: false,
-            symbol: 'none',
-            data: t['years'].buckets.map((b: JSONFacet) => [b.val, b.count])
-          });
-          
-
+      series.push({
+        name: t.val,
+        //color: this.config.tenant_colors[t.val],
+        type: 'line',
+        smooth: false,
+        symbol: 'none',
+        data: t['years'].buckets.map((b: JSONFacet) => [b.val, b.count])
+      });
     });
-
 
     this.loading.set(false);
 
@@ -157,7 +164,7 @@ export class CatalogsInTimeComponent {
           params.forEach((serie: any) => {
             if (serie.value[1] > 0) {
               ret += `${serie.marker}<span style="font-size:14px;color:#6d6e73;font-weight:400;margin-left:2px">
-              ${this.translation.instant('catalog.'+serie.seriesName)}</span><span style="float:right;margin-left:20px;font-size:14px;color:#6d6e73;font-weight:900">${serie.value[1]}</span><br/>`;
+              ${this.translation.instant('catalog.' + serie.seriesName)}</span><span style="float:right;margin-left:20px;font-size:14px;color:#6d6e73;font-weight:900">${serie.value[1]}</span><br/>`;
             }
           });
           return ret;
@@ -190,7 +197,7 @@ export class CatalogsInTimeComponent {
         top: 30,
         left: 30,
         formatter: (name: string) => {
-            return this.translation.instant('catalog.'+name);
+          return this.translation.instant('catalog.' + name);
         }
       },
       dataZoom: [
@@ -198,7 +205,7 @@ export class CatalogsInTimeComponent {
           type: 'slider',
           start: 0,
           end: 100,
-          xAxisIndex: [0,1]
+          xAxisIndex: [0, 1]
         }
       ],
       series: series

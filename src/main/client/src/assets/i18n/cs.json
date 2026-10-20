@@ -1,4 +1,39 @@
 {
+  "letter": {
+    "detail": "Dopis",
+    "summary": "Základní údaje",
+    "route": "Trasa dopisu",
+    "not_provided": "Neuvedeno",
+    "unknown_author": "Neznámý autor",
+    "unknown_recipient": "Neznámý adresát",
+    "map": "Mapa míst spojených s dopisem",
+    "no_coordinates": "Pro tento dopis nejsou dostupné zeměpisné souřadnice.",
+    "transcription": "Přepis dopisu",
+    "load_error": "Dopis se nepodařilo načíst.",
+    "retry": "Zkusit znovu",
+    "copy_values": {
+      "handwritten": "Rukopis",
+      "typewritten": "Strojopis",
+      "mode_printed": "Tisk",
+      "printed": "Tisk"
+    },
+    "preservation_values": {
+      "original": "Originál",
+      "copy": "Opis",
+      "draft": "Koncept",
+      "printed": "Tištěné vydání"
+    },
+    "languages": {
+      "Czech": "Čeština",
+      "German": "Němčina",
+      "Latin": "Latina",
+      "French": "Francouzština",
+      "English": "Angličtina",
+      "Italian": "Italština",
+      "Polish": "Polština",
+      "Russian": "Ruština"
+    }
+  },
   "tenant": "Katalog",
   "tenants": "Katalogy",
   "view": "Zobrazení",
@@ -76,6 +111,9 @@
   },
   "periods": {
     "title": "Srovnání témat a profesí napříč obdobími"
+  },
+  "catalogs_in_time": {
+    "title": "Vývoj korespondence v jednotlivých katalozích"
   },
   "navbar": {
     "search": "Vyhledávání",

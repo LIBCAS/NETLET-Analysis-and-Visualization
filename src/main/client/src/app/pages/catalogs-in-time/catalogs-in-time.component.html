@@ -1,31 +1,59 @@
 <div class="app-loading">
-  @if(loading()){
+  @if (loading()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   }
 </div>
-<as-split class="app-analysis-layout" direction="horizontal" [unit]="'pixel'" (gutterClick)="state.gutterClick($event)">
+
+<as-split
+  class="app-analysis-layout"
+  direction="horizontal"
+  [unit]="'pixel'"
+  (gutterClick)="state.gutterClick($event)">
   <as-split-area class="app-analysis-facets" [size]="state.facetsSize">
     <div class="app-filters">
-      @if(facets()) {
+      @if (facets()) {
         <app-facets
           [fields]="['authors', 'recipients', 'mentioned', 'identities', 'keyword_categories', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
           [renderLists]="true"
           [facets]="facets()"
-          (onFiltersChanged)="onFiltersChanged($event)"></app-facets>
+          (onFiltersChanged)="onFiltersChanged($event)">
+        </app-facets>
       }
     </div>
   </as-split-area>
+
   <as-split-area class="app-analysis-results">
-    <div class="app-content app-analysis-content">
-      <div class="app-analysis-workspace app-analysis-graph">
+    <div class="app-view-content app-analysis-content app-view-long-content">
+      <nav class="app-view-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+        <ol>
+          <li>
+            <a routerLink="/" queryParamsHandling="preserve">{{ 'navbar.search' | translate }}</a>
+          </li>
+          <li aria-current="page">
+            <mat-icon aria-hidden="true">chevron_right</mat-icon>
+            {{ 'home.catalogs_in_time.header' | translate }}
+          </li>
+        </ol>
+      </nav>
+
+      <header class="app-view-header app-view-card">
+        <p>{{ 'home.catalogs_in_time.header' | translate }}</p>
+        <h1>{{ 'catalogs_in_time.title' | translate }}</h1>
+        <div>{{ 'home.catalogs_in_time.text' | translate }}</div>
+      </header>
+
+      <section
+        class="app-analysis-workspace app-analysis-graph app-view-card app-view-chart"
+        [attr.aria-label]="'home.catalogs_in_time.header' | translate">
         <div
           echarts
           class="app-analysis-graph-fill"
           [class.app-loading-identity]="loading()"
           [initOpts]="{ locale: 'CZ' }"
           [options]="yearsChartOptions"
-          (chartInit)="onYearsChartInit($event)"></div>
-      </div>
+          (chartInit)="onYearsChartInit($event)">
+        </div>
+      </section>
     </div>
   </as-split-area>
 </as-split>

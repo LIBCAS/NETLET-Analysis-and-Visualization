@@ -1,4 +1,39 @@
 {
+  "letter": {
+    "detail": "Letter",
+    "summary": "Basic information",
+    "route": "Letter route",
+    "not_provided": "Not provided",
+    "unknown_author": "Unknown author",
+    "unknown_recipient": "Unknown recipient",
+    "map": "Map of places associated with the letter",
+    "no_coordinates": "No geographical coordinates are available for this letter.",
+    "transcription": "Letter transcription",
+    "load_error": "The letter could not be loaded.",
+    "retry": "Try again",
+    "copy_values": {
+      "handwritten": "Manuscript",
+      "typewritten": "Typescript",
+      "mode_printed": "Print",
+      "printed": "Print"
+    },
+    "preservation_values": {
+      "original": "Original",
+      "copy": "Copy",
+      "draft": "Draft",
+      "printed": "Printed edition"
+    },
+    "languages": {
+      "Czech": "Czech",
+      "German": "German",
+      "Latin": "Latin",
+      "French": "French",
+      "English": "English",
+      "Italian": "Italian",
+      "Polish": "Polish",
+      "Russian": "Russian"
+    }
+  },
   "tenant": "Catalog",
   "tenants": "Catalogs",
   "view": "View",
@@ -76,6 +111,9 @@
   },
   "periods": {
     "title": "Comparing topics and professions across periods"
+  },
+  "catalogs_in_time": {
+    "title": "Correspondence trends across catalogs"
   },
   "navbar": {
     "search": "Search",

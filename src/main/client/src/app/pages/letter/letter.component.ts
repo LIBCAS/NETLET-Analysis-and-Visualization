@@ -1,281 +1,149 @@
-import { Component, computed, effect, inject, resource, signal } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
-import { Letter, Place } from '../../shared/letter';
+import { afterRenderEffect, Component, computed, ElementRef, inject, viewChild } from '@angular/core';
 import { httpResource } from '@angular/common/http';
+import { ActivatedRoute, PRIMARY_OUTLET, Router, RouterModule } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { DatePipe } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
-
-import {
-  LeafletComponent,
-  LeafletComponentOption,
-} from "@joakimono/echarts-extension-leaflet/src/export";
-
-
-import L, { latLng, Map, tileLayer as LtileLayer, MapOptions } from "leaflet";
-
-import { GraphSeriesOption } from 'echarts';
-import { init, EChartsType, ComposeOption } from "echarts/core";
-
-import * as echarts from 'echarts/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { LeafletComponent } from '@joakimono/echarts-extension-leaflet/src/export';
+import L from 'leaflet';
+import { init, use } from 'echarts/core';
 import { GraphChart } from 'echarts/charts';
-import { TooltipComponent, TitleComponentOption } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
+import { TooltipComponent } from 'echarts/components';
+import { AppConfiguration } from '../../app-configuration';
+import { AppState } from '../../app-state';
 
-type ECOption = ComposeOption<
-  | TitleComponentOption
-  | GraphSeriesOption
-> &
-  LeafletComponentOption<MapOptions>;
-
-echarts.use([CanvasRenderer, GraphChart, TooltipComponent, LeafletComponent]);
+use([CanvasRenderer, GraphChart, TooltipComponent, LeafletComponent]);
 
 @Component({
   selector: 'app-letter',
-  imports: [DatePipe, TranslateModule, RouterModule],
+  imports: [DatePipe, TranslateModule, RouterModule, MatIconModule, MatButtonModule, MatProgressBarModule],
   templateUrl: './letter.component.html',
   styleUrl: './letter.component.scss',
 })
 export class LetterComponent {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private config = inject(AppConfiguration);
+  private state = inject(AppState);
+  private translation = inject(TranslateService);
+  private mapElement = viewChild<ElementRef<HTMLDivElement>>('letterMap');
+  private letterId = toSignal(this.route.paramMap.pipe(map(params => params.get('id') ?? '')), {
+    initialValue: this.route.snapshot.paramMap.get('id') ?? '',
+  });
 
-  letterId = signal('');
-  private activatedRoute = inject(ActivatedRoute);
-
-  letterRes: any = httpResource(() => ({
-    url: `/api/data/get_letter`,
-    method: 'GET',
-    params: {
-      'id': this.letterId()
-    }
-  }));
-
-  letter = computed<any>(() => this.letterRes.value());
-
-  authors = computed<any>(() => this.letter().identities.filter((i: any) => i.role === 'author'));
-  recipients = computed<any>(() => this.letter().identities.filter((i: any) => i.role === 'recipient'));
-  mentioned = computed<any>(() => this.letter().identities.filter((i: any) => i.role === 'mentioned'));
-  origins = computed<any>(() => this.letter().places?.filter((i: any) => i.role === 'origin'));
-  destinations = computed<any>(() => this.letter().places?.filter((i: any) => i.role === 'destination'));
-
-  map: Map;
-  // options = {
-  //   layers: [
-  //     LtileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: 'OpenStreetMaps' })
-  //   ],
-  //   zoom: 4,
-  //   center: latLng(49.879966, 16.726909)
-  // };
-
-  graphOptions: ECOption = {};
-  graphChart: EChartsType;
-
-  nodes: { [id: string]: { coords: [number, number], name: string } } = {};
-  links: {
-    [id: string]: {
-      node1: [number, number], node2: [number, number], count: number,
-      letters: Letter[], authors: string[], recipients: string[]
-    }
-  } = {};
-
-  graphData: {
-    links: {
-      source: string,
-      target: string,
-      authors: string[],
-      recipients: string[]
-    }[],
-    nodes: {
-      category: number,
-      id: string,
-      name: string
-      symbolSize: number
-      value: number
-    }[],
-    bounds: any
-  }
+  readonly language = toSignal(this.translation.onLangChange.pipe(map(event => event.lang)), {
+    initialValue: this.translation.currentLang || 'cs',
+  });
+  readonly source = this.getSource();
+  readonly searchUrl = this.router.createUrlTree(['/'], {
+    queryParams: this.source?.url.queryParams ?? this.route.snapshot.queryParams,
+  });
+  readonly letterRes = httpResource<any>(() => this.letterId() ? {
+    url: '/api/data/get_letter',
+    params: { id: this.letterId() },
+  } : undefined);
+  readonly letter = computed(() => this.letterRes.hasValue() ? this.letterRes.value() : undefined);
+  readonly personGroups = computed(() => ['authors', 'recipients', 'mentioned'].map((label, index) => ({
+    label,
+    people: (this.letter()?.identities ?? []).filter((person: any) => person.role === ['author', 'recipient', 'mentioned'][index]),
+  })));
+  readonly placeGroups = computed(() => ['origins', 'destinations'].map((label, index) => ({
+    label,
+    places: (this.letter()?.places ?? []).filter((place: any) => place.role === ['origin', 'destination'][index]),
+  })));
+  readonly mappedPlaces = computed<any[]>(() => (this.letter()?.places ?? []).filter((place: any) =>
+    place.latitude != null && place.longitude != null &&
+    Number.isFinite(Number(place.latitude)) && Number.isFinite(Number(place.longitude))));
+  readonly keywords = computed<any[]>(() => this.letter()?.keywords ?? this.letter()?.hiko?.keywords ?? []);
+  readonly abstract = computed(() => {
+    const value = this.letter()?.abstract;
+    return value?.[this.language()] || value?.cs || value?.en;
+  });
+  readonly hikoUrl = computed(() => {
+    const letter = this.letter();
+    const id = letter?.letter_id ?? letter?.hiko?.id;
+    const tenant = this.config.isTest ? this.config.test_mappings[letter?.tenant] : letter?.tenant;
+    return id && tenant ? this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', String(id)) : null;
+  });
 
   constructor() {
-    this.activatedRoute.params.subscribe((params) => {
-      this.letterId.set(params['id']);
-    });
+    afterRenderEffect(onCleanup => {
+      const element = this.mapElement()?.nativeElement;
+      const places = this.mappedPlaces();
+      if (!element || !places.length) return;
 
-    effect(() => {
-      const letter = this.letterRes.value();
-      if (letter?.places) {
-        setTimeout(() => {
-          this.setGraphData(letter);
-          this.setMap();
-        }, 100)
-      }
-    })
-  }
-
-
-
-  setGraphData(letter: Letter) {
-
-    this.nodes = {};
-    const nodes: any = [];
-    this.links = {};
-    const links: any[] = [];
-
-    let latMax = -90;
-    let latMin = 90;
-    let lngMax = -180;
-    let lngMin = 180;
-
-    letter.places.forEach((place: Place) => {
-      if (place.latitude && !this.nodes[place.id]) {
-        this.nodes[place.id] = { coords: [place.latitude, place.longitude], name: place.name };
-        nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1] });
-        latMax = Math.max(latMax, place.latitude);
-        lngMax = Math.max(lngMax, place.longitude);
-        latMin = Math.min(latMin, place.latitude);
-        lngMin = Math.min(lngMin, place.longitude);
-      }
-    });
-
-    const southWest = L.latLng(latMin, lngMin);
-    const northEast = L.latLng(latMax, lngMax);
-    const bounds = L.latLngBounds(southWest, northEast);
-
-    const linkId = letter.origin_id + '_' + letter.destination_id;
-    const place_origin = letter.places.find(p => p.role === 'origin');
-    const place_destination = letter.places.find(p => p.role === 'destination');
-
-    if (place_origin && place_destination && place_origin.latitude && place_destination.latitude) {
-      if (!this.links[linkId]) {
-        this.links[linkId] = {
-          node1: [place_origin.latitude, place_origin.longitude],
-          node2: [place_destination.latitude, place_destination.longitude],
-          authors: letter.identity_author,
-          recipients: letter.identity_recipient,
-          count: 1,
-          letters: [letter]
-        };
-        links.push({
-          id: linkId,
-          source: letter.origin_id,
-          target: letter.destination_id,
-          authors: letter.identity_author,
-          recipients: letter.identity_recipient,
-          label: place_origin.name + ' > ' + place_destination.name,
-          labelReversed: place_destination.name + ' > ' + place_origin.name,
-          count: this.links[linkId].count,
-          lineStyle: {
-            //color: this.config.tenant_colors[letter.tenant],
-            width: 1,
-            opacity: 1
-          }
+      const unique = [...new Map(places.map(place => [String(place.id), place])).values()];
+      const bounds = L.latLngBounds(unique.map(place => L.latLng(Number(place.latitude), Number(place.longitude))));
+      const center = bounds.getCenter();
+      const chart = init(element);
+      const origin = places.find(place => place.role === 'origin');
+      const destination = places.find(place => place.role === 'destination');
+      chart.setOption({
+        lmap: {
+          center: [center.lng, center.lat], zoom: 10, resizeEnable: true,
+          renderOnMoving: true, echartsLayerInteractive: true,
+        },
+        tooltip: {
+          trigger: 'item', renderMode: 'richText',
+          formatter: (params: any) => params.dataType === 'edge' ? params.data.name : params.name,
+        },
+        series: [{
+          type: 'graph', coordinateSystem: 'lmap',
+          data: unique.map(place => ({ id: String(place.id), name: place.name, value: [Number(place.longitude), Number(place.latitude), 1] })),
+          links: origin && destination ? [{
+            source: String(origin.id), target: String(destination.id),
+            name: `${origin.name} → ${destination.name}`,
+          }] : [],
+          edgeSymbol: ['circle', 'arrow'], edgeSymbolSize: [2, 6],
+          label: { show: true, position: 'right', formatter: '{b}' },
+          labelLayout: { hideOverlap: true },
+          lineStyle: { color: 'source', curveness: 0.3 },
+          emphasis: { focus: 'adjacency', lineStyle: { width: 10 } },
+        }],
+      });
+      const leaflet: L.Map = (chart as any).getModel().getComponent('lmap').getLeaflet();
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors', maxZoom: 19,
+      }).addTo(leaflet);
+      leaflet.fitBounds(bounds, { padding: [24, 24], maxZoom: 10 });
+      let frame = 0;
+      const observer = new ResizeObserver(() => {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          chart.resize();
+          leaflet.invalidateSize();
         });
-      } else {
-        this.links[linkId].count++;
-        this.links[linkId].letters.push(letter);
-        this.links[linkId].authors.concat(letter.identity_author)
-        this.links[linkId].recipients.concat(letter.identity_recipient)
-      }
-    }
-
-
-    links.forEach(link => {
-      link.count = this.links[link.id].count
-    })
-
-    this.graphData = {
-      links,
-      nodes,
-      bounds
-    };
-
+      });
+      observer.observe(element);
+      onCleanup(() => {
+        observer.disconnect();
+        cancelAnimationFrame(frame);
+        chart.dispose();
+      });
+    });
   }
 
-  setMap() {
-    const center = this.graphData.bounds.getCenter();
-    this.graphOptions = {
-      lmap: {
-        // See https://leafletjs.com/reference.html#map-option for details
-        // NOTE: note that this order is reversed from Leaflet's [lat, lng]!
-        
-        center: [center.lng, center.lat],     // [lng, lat]
-        zoom: 10,
+  identityUrl(person: any): string {
+    return '/identity/' + (person.global_identity ? 'global_' + person.global_identity.id : person.id);
+  }
 
-        resizeEnable: true,     // automatically handles browser window resize.
-        // whether echarts layer should be rendered when the map is moving. Default is true.
-        // if false, it will only be re-rendered after the map `moveend`.
-        // It's better to set this option to false if data is large.
-        renderOnMoving: true,
-        echartsLayerInteractive: true, // Default: true
-        largeMode: false               // Default: false
-        // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
-      },
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: any) => {
-          return params.dataType === 'edge' ?
-            `${params.data.label} (${params.data.count})` :
-            params.name
-        }
-      },
-      series: [
-        {
-          type: 'graph',
-          // use `lmap` as the coordinate system
-          coordinateSystem: 'lmap',
-          // data items [[lng, lat, value], [lng, lat, value], ...]
-          data: this.graphData.nodes,
-          links: this.graphData.links,
+  translatedValue(group: string, value: string): string {
+    this.language();
+    const key = `letter.${group}.${value}`;
+    const translated = this.translation.instant(key);
+    return translated === key ? value : translated;
+  }
 
-          edgeSymbol: ['circle', 'arrow'],
-          edgeSymbolSize: [2, 6],
-
-          roam: true,
-          label: {
-            show: true,
-            position: 'right',
-            formatter: '{b}'
-          },
-          labelLayout: {
-            hideOverlap: true
-          },
-          scaleLimit: {
-            min: 0.4,
-            max: 2
-          },
-          lineStyle: {
-            color: 'source',
-            curveness: 0.3
-          },
-          emphasis: {
-            focus: 'adjacency',
-            lineStyle: {
-              width: 10
-            }
-          }
-
-        }
-      ]
-    }
-
-    const d = document.getElementById("echarts-lmap");
-    if (!this.graphChart) {
-      this.graphChart = init(d);
-    }
-
-    this.graphChart.setOption(this.graphOptions);
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const lmapComponent = this.graphChart.getModel().getComponent("lmap");
-    // Get the instance of Leaflet
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const lmap = lmapComponent.getLeaflet();
-
-    LtileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OpenStreetMaps'  }).addTo(lmap);
-    
-
-    setTimeout(() => {
-      lmap.fitBounds(this.graphData.bounds, { paddingTopLeft: [-20, -20], paddingBottomRight: [-20, -20] });
-    }, 100)
-    
+  private getSource() {
+    const previous = this.router.currentNavigation()?.previousNavigation ?? this.router.lastSuccessfulNavigation();
+    const url = previous?.finalUrl ?? previous?.extractedUrl;
+    const path = url?.root.children[PRIMARY_OUTLET]?.segments.map(segment => segment.path).join('/');
+    const view = this.state.views.find(view => view.route && view.route === path);
+    return view && url ? { header: view.header, url } : null;
   }
 }
