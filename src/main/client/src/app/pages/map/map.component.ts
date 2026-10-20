@@ -86,7 +86,6 @@ export class MapComponent {
     center: latLng(49.879966, 16.726909)
   };
 
-  geojsons: string[] = ['1500', '1530', '1600', '1650', '1700', '1715', '1783', '1800', '1815', '1878', '1880', '1900', '1914', '1920', '1930', '1938', '1945', '1960', '1994', '2000', '2010'];
   geojsonsFiltered = signal<string[]>([]);
   selectedGeo = signal<string>('');
 
@@ -799,9 +798,9 @@ export class MapComponent {
   }
 
   filterGeos() {
-    const first = this.geojsons.findIndex(g => parseInt(g) > this.limits[0].getFullYear()) - 1;
-    const last = this.geojsons.findIndex(g => parseInt(g) > this.limits[1].getFullYear());
-    this.geojsonsFiltered.set(this.geojsons.slice(Math.max(0, first), Math.min(last, this.geojsons.length - 1)));
+    const first = this.config.geojsons.findIndex(g => g > this.limits[0].getFullYear()) - 1;
+    const last = this.config.geojsons.findIndex(g => g > this.limits[1].getFullYear());
+    this.geojsonsFiltered.set(this.config.geojsons.slice(Math.max(0, first), Math.min(last, this.config.geojsons.length - 1)).map(g => g + ''));
     this.selectedGeo.set('');
     if (this.graphChart) {
 

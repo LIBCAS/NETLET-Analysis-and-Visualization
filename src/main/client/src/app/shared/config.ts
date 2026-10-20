@@ -13,4 +13,5 @@ export class Configuration {
   isTest: boolean;
   test_mappings: {[tenant: string]: string};
   obdobi: string[];
+  geojsons: number[];
 }

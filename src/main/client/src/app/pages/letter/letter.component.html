@@ -135,7 +135,7 @@
             }
           </div>
           @if (mappedPlaces().length) {
-            <div #letterMap class="app-letter-map" role="region" [attr.aria-label]="'letter.map' | translate"></div>
+            <div #letterMap class="app-letter-map" role="region" [attr.aria-label]="'letter.map' | translate" ></div>
           } @else {
             <p class="app-letter-muted">{{ 'letter.no_coordinates' | translate }}</p>
           }

@@ -49,6 +49,10 @@ import { Configuration } from './shared/config';
         return this.config.obdobi;
     }
 
+    public get geojsons() {
+        return this.config.geojsons;
+    }
+
     constructor(
         private http: HttpClient,
         public state: AppState) { }
