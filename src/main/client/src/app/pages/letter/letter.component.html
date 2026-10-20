@@ -1,119 +1,231 @@
-@if (letter()) {
-<div class="app-detail">
-
-  <fieldset>
-    <legend>{{ 'field.dates' | translate }}</legend>
-    <div>
-      <label>{{ 'datum' | translate }}:</label>
-      <div>{{ letter().date_computed | date : 'dd.MM.yyyy'}}</div>
-    </div>
-  </fieldset>
-
-  <fieldset>
-    <legend>{{ 'field.identities' | translate }}</legend>
-
-    <div>
-      <label>{{ 'field.authors' | translate }}:</label>
-      @for (a of authors(); track a) {
-        <div><a class="app-link" [routerLink]="'/identity/'+(a.global_identity ? ('global_'+ a.global_identity.id) : a.id)">{{ a.name }}</a></div>
-      }
-    </div>
-
-    <div>
-      <label>{{ 'field.recipients' | translate }}:</label>
-      @for (a of recipients(); track a) {
-        <div><a class="app-link" [routerLink]="'/identity/'+(a.global_identity ? ('global_'+ a.global_identity.id) : a.id)">{{ a.name }}</a></div>
-      }
-    </div>
-
-    <div>
-      <label>{{ 'field.mentioned' | translate }}:</label>
-      @for (a of mentioned(); track a) {
-        <div>
-          <a class="app-link" [routerLink]="'/identity/'+ (a.global_identity ? ('global_'+ a.global_identity.id) : a.id)">{{ a.name }}</a>
-        </div>
-      }
-    </div>
-  </fieldset>
-
-  <fieldset>
-    <legend>{{ 'field.places' | translate }}</legend>
-    @if (origins()) {
-    <div>
-      <label>{{ 'field.origins' | translate }}:</label>
-      @for (a of origins(); track a) {
-      <div><a class="app-link" [routerLink]="'/place/'+a.id">{{ a.name }}</a></div>
-      }
-    </div>}
-@if (destinations()) {
-    <div>
-      <label>{{ 'field.destinations' | translate }}:</label>
-      @for (a of destinations(); track a) {
-      <div><a class="app-link" [routerLink]="'/place/'+a.id">{{ a.name }}</a></div>
-      }
-    </div>
-}
-    <div style="height: 350px; width: 600px; position: relative;">
-      <div style="height: 100%; width: 100%;" id="echarts-lmap"></div>
-    </div>
-
-  </fieldset>
-  <fieldset>
-    <legend>{{ 'field.content' | translate }}</legend>
-    <div>
-      <label>{{ 'field.keywords' | translate }}:</label>
-      @for (a of letter().keywords; track a) {
-      <div>{{ a.name_cs }}</div>
-      }
-    </div>
-
-    <div>
-      <label>{{ 'field.languages' | translate }}:</label>
-      @for (a of letter().languages; track a) {
-      <div>{{ a }}</div>
-      }
-    </div>
-
-    <div>
-      <label>{{ 'field.incipit' | translate }}:</label>
-      <div>{{ letter().incipit }}</div>
-    </div>
-
-    <div>
-      <label>{{ 'field.explicit' | translate }}:</label>
-      <div>{{ letter().explicit }}</div>
-    </div>
-
-    <div>
-      <label>{{ 'field.abstract' | translate }}:</label>
-      <div>{{ letter().abstract?.cs }}</div>
-      <div>{{ letter().abstract?.en }}</div>
-    </div>
-
-    <div>
-      <label>{{ 'field.content' | translate }}:</label>
-      <div [innerHTML]="letter().content"></div>
-    </div>
-  </fieldset>
-
-  <fieldset>
-    <legend>{{ 'field.copies' | translate }}</legend>
-    @for (c of letter().hiko.copies; track c) {
-    <div>
-      <label>{{ 'field.copy' | translate }}:</label>
-      <div>{{ c.copy }}</div>
-      <label>{{ 'field.preservation' | translate }}:</label>
-      <div>{{ c.preservation }}</div>
-      <label>{{ 'field.signature' | translate }}:</label>
-      <div>{{ c.signature }}</div>
-      <label>{{ 'field.archive' | translate }}:</label>
-      <div>{{ c.archive?.label }}</div>
-      <label>{{ 'field.repository' | translate }}:</label>
-      <div>{{ c.repository?.label }}</div>
-      <hr />
-    </div>
-    }
-  </fieldset>
-
+<div class="app-loading">
+  @if (letterRes.isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
 </div>
-}
+
+<div class="app-letter">
+  <nav class="app-view-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+    <ol>
+      <li><a [routerLink]="searchUrl">{{ 'navbar.search' | translate }}</a></li>
+      @if (source) {
+        <li>
+          <mat-icon aria-hidden="true">chevron_right</mat-icon>
+          <a [routerLink]="source.url">{{ 'home.' + source.header + '.header' | translate }}</a>
+        </li>
+      }
+      <li aria-current="page">
+        <mat-icon aria-hidden="true">chevron_right</mat-icon>
+        {{ 'letter.detail' | translate }}
+        @if (letter(); as data) {
+          {{ 'catalog.' + data.tenant | translate }} · {{ data.letter_id || data.table_id }}
+        }
+      </li>
+    </ol>
+  </nav>
+
+  @if (letter(); as data) {
+    <header class="app-view-header app-view-card app-letter-header">
+      <p>{{ 'letter.detail' | translate }}</p>
+      <h1>
+        @for (person of personGroups()[0].people; track person.id) {
+          {{ person.name }}{{ $last ? '' : ', ' }}
+        } @empty {
+          {{ 'letter.unknown_author' | translate }}
+        }
+        <span aria-hidden="true"> → </span>
+        @for (person of personGroups()[1].people; track person.id) {
+          {{ person.name }}{{ $last ? '' : ', ' }}
+        } @empty {
+          {{ 'letter.unknown_recipient' | translate }}
+        }
+      </h1>
+      @if (hikoUrl(); as url) {
+        <a mat-stroked-button [href]="url" target="_blank" rel="noopener noreferrer">
+          {{ 'action.view_in_hiko' | translate }}
+          <mat-icon iconPositionEnd>open_in_new</mat-icon>
+        </a>
+      }
+    </header>
+
+    <div class="app-letter-layout">
+      <aside class="app-letter-summary" [attr.aria-label]="'letter.summary' | translate">
+        <section class="app-view-card app-letter-card">
+          <h2>
+            <mat-icon aria-hidden="true">calendar_today</mat-icon>
+            {{ 'field.date' | translate }}
+          </h2>
+          <strong>{{ data.hiko?.dates?.date || (data.date_computed | date: 'd. M. yyyy') || ('letter.not_provided' | translate) }}</strong>
+          @if (data.hiko?.dates?.date_range) {
+            <div>– {{ data.hiko.dates.date_range }}</div>
+          }
+        </section>
+        <section class="app-view-card app-letter-card">
+          <h2>
+            <mat-icon aria-hidden="true">alt_route</mat-icon>
+            {{ 'letter.route' | translate }}
+          </h2>
+          @for (group of placeGroups(); track group.label) {
+            <div class="app-letter-summary-row">
+              <span>{{ 'field.' + group.label | translate }}</span>
+              @for (place of group.places; track place.id) {
+                <a [routerLink]="'/place/' + place.id">{{ place.name }}</a>
+              } @empty {
+                <div class="app-letter-muted">{{ 'letter.not_provided' | translate }}</div>
+              }
+            </div>
+          }
+        </section>
+        <section class="app-view-card app-letter-card">
+          <h2>
+            <mat-icon aria-hidden="true">language</mat-icon>
+            {{ 'field.languages' | translate }}
+          </h2>
+          @for (language of data.languages; track language) {
+            <div>{{ translatedValue('languages', language) }}</div>
+          } @empty {
+            <span class="app-letter-muted">{{ 'letter.not_provided' | translate }}</span>
+          }
+        </section>
+        <section class="app-view-card app-letter-card">
+          <h2>
+            <mat-icon aria-hidden="true">library_books</mat-icon>
+            {{ 'field.tenant' | translate }}
+          </h2>
+          <strong>{{ 'catalog.' + data.tenant | translate }}</strong>
+          <div class="app-letter-muted">{{ 'field.letter_id' | translate }}: {{ data.letter_id || data.table_id || data.id }}</div>
+        </section>
+      </aside>
+
+      <div class="app-letter-content">
+        <section class="app-view-card app-letter-card">
+          <h2>
+            <mat-icon aria-hidden="true">people_outline</mat-icon>
+            {{ 'field.identities' | translate }}
+          </h2>
+          <div class="app-letter-persons">
+            @for (group of personGroups(); track group.label) {
+              <div class="app-letter-group">
+                <h3>{{ 'field.' + group.label | translate }}</h3>
+                @for (person of group.people; track person.id) {
+                  <a [routerLink]="identityUrl(person)">{{ person.name }}</a>
+                } @empty {
+                  <span class="app-letter-muted">{{ 'letter.not_provided' | translate }}</span>
+                }
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="app-view-card app-letter-card">
+          <h2>
+            <mat-icon aria-hidden="true">place</mat-icon>
+            {{ 'field.places' | translate }}
+          </h2>
+          <div class="app-letter-places">
+            @for (group of placeGroups(); track group.label) {
+              <div class="app-letter-group">
+                <h3>{{ 'field.' + group.label | translate }}</h3>
+                @for (place of group.places; track place.id) {
+                  <a [routerLink]="'/place/' + place.id">{{ place.name }}</a>
+                } @empty {
+                  <span class="app-letter-muted">{{ 'letter.not_provided' | translate }}</span>
+                }
+              </div>
+            }
+          </div>
+          @if (mappedPlaces().length) {
+            <div #letterMap class="app-letter-map" role="region" [attr.aria-label]="'letter.map' | translate"></div>
+          } @else {
+            <p class="app-letter-muted">{{ 'letter.no_coordinates' | translate }}</p>
+          }
+        </section>
+
+        <section class="app-view-card app-letter-card">
+          <h2>
+            <mat-icon aria-hidden="true">description</mat-icon>
+            {{ 'field.content' | translate }}
+          </h2>
+          <dl class="app-letter-metadata">
+            <div>
+              <dt>{{ 'field.incipit' | translate }}</dt>
+              <dd>{{ data.incipit || ('letter.not_provided' | translate) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'field.explicit' | translate }}</dt>
+              <dd>{{ data.explicit || ('letter.not_provided' | translate) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'field.abstract' | translate }}</dt>
+              <dd>{{ abstract() || ('letter.not_provided' | translate) }}</dd>
+            </div>
+          </dl>
+          <h3>{{ 'letter.transcription' | translate }}</h3>
+          @if (data.content) {
+            <div class="app-letter-transcription" [innerHTML]="data.content"></div>
+          } @else {
+            <p class="app-letter-muted">{{ 'letter.not_provided' | translate }}</p>
+          }
+        </section>
+
+        <section class="app-view-card app-letter-card">
+          <h2>
+            <mat-icon aria-hidden="true">sell</mat-icon>
+            {{ 'field.keywords' | translate }}
+          </h2>
+          <div class="app-letter-tags">
+            @for (keyword of keywords(); track $index) {
+              <span>{{ keyword['name_' + language()] || keyword.name?.[language()] || keyword.name_cs || keyword.name || keyword }}</span>
+            } @empty {
+              <p class="app-letter-muted">{{ 'letter.not_provided' | translate }}</p>
+            }
+          </div>
+        </section>
+
+        <section class="app-view-card app-letter-card">
+          <h2>
+            <mat-icon aria-hidden="true">inventory_2</mat-icon>
+            {{ 'field.copies' | translate }}
+          </h2>
+          @for (copy of data.hiko?.copies; track copy.id) {
+            <dl class="app-letter-metadata app-letter-copy">
+              <div>
+                <dt>{{ 'field.copy' | translate }}</dt>
+                <dd>{{ copy.copy ? translatedValue('copy_values', copy.copy) : ('letter.not_provided' | translate) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'field.preservation' | translate }}</dt>
+                <dd>{{ copy.preservation ? translatedValue('preservation_values', copy.preservation) : ('letter.not_provided' | translate) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'field.signature' | translate }}</dt>
+                <dd>{{ copy.signature || ('letter.not_provided' | translate) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'field.archive' | translate }}</dt>
+                <dd>{{ copy.archive?.label || ('letter.not_provided' | translate) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'field.repository' | translate }}</dt>
+                <dd>{{ copy.repository?.label || ('letter.not_provided' | translate) }}</dd>
+              </div>
+              @if (copy.manifestation_notes) {
+                <div>
+                  <dt>{{ 'field.manifestation_notes' | translate }}</dt>
+                  <dd>{{ copy.manifestation_notes }}</dd>
+                </div>
+              }
+            </dl>
+          } @empty {
+            <p class="app-letter-muted">{{ 'letter.not_provided' | translate }}</p>
+          }
+        </section>
+      </div>
+    </div>
+  } @else if (letterRes.error()) {
+    <section class="app-view-card app-letter-card" role="alert">
+      <p>{{ 'letter.load_error' | translate }}</p>
+      <button mat-stroked-button (click)="letterRes.reload()">{{ 'letter.retry' | translate }}</button>
+    </section>
+  }
+</div>
