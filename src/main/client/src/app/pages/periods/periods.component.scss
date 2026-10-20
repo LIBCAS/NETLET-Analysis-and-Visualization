@@ -2,20 +2,10 @@
 
 // redesign
 .app-periods-keywords {
-  @include mat.expansion-overrides((
-    container-background-color: transparent,
-    container-elevation-shadow: none,
-    header-collapsed-state-height: 42px,
-    header-expanded-state-height: 42px,
-    header-text-size: 14px,
-    header-text-weight: 850
-  ));
   @include mat.checkbox-overrides((label-text-size: 13px));
 
   margin: 0 16px 18px;
-  border-bottom: 1px solid var(--app-color-line);
 
-  mat-expansion-panel-header,
   mat-list {
     padding: 0;
   }
@@ -25,11 +15,6 @@
   }
 }
 
-// redesign: Material neposkytuje override pro vnitřní odsazení panelu.
-:host ::ng-deep .app-periods-keywords .mat-expansion-panel-body {
-  padding: 0;
-}
-
 // redesign: Trojice období se na užších obrazovkách posouvá vodorovně.
 .app-periods-comparison {
   overflow-x: auto;
@@ -37,4 +22,9 @@
   .app-view-pie-chart {
     min-width: 960px;
   }
+}
+
+// redesign: Doplňkový panel bezprostředně navazuje na poslední společnou facetu.
+app-facets {
+  padding-bottom: 0;
 }

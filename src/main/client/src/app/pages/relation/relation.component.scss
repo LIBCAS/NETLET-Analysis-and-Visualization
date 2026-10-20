@@ -2,18 +2,6 @@
 
 // redesign
 .app-relation-catalogs {
-  @include mat.expansion-overrides((
-    container-background-color: transparent,
-    container-elevation-shadow: none,
-    container-shape: 0,
-    header-collapsed-state-height: 42px,
-    header-expanded-state-height: 42px,
-    header-text-size: 14px,
-    header-text-weight: 850,
-    header-text-color: var(--app-color-ink),
-    header-indicator-color: var(--app-color-muted),
-    header-hover-state-layer-color: transparent
-  ));
   @include mat.list-overrides((
     list-item-one-line-container-height: 28px,
     list-item-label-text-size: 13px,
@@ -26,12 +14,6 @@
   ));
 
   margin: 18px 16px 0;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--app-color-line);
-
-  mat-expansion-panel-header {
-    padding: 0;
-  }
 
   mat-list {
     padding: 0;
@@ -56,12 +38,12 @@
   opacity: .7;
 }
 
-// redesign: Material nemá override token pro vnitřní odsazení panelu.
-:host ::ng-deep .app-relation-catalogs .mat-expansion-panel-body {
-  padding: 0;
-}
-
 // redesign: Navazující facety už mají horní odstup z panelu katalogů.
 app-facets {
   padding-top: 0;
+}
+
+// redesign: Prostor pod porovnávanými katalogy patří pouze rozbalenému panelu.
+.app-relation-catalogs.mat-expanded {
+  padding-bottom: 10px;
 }

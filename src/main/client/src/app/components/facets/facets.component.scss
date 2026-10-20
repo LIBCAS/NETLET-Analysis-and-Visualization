@@ -2,19 +2,6 @@
 
 // redesign
 :host {
-  @include mat.expansion-overrides((
-    container-background-color: transparent,
-    container-elevation-shadow: none,
-    container-shape: 0,
-    container-text-size: 13px,
-    header-collapsed-state-height: 42px,
-    header-expanded-state-height: 42px,
-    header-text-color: #2f3136,
-    header-text-size: 14px,
-    header-text-weight: 850,
-    header-indicator-color: #77706a,
-    header-hover-state-layer-color: transparent
-  ));
   @include mat.list-overrides((
     list-item-one-line-container-height: 34px,
     list-item-label-text-size: 13px,
@@ -49,30 +36,11 @@
   background: var(--app-color-gray-0);
 }
 
-.app-facet-group {
-  margin: 0;
-  border-bottom: 1px solid #e6dfd8;
-
-  mat-expansion-panel-header {
-    padding: 0;
-
-    &:hover mat-panel-title {
-      color: var(--app-color-primary-strong);
-    }
-  }
-
-  mat-panel-title {
-    min-width: 0;
-    margin-right: 12px;
-  }
-}
-
 .app-facet-catalogs {
   @include mat.expansion-overrides((
     header-collapsed-state-height: 38px,
     header-expanded-state-height: 38px
   ));
-  padding-bottom: 10px;
 }
 
 .app-facet-list {
@@ -139,10 +107,6 @@
 
 .app-selected .app-facet-color-dot {
   opacity: 1;
-}
-
-.app-facet-used {
-  padding-bottom: 12px;
 }
 
 .app-facet-item {
@@ -332,12 +296,8 @@
   }
 }
 
-// redesign: Pro vnitřní odsazení panelu a rozměry checkboxu Material nemá override tokeny.
+// redesign: Pro vnitřní odsazení vyhledávání a rozměry checkboxu Material nemá override tokeny.
 :host ::ng-deep {
-  .app-facet-group .mat-expansion-panel-body {
-    padding: 0;
-  }
-
   .app-facet-search {
     .mat-mdc-form-field-subscript-wrapper {
       height: auto;
@@ -404,4 +364,14 @@
 :host ::ng-deep .app-facet-search .mat-mdc-form-field-text-prefix {
   display: flex;
   align-self: center;
+}
+
+// redesign: Odsazení obsahu vybraných filtrů se neuplatňuje na sbalenou hlavičku.
+.app-facet-used.mat-expanded {
+  padding-bottom: 12px;
+}
+
+// redesign: Prostor pod seznamem katalogů patří pouze rozbalenému panelu.
+.app-facet-catalogs.mat-expanded {
+  padding-bottom: 10px;
 }

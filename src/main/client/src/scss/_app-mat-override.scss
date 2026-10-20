@@ -279,3 +279,54 @@
   top: calc((100% - var(--mat-radio-state-layer-size)) / 2);
   left: calc((100% - var(--mat-radio-state-layer-size)) / 2);
 }
+
+// redesign: Jednotné hlavičky všech facetů, včetně doplňkových panelů jednotlivých pohledů.
+.app-analysis-facets {
+  @include mat.expansion-overrides((
+    container-background-color: transparent,
+    container-elevation-shadow: none,
+    container-shape: 0,
+    container-text-size: 13px,
+    header-collapsed-state-height: 42px,
+    header-expanded-state-height: 42px,
+    header-text-color: var(--app-color-ink),
+    header-text-size: 14px,
+    header-text-weight: 850,
+    header-indicator-color: var(--app-color-muted),
+    header-hover-state-layer-color: transparent
+  ));
+
+  .app-facet-group {
+    margin: 0;
+  }
+
+  :is(.app-facet-group, .app-periods-keywords, .app-relation-catalogs) {
+    border-bottom: 1px solid var(--app-color-line);
+  }
+
+  mat-expansion-panel-header {
+    padding: 0;
+
+    &:hover mat-panel-title {
+      color: var(--app-color-primary-strong);
+    }
+  }
+
+  mat-panel-title {
+    min-width: 0;
+    margin-right: 12px;
+  }
+
+  // Material nemá override pro vnitřní padding ani záporné okraje SVG indikátoru.
+  .mat-expansion-panel-body {
+    padding: 0;
+  }
+
+  .mat-expansion-indicator {
+    flex-shrink: 0;
+
+    svg {
+      margin: 0;
+    }
+  }
+}
