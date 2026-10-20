@@ -1,4 +1,10 @@
 {
+  "catalog_detail": {
+    "description": "Přehled dopisů, osob a časového vývoje korespondence v katalogu.",
+    "search_letters": "Prohlédnout dopisy",
+    "correspondence": "Korespondence hlavních osob",
+    "main_people": "Hlavní osoby"
+  },
   "letter": {
     "detail": "Dopis",
     "summary": "Základní údaje",

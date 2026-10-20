@@ -1,4 +1,10 @@
 {
+  "catalog_detail": {
+    "description": "An overview of letters, people and the development of correspondence over time within the catalog.",
+    "search_letters": "Browse letters",
+    "correspondence": "Correspondence of key people",
+    "main_people": "Key people"
+  },
   "letter": {
     "detail": "Letter",
     "summary": "Basic information",
