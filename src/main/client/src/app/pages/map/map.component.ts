@@ -75,6 +75,7 @@ export class MapComponent {
 
   loading: boolean;
   running: boolean;
+  graphRendering: boolean;
   invalidTenant: boolean;
   map: Map;
   options = {
@@ -94,6 +95,7 @@ export class MapComponent {
   authors: JSONFacet[];
   recipients: JSONFacet[];
   mentioned: JSONFacet[];
+  years: JSONFacet[];
 
   graphOptions: ECOption = {};
   graphChart: EChartsType;
@@ -131,7 +133,7 @@ export class MapComponent {
       const sc = this.state.stateChanged();
       if (sc > 0) {
         this.limits = this.state.getTenantsRange();
-        this.getData(true);
+        this.getData(true, true);
       } else {
         this.loading = false;
         this.facets.set({});
@@ -162,7 +164,7 @@ export class MapComponent {
       setTimeout(() => {
 
         this.limits = this.state.getTenantsRange();
-        this.getData(true);
+        this.getData(true, true);
       }, 10)
     }
   }
@@ -174,10 +176,10 @@ export class MapComponent {
 
   changeTenant() {
     this.limits = this.state.getTenantsRange();
-    this.getData(true);
+    this.getData(true, true);
   }
 
-  getData(withMap: boolean) {
+  getData(withMap: boolean, withYears: boolean) {
     this.loading = true;
     this.invalidTenant = false;
     this.closeInfo();
@@ -213,6 +215,9 @@ export class MapComponent {
       //   return;
       // }
       this.facets.set(resp.facets);
+      if (withYears) {
+        this.years = resp.facets.years;
+      }
       if (resp.stats?.stats_fields.latitude) {
         const lat = resp.stats.stats_fields.latitude;
         const lon = resp.stats.stats_fields.longitude;
@@ -241,18 +246,122 @@ export class MapComponent {
             }
           ]
         });
-        setTimeout(() => {
-          this.fitBounds();
-        }, 100);
+        if (!this.running) {
+          setTimeout(() => {
+            this.fitBounds();
+          }, 100);
+        }
       }
 
       this.loading = false;
     });
   }
 
+  fillNodes(facet: any, nodes: any) {
+    facet.forEach((f: { val: string, count: number }) => {
+      const place = this.state.places()[f.val];
+      if (!nodes.find((n: any) => n.id === place.id)) {
+      let symbolSize = this.minSize;
+      if (f.count > 0) {
+        symbolSize = this.maxSize * (f.count) / this.maxCount() + this.minSize;
+      } else {
+        symbolSize = this.minSize;
+      }
+      const itemStyle = {
+        //borderColor: '#fff',
+        //borderWidth: 2,
+        //color: this.getColor(symbolSize);
+        color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [
+          { offset: 0, color: '#ff7e5f' },  // Barva uprostřed
+          { offset: 1, color: this.getColor(symbolSize) },   // Barva na okrajích
+        ]),
+      }
+
+      nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: f.count, color: '#00f', 
+        //symbol: 'image://' + svgGradientCircle,
+        symbolSize: symbolSize, 
+        itemStyle
+       });
+      }
+
+    });
+  }
+
+  fillLinks(facet: any, links: any[] ) {
+    facet.forEach((f: { val: string, count: number, tenant: any }) => {
+      const parts = f.val.split('-');
+      const linkId = f.val;
+      const place_origin = this.state.places()[parts[0]];
+      const place_destination = this.state.places()[parts[1]];
+      if (place_origin && place_destination && place_origin.latitude && place_destination.latitude) {
+        links.push({
+          id: linkId,
+          source: parts[0],
+          target: parts[1],
+          authors: [],
+          recipients: [],
+          label: place_origin.name + ' > ' + place_destination.name,
+          labelReversed: place_destination.name + ' > ' + place_origin.name,
+          count: f.count,
+          lineStyle: {
+            color: this.config.tenant_colors[f.tenant.buckets[0].val],
+            width: 1,
+            opacity: 1
+          }
+        });
+      }
+    });
+  }
+
+  mapInTime: any;
+  getMapInTime() {
+    const p: any = {};
+    p.tenant = this.state.selectedTenants().map(t => t.val);
+    p.tenant_year_range = this.state.getTenantsRange().toString();
+    p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
+
+    this.state.addFilters(p);
+
+    this.service.getMapInTime(p as HttpParams).subscribe((resp: any) => {
+      if (!resp) {
+        return;
+      }
+      this.mapInTime = resp.facets;
+    });
+  }
+
+  graphInTime() {
+    const nodes: any = [];
+    const links: any = [];
+    if (!this.mapInTime || this.graphRendering) {
+      return
+    }
+    const limitedYears = this.mapInTime.years.buckets.filter((b: any) => {
+      return b.val >= this.limits[0].getFullYear() && b.val <= this.limits[1].getFullYear();
+    });
+    limitedYears.forEach((y: any) => {
+      if (y.places) {
+        this.fillNodes(y.places.buckets, nodes);
+      }
+      if (y.links) {
+        this.fillLinks(y.links.buckets, links);
+      }
+      
+    }); 
+    this.graphRendering = true;
+    this.graphChart.setOption({
+      series: {
+        data: nodes,
+        links: links
+      }
+    })
+  }
+
   changeRunning(r: boolean) {
+    this.getMapInTime();
     this.running = r;
     this.graphChart.setOption({
+      animation: false,
       series: [
         {
           animation: !this.running
@@ -263,7 +372,12 @@ export class MapComponent {
 
   changeLimits(limits: [Date, Date]) {
     this.limits = limits;
-    this.getData(false);
+    if (this.running) {
+      this.graphInTime();
+    } else {
+      this.getData(true, false);
+    }
+    
   }
 
   activeIdentity: JSONFacet = null;
@@ -274,7 +388,7 @@ export class MapComponent {
   usedFacets: { field: string, value: string }[] = [];
   onFiltersChanged(usedFacets: { field: string, value: string }[]) {
     this.usedFacets = usedFacets;
-    this.getData(true);
+    this.getData(true, true);
   }
 
   graphData: {
@@ -440,6 +554,7 @@ export class MapComponent {
     // this.map.addLayer(this.linkLayer);
     // this.map.addLayer(this.nodeLayer);
     this.graphOptions = {
+      lazyUpdate: true,
       lmap: {
         // See https://leafletjs.com/reference.html#map-option for details
         // NOTE: note that this order is reversed from Leaflet's [lat, lng]!
@@ -513,6 +628,10 @@ export class MapComponent {
 
     this.graphChart.setOption(this.graphOptions);
 
+    this.graphChart.on('rendered', (params: any) => {
+      this.graphRendering = false;
+    });
+
     this.graphChart.on('click', (params: any) => {
       if (params.dataType === 'node') {
         this._ngZone.run(() => {
@@ -564,9 +683,11 @@ export class MapComponent {
     //var layerControl = L.control.layers(baseMaps).addTo(lmap);
 
     this.filterGeos();
-    setTimeout(() => {
-      this.fitBounds();
-    }, 100);
+    if (!this.running) {
+      setTimeout(() => {
+        this.fitBounds();
+      }, 100);
+    }
 
 
     lmap.on('enterFullscreen', () => {

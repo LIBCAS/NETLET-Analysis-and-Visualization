@@ -104,7 +104,22 @@ public class DataServlet extends HttpServlet {
                 JSONObject json = new JSONObject();
                 try {
                     HikoIndexer hi = new HikoIndexer();
-                    json = hi.indexIdentities(null);
+                    json = hi.indexIdentities(req.getParameter("tenant"));
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE, "Error {0}", ex);
+                    json.put("error", ex.toString());
+                }
+                return json;
+            }
+        },
+        INDEX_PROFESSIONS {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+                JSONObject json = new JSONObject();
+                try {
+                    HikoIndexer hi = new HikoIndexer();
+                    json = hi.indexGlobalProfessions();
                 } catch (Exception ex) {
                     LOGGER.log(Level.SEVERE, "Error {0}", ex);
                     json.put("error", ex.toString());
@@ -205,6 +220,12 @@ public class DataServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 return IndexSearcher.getMapLetters(request);
+            }
+        },
+        MAP_IN_TIME{
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.mapInTime(request); 
             }
         },
         IDENTITIES{

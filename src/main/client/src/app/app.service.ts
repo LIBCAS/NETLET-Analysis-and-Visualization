@@ -77,6 +77,10 @@ export class AppService {
     return this.get('data/map', params)
   }
 
+  getMapInTime(params: HttpParams): Observable<any> {
+    return this.get('data/map_in_time', params)
+  }
+
   getKeywords(params: HttpParams): Observable<any> {
     return this.get('data/keywords', params)
   }

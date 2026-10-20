@@ -640,7 +640,7 @@ public class HikoIndexer {
         id = "global_" + gi.getInt("id");
       }
       doc.addField("identity_id", id);
-      doc.addField("identity_role", role);
+      //doc.addField("identity_role", role);
       doc.addField("identity_name", rs.getString("name"));
 
       doc.addField("identity_" + role, rs.getString("name"));
@@ -1424,6 +1424,7 @@ public class HikoIndexer {
     LOGGER.log(Level.INFO, "Indexing HIKO Professions");
     try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       Set<String> tenants = Options.getInstance().getJSONObject("test_mappings").keySet();
+      indexGlobalProfessions(client, ret, "brezina");
       for (String tenant : tenants) {
         indexTenantProfessions(client, ret, tenant);
       }

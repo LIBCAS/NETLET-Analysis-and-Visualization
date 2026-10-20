@@ -435,7 +435,7 @@ export class YearsChartComponent {
                 symbol: 'none',
                 label: {
                   show: false,
-                  formatter: '1. období'
+                  formatter: '2. období'
                 },
                 xAxis: '1870'
               },
@@ -443,7 +443,7 @@ export class YearsChartComponent {
                 symbol: 'none',
                 label: {
                   show: false,
-                  formatter: '1. období'
+                  formatter: '3. období'
                 },
                 xAxis: '1939'
               }
@@ -496,19 +496,22 @@ export class YearsChartComponent {
     this.animation = setInterval(() => {
       this.limits = [startRok, endRok++];
       this.fireChangeLimits();
-      this.onChangeRunning.emit(true);
       this.setChartTitle();
 
-      // this.chartRok.dispatchAction({
-      //   type: 'brush',
-      //   areas: [
-      //     {
-      //       brushType: 'lineX',
-      //       coordRange: [startRok + '', endRok + ''],
-      //       xAxisIndex: 0
-      //     }
-      //   ]
-      // });
+      this.chartRok.setOption({
+        series: {
+          markArea: {
+            itemStyle: {
+              opacity: 0.3
+            },
+            silent: true,
+            data: [
+              [{xAxis: startRok + ''},{xAxis: endRok + ''}]
+            ]
+          }
+        }
+      });
+
 
       if (endRok >= maxRok) {
         this.stop();
@@ -521,37 +524,46 @@ export class YearsChartComponent {
     this.running = true;
     this.onChangeRunning.emit(true);
     let startRok = this.limits[0];
-    let endRok = this.limits[1];
+    
+    let endRok = startRok + 1;
     const maxRok = this.state.getTenantsRange()[1].getFullYear();
     this.animation = setInterval(() => {
-      this.limits = [startRok++, endRok++];
-      this.fireChangeLimits();
-      this.running = true;
-      this.onChangeRunning.emit(this.running);
+      this.limits = [startRok, endRok];
+      //this.fireChangeLimits();
+      this.onChangeLimits.emit([new Date(this.limits[0] + '-01-01'), new Date(this.limits[1] + '-12-31')]);
       this.setChartTitle();
 
-      // this.chartRok.dispatchAction({
-      //   type: 'brush',
-      //   areas: [
-      //     {
-      //       brushType: 'lineX',
-      //       coordRange: [startRok + '', endRok + ''],
-      //       xAxisIndex: 0
-      //     }
-      //   ]
-      // });
+      this.chartRok.setOption({
+        series: {
+          markArea: {
+            itemStyle: {
+              opacity: 0.3
+            },
+            silent: true,
+            data: [
+              [{xAxis: startRok + ''},{xAxis: endRok + ''}]
+            ]
+          }
+        }
+      });
+      startRok++; endRok++;
 
       if (endRok >= maxRok) {
-        clearInterval(this.animation);
-        this.running = false;
-        this.onChangeRunning.emit(this.running);
+        this.stop();
       }
-    }, 1500);
+    }, 1000);
   }
 
   stop() {
     this.running = false;
     this.onChangeRunning.emit(this.running);
+    this.chartRok.setOption({
+        series: {
+          markArea: {
+            data: []
+          }
+        }
+      })
     clearInterval(this.animation);
   }
 }

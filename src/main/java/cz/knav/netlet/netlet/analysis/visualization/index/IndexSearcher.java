@@ -688,6 +688,54 @@ public class IndexSearcher {
     }
     return ret;
   }
+  public static JSONObject mapInTime(HttpServletRequest request) {
+    JSONObject ret = new JSONObject();
+    try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+
+      String lang = request.getParameter("lang");
+      if (lang == null) {
+        lang = "cs";
+      }
+
+      String date_range = request.getParameter("date_range");
+      if (date_range == null || date_range.isBlank()) {
+        date_range = "1000,2025";
+      }
+      String[] years = date_range.split(",");
+      RangeFacetMap yearsFacet = new RangeFacetMap("date_year", Integer.parseInt(years[0].substring(0, 4)), Integer.parseInt(years[1].substring(0, 4)), 1)
+              .withDomain(new DomainMap().withTagsToExclude("ffyear_range"))
+              .setOtherBuckets(RangeFacetMap.OtherBuckets.AFTER);
+
+      JsonQueryRequest jrequest = new JsonQueryRequest()
+              .setQuery("*:*")
+              //.withFilter("status:publish")
+              .setLimit(0)
+              .withFilter("origin:* OR destination:*");
+
+        jrequest = jrequest.withParam("stats", "true")
+                .withParam("stats.field", new String[]{"latitude", "longitude"})
+                .withFacet("years", yearsFacet
+                .withSubFacet("places", new TermsFacetMap("place_id")
+                        .setLimit(-1)
+                        .setMinCount(1))
+                .withSubFacet("links", new TermsFacetMap("link_id") 
+                        .withSubFacet("tenant", new TermsFacetMap("tenant"))
+                        .setLimit(-1)
+                        .setMinCount(1)));
+      
+
+      jrequest = addFilters(request, jrequest, lang);
+      jrequest.setResponseParser(new InputStreamResponseParser("json"));
+      NamedList<Object> resp = solr.request(jrequest, "hiko");
+      InputStream is = (InputStream) resp.get("stream");
+      ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, "Error {0}", ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
 
   public static JSONObject identityFacets(HttpServletRequest request) {
     JSONObject ret = new JSONObject();
