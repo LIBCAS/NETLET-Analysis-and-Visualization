@@ -1,6 +1,8 @@
 import { httpResource } from '@angular/common/http';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, PRIMARY_OUTLET, Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { JSONFacet } from '../../shared/facet';
 
@@ -26,7 +28,7 @@ echarts.registerLocale("CZ", langCZ)
 
 @Component({
   selector: 'app-identity',
-  imports: [TranslateModule, NgxEchartsModule, NgxEchartsDirective, MatProgressBarModule, MatButtonModule, MatIconModule],
+  imports: [TranslateModule, RouterLink, NgxEchartsModule, NgxEchartsDirective, MatProgressBarModule, MatButtonModule, MatIconModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -42,24 +44,32 @@ export class IdentityComponent {
   private config = inject(AppConfiguration);
   private state = inject(AppState);
 
-  identityRes: any = httpResource(() => ({
+  readonly source = this.getSource();
+  readonly searchUrl = this.router.createUrlTree(['/'], {
+    queryParams: this.source?.url.queryParams ?? this.activatedRoute.snapshot.queryParams,
+  });
+  readonly language = toSignal(this.translation.onLangChange.pipe(map(event => event.lang)), {
+    initialValue: this.translation.currentLang || 'cs',
+  });
+
+  identityRes: any = httpResource(() => this.identityId() ? ({
     url: `/api/data/get_identity`,
     method: 'GET',
     params: {
       'id': this.identityId()
     }
-  }));
-  identity = computed<any>(() => this.identityRes.value());
+  }) : undefined);
+  identity = computed<any>(() => this.identityRes.hasValue() ? this.identityRes.value() : undefined);
 
   nameInTime = signal('');
-  identityInTimeRes: any = httpResource(() => ({
+  identityInTimeRes: any = httpResource(() => this.identityId() && this.nameInTime() ? ({
     url: `/api/data/identity_in_time`,
     method: 'GET',
     params: {
       'id': this.identityId(), 'id2': this.nameInTime()
     }
-  }));
-  identityInTime = computed<any>(() => this.identityInTimeRes.value());
+  }) : undefined);
+  identityInTime = computed<any>(() => this.identityInTimeRes.hasValue() ? this.identityInTimeRes.value() : undefined);
 
   limits: [Date, Date];
   yearsChartOptions: EChartsOption | any;
@@ -76,26 +86,26 @@ export class IdentityComponent {
   identityYearsChart: ECharts;
   identityYearsChartType: string = 'line';
 
-  loading = signal(false);
+  loading = computed(() => this.identityInTimeRes.isLoading());
 
   constructor() {
-    this.activatedRoute.params.subscribe((params) => {
+    this.activatedRoute.params.pipe(takeUntilDestroyed()).subscribe((params) => {
+      this.nameInTime.set('');
+      this.excludedTenants = [];
       this.identityId.set(params['id']);
     });
 
     effect(() => {
-      const identity = this.identityRes.value();
+      const identity = this.identity();
       if (identity) {
-        setTimeout(() => {
-          this.setYearsOptions();
-          this.setTenantsPieChart();
-          this.setIdentitiesPieChart();
-        }, 100)
+        this.setYearsOptions();
+        this.setTenantsPieChart();
+        this.setIdentitiesPieChart();
       }
     });
 
     effect(() => {
-      const i = this.identityInTimeRes.value();
+      const i = this.identityInTime();
       if (i) {
         this.setIdentityYearsOptions();
       }
@@ -107,6 +117,24 @@ export class IdentityComponent {
     this.state.usedFacets.set([{ field, value: this.identity()?.name, op: '' }]);
     this.router.navigate(['timeline'], { queryParams: { s: this.state.encodeState() } });
 
+  }
+
+  private getSource() {
+    const previous = this.router.currentNavigation()?.previousNavigation ?? this.router.lastSuccessfulNavigation();
+    const url = previous?.finalUrl ?? previous?.extractedUrl;
+    const segments = url?.root.children[PRIMARY_OUTLET]?.segments.map(segment => segment.path) ?? [];
+    const view = this.state.views.find(view => view.route && view.route === segments.join('/'));
+    const label = view ? `home.${view.header}.header` :
+      segments[0] === 'letter' ? 'letter.detail' :
+      segments[0] === 'catalog' ? 'field.tenant' : null;
+    return label && url ? { label, url } : null;
+  }
+
+  identityType(value: string): string {
+    this.language();
+    const key = `identity_detail.types.${value}`;
+    const translated = this.translation.instant(key);
+    return translated === key ? value : translated;
   }
 
   excludedTenants: string[] = [];
@@ -134,10 +162,8 @@ export class IdentityComponent {
 
     this.identitiesBarChart.on('click', (params: any) => {
       if (params.componentType === 'yAxis') {
-        this.loading.set(true);
         this.nameInTime.set(params.value);
       } else if (params.componentType === 'series') {
-        this.loading.set(true);
         this.nameInTime.set(params.name);
       }
     });
@@ -155,7 +181,7 @@ export class IdentityComponent {
   setTenantsPieChart() {
     const data: any[] = [];
 
-    this.identity().stats.tenant.buckets.forEach((p: JSONFacet) => {
+    (this.identity().stats?.tenant?.buckets ?? []).forEach((p: JSONFacet) => {
       let i = 0;
       if (p.val) {
         data.push({
@@ -179,8 +205,7 @@ export class IdentityComponent {
         right: 10,
         data: data.map(a => a.name),
         formatter: name => {
-          var series: any = this.tenantsPieChart.getOption()['series'];
-          var value = series[0].data.filter((row: any) => row.name === name)[0].value
+          const value = data.find(row => row.name === name)?.value ?? 0;
           return name + ' - ' + value;
         },
       },
@@ -225,8 +250,8 @@ export class IdentityComponent {
 
   setYearsData() {
     const series: any = [];
-    const limits = this.getYearsLimits(this.identity().stats.tenant.buckets);
-    if (this.identity().stats.author?.years) {
+    const limits = this.getYearsLimits((this.identity().stats?.tenant?.buckets ?? []));
+    if (this.identity().stats?.author?.years) {
 
       const d = this.identity().stats.author.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
@@ -245,8 +270,8 @@ export class IdentityComponent {
         })
       });
     }
-    if (this.identity().stats.recipient?.years) {
-      
+    if (this.identity().stats?.recipient?.years) {
+
       const d = this.identity().stats.recipient.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
         name: 'Recipient',
@@ -264,8 +289,8 @@ export class IdentityComponent {
         })
       });
     }
-    if (this.identity().stats.mentioned?.years) {
-      
+    if (this.identity().stats?.mentioned?.years) {
+
       const d = this.identity().stats.mentioned.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       series.push({
         name: 'Mentioned',
@@ -324,8 +349,8 @@ export class IdentityComponent {
   identitiesPieHeight: string = '300px';
   setIdentitiesPieChart() {
     const recipients: any[] = [];
-    if (this.identity().stats.author.recipients) {
-      this.identity().stats.author.recipients.buckets.forEach((p: JSONFacet) => {
+    if (this.identity().stats?.author?.recipients) {
+      (this.identity().stats?.author?.recipients?.buckets ?? []).forEach((p: JSONFacet) => {
         let i = 0;
         if (p.val) {
           recipients.unshift([p.count, p.val]);
@@ -334,8 +359,8 @@ export class IdentityComponent {
     }
 
     const authors: any[] = [];
-    if (this.identity().stats.recipient.authors)
-      this.identity().stats.recipient.authors.buckets.forEach((p: JSONFacet) => {
+    if (this.identity().stats?.recipient?.authors)
+      (this.identity().stats?.recipient?.authors?.buckets ?? []).forEach((p: JSONFacet) => {
         let i = 0;
         if (p.val) {
           authors.push([p.count, p.val]);
@@ -344,17 +369,17 @@ export class IdentityComponent {
 
     const dimensions = [...new Set([
       'names',
-      ...this.identity().stats.recipient.authors.buckets.map((c: JSONFacet) => c.val), 
-      ...this.identity().stats.author.recipients.buckets.map((c: JSONFacet) => c.val)])];
+      ...(this.identity().stats?.recipient?.authors?.buckets ?? []).map((c: JSONFacet) => c.val),
+      ...(this.identity().stats?.author?.recipients?.buckets ?? []).map((c: JSONFacet) => c.val)])];
 
     const source: any[] = [];
-    this.identity().stats.author.recipients.buckets.forEach((c: JSONFacet) => {
+    (this.identity().stats?.author?.recipients?.buckets ?? []).forEach((c: JSONFacet) => {
       const s: any = {names: c.val};
       s['recipient']= c.count;
       source.push(s)
     });
     //const s2: any = {names: 'author'};
-    this.identity().stats.recipient.authors.buckets.forEach((c: JSONFacet) => {
+    (this.identity().stats?.recipient?.authors?.buckets ?? []).forEach((c: JSONFacet) => {
       const s: any = {names: c.val};
       s['author']= c.count;
       source.push(s)
@@ -366,17 +391,17 @@ export class IdentityComponent {
       };
 
     //this.identitiesPieHeight = Math.max(recipients.length, authors.length) * 30 + 'px';
-    this.identitiesPieHeight = dimensions.length * 30 + 'px';
+    this.identitiesPieHeight = Math.max(300, dimensions.length * 30) + 'px';
 
     this.identitiesBarOptions = {
 
       dataset: dataset,
-      series: [{ 
-        type: 'bar', seriesLayoutBy: 'row', 
+      series: [{
+        type: 'bar', seriesLayoutBy: 'row',
           itemStyle: this.state.getBarItemStyle(this.config.colors['author'], this.config.colors['author1'], true)
         },
-           { 
-            type: 'bar', seriesLayoutBy: 'row' , 
+           {
+            type: 'bar', seriesLayoutBy: 'row' ,
           itemStyle: this.state.getBarItemStyle(this.config.colors['recipient'], this.config.colors['recipient1'], true)
           }
           ],
@@ -409,7 +434,7 @@ export class IdentityComponent {
         // formatter: '{a0}<br />${this.identity().stats.identities[${b0}].name}: {c0}'
         formatter: (params: any) => {
           //console.log(params)
-          return params.seriesName + '<br/>' + this.identity().stats.identities[params.name].name + ' <strong>' + params.value[0] + '</strong>'
+          return params.seriesName + '<br/>' + (this.identity().stats?.identities?.[params.name]?.name ?? params.name) + ' <strong>' + params.value[0] + '</strong>'
         }
       },
       grid: {
@@ -422,7 +447,7 @@ export class IdentityComponent {
         axisLabel: {
           interval: 0,
           formatter: (name: string) => {
-            return this.identity().stats.identities[name].name;
+            return this.identity().stats?.identities?.[name]?.name ?? name;
           },
         },
       },
@@ -458,7 +483,6 @@ export class IdentityComponent {
         data: d.map((c: JSONFacet) => [c.val, c.count])
       });
     }
-    this.loading.set(false);
 
     this.identityYearsChartOptions = {
       tooltip: {

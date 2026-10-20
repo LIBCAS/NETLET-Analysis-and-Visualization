@@ -1,4 +1,23 @@
 {
+  "identity_detail": {
+    "detail": "Detail osoby",
+    "description": "Základní údaje, korespondenční role a vývoj vztahů v čase.",
+    "not_provided": "Neuvedeno",
+    "all_letters": "Všechny dopisy",
+    "sent_letters": "Odeslané dopisy",
+    "received_letters": "Přijaté dopisy",
+    "mentions": "Zmínky v dopisech",
+    "correspondents": "Adresáti a autoři (max. 100)",
+    "selection_hint": "Kliknutím na jméno nebo sloupec zobrazíte časový vývoj vzájemné korespondence.",
+    "select_person": "Vyberte osobu v grafu vlevo.",
+    "load_error": "Údaje o osobě se nepodařilo načíst.",
+    "retry": "Zkusit znovu",
+    "types": {
+      "person": "Osoba",
+      "institution": "Instituce",
+      "organization": "Organizace"
+    }
+  },
   "catalog_detail": {
     "description": "Přehled dopisů, osob a časového vývoje korespondence v katalogu.",
     "search_letters": "Prohlédnout dopisy",
@@ -246,10 +265,10 @@
     "signature": "Signatura",
     "manifestation_notes": "Poznámka k manifestaci",
     "location_note": "Poznámka k uložení",
-    "birth_year": "Rok narozeni",
-    "death_year": "Rok umrti",
+    "birth_year": "Rok narození",
+    "death_year": "Rok úmrtí",
     "identity_type": "Typ",
-    "nationality": "Narodnost",
+    "nationality": "Národnost",
     "stats": "Statistiky",
     "year_from": "Od roku",
     "year_to": "Do roku",

@@ -1,97 +1,165 @@
-@if (identity()) {
+<div class="app-loading">
+  @if (identityRes.isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+</div>
 
-<div class="app-detail">
-  <h2>{{ identity()?.name }}</h2>
-
-  <fieldset>
-    <legend>{{ 'field.detail' | translate }}</legend>
-
-    <div>
-      <label>{{ 'field.birth_year' | translate }}:</label>
-      <div>{{ identity().birth_year }}</div>
-    </div>
-
-    <div>
-      <label>{{ 'field.death_year' | translate }}:</label>
-      <div>{{ identity().death_year }}</div>
-    </div>
-
-    <div>
-      <label>{{ 'field.identity_type' | translate }}:</label>
-      <div>{{ identity().type }}</div>
-    </div>
-
-    <div>
-      <label>{{ 'field.nationality' | translate }}:</label>
-      <div>{{ identity().nationality }}</div>
-    </div>
-
-    <div>
-      <label>{{ 'field.professions' | translate }}:</label>
-      @for (p of identity().professions; track p) {
-      <div>{{ p.name.cs }}</div>
+<div class="app-identity">
+  <nav class="app-view-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+    <ol>
+      <li><a [routerLink]="searchUrl">{{ 'navbar.search' | translate }}</a></li>
+      @if (source) {
+        <li>
+          <mat-icon aria-hidden="true">chevron_right</mat-icon>
+          <a [routerLink]="source.url">{{ source.label | translate }}</a>
+        </li>
       }
-    </div>
+      <li aria-current="page">
+        <mat-icon aria-hidden="true">chevron_right</mat-icon>
+        {{ identity()?.name || ('identity_detail.detail' | translate) }}
+      </li>
+    </ol>
+  </nav>
 
-  </fieldset>
+  @if (identity(); as data) {
+    <header class="app-view-header app-view-card">
+      <p>{{ 'identity_detail.detail' | translate }}</p>
+      <h1>{{ data.name }}</h1>
+      <div>{{ 'identity_detail.description' | translate }}</div>
+    </header>
 
+    <section class="app-view-card app-view-chart" [attr.aria-label]="'field.detail' | translate">
+      <dl class="app-identity-details">
+        <div>
+          <dt>{{ 'field.birth_year' | translate }}</dt>
+          <dd>{{ data.birth_year || ('identity_detail.not_provided' | translate) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'field.death_year' | translate }}</dt>
+          <dd>{{ data.death_year || ('identity_detail.not_provided' | translate) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'field.identity_type' | translate }}</dt>
+          <dd>{{ data.type ? identityType(data.type) : ('identity_detail.not_provided' | translate) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'field.nationality' | translate }}</dt>
+          <dd>{{ data.nationality || ('identity_detail.not_provided' | translate) }}</dd>
+        </div>
+        <div class="app-identity-professions">
+          <dt>{{ 'field.professions' | translate }}</dt>
+          <dd>
+            @for (profession of data.professions; track $index) {
+              <span>{{ profession.name?.[language()] || profession.name?.cs || profession.name?.en || ('identity_detail.not_provided' | translate) }}</span>
+            } @empty {
+              {{ 'identity_detail.not_provided' | translate }}
+            }
+          </dd>
+        </div>
+      </dl>
+    </section>
 
-  <fieldset>
-    <legend>{{ 'field.stats' | translate }}</legend>
+    <dl class="app-view-stats" [attr.aria-label]="'field.stats' | translate">
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">mail_outline</mat-icon>
+          {{ 'field.letters' | translate }}
+        </dt>
+        <dd>{{ data.stats?.count ?? 0 }}</dd>
+        <button mat-stroked-button (click)="search('identities')">{{ 'identity_detail.all_letters' | translate }}</button>
+      </div>
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">edit_note</mat-icon>
+          {{ 'field.author' | translate }}
+        </dt>
+        <dd>{{ data.stats?.author?.count ?? 0 }}</dd>
+        <button mat-stroked-button (click)="search('authors')">{{ 'identity_detail.sent_letters' | translate }}</button>
+      </div>
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">forward_to_inbox</mat-icon>
+          {{ 'field.recipient' | translate }}
+        </dt>
+        <dd>{{ data.stats?.recipient?.count ?? 0 }}</dd>
+        <button mat-stroked-button (click)="search('recipients')">{{ 'identity_detail.received_letters' | translate }}</button>
+      </div>
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">people_outline</mat-icon>
+          {{ 'field.mentioned' | translate }}
+        </dt>
+        <dd>{{ data.stats?.mentioned?.count ?? 0 }}</dd>
+        <button mat-stroked-button (click)="search('mentioned')">{{ 'identity_detail.mentions' | translate }}</button>
+      </div>
+    </dl>
 
-    <div>
-      <label><button matIconButton class="app-hiko app-small-icon-button" [title]="'action.search' | translate" 
-                 (click)="search('identities')"><mat-icon>search</mat-icon></button>{{ 'field.letters' | translate }}:</label>
-      <div>{{ identity().stats.count }}</div>
-    </div>
-
-    <div>
-      <label><button matIconButton class="app-hiko app-small-icon-button" [title]="'action.search' | translate" 
-                 (click)="search('authors')"><mat-icon>search</mat-icon></button>{{ 'field.author' | translate }}:</label>
-      <div>{{ identity().stats.author.count }}</div>
-    </div>
-
-    <div>
-      <label><button matIconButton class="app-hiko app-small-icon-button" [title]="'action.search' | translate" 
-                 (click)="search('recipients')"><mat-icon>search</mat-icon></button>{{ 'field.recipient' | translate }}:</label>
-      <div>{{ identity().stats.recipient.count }}</div>
-    </div>
-
-    <div>
-      <label><button matIconButton class="app-hiko app-small-icon-button" [title]="'action.search' | translate" 
-                 (click)="search('mentioned')"><mat-icon>search</mat-icon></button>{{ 'field.stats_mentioned' | translate }}:</label>
-      <div>{{ identity().stats.mentioned.count }}</div>
-    </div>
-    <div  style="height: 300px; width: 100%; position: relative;display: flex; ">
-      <div style="height: 250px; width: 600px; position: relative;">
-        <div echarts style="height: 100%; width: 100%;" [initOpts]="{ locale: 'CZ' }" [options]="yearsChartOptions"
+    <div class="app-identity-overview">
+      <section class="app-view-card app-view-chart" [attr.aria-label]="'letters_count_by_year' | translate">
+        <div
+          echarts
+          class="app-identity-overview-chart"
+          [initOpts]="{ locale: 'CZ' }"
+          [options]="yearsChartOptions"
           (chartInit)="onYearsChartInit($event)">
         </div>
-      </div>
-
-      <div style="height: 250px; width: 600px; position: relative;">
-        <div echarts style="width: 100%; height:100%;" [options]="tenantsPieOptions" (chartInit)="onTenantsPieChartInit($event)">
+      </section>
+      <section class="app-view-card app-view-chart" [attr.aria-label]="'tenants' | translate">
+        <div
+          echarts
+          class="app-identity-overview-chart"
+          [options]="tenantsPieOptions"
+          (chartInit)="onTenantsPieChartInit($event)">
         </div>
-      </div>
+      </section>
     </div>
-    
-    <h3 style="padding-left:50%;">Adresati / Autori (max 100)</h3>
-    <div  style="height: 300px; width: 100%; position: relative;display: flex; ">
-      <div style="height: 300px; overflow-y: scroll;width: 70%; position: relative;">
-        <div [style.height]="identitiesPieHeight" style="width: 100%; position: relative;">
-          <div echarts style="width: 100%; height:100%;" [options]="identitiesBarOptions" (chartInit)="onIdentitiesBarChartInit($event)">
+
+    <section class="app-view-card app-view-chart">
+      <h2 class="app-identity-section-title">{{ 'identity_detail.correspondents' | translate }}</h2>
+      <p class="app-identity-hint">{{ 'identity_detail.selection_hint' | translate }}</p>
+      <div class="app-identity-correspondence">
+        <div class="app-identity-correspondents-scroll">
+          <div class="app-identity-correspondents-chart" [style.height]="identitiesPieHeight">
+            <div
+              echarts
+              class="app-identity-chart-fill"
+              [options]="identitiesBarOptions"
+              (chartInit)="onIdentitiesBarChartInit($event)">
+            </div>
           </div>
         </div>
-      </div>
 
-      <div style="height: 250px; width: 30%; position: relative; top: 20px;">
-        <div style="position: relative;top:0;">@if(loading()){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
-        <div echarts [class.app-loading-identity]="loading()" style="height: 100%; width: 100%;" [initOpts]="{ locale: 'CZ' }" [options]="identityYearsChartOptions"
-          (chartInit)="onIdentityYearsChartInit($event)">
+        <div class="app-identity-correspondence-chart" [attr.aria-busy]="loading()">
+          @if (nameInTime()) {
+            <div class="app-identity-loading">
+              @if (loading()) {
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+              }
+            </div>
+            <div
+              echarts
+              class="app-identity-chart-fill"
+              [class.app-loading-identity]="loading()"
+              [initOpts]="{ locale: 'CZ' }"
+              [options]="identityYearsChartOptions"
+              (chartInit)="onIdentityYearsChartInit($event)">
+            </div>
+            @if (identityInTimeRes.error()) {
+              <button mat-stroked-button (click)="identityInTimeRes.reload()">{{ 'identity_detail.retry' | translate }}</button>
+            }
+          } @else {
+            <div class="app-identity-placeholder">
+              <mat-icon aria-hidden="true">touch_app</mat-icon>
+              <p>{{ 'identity_detail.select_person' | translate }}</p>
+            </div>
+          }
         </div>
       </div>
+    </section>
+  } @else if (identityRes.error()) {
+    <section class="app-view-card app-view-chart" role="alert">
+      <p>{{ 'identity_detail.load_error' | translate }}</p>
+      <button mat-stroked-button (click)="identityRes.reload()">{{ 'identity_detail.retry' | translate }}</button>
+    </section>
+  }
 </div>
-  </fieldset>
-
-</div>
-}

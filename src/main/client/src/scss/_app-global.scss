@@ -545,3 +545,46 @@ main:is(.app-scroll-page, .app-scroll-panels) .app-view-content.app-view-long-co
   width: 100%;
   height: 350px;
 }
+
+// redesign: Společné statistické karty detailu katalogu a osoby.
+.app-view-stats,
+.app-catalog-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--app-analysis-gap);
+  margin: 0;
+
+  > div {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    padding: var(--app-view-chart-padding);
+  }
+
+  dt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--app-color-muted);
+    font-weight: 700;
+  }
+
+  mat-icon {
+    flex-shrink: 0;
+    color: var(--app-color-accent);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+  }
+}
+
+
+@media (max-width: 980px) {
+  .app-view-stats,
+  .app-catalog-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

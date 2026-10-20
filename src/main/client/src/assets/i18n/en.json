@@ -1,4 +1,23 @@
 {
+  "identity_detail": {
+    "detail": "Identity detail",
+    "description": "Basic information, correspondence roles and the development of relationships over time.",
+    "not_provided": "Not provided",
+    "all_letters": "All letters",
+    "sent_letters": "Sent letters",
+    "received_letters": "Received letters",
+    "mentions": "Mentions in letters",
+    "correspondents": "Recipients and authors (max. 100)",
+    "selection_hint": "Click a name or bar to display the development of mutual correspondence over time.",
+    "select_person": "Select a person in the chart on the left.",
+    "load_error": "The identity could not be loaded.",
+    "retry": "Try again",
+    "types": {
+      "person": "Person",
+      "institution": "Institution",
+      "organization": "Organization"
+    }
+  },
   "catalog_detail": {
     "description": "An overview of letters, people and the development of correspondence over time within the catalog.",
     "search_letters": "Browse letters",
