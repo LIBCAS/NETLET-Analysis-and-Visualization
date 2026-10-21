@@ -1,47 +1,110 @@
-@if (place()) {
-<div class="app-detail">
-  <h2>{{ place()?.name }}</h2>
-
-  <fieldset>
-    <legend>{{ 'field.position' | translate }}</legend>
-    <div>
-      <label>{{ 'field.latitude' | translate }}:</label>
-      <div>{{ place().latitude }}</div>
-
-      <label>{{ 'field.longitude' | translate }}:</label>
-      <div>{{ place().longitude }}</div>
-    </div>
-  </fieldset>
-  <fieldset>
-    <legend>{{ 'field.stats' | translate }}</legend>
-    <div>
-      <label>{{ 'field.letters' | translate }}:</label>
-      <div>{{ place().stats.count }}</div>
-
-      <label>{{ 'field.letters_from' | translate }}:</label>
-      <div>{{ place().stats.orig.count }}</div>
-
-      <label>{{ 'field.letters_to' | translate }}:</label>
-      <div>{{ place().stats.dest.count }}</div>
-
-      <label>{{ 'field.stats_mentioned' | translate }}:</label>
-      <div>{{ place().stats.mentioned.count }}</div>
-
-    </div>
-
-  </fieldset>
-
-  <div style="height: 350px; width: 600px; position: relative;">
-    <div style="height: 100%; width: 100%;" class="app-fxFlex" leaflet [leafletOptions]="options"
-      (leafletMapReady)="onMapReady($event)">
-    </div>
-  </div>
-
-  @if(place().geoname_id) {
-  <div>
-    <a class="app-link" [href]="'http://www.geonames.org/'+place().geoname_id+'/calw.html'" target="_blank">Geonames</a>
-  </div>
+<div class="app-loading">
+  @if (placeRes.isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   }
-
 </div>
-}
+
+<div class="app-place">
+  <nav class="app-view-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+    <ol>
+      <li><a [routerLink]="searchUrl">{{ 'navbar.search' | translate }}</a></li>
+      @if (source) {
+        <li>
+          <mat-icon aria-hidden="true">chevron_right</mat-icon>
+          <a [routerLink]="source.url">{{ source.label | translate }}</a>
+        </li>
+      }
+      <li aria-current="page">
+        <mat-icon aria-hidden="true">chevron_right</mat-icon>
+        {{ place()?.name || ('place_detail.detail' | translate) }}
+      </li>
+    </ol>
+  </nav>
+
+  @if (place(); as data) {
+    <header class="app-view-header app-view-card">
+      <p>{{ 'place_detail.detail' | translate }}</p>
+      <h1>{{ data.name }}</h1>
+      <div>{{ 'place_detail.description' | translate }}</div>
+      @if (geonamesUrl(); as url) {
+        <div>
+          <a mat-stroked-button [href]="url" target="_blank" rel="noopener noreferrer">
+            {{ 'place_detail.geonames' | translate }}
+            <mat-icon iconPositionEnd aria-hidden="true">open_in_new</mat-icon>
+          </a>
+        </div>
+      }
+    </header>
+
+    <section class="app-view-card app-view-chart" [attr.aria-label]="'field.position' | translate">
+      <dl class="app-place-position">
+        <div>
+          <dt>{{ 'field.latitude' | translate }}</dt>
+          <dd>{{ data.latitude ?? ('place_detail.not_provided' | translate) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'field.longitude' | translate }}</dt>
+          <dd>{{ data.longitude ?? ('place_detail.not_provided' | translate) }}</dd>
+        </div>
+        @if (data.country) {
+          <div>
+            <dt>{{ 'place_detail.country' | translate }}</dt>
+            <dd>{{ data.country }}</dd>
+          </div>
+        }
+      </dl>
+      @if (data.note) {
+        <p class="app-place-note">{{ data.note }}</p>
+      }
+    </section>
+
+    <dl class="app-view-stats" [attr.aria-label]="'field.stats' | translate">
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">mail_outline</mat-icon>
+          {{ 'field.letters' | translate }}
+        </dt>
+        <dd>{{ data.stats?.count ?? 0 }}</dd>
+      </div>
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">outgoing_mail</mat-icon>
+          {{ 'field.letters_from' | translate }}
+        </dt>
+        <dd>{{ data.stats?.orig?.count ?? 0 }}</dd>
+      </div>
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">move_to_inbox</mat-icon>
+          {{ 'field.letters_to' | translate }}
+        </dt>
+        <dd>{{ data.stats?.dest?.count ?? 0 }}</dd>
+      </div>
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">place</mat-icon>
+          {{ 'field.stats_mentioned' | translate }}
+        </dt>
+        <dd>{{ data.stats?.mentioned?.count ?? 0 }}</dd>
+      </div>
+    </dl>
+
+    <section class="app-view-card app-view-card-clip" [attr.aria-label]="'place_detail.map' | translate">
+      @if (coordinates()) {
+        <div
+          leaflet
+          class="app-place-map"
+          [leafletOptions]="options"
+          (leafletMapReady)="onMapReady($event)">
+        </div>
+      } @else {
+        <p class="app-place-map-empty">{{ 'place_detail.no_coordinates' | translate }}</p>
+      }
+    </section>
+  } @else if (placeRes.error()) {
+    <section class="app-view-card app-view-chart" role="alert">
+      <p>{{ 'place_detail.load_error' | translate }}</p>
+      <button mat-stroked-button (click)="placeRes.reload()">{{ 'place_detail.retry' | translate }}</button>
+    </section>
+  }
+</div>
