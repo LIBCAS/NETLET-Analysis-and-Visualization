@@ -1,6 +1,6 @@
 import { httpResource } from '@angular/common/http';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, PRIMARY_OUTLET, Router, RouterLink } from '@angular/router';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -21,7 +21,7 @@ echarts.use([BarChart, CanvasRenderer, LegendComponent,
 
 @Component({
   selector: 'app-catalog',
-  imports: [TranslateModule, LeafletModule, NgxEchartsDirective, MatProgressBarModule, MatIconModule, MatButtonModule],
+  imports: [TranslateModule, RouterLink, LeafletModule, NgxEchartsDirective, MatProgressBarModule, MatIconModule, MatButtonModule],
   templateUrl: './catalog.component.html',
   styleUrl: './catalog.component.scss',
   providers: [
@@ -35,6 +35,19 @@ export class CatalogComponent {
   private translation = inject(TranslateService);
   private config = inject(AppConfiguration);
   private state = inject(AppState);
+
+  readonly source = this.getSource();
+  readonly searchUrl = this.router.createUrlTree(['/'], {
+    queryParams: this.source?.url.queryParams ?? this.activatedRoute.snapshot.queryParams,
+  });
+
+  private getSource() {
+    const previous = this.router.currentNavigation()?.previousNavigation ?? this.router.lastSuccessfulNavigation();
+    const url = previous?.finalUrl ?? previous?.extractedUrl;
+    const path = url?.root.children[PRIMARY_OUTLET]?.segments.map(segment => segment.path).join('/');
+    const view = this.state.views.find(view => view.route && view.route === path);
+    return view && url ? { header: view.header, url } : null;
+  }
 
   catalogId = signal('');
 

@@ -1,3 +1,94 @@
-.app-selected-identity {
-  text-decoration: underline;
+// redesign
+:host {
+  position: relative; // redesign
+  display: block;
+  min-width: 0;
+  background: var(--app-color-gray-1);
+  color: var(--app-color-ink);
+}
+
+.app-catalog {
+  display: grid;
+  gap: var(--app-analysis-gap);
+  padding: var(--app-analysis-padding); // redesign: Odsazení obsahu nesmí posouvat progress bar.
+}
+
+.app-catalog-actions {
+  margin-top: 16px;
+}
+
+.app-catalog-years-chart {
+  width: 100%;
+  height: 250px;
+}
+
+.app-catalog-correspondence {
+  display: grid;
+  grid-template-columns: minmax(210px, 30%) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--app-analysis-gap);
+}
+
+.app-catalog-identities {
+  min-width: 0;
+  padding-right: var(--app-view-chart-padding);
+  border-right: 1px solid var(--app-color-line);
+
+  h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+  }
+
+  ul {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  button {
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+    white-space: normal;
+    height: auto;
+    min-height: 40px;
+    padding: 8px 12px;
+
+    &.app-selected-identity {
+      background: var(--app-color-gray-2);
+      color: var(--app-color-primary-strong);
+      font-weight: 800;
+    }
+  }
+}
+
+.app-catalog-identity-chart {
+  position: relative;
+  min-width: 0;
+  height: 250px;
+}
+
+.app-catalog-loading {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+}
+
+.app-catalog-chart-fill {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 620px) {
+  .app-catalog-correspondence {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-catalog-identities {
+    padding: 0 0 var(--app-view-chart-padding);
+    border-right: 0;
+    border-bottom: 1px solid var(--app-color-line);
+  }
 }

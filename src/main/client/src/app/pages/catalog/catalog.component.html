@@ -1,49 +1,118 @@
-@if (catalog()) {
-<div class="app-detail">
-    <h2>{{ 'catalog.' + catalogId() | translate}}</h2>
-    <fieldset>
-        <legend>{{ 'field.stats' | translate }}</legend>
-        <div>
-            <label><button matIconButton class="app-hiko app-small-icon-button" [title]="'action.search' | translate" 
-                 (click)="search()"><mat-icon>search</mat-icon></button>{{ 'letters_count' | translate }}:</label>
-            <div>{{ catalog().response.numFound }} </div>
-
-            <label>{{ 'authors' | translate }}:</label>
-            <div>{{ catalog().facets.authors.numBuckets }}</div>
-
-            <label>{{ 'recipients' | translate }}:</label>
-            <div>{{ catalog().facets.recipients.numBuckets }}</div>
-
-            <label>{{ 'mentioned' | translate }}:</label>
-            <div>{{ catalog().facets.mentioned.numBuckets }}</div>
-
-        </div>
-
-    </fieldset>
-
-    <div echarts style="height: 250px; width: 100%;margin-bottom: 20px;" [options]="chartOptionsRok" (chartInit)="onChartRokInit($event)">
-    </div>
-
-    <h3>Korespondence</h3>
-    <div style="width: 100%; display: flex; ">
-        
-        <div style="width: 30%;">
-            <h3>Hlavni osoby</h3>
-            <ul>
-                @for(f of catalog().facets.identity.buckets; track f) {
-                <li><a class="app-link" [class.app-selected-identity]="f.val === authorInTime()" (click)="showCorrespondence(f.val)">{{ catalog().identities[f.val].name }}</a></li>
-                }
-
-            </ul>
-        </div>
-        <div style="height: 250px; width: 70%; position: relative; ">
-            <div style="position: relative;top:0;">@if(loading()){<mat-progress-bar mode="indeterminate"></mat-progress-bar>}</div>
-            <div echarts [class.app-loading-identity]="loading()" style="height: 100%; width: 100%;"
-                [initOpts]="{ locale: 'CZ' }" [options]="identityYearsChartOptions"
-                (chartInit)="onIdentityYearsChartInit($event)">
-            </div>
-        </div>
-    </div>
-
+<div class="app-loading">
+  @if (catalogRes.isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
 </div>
-}
+
+<div class="app-catalog">
+  <nav class="app-view-breadcrumbs" [attr.aria-label]="'timeline.breadcrumbs' | translate">
+    <ol>
+      <li>
+        <a [routerLink]="searchUrl">
+          {{ 'navbar.search' | translate }}
+        </a>
+      </li>
+      @if (source) {
+        <li>
+          <mat-icon aria-hidden="true">chevron_right</mat-icon>
+          <a [routerLink]="source.url">{{ 'home.' + source.header + '.header' | translate }}</a>
+        </li>
+      }
+      <li aria-current="page">
+        <mat-icon aria-hidden="true">chevron_right</mat-icon>
+        {{ 'field.tenant' | translate }} {{ 'catalog.' + catalogId() | translate }}
+      </li>
+    </ol>
+  </nav>
+
+  @if (catalog(); as data) {
+    <header class="app-view-header app-view-card">
+      <p>{{ 'field.tenant' | translate }}</p>
+      <h1>{{ 'catalog.' + catalogId() | translate }}</h1>
+      <div>{{ 'catalog_detail.description' | translate }}</div>
+      <div class="app-catalog-actions">
+        <button mat-stroked-button (click)="search()">
+          <mat-icon aria-hidden="true">search</mat-icon>
+          {{ 'catalog_detail.search_letters' | translate }}
+        </button>
+      </div>
+    </header>
+
+    <dl class="app-catalog-stats" [attr.aria-label]="'field.stats' | translate">
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">mail_outline</mat-icon>
+          {{ 'letters_count' | translate }}
+        </dt>
+        <dd>{{ data.response.numFound }}</dd>
+      </div>
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">edit_note</mat-icon>
+          {{ 'field.authors' | translate }}
+        </dt>
+        <dd>{{ data.facets.authors.numBuckets }}</dd>
+      </div>
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">forward_to_inbox</mat-icon>
+          {{ 'field.recipients' | translate }}
+        </dt>
+        <dd>{{ data.facets.recipients.numBuckets }}</dd>
+      </div>
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">people_outline</mat-icon>
+          {{ 'field.mentioned' | translate }}
+        </dt>
+        <dd>{{ data.facets.mentioned.numBuckets }}</dd>
+      </div>
+    </dl>
+
+    <section class="app-view-card app-view-chart" [attr.aria-label]="'letters_count_by_year' | translate">
+      <div
+        echarts
+        class="app-catalog-years-chart"
+        [options]="chartOptionsRok"
+        (chartInit)="onChartRokInit($event)">
+      </div>
+    </section>
+
+    <section class="app-view-card app-view-chart" [attr.aria-label]="'catalog_detail.correspondence' | translate">
+      <div class="app-catalog-correspondence">
+        <div class="app-catalog-identities">
+          <h2>{{ 'catalog_detail.main_people' | translate }}</h2>
+          <ul>
+            @for (f of data.facets.identity.buckets; track f.val) {
+              <li>
+                <button
+                  mat-button
+                  [class.app-selected-identity]="f.val === authorInTime()"
+                  [attr.aria-pressed]="f.val === authorInTime()"
+                  (click)="showCorrespondence(f.val)">
+                  {{ data.identities[f.val]?.name || f.val }}
+                </button>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <div class="app-catalog-identity-chart" [attr.aria-busy]="loading()">
+          <div class="app-catalog-loading">
+            @if (loading()) {
+              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            }
+          </div>
+          <div
+            echarts
+            class="app-catalog-chart-fill"
+            [class.app-loading-identity]="loading()"
+            [initOpts]="{ locale: 'CZ' }"
+            [options]="identityYearsChartOptions"
+            (chartInit)="onIdentityYearsChartInit($event)">
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+</div>
