@@ -362,7 +362,7 @@ export class CentralityComponent {
       // });
 
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
+      this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
 
       this.setInfoHeader('identities.author_letters', identity);
       this.state.showInfo.set(true);
@@ -392,7 +392,7 @@ export class CentralityComponent {
       // });
 
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
+      this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       this.setInfoHeader('identities.recipient_letters', identity);
       this.state.showInfo.set(true);
     });
@@ -422,7 +422,7 @@ export class CentralityComponent {
 
       this.setInfoHeader('identities.mentioned_letters', identity);
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
+      this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       this.state.showInfo.set(true);
     });
   }

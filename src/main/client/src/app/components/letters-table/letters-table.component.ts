@@ -30,8 +30,13 @@ export class LettersTableComponent {
   displayedColumns = input.required<string[]>();
   target = input<string>('_self');
 
-  viewLetter(id: number, t: string) {
-    this.router.navigate(['/letter', id])
+  viewLetter(id: number) {
+    if (this.target() === '_self') {
+      this.router.navigate(['/letter', id])
+    } else {
+      window.open('letter/' + id, 'letter');
+    }
+    
   }
 
   viewLetterInHIKO(id: number, t: string) {
