@@ -1,0 +1,54 @@
+// redesign
+:host {
+  position: relative;
+  display: block;
+  min-width: 0;
+  background: var(--app-color-gray-1);
+  color: var(--app-color-ink);
+}
+
+.app-place {
+  display: grid;
+  gap: var(--app-analysis-gap);
+  padding: var(--app-analysis-padding);
+}
+
+.app-place-position {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 48px;
+  margin: 0;
+
+  dt {
+    margin-bottom: 8px;
+    color: var(--app-color-muted);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  dd {
+    margin: 0;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+}
+
+.app-place-note {
+  margin: 16px 0 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.app-place-map {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  isolation: isolate;
+}
+
+.app-place-map-empty {
+  margin: 0;
+  padding: var(--app-view-chart-padding);
+  color: var(--app-color-muted);
+  line-height: 1.6;
+}

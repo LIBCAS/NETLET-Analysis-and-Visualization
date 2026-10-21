@@ -1,4 +1,15 @@
 {
+  "place_detail": {
+    "detail": "Detail místa",
+    "description": "Poloha místa a jeho zastoupení v korespondenci.",
+    "country": "Země",
+    "geonames": "Zobrazit v GeoNames",
+    "map": "Mapa místa",
+    "not_provided": "Neuvedeno",
+    "no_coordinates": "Pro toto místo nejsou dostupné platné zeměpisné souřadnice.",
+    "load_error": "Údaje o místě se nepodařilo načíst.",
+    "retry": "Zkusit znovu"
+  },
   "identity_detail": {
     "detail": "Detail osoby",
     "description": "Základní údaje, korespondenční role a vývoj vztahů v čase.",

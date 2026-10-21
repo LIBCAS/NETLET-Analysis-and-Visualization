@@ -1,4 +1,15 @@
 {
+  "place_detail": {
+    "detail": "Place detail",
+    "description": "The location and its role in the correspondence.",
+    "country": "Country",
+    "geonames": "View in GeoNames",
+    "map": "Map of the place",
+    "not_provided": "Not provided",
+    "no_coordinates": "No valid geographical coordinates are available for this place.",
+    "load_error": "The place could not be loaded.",
+    "retry": "Try again"
+  },
   "identity_detail": {
     "detail": "Identity detail",
     "description": "Basic information, correspondence roles and the development of relationships over time.",
