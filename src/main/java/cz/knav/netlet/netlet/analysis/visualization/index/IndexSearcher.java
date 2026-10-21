@@ -831,7 +831,8 @@ public class IndexSearcher {
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
               //.withFilter("identity_mentioned:\"" + request.getParameter("mentioned") +"\"")
-              .returnFields("id,letter_id,identity_author,identity_recipient,date_year,origin_name,destination_name")
+              .returnFields("id,letter_id,tenant,date_computed,date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
+              //.returnFields("id,letter_id,identity_author,identity_recipient,date_year,origin_name,destination_name")
               .setLimit(rows);
 
       jrequest = addFilters(request, jrequest, lang);

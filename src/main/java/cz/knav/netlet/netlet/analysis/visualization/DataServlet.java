@@ -240,7 +240,7 @@ public class DataServlet extends HttpServlet {
                 return IndexSearcher.relation(request);
             }
         },
-        IDENTY_LETTERS{
+        IDENTITY_LETTERS{
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 return IndexSearcher.identityLetters(request);

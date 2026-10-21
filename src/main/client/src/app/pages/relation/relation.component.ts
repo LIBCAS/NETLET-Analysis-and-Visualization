@@ -144,13 +144,13 @@ export class RelationComponent {
 
           this.state.addFilters(p);
           p.rows = 20000;
-          p.recipient = identity;
+          p.recipient = '"' + identity + '"';
 
 
           this.service.getIdentitiyLetters(p as HttpParams).subscribe((resp: any) => {
 
             this.infoContent = '';
-            this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
+            this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
             this.infoData = resp.response.docs;
             this.infoIdentity = identity;
             this.updateInfoHeader();

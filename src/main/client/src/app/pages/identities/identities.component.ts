@@ -160,7 +160,7 @@ export class IdentitiesComponent {
   authorLabel(identity: string) {
     this._ngZone.run(() => {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_recipient', 'date_year', 'action'];
+      this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       this.setInfoHeader('identities.author_letters', identity);
       this.state.showInfo.set(true);
     });
@@ -169,7 +169,7 @@ export class IdentitiesComponent {
   recipientLabel(identity: string) {
     this._ngZone.run(() => {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_author', 'date_year', 'action'];
+      this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       this.setInfoHeader('identities.recipient_letters', identity);
       this.state.showInfo.set(true);
     });
@@ -178,7 +178,7 @@ export class IdentitiesComponent {
   mentionedLabel(identity: string) {
     this._ngZone.run(() => {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
-      this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'action'];
+      this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       this.setInfoHeader('identities.mentioned_letters', identity);
       this.state.showInfo.set(true);
     });
