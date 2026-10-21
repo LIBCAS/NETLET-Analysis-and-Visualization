@@ -557,7 +557,7 @@ public class IndexSearcher {
               .withFilter("keywords_category_" + lang + ":*")
               //.withFilter("status:publish")
               .setLimit(0)
-              .returnFields("date_year,date_computed,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_" + lang + ",keywords_" + lang + "")
+              //.returnFields("date_year,date_computed,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_" + lang + ",keywords_" + lang + "")
               .withFacet("date_year", rangeFacet)
               //.withFacet("keyword_categories", keywordsCategoriesFacet) 
               .withFacet("tenants", new TermsFacetMap("tenant")
@@ -649,8 +649,12 @@ public class IndexSearcher {
       } else {
 
         jrequest = jrequest.withParam("stats", "true")
-                .withParam("stats.field", new String[]{"latitude", "longitude"})
-                .withFacet("years", yearsFacet)
+                .withParam("stats.field", new String[]{"latitude", "longitude", "place_id"})
+                
+                .withFacet("places", new TermsFacetMap("place_id")
+                        .setLimit(1)
+                        .setMinCount(1))
+                
                 .withFacet("keywords_cs", keywords_csFacet)
                 .withFacet("keyword_categories", categories_csFacet)
                 .withFacet("mentioned", identity_mentionedFacet)
@@ -667,13 +671,23 @@ public class IndexSearcher {
                 .withFacet("authors", new TermsFacetMap("identity_author")
                         .setLimit(1000)
                         .setMinCount(1))
-                .withFacet("places", new TermsFacetMap("place_id")
-                        .setLimit(1000)
+                .withFacet("years", yearsFacet
+                .withSubFacet("places", new TermsFacetMap("place_id")
+                        .setLimit(-1)
                         .setMinCount(1))
-                .withFacet("links", new TermsFacetMap("link_id")
+                .withSubFacet("links", new TermsFacetMap("link_id") 
                         .withSubFacet("tenant", new TermsFacetMap("tenant"))
                         .setLimit(-1)
-                        .setMinCount(1));
+                        .setMinCount(1))) 
+//                .withFacet("years", yearsFacet)
+//                .withFacet("places", new TermsFacetMap("place_id")
+//                        .setLimit(1000)
+//                        .setMinCount(1))
+//                .withFacet("links", new TermsFacetMap("link_id")
+//                        .withSubFacet("tenant", new TermsFacetMap("tenant"))
+//                        .setLimit(-1)
+//                        .setMinCount(1))
+                ;
       }
 
       jrequest = addFilters(request, jrequest, lang);

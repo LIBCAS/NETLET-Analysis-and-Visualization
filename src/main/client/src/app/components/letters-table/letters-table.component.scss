@@ -1,0 +1,105 @@
+// redesign
+:host {
+  --app-timeline-shadow: 0 14px 34px rgba(42, 43, 47, .06);
+  --app-view-card-shadow: var(--app-timeline-shadow);
+  --app-timeline-tool-color: #33437f;
+  position: relative;
+}
+
+
+.app-letters-table {
+  max-height: 400px;
+  overflow: auto;
+
+  table {
+    width: 100%;
+    min-width: 980px;
+  }
+
+  th {
+    background: var(--app-color-gray-0);
+    font-weight: 750;
+    white-space: nowrap;
+  }
+
+  td {
+    font-size: 13px;
+    vertical-align: top;
+    padding-block: 12px;
+  }
+
+  tr:nth-child(even) td {
+    background: var(--app-color-gray-1);
+  }
+
+  a {
+    color: var(--app-color-primary-strong);
+    font-weight: 750;
+    text-decoration: none;
+    text-underline-offset: 3px;
+
+    &:hover {
+      color: var(--app-color-accent);
+      text-decoration: underline;
+    }
+  }
+
+  .mat-column-action {
+    white-space: nowrap;
+    background: var(--app-color-paper);
+  }
+
+  button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    margin-inline: 3px;
+    border: 1px solid var(--app-color-line);
+    border-radius: var(--app-view-radius);
+    color: var(--app-timeline-tool-color);
+    background: var(--app-color-paper);
+
+    mat-icon {
+      width: 16px;
+      height: 16px;
+      font-size: 16px;
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  .app-timeline-chart {
+    padding-right: var(--app-view-chart-padding);
+  }
+
+  .app-timeline-chart-tools {
+    position: static;
+    display: flex;
+    margin-bottom: 12px;
+  }
+
+  .app-timeline-letters > header > div {
+    flex-basis: 100%;
+  }
+}
+
+// redesign
+.app-timeline-controls {
+  --mat-radio-label-text-size: 14px;
+  --mat-radio-label-text-weight: 700;
+  --mat-radio-label-text-color: var(--app-color-gray-8);
+  --mat-checkbox-label-text-size: 14px;
+  --mat-checkbox-label-text-weight: 700;
+  --mat-checkbox-label-text-color: var(--app-color-gray-8);
+}
+
+// redesign
+.app-timeline-table {
+  th.mat-column-action {
+    background: var(--app-color-gray-0);
+  }
+
+  button {
+    color: var(--app-color-accent);
+  }
+}

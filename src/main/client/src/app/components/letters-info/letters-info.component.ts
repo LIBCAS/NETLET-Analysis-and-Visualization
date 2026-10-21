@@ -11,13 +11,14 @@ import { MatCheckbox } from "@angular/material/checkbox";
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { Letter } from '../../shared/letter';
+import { LettersTableComponent } from '../letters-table/letters-table.component';
 
 
 @Component({
   selector: 'app-letters-info',
   imports: [TranslateModule, FormsModule, MatFormFieldModule,
     MatTooltipModule, MatIconModule,
-    MatCardModule, MatButtonModule, MatTableModule, MatCheckbox],
+    MatCardModule, MatButtonModule, MatTableModule, MatCheckbox, LettersTableComponent],
   templateUrl: './letters-info.component.html',
   styleUrl: './letters-info.component.scss'
 })

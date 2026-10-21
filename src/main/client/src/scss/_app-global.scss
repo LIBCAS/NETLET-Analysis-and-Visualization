@@ -322,7 +322,7 @@ fieldset {
 
 
 .app-letters-info {
-    position: absolute;
+    position: fixed;
     width: 600px;
     right: 20px;
     top:var(--mat-toolbar-standard-height, 64px);

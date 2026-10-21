@@ -230,9 +230,10 @@ export class MapComponent {
       this.mentioned = resp.facets.mentioned ? resp.facets.mentioned.buckets : [];
       if (withMap) {
         this.solrResponse = resp;
+        this.mapInTime = resp.facets;
         // this.setYearsChart(this.solrResponse.facet_counts.facet_ranges.date_year);
       }
-
+      //this.graphInTime();
       this.setGraphData();
       if (withMap && !this.graphChart) {
         this.setMap();
@@ -259,28 +260,41 @@ export class MapComponent {
   fillNodes(facet: any, nodes: any) {
     facet.forEach((f: { val: string, count: number }) => {
       const place = this.state.places()[f.val];
-      if (!nodes.find((n: any) => n.id === place.id)) {
-      let symbolSize = this.minSize;
-      if (f.count > 0) {
-        symbolSize = this.maxSize * (f.count) / this.maxCount() + this.minSize;
-      } else {
-        symbolSize = this.minSize;
-      }
-      const itemStyle = {
-        //borderColor: '#fff',
-        //borderWidth: 2,
-        //color: this.getColor(symbolSize);
-        color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [
-          { offset: 0, color: '#ff7e5f' },  // Barva uprostřed
-          { offset: 1, color: this.getColor(symbolSize) },   // Barva na okrajích
-        ]),
-      }
+      const node = nodes.find((n: any) => n.id === place.id);
+      if (!node) {
+        let symbolSize = this.minSize;
+        if (f.count > 0) {
+          symbolSize = this.maxSize * (f.count) / this.maxCount() + this.minSize;
+        } else {
+          symbolSize = this.minSize;
+        }
+        const itemStyle = {
+          color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [
+            { offset: 0, color: '#ff7e5f' },  // Barva uprostřed
+            { offset: 1, color: this.getColor(symbolSize) },   // Barva na okrajích
+          ]),
+        }
 
-      nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: f.count, color: '#00f', 
-        //symbol: 'image://' + svgGradientCircle,
-        symbolSize: symbolSize, 
-        itemStyle
-       });
+        nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: f.count, color: '#00f', 
+          symbolSize: symbolSize, 
+          itemStyle
+        });
+      } else {
+        node.count += f.count;
+        let symbolSize = this.minSize;
+        if (f.count > 0) {
+          symbolSize = this.maxSize * (node.count) / this.maxCount() + this.minSize;
+        } else {
+          symbolSize = this.minSize;
+        }
+        node.symbolSize = symbolSize;
+        node.itemStyle = {
+          color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [
+            { offset: 0, color: '#ff7e5f' },  // Barva uprostřed
+            { offset: 1, color: this.getColor(symbolSize) },   // Barva na okrajích
+          ]),
+        }
+
       }
 
     });
@@ -357,7 +371,7 @@ export class MapComponent {
   }
 
   changeRunning(r: boolean) {
-    this.getMapInTime();
+    // this.getMapInTime();
     this.running = r;
     this.graphChart.setOption({
       animation: false,
@@ -371,11 +385,11 @@ export class MapComponent {
 
   changeLimits(limits: [Date, Date]) {
     this.limits = limits;
-    if (this.running) {
       this.graphInTime();
-    } else {
-      this.getData(true, false);
-    }
+    // if (this.running) {
+    // } else {
+    //   this.getData(true, false);
+    // }
     
   }
 
@@ -478,68 +492,78 @@ export class MapComponent {
   setGraphData() {
     
     this.nodes = {};
-    const nodes: any = [];
-    this.maxCount.set(this.solrResponse.facets.places.buckets[0].count);
-    this.solrResponse.facets.places.buckets.forEach((f: { val: string, count: number }) => {
-      const place = this.state.places()[f.val];
-      let symbolSize = this.minSize;
-      if (f.count > 0) {
-        symbolSize = this.maxSize * (f.count) / this.maxCount() + this.minSize;
-      } else {
-        symbolSize = this.minSize;
-      }
-      const itemStyle = {
-        //borderColor: '#fff',
-        //borderWidth: 2,
-        //color: this.getColor(symbolSize);
-        color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [
-          { offset: 0, color: '#ff7e5f' },  // Barva uprostřed
-          { offset: 1, color: this.getColor(symbolSize) },   // Barva na okrajích
-        ]),
-      }
-
-      this.nodes[f.val] = { coords: [place.latitude, place.longitude], name: place.name, count: f.count };
-      nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: f.count, color: '#00f', 
-        //symbol: 'image://' + svgGradientCircle,
-        symbolSize: symbolSize, 
-        itemStyle
-       });
-
-    });
-
     this.links = {};
+    const nodes: any = [];
     const links: any[] = [];
-    this.solrResponse.facets.links.buckets.forEach((f: { val: string, count: number, tenant: any }) => {
-      const parts = f.val.split('-');
-      const linkId = f.val;
-      const place_origin = this.state.places()[parts[0]];
-      const place_destination = this.state.places()[parts[1]];
-      if (place_origin && place_destination && place_origin.latitude && place_destination.latitude) {
-        this.links[linkId] = {
-          node1: [place_origin.latitude, place_origin.longitude],
-          node2: [place_destination.latitude, place_destination.longitude],
-          authors: [],
-          recipients: [],
-          count: f.count,
-          letters: []
-        };
-        links.push({
-          id: linkId,
-          source: parts[0],
-          target: parts[1],
-          authors: [],
-          recipients: [],
-          label: place_origin.name + ' > ' + place_destination.name,
-          labelReversed: place_destination.name + ' > ' + place_origin.name,
-          count: this.links[linkId].count,
-          lineStyle: {
-            color: this.config.tenant_colors[f.tenant.buckets[0].val],
-            width: 1,
-            opacity: 1
-          }
-        });
-      }
+    this.maxCount.set(this.solrResponse.facets.places.buckets[0].count);
+
+    const limitedYears = this.mapInTime.years.buckets.filter((b: any) => {
+      return b.val >= this.limits[0].getFullYear() && b.val <= this.limits[1].getFullYear();
     });
+    limitedYears.forEach((y: any) => {
+      if (y.places) {
+        this.fillNodes(y.places.buckets, nodes);
+      }
+      if (y.links) {
+        this.fillLinks(y.links.buckets, links);
+      }
+      
+    }); 
+
+    // this.solrResponse.facets.places.buckets.forEach((f: { val: string, count: number }) => {
+    //   const place = this.state.places()[f.val];
+    //   let symbolSize = this.minSize;
+    //   if (f.count > 0) {
+    //     symbolSize = this.maxSize * (f.count) / this.maxCount() + this.minSize;
+    //   } else {
+    //     symbolSize = this.minSize;
+    //   }
+    //   const itemStyle = {
+    //     color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [
+    //       { offset: 0, color: '#ff7e5f' },  // Barva uprostřed
+    //       { offset: 1, color: this.getColor(symbolSize) },   // Barva na okrajích
+    //     ]),
+    //   }
+
+    //   this.nodes[f.val] = { coords: [place.latitude, place.longitude], name: place.name, count: f.count };
+    //   nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: f.count, color: '#00f', 
+    //     symbolSize: symbolSize, 
+    //     itemStyle
+    //    });
+
+    // });
+
+    // this.solrResponse.facets.links.buckets.forEach((f: { val: string, count: number, tenant: any }) => {
+    //   const parts = f.val.split('-');
+    //   const linkId = f.val;
+    //   const place_origin = this.state.places()[parts[0]];
+    //   const place_destination = this.state.places()[parts[1]];
+    //   if (place_origin && place_destination && place_origin.latitude && place_destination.latitude) {
+    //     this.links[linkId] = {
+    //       node1: [place_origin.latitude, place_origin.longitude],
+    //       node2: [place_destination.latitude, place_destination.longitude],
+    //       authors: [],
+    //       recipients: [],
+    //       count: f.count,
+    //       letters: []
+    //     };
+    //     links.push({
+    //       id: linkId,
+    //       source: parts[0],
+    //       target: parts[1],
+    //       authors: [],
+    //       recipients: [],
+    //       label: place_origin.name + ' > ' + place_destination.name,
+    //       labelReversed: place_destination.name + ' > ' + place_origin.name,
+    //       count: this.links[linkId].count,
+    //       lineStyle: {
+    //         color: this.config.tenant_colors[f.tenant.buckets[0].val],
+    //         width: 1,
+    //         opacity: 1
+    //       }
+    //     });
+    //   }
+    // });
 
     this.graphData = {
       links,
@@ -753,7 +777,9 @@ export class MapComponent {
         return;
       }
       this.infoData = resp.response.docs;
-      this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
+      //this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
+      this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
+      
       this.infoHeader = `Letters from/to ${params.data.name}`;
       this.infoType = 'place';
       this.infoTypeData = place;
@@ -780,7 +806,7 @@ export class MapComponent {
         return;
       }
       this.infoData = resp.response.docs.filter((letter: Letter) => letter.link_id?.includes(link_id));
-      this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
+      this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       this.infoHeader = `Letters from ${params.data.label} (${this.infoData.length})`;
       this.infoType = 'link';
       const reversed = resp.response.docs.filter((letter: Letter) => letter.link_id?.includes(reversed_link_id));

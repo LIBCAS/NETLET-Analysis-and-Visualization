@@ -123,7 +123,8 @@
           </header>
 
           <div class="app-timeline-table" tabindex="0" role="region" [attr.aria-label]="'timeline.results_table' | translate">
-            <table mat-table [dataSource]="letters()">
+            <app-letters-table [letters]="letters()" [displayedColumns]="displayedColumns"></app-letters-table>
+            <!-- <table mat-table [dataSource]="letters()">
               <ng-container matColumnDef="id">
                 <th mat-header-cell *matHeaderCellDef> Id </th>
                 <td mat-cell *matCellDef="let element"> {{ element.letter_id }} </td>
@@ -217,7 +218,7 @@
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns sticky: true"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-            </table>
+            </table> -->
           </div>
         </section>
       </div>

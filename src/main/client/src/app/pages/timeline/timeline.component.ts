@@ -22,7 +22,7 @@ import { EChartsOption, ECharts } from 'echarts';
 import { NgxEchartsDirective, NgxEchartsModule, provideEchartsCore } from 'ngx-echarts';
 import { BarChart, LineChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
-import { DataZoomComponent, LegendComponent } from 'echarts/components';
+import { DataZoomComponent, GraphicComponent, LegendComponent } from 'echarts/components';
 import { TooltipComponent } from 'echarts/components';
 import { GridComponent } from 'echarts/components';
 import { TitleComponent } from 'echarts/components';
@@ -36,13 +36,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { AngularSplitModule } from 'angular-split';
-echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent,
+echarts.use([BarChart, LineChart, CanvasRenderer, LegendComponent, TooltipComponent, GraphicComponent,
   GridComponent, TitleComponent, BrushComponent, ToolboxComponent, DataZoomComponent]);
 
 //@ts-ignore
 import langCZ from 'echarts/lib/i18n/langCS.js';
 import { debounceTime, Subject } from 'rxjs';
 import { FacetsComponent } from "../../components/facets/facets.component";
+import { LettersTableComponent } from '../../components/letters-table/letters-table.component';
 
 echarts.registerLocale("CZ", langCZ);
 
@@ -78,7 +79,7 @@ export class MyCustomPaginatorIntl implements MatPaginatorIntl {
     NgxEchartsModule, AngularSplitModule, RouterModule,
     MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule,
     MatButtonModule, MatTableModule, MatPaginatorModule,
-    MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, MatTooltipModule, FacetsComponent],
+    MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, MatTooltipModule, FacetsComponent, LettersTableComponent],
   providers: [
     provideEchartsCore({ echarts }),
     { provide: MatPaginatorIntl, useClass: MyCustomPaginatorIntl },
@@ -245,6 +246,9 @@ export class TimelineComponent {
     p.offset = this.pageIndex * p.rows;
     this.state.addFilters(p);
 
+    if (this.chart) {
+      this.chart.showLoading('default', {color: '#c23531', text: ''});
+    }
 
     this.service.getTimeline(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
@@ -276,7 +280,9 @@ export class TimelineComponent {
   setOptions(data: any, date: any) {
     const dataZoomStart = data.length > 0 ? data[0][0] : 0;
     const dataZoomEnd = data.length > 0 ? data[data.length-1][0] : 100;
+
     this.chartOptions = {
+
       legend: {
         show: false,
         bottom: 10
@@ -464,6 +470,9 @@ export class TimelineComponent {
     //const data = this.date_facet.buckets.map(c => c.count);
     const date = this.date_facet.buckets.map(c => this.datePipe.transform(c.val, 'd. M. yyyy'));
     // console.log(data)
+    if (this.chart) {
+      this.chart.hideLoading();
+    }
     this.setOptions(data, date);
   }
 
