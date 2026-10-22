@@ -1464,9 +1464,13 @@ public class HikoIndexer {
                 .build();
         HttpResponse<String> response = httpclient.send(request, HttpResponse.BodyHandlers.ofString());
         JSONObject resp = new JSONObject(response.body());
-        JSONArray docs = resp.getJSONArray("data");
-        processProfessions(client, ret, tenant, docs, t);
-        url = resp.getJSONObject("links").optString("next", null);
+        if (resp.has("data")) {
+          JSONArray docs = resp.getJSONArray("data");
+          processProfessions(client, ret, tenant, docs, t);
+          url = resp.getJSONObject("links").optString("next", null);
+        } else {
+          url = null;
+        }
         Thread.sleep(1000);
       }
       client.commit("professions");
