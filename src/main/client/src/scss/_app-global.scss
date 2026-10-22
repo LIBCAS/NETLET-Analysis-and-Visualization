@@ -329,11 +329,6 @@ fieldset {
     z-index: 2000;
 }
 
-.app-loading {
-  position: absolute;
-  width: 100%;
-}
-
 .app-hiko {
   color: var(--app-hiko-color) !important;
 }
@@ -587,4 +582,13 @@ main:is(.app-scroll-page, .app-scroll-panels) .app-view-content.app-view-long-co
   .app-catalog-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+// redesign: Společný progress bar zůstává pod navigací v obou režimech scrollování.
+.app-loading {
+  position: fixed;
+  top: var(--app-navbar-height);
+  inset-inline: 0;
+  z-index: 21;
+  pointer-events: none;
 }

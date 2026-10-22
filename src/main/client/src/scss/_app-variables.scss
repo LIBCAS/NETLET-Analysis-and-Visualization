@@ -178,3 +178,8 @@ $alerts: (
     --app-view-chart-padding: 14px;
   }
 }
+
+// redesign: Skutečnou výšku navigace aktualizuje app-root i při jejím zalomení.
+:root {
+  --app-navbar-height: var(--app-topbar-height);
+}
