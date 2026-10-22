@@ -32,12 +32,15 @@ import { AppConfiguration } from '../../app-configuration';
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 import { FacetsComponent } from "../../components/facets/facets.component";
 import { AngularSplitModule } from "angular-split";
+import { MatDialog } from '@angular/material/dialog';
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-centrality',
-  imports: [RouterLink, TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent, AngularSplitModule],
+  imports: [RouterLink, TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule,
+    MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule,
+    MatRadioModule, YearsChartComponent, FacetsComponent, AngularSplitModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -104,6 +107,7 @@ export class CentralityComponent {
     @Inject(DOCUMENT) private document: Document,
     private _ngZone: NgZone,
     private router: Router,
+    private dialog: MatDialog,
     private translation: TranslateService,
     public config: AppConfiguration,
     public state: AppState,
@@ -282,7 +286,6 @@ export class CentralityComponent {
 
   getData(setResponse: boolean) {
     this.loading = true;
-    this.closeInfo();
     const p: any = {};
     p.tenant = this.state.selectedTenants().map(t => t.val);
     p.tenant_year_range = this.state.getTenantsRange().toString();
@@ -365,9 +368,20 @@ export class CentralityComponent {
       this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
 
       this.setInfoHeader('identities.author_letters', identity);
-      this.state.showInfo.set(true);
+      this.openInfoDialog();
     });
   }
+
+  openInfoDialog() {
+    this.service.openInfoDialog({
+      header: this.infoHeader,
+      content: this.infoContent,
+      fields: this.infoFields,
+      data: this.infoData
+    });
+  }
+
+
 
   recipientLabel(identity: string) {
     this._ngZone.run(() => {
@@ -394,7 +408,7 @@ export class CentralityComponent {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
       this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       this.setInfoHeader('identities.recipient_letters', identity);
-      this.state.showInfo.set(true);
+      this.openInfoDialog();
     });
   }
 
@@ -423,13 +437,13 @@ export class CentralityComponent {
       this.setInfoHeader('identities.mentioned_letters', identity);
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
       this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
-      this.state.showInfo.set(true);
+      this.openInfoDialog();
     });
   }
 
   processResponse() {
     const categories = [{
-      name: 'authors', 
+      name: 'authors',
       itemStyle: {
         color: this.config.colors['author']
       }
@@ -493,7 +507,7 @@ export class CentralityComponent {
           x: pos.x,
           y: pos.y,
           // radiusAxis: pos.radius,
-        draggable: true,
+          draggable: true,
           // angleAxis: pos.angle,
           itemStyle: {
             color: this.config.colors['recipient']
@@ -516,7 +530,7 @@ export class CentralityComponent {
           y: pos.y,
           // radiusAxis: pos.radius,
           // angleAxis: pos.angle,
-        draggable: true,
+          draggable: true,
           itemStyle: {
             color: this.config.colors['author']
           }
@@ -547,11 +561,11 @@ export class CentralityComponent {
           show: true,
           bottom: 5,
           data: this.graphData.categories,
-          
+
           formatter: (name: string) => {
-            return this.translation.instant('field.'+name);
+            return this.translation.instant('field.' + name);
           }
-          
+
         }
       ],
       animationDuration: 1500,
@@ -621,13 +635,6 @@ export class CentralityComponent {
         }
       ]
     });
-  }
-
-  closeInfo() {
-    this.infoContent = null;
-    this.infoHeader = null;
-    this.infoHeaderKey = null;
-    this.infoIdentity = null;
   }
 
   private setInfoHeader(key: string, identity: string) {

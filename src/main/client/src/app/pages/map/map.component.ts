@@ -43,6 +43,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AppConfiguration } from '../../app-configuration';
 import { FacetsComponent } from "../../components/facets/facets.component";
 import { AngularSplitModule } from "angular-split";
+import { MatDialog } from '@angular/material/dialog';
 
 
 type ECOption = ComposeOption<
@@ -61,7 +62,7 @@ echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, Titl
   imports: [TranslateModule, FormsModule, LeafletModule, RouterModule,
     MatCardModule, MatExpansionModule, MatCheckboxModule, MatFormFieldModule,
     MatSelectModule, MatInputModule, MatListModule, MatIconModule,
-    MatProgressBarModule, YearsChartComponent, LettersInfoComponent, FacetsComponent, AngularSplitModule],
+    MatProgressBarModule, YearsChartComponent, FacetsComponent, AngularSplitModule],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss'
 })
@@ -122,6 +123,7 @@ export class MapComponent {
     private _ngZone: NgZone,
     private router: Router,
     private translation: TranslateService,
+    private dialog: MatDialog,
     public config: AppConfiguration,
     public state: AppState,
     private service: AppService
@@ -783,7 +785,8 @@ export class MapComponent {
       this.infoHeader = `Letters from/to ${params.data.name}`;
       this.infoType = 'place';
       this.infoTypeData = place;
-      this.state.showInfo.set(true);
+      //this.state.showInfo.set(true);
+      this.openInfoDialog();
     });
   }
 
@@ -815,8 +818,21 @@ export class MapComponent {
         header: header,
         docs: reversed
       };
-      this.state.showInfo.set(true);
+
+      //this.state.showInfo.set(true);
+      this.openInfoDialog();
     });
+  }
+
+  openInfoDialog() {
+    this.service.openInfoDialog({
+        type: this.infoType,
+        typeData: this.infoTypeData,
+        header: this.infoHeader,
+        content: null,
+        fields: this.infoFields,
+        data: this.infoData
+      });
   }
 
   onSelectionChange(event: any) {

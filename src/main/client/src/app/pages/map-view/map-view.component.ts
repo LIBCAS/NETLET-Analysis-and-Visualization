@@ -20,14 +20,15 @@ import { Letter, Place } from '../../shared/letter';
 import { MatIconModule } from '@angular/material/icon';
 import { AppState, Tenant } from '../../app-state';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
-import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FacetsComponent } from "../../components/facets/facets.component";
 
 @Component({
   selector: 'app-map-view',
-  imports: [TranslateModule, FormsModule, LeafletModule, MatCardModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule, MatIconModule, MatProgressBarModule, YearsChartComponent, LettersInfoComponent, FacetsComponent],
+  imports: [TranslateModule, FormsModule, LeafletModule, MatCardModule, 
+    MatExpansionModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatListModule, 
+    MatIconModule, MatProgressBarModule, YearsChartComponent, FacetsComponent],
   templateUrl: './map-view.component.html',
   styleUrl: './map-view.component.scss'
 })

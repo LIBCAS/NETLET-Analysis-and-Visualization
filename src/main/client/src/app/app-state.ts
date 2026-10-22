@@ -20,7 +20,6 @@ export interface Tenant {
 }) export class AppState {
 
   public isHome = signal<boolean>(false);
-  public showInfo = signal<boolean>(false);
   public tenants = signal<Tenant[]>([]);
   public places = signal<any>({});
 

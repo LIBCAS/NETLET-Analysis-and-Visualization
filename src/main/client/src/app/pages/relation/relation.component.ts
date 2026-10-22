@@ -29,12 +29,15 @@ import { LettersInfoComponent } from "../../components/letters-info/letters-info
 import { FacetsComponent } from "../../components/facets/facets.component";
 import { AngularSplitModule } from "angular-split";
 import { AppConfiguration } from '../../app-configuration';
+import { MatDialog } from '@angular/material/dialog';
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-relation',
-  imports: [RouterLink, TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, LettersInfoComponent, FacetsComponent, AngularSplitModule],
+  imports: [RouterLink, TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, 
+    MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, 
+    MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, AngularSplitModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -76,6 +79,7 @@ export class RelationComponent {
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
     private _ngZone: NgZone,
+    private dialog: MatDialog,
     private translation: TranslateService,
     public config: AppConfiguration,
     public state: AppState,
@@ -154,7 +158,7 @@ export class RelationComponent {
             this.infoData = resp.response.docs;
             this.infoIdentity = identity;
             this.updateInfoHeader();
-            this.state.showInfo.set(true);
+            this.openInfoDialog();
 
 
           });
@@ -166,6 +170,15 @@ export class RelationComponent {
     if (this.solrResponse && this.recipients && this.mentioned) {
       this.processResponse();
     }
+  }
+
+  openInfoDialog() {
+    this.service.openInfoDialog({
+        header: this.infoHeader,
+        content: '',
+        fields: this.infoFields,
+        data: this.infoData
+      });
   }
   
   changeTenant() {

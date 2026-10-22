@@ -61,11 +61,11 @@
         </div>
         <div class="app-analysis-graph-body" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"></div>
       </div>
-      @if (infoHeader) {
+      <!-- @if (infoHeader) {
         <div class="app-letters-info">
           <app-letters-info [header]="infoHeader" [content]="infoContent" (onClose)="closeInfo()"></app-letters-info>
         </div>
-      }
+      } -->
     </div>
   </div>
 }

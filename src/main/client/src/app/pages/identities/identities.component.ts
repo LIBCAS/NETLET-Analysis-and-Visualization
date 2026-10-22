@@ -31,12 +31,15 @@ import { AppConfiguration } from '../../app-configuration';
 import { FacetsComponent } from "../../components/facets/facets.component";
 import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
 import { AngularSplitModule } from "angular-split";
+import { MatDialog } from '@angular/material/dialog';
 
 echarts.use([CanvasRenderer, GraphChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent, LabelLayout]);
 
 @Component({
   selector: 'app-identities',
-  imports: [RouterLink, TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, LettersInfoComponent, AngularSplitModule],
+  imports: [RouterLink, TranslateModule, FormsModule, NgxEchartsDirective, MatProgressBarModule, 
+    MatExpansionModule, MatFormFieldModule, MatSelectModule, MatListModule, MatIconModule, 
+    MatCheckboxModule, MatRadioModule, YearsChartComponent, FacetsComponent, AngularSplitModule],
   providers: [
     provideEchartsCore({ echarts }),
   ],
@@ -80,6 +83,7 @@ export class IdentitiesComponent {
     @Inject(DOCUMENT) private document: Document,
     private _ngZone: NgZone,
     private router: Router,
+    private dialog: MatDialog,
     private translation: TranslateService,
     private config: AppConfiguration,
     public state: AppState,
@@ -162,7 +166,17 @@ export class IdentitiesComponent {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
       this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       this.setInfoHeader('identities.author_letters', identity);
-      this.state.showInfo.set(true);
+      
+      this.openInfoDialog();
+    });
+  }
+
+  openInfoDialog() {
+    this.service.openInfoDialog({
+      header: this.infoHeader,
+      content: this.infoContent,
+      fields: this.infoFields,
+      data: this.infoData
     });
   }
 
@@ -171,7 +185,8 @@ export class IdentitiesComponent {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
       this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       this.setInfoHeader('identities.recipient_letters', identity);
-      this.state.showInfo.set(true);
+      //this.state.showInfo.set(true);
+      this.openInfoDialog();
     });
   }
 
@@ -180,7 +195,8 @@ export class IdentitiesComponent {
       this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
       this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       this.setInfoHeader('identities.mentioned_letters', identity);
-      this.state.showInfo.set(true);
+      //this.state.showInfo.set(true);
+      this.openInfoDialog();
     });
   }
 

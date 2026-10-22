@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map, finalize, catchError, of, debounceTime, throttleTime, Subject, switchMap } from 'rxjs';
+import { LettersInfoComponent } from './components/letters-info/letters-info.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +10,9 @@ import { Observable, map, finalize, catchError, of, debounceTime, throttleTime, 
 export class AppService {
 
   constructor(
-    private http: HttpClient) { }
+    private dialog: MatDialog,
+    private http: HttpClient
+  ) { }
 
   private get(path: string, params = {}): Observable<Object> {
     const headers = new HttpHeaders({
@@ -125,6 +129,13 @@ export class AppService {
 
   getCatalogsInTime(params: HttpParams): Observable<any> {
     return this.get('data/catalogs_in_time', params)
+  }
+
+  openInfoDialog(data: any) {
+    const dialogRef = this.dialog.open(LettersInfoComponent, {
+      data: data,
+      width: '600px'
+    });
   }
   
 }

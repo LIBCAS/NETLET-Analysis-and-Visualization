@@ -10,7 +10,7 @@
   <nav class="app-navbar-nav" [attr.aria-label]="'navbar.main_navigation' | translate">
     <!-- redesign -->
     @if (showViews()) {
-      <button mat-button class="app-navbar-link" [matMenuTriggerFor]="views" (menuOpened)="op()">{{ 'views' | translate }}</button>
+      <button mat-button class="app-navbar-link" [matMenuTriggerFor]="views" >{{ 'views' | translate }}</button>
       <mat-menu #views="matMenu" class="app-views">
         @for (t of state.views; track t) {
           @if (t.route) {

@@ -151,21 +151,4 @@ export class NavbarComponent {
     this.onLanguageChanged('cs');
   }
 
-  // changeTenant(t: Tenant) {
-  //   this.state.changeMainTenant(t);
-  //   this.router.navigate([], {queryParams: {tenant:t.val}});
-  // }
-
-  // selectTenant(t: Tenant) {
-  //   this.state.setSelectedTenants();
-  //   this.router.navigate([], {queryParams: {tenant:this.state.selectedTenants().map(t => t.val).toString()}});
-  // }
-
-  // formatTenants() {
-  //   return this.state.selectedTenants().map(t => t.val)
-  // }
-
-  op() {
-    this.state.showInfo.set(false);
-  }
 }
