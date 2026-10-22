@@ -80,22 +80,6 @@
   }
 }
 
-// dialog
-.mat-mdc-dialog-container {
-  .mat-mdc-dialog-title {
-    margin: 0;
-    padding: 0 16px 8px 16px;
-  }
-
-  .mat-mdc-dialog-content {
-    padding: 16px !important;
-  }
-
-  .mat-mdc-dialog-actions {
-    padding: 0 16px 16px 16px !important;
-  }
-}
-
 // redesign
 :root {
   @include mat.form-field-overrides((
@@ -329,4 +313,73 @@
       margin: 0;
     }
   }
+}
+
+// redesign: Společný vzhled všech dialogů Angular Material.
+:root {
+  @include mat.dialog-overrides((
+    container-color: var(--app-color-paper),
+    container-shape: var(--app-view-radius),
+    container-elevation-shadow: var(--app-shadow-soft),
+    container-max-width: calc(100vw - 32px),
+    container-small-max-width: calc(100vw - 32px),
+    subhead-color: var(--app-color-ink),
+    subhead-font: var(--app-font-family),
+    subhead-size: 22px,
+    subhead-weight: 800,
+    subhead-line-height: 1.3,
+    supporting-text-color: var(--app-color-gray-8),
+    supporting-text-font: var(--app-font-family),
+    supporting-text-size: 14px,
+    supporting-text-line-height: 1.6,
+    headline-padding: var(--app-view-chart-padding) var(--app-view-chart-padding) 12px,
+    content-padding: 0 var(--app-view-chart-padding) var(--app-view-chart-padding),
+    with-actions-content-padding: 0 var(--app-view-chart-padding) var(--app-view-chart-padding),
+    actions-padding: 16px var(--app-view-chart-padding),
+    actions-alignment: flex-end,
+  ));
+}
+
+.mat-mdc-dialog-container {
+  @include mat.button-overrides((
+    outlined-container-shape: var(--app-view-radius),
+    outlined-outline-color: var(--app-color-line),
+    outlined-label-text-color: var(--app-color-primary-strong),
+    protected-container-shape: var(--app-view-radius),
+    protected-container-color: var(--app-color-paper),
+    protected-label-text-color: var(--app-color-primary-strong),
+    text-label-text-color: var(--app-color-primary-strong),
+  ));
+  @include mat.icon-button-overrides((
+    icon-color: var(--app-color-accent),
+    state-layer-color: var(--app-color-accent),
+  ));
+
+  .mat-mdc-dialog-title {
+    margin: 0;
+
+    // Material nemá token pro výšku pseudo-elementu, který posouvá první řádek titulku.
+    &::before {
+      display: none;
+    }
+  }
+
+  .mat-mdc-dialog-actions {
+    gap: 8px;
+    border-top: 1px solid var(--app-color-line);
+    background: var(--app-color-gray-0);
+  }
+
+  app-letters-table {
+    --app-timeline-tool-color: var(--app-color-accent);
+  }
+}
+
+// redesign: Na malé výšce zůstává scrollování tabulky uvnitř dialogu a akce jsou dostupné.
+.app-letters-info-dialog .mat-mdc-dialog-container .app-letters-table {
+  max-height: min(400px, calc(100dvh - 260px));
+}
+
+.app-letters-info-dialog .mat-mdc-dialog-container .app-letters-table th.mat-column-action {
+  background: var(--app-color-gray-0);
 }

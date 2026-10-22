@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map, finalize, catchError, of, debounceTime, throttleTime, Subject, switchMap } from 'rxjs';
-import { LettersInfoComponent } from './components/letters-info/letters-info.component';
+import { DialogLettersInfoComponent } from './components/dialog-letters-info/dialog-letters-info.component';
 import { MatDialog } from '@angular/material/dialog';
 
 @Injectable({
@@ -132,9 +132,12 @@ export class AppService {
   }
 
   openInfoDialog(data: any) {
-    const dialogRef = this.dialog.open(LettersInfoComponent, {
-      data: data,
-      width: '600px'
+    return this.dialog.open(DialogLettersInfoComponent, {
+      data,
+      width: '1280px',
+      maxWidth: 'calc(100vw - 32px)',
+      maxHeight: 'calc(100dvh - 32px)',
+      panelClass: 'app-letters-info-dialog',
     });
   }
   

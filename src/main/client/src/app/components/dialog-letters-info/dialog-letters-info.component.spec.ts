@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { testProviders } from '../../testing';
 
-import { LettersInfoComponent } from './letters-info.component';
+import { DialogLettersInfoComponent } from './dialog-letters-info.component';
 
-describe('LettersInfoComponent', () => {
-  let component: LettersInfoComponent;
-  let fixture: ComponentFixture<LettersInfoComponent>;
+describe('DialogLettersInfoComponent', () => {
+  let component: DialogLettersInfoComponent;
+  let fixture: ComponentFixture<DialogLettersInfoComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LettersInfoComponent],
+      imports: [DialogLettersInfoComponent],
       providers: testProviders
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(LettersInfoComponent);
+    fixture = TestBed.createComponent(DialogLettersInfoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

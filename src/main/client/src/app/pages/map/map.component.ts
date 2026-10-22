@@ -1,6 +1,6 @@
 import { Component, effect, Inject, NgZone, DOCUMENT, signal, computed, inject, DestroyRef, untracked } from '@angular/core';
 import { YearsChartComponent } from "../../components/years-chart/years-chart.component";
-import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
+import { DialogLettersInfoComponent } from "../../components/dialog-letters-info/dialog-letters-info.component";
 
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';

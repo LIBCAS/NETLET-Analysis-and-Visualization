@@ -25,7 +25,7 @@ import { AppService } from '../../app.service';
 import { YearsChartComponent } from '../../components/years-chart/years-chart.component';
 import { FacetFields, JSONFacet } from '../../shared/facet';
 import { Letter } from '../../shared/letter';
-import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
+import { DialogLettersInfoComponent } from "../../components/dialog-letters-info/dialog-letters-info.component";
 import { FacetsComponent } from "../../components/facets/facets.component";
 import { AngularSplitModule } from "angular-split";
 import { AppConfiguration } from '../../app-configuration';

@@ -1,0 +1,42 @@
+<div class="app-letters-info-heading">
+  <h2 mat-dialog-title>{{ computedHeader() }}</h2>
+  @if (data.type === 'link') {
+    <button
+      type="button"
+      mat-icon-button
+      [disabled]="!reversedLink()"
+      [attr.aria-label]="'letters_info.swap_direction' | translate"
+      [matTooltip]="'letters_info.swap_direction' | translate"
+      (click)="swapLink()">
+      <mat-icon aria-hidden="true">swap_horiz</mat-icon>
+    </button>
+  }
+</div>
+
+<mat-dialog-content>
+  @if (data.type === 'place') {
+    <div class="app-letters-info-controls">
+      <mat-checkbox [checked]="showFrom()" (change)="showFrom.set($event.checked)">
+        {{ 'letters_info.from' | translate }}
+      </mat-checkbox>
+      <mat-checkbox [checked]="showTo()" (change)="showTo.set($event.checked)">
+        {{ 'letters_info.to' | translate }}
+      </mat-checkbox>
+    </div>
+  }
+  @if (data.content) {
+    <div class="app-letters-info-description" [innerHTML]="data.content"></div>
+  }
+  <app-letters-table
+    [letters]="filteredData()"
+    [displayedColumns]="data.fields"
+    [target]="'_blank'">
+  </app-letters-table>
+  @if (!filteredData().length) {
+    <p class="app-letters-info-empty" role="status">{{ 'letters_info.empty' | translate }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button type="button" mat-stroked-button mat-dialog-close="done">{{ 'action.Close' | translate }}</button>
+</mat-dialog-actions>

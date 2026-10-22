@@ -1,4 +1,12 @@
 {
+  "letters_info": {
+    "place_title": "Letters from/to {{place}} ({{count}})",
+    "link_title": "Letters {{route}} ({{count}})",
+    "swap_direction": "Reverse correspondence direction",
+    "from": "Sent from here",
+    "to": "Delivered here",
+    "empty": "There are no letters for this selection."
+  },
   "place_detail": {
     "detail": "Place detail",
     "description": "The location and its role in the correspondence.",

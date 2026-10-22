@@ -29,7 +29,7 @@ import { LabelLayout } from "echarts/features";
 import { MatExpansionModule } from '@angular/material/expansion';
 import { AppConfiguration } from '../../app-configuration';
 import { FacetsComponent } from "../../components/facets/facets.component";
-import { LettersInfoComponent } from "../../components/letters-info/letters-info.component";
+import { DialogLettersInfoComponent } from "../../components/dialog-letters-info/dialog-letters-info.component";
 import { AngularSplitModule } from "angular-split";
 import { MatDialog } from '@angular/material/dialog';
 

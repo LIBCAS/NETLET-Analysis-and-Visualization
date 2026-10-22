@@ -1,0 +1,38 @@
+// redesign
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.app-letters-info-heading {
+  display: flex;
+  align-items: center;
+
+  h2 {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  button {
+    flex-shrink: 0;
+    margin-right: var(--app-view-chart-padding);
+  }
+}
+
+.app-letters-info-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-bottom: 12px;
+}
+
+.app-letters-info-description {
+  margin-bottom: 16px;
+}
+
+.app-letters-info-empty {
+  margin: 16px 0 0;
+  color: var(--app-color-muted);
+}

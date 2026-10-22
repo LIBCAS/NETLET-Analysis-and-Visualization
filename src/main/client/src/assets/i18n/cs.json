@@ -1,4 +1,12 @@
 {
+  "letters_info": {
+    "place_title": "Dopisy z/do místa {{place}} ({{count}})",
+    "link_title": "Dopisy {{route}} ({{count}})",
+    "swap_direction": "Obrátit směr korespondence",
+    "from": "Odeslané odsud",
+    "to": "Doručené sem",
+    "empty": "Pro tento výběr nejsou žádné dopisy."
+  },
   "place_detail": {
     "detail": "Detail místa",
     "description": "Poloha místa a jeho zastoupení v korespondenci.",
@@ -295,7 +303,7 @@
     "letter_details": "Zobrazit dopis",
     "selectAll": "Vybrat všechny",
     "showLinks": "Zobrazit spojnice",
-    "Close": "Zavřít "
+    "Close": "Zavřít"
   },
   "invalidTenant": "Nejsou k dispozice data pro tento Katalog",
   "catalog": {
