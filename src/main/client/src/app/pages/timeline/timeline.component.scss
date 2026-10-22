@@ -109,61 +109,6 @@
 .app-timeline-table {
   max-height: 400px;
   overflow: auto;
-
-  table {
-    width: 100%;
-    min-width: 980px;
-  }
-
-  th {
-    background: var(--app-color-gray-0);
-    font-weight: 750;
-    white-space: nowrap;
-  }
-
-  td {
-    font-size: 13px;
-    vertical-align: top;
-    padding-block: 12px;
-  }
-
-  tr:nth-child(even) td {
-    background: var(--app-color-gray-1);
-  }
-
-  a {
-    color: var(--app-color-primary-strong);
-    font-weight: 750;
-    text-decoration: none;
-    text-underline-offset: 3px;
-
-    &:hover {
-      color: var(--app-color-accent);
-      text-decoration: underline;
-    }
-  }
-
-  .mat-column-action {
-    white-space: nowrap;
-    background: var(--app-color-paper);
-  }
-
-  button {
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    margin-inline: 3px;
-    border: 1px solid var(--app-color-line);
-    border-radius: var(--app-view-radius);
-    color: var(--app-timeline-tool-color);
-    background: var(--app-color-paper);
-
-    mat-icon {
-      width: 16px;
-      height: 16px;
-      font-size: 16px;
-    }
-  }
 }
 
 @media (max-width: 700px) {

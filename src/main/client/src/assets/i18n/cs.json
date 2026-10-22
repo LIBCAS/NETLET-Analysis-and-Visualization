@@ -294,7 +294,8 @@
     "view_in_hiko": "Zobrazit v HIKO",
     "letter_details": "Zobrazit dopis",
     "selectAll": "Vybrat všechny",
-    "showLinks": "Zobrazit spojnice"
+    "showLinks": "Zobrazit spojnice",
+    "Close": "Zavřít "
   },
   "invalidTenant": "Nejsou k dispozice data pro tento Katalog",
   "catalog": {

@@ -294,7 +294,8 @@
     "view_in_hiko": "View in HIKO",
     "letter_details": "View letter",
     "selectAll": "Select all",
-    "showLinks": "Show links"
+    "showLinks": "Show links",
+    "Close": "Close"
   },
   "invalidTenant": "No data is available for this catalog",
   "catalog": {

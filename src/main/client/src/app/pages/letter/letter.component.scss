@@ -194,6 +194,104 @@
   }
 }
 
+:host ::ng-deep #letterMap {
+  
+  .lmap-ec-layer {
+    z-index: 300 !important;
+  }
+
+  .info {
+    padding: 3px;
+    border: 1px solid #aaa;
+    background-color: white;
+    box-shadow: 5px 2px 2px #ccc;
+
+    .title {
+      font-weight: bolder;
+    }
+
+    .rok {
+      cursor: pointer;
+
+      &.selected {
+        color: red;
+      }
+    }
+  }
+  
+  .app-map-boundaries {
+    width: 280px;
+    max-width: calc(100vw - 70px);
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 14px;
+    border: 1px solid var(--app-color-line);
+    border-radius: 8px;
+    background: var(--app-color-paper);
+    box-shadow: var(--app-shadow-soft);
+    color: var(--app-color-ink);
+    font-family: var(--app-font-family);
+
+    .app-map-boundaries-title {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .app-map-boundaries-years {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .rok {
+      min-height: 30px;
+      padding: 4px;
+      border: 1px solid var(--app-color-line);
+      border-radius: 6px;
+      background: var(--app-color-paper);
+      color: var(--app-color-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--app-color-gray-1);
+        color: var(--app-color-primary-strong);
+      }
+
+      &.selected {
+        border-color: var(--app-color-accent);
+        background: color-mix(in srgb, var(--app-color-accent) 10%, white);
+        color: var(--app-color-accent);
+        font-weight: 800;
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--app-color-primary);
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  .leaflet-control-zoom,
+  .leaflet-control-fullscreen {
+    overflow: hidden;
+    border: 1px solid var(--app-color-line);
+    border-radius: 8px;
+    box-shadow: var(--app-shadow-soft);
+
+    a {
+      border-color: var(--app-color-line);
+      background-color: var(--app-color-paper);
+      color: var(--app-color-accent);
+    }
+  }
+}
+
+
+
 @media (max-width: 980px) {
   .app-letter-layout {
     grid-template-columns: minmax(0, 1fr);
