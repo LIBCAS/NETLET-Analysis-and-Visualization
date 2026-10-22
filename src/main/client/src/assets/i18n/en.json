@@ -167,7 +167,9 @@
     "project": "NETLET Project",
     "language": "Change language",
     "czech": "Čeština",
-    "english": "English"
+    "english": "English",
+    "open_menu": "Open navigation",
+    "close_menu": "Close navigation"
   },
   "footer": {
     "license": "Developed under the license"

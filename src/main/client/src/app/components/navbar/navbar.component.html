@@ -1,16 +1,37 @@
-<!-- redesign -->
-<mat-toolbar class="app-navbar">
-  <a [routerLink]="['/']" queryParamsHandling="replace" class="app-navbar-brand" aria-label="NETLET">
-    <img src="https://netlet.lib.cas.cz/wp-content/uploads/2023/08/netlet-logo-white.svg" title="Netlet" alt="NETLET" class="app-logo" />
-    <!-- redesign -->
+<mat-toolbar class="app-navbar" (keydown.escape)="closeMenu(menuToggle)">
+  <a
+    [routerLink]="['/']"
+    queryParamsHandling="replace"
+    class="app-navbar-brand"
+    aria-label="NETLET"
+    (click)="menuOpen.set(false)">
+    <img
+      src="https://netlet.lib.cas.cz/wp-content/uploads/2023/08/netlet-logo-white.svg"
+      title="Netlet"
+      alt="NETLET"
+      class="app-logo" />
     <span class="app-logo-desc">{{ 'navbar.brand_description' | translate }}</span>
   </a>
 
-  <!-- redesign -->
-  <nav class="app-navbar-nav" [attr.aria-label]="'navbar.main_navigation' | translate">
-    <!-- redesign -->
+  <button
+    #menuToggle
+    mat-icon-button
+    type="button"
+    class="app-navbar-toggle"
+    aria-controls="app-navbar-navigation"
+    [attr.aria-expanded]="menuOpen()"
+    [attr.aria-label]="(menuOpen() ? 'navbar.close_menu' : 'navbar.open_menu') | translate"
+    (click)="menuOpen.set(!menuOpen())">
+    <mat-icon aria-hidden="true">{{ menuOpen() ? 'close' : 'menu' }}</mat-icon>
+  </button>
+
+  <nav
+    id="app-navbar-navigation"
+    class="app-navbar-nav"
+    [class.app-navbar-nav-open]="menuOpen()"
+    [attr.aria-label]="'navbar.main_navigation' | translate">
     @if (showViews()) {
-      <button mat-button class="app-navbar-link" [matMenuTriggerFor]="views" >{{ 'views' | translate }}</button>
+      <button mat-button class="app-navbar-link" [matMenuTriggerFor]="views">{{ 'views' | translate }}</button>
       <mat-menu #views="matMenu" class="app-views">
         @for (t of state.views; track t) {
           @if (t.route) {
@@ -41,19 +62,26 @@
       </mat-menu>
     }
 
-    <!-- redesign -->
-    <a mat-button class="app-navbar-link app-navbar-external" href="https://netlet-conversion-editor.inovatika.dev/" target="_blank" rel="noreferrer">
+    <a
+      mat-button
+      class="app-navbar-link app-navbar-external"
+      href="https://netlet-conversion-editor.inovatika.dev/"
+      target="_blank"
+      rel="noreferrer">
       <span>{{ 'navbar.conversion_editor' | translate }}</span>
       <mat-icon aria-hidden="true">open_in_new</mat-icon>
     </a>
 
-    <!-- redesign -->
-    <a mat-button class="app-navbar-link app-navbar-external" href="https://netlet.lib.cas.cz/" target="_blank" rel="noreferrer">
+    <a
+      mat-button
+      class="app-navbar-link app-navbar-external"
+      href="https://netlet.lib.cas.cz/"
+      target="_blank"
+      rel="noreferrer">
       <span>{{ 'navbar.project' | translate }}</span>
       <mat-icon aria-hidden="true">open_in_new</mat-icon>
     </a>
 
-    <!-- redesign -->
     <div class="app-navbar-language" role="group" [attr.aria-label]="'navbar.language' | translate">
       <button
         type="button"

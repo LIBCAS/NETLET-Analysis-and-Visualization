@@ -1,15 +1,14 @@
-
-import { Component, computed } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Component, computed, signal } from '@angular/core';
+import { MatButtonModule, MatIconButton } from '@angular/material/button';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Router, RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppState } from '../../app-state';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { FormsModule } from '@angular/forms';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 
 /*
@@ -108,12 +107,12 @@ const NAVBAR_VIEW_ICONS: Record<string, string> = {
 
 @Component({
   selector: 'app-navbar',
-  imports: [MatToolbarModule, MatButtonModule, MatIconModule, MatDialogModule, 
-    MatCheckboxModule, FormsModule, RouterModule, TranslateModule, MatMenuModule],
+  imports: [MatToolbarModule, MatButtonModule, MatIconModule, RouterModule, TranslateModule, MatMenuModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent {
+  readonly menuOpen = signal(false);
 
   readonly viewAppearance: Record<string, { icon: string; color: string }> = {
     timeline: { icon: 'timeline', color: '#b6463f' },
@@ -130,25 +129,39 @@ export class NavbarComponent {
   showViews = computed<boolean>(() => !this.state.isHome());
 
   constructor(
-    private router: Router,
-    public dialog: MatDialog,
+    router: Router,
+    breakpoints: BreakpointObserver,
     public translator: TranslateService,
     public state: AppState,
     iconRegistry: MatIconRegistry,
     sanitizer: DomSanitizer
   ) {
+    router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntilDestroyed()
+    ).subscribe(() => this.menuOpen.set(false));
+
+    breakpoints.observe('(max-width: 1040px)').pipe(
+      takeUntilDestroyed()
+    ).subscribe(() => this.menuOpen.set(false));
+
     for (const [name, svg] of Object.entries(NAVBAR_VIEW_ICONS)) {
       iconRegistry.addSvgIconLiteralInNamespace('app-navbar', name, sanitizer.bypassSecurityTrustHtml(svg));
     }
   }
 
+  closeMenu(toggle: MatIconButton): void {
+    if (this.menuOpen()) {
+      this.menuOpen.set(false);
+      toggle.focus();
+    }
+  }
+
   onLanguageChanged(lang: string) {
-    //localStorage.setItem('lang', lang);
     this.translator.use(lang);
   }
 
   ngOnInit(): void {
     this.onLanguageChanged('cs');
   }
-
 }
