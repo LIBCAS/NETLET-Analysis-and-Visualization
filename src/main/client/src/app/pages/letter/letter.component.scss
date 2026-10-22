@@ -325,3 +325,11 @@
     gap: 4px;
   }
 }
+
+// redesign: Delší seznam zmíněných osob se posouvá samostatně, nadpis zůstává viditelný.
+.app-letter-person-list-scroll {
+  max-height: calc(10 * (1.5em + 6px));
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  scrollbar-gutter: stable;
+}

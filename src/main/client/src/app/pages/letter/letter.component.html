@@ -105,13 +105,20 @@
           </h2>
           <div class="app-letter-persons">
             @for (group of personGroups(); track group.label) {
+              @let scrollable = group.label === 'mentioned' && group.people.length > 10;
               <div class="app-letter-group">
                 <h3>{{ 'field.' + group.label | translate }}</h3>
-                @for (person of group.people; track person.id) {
-                  <a [routerLink]="identityUrl(person)">{{ person.name }}</a>
-                } @empty {
-                  <span class="app-letter-muted">{{ 'letter.not_provided' | translate }}</span>
-                }
+                <div
+                  [class.app-letter-person-list-scroll]="scrollable"
+                  [attr.tabindex]="scrollable ? 0 : null"
+                  [attr.role]="scrollable ? 'region' : null"
+                  [attr.aria-label]="scrollable ? ('field.' + group.label | translate) : null">
+                  @for (person of group.people; track person.id) {
+                    <a [routerLink]="identityUrl(person)">{{ person.name }}</a>
+                  } @empty {
+                    <span class="app-letter-muted">{{ 'letter.not_provided' | translate }}</span>
+                  }
+                </div>
               </div>
             }
           </div>
