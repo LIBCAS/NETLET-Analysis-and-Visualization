@@ -164,15 +164,15 @@ export class TimelineComponent {
     this.chart = e;
     this.chart.on('dataZoom', (params: any) => {
       var option: any = this.chart.getOption();
-//console.log(option)
+      //console.log(option)
 
-  // var axis = myChart.getModel().option.xAxis[0];
-  // var starttime = axis.data[axis.rangeStart];
-  // var endtime = axis.data[axis.rangeEnd];
-  // console.log(starttime,endtime);
+      // var axis = myChart.getModel().option.xAxis[0];
+      // var starttime = axis.data[axis.rangeStart];
+      // var endtime = axis.data[axis.rangeEnd];
+      // console.log(starttime,endtime);
 
       this.excludeDate = false;
-      
+
       this.limits = [new Date(option.dataZoom[1].startValue), new Date(option.dataZoom[1].endValue)];
       this.getData(false);
     });
@@ -246,8 +246,8 @@ export class TimelineComponent {
     p.offset = this.pageIndex * p.rows;
     this.state.addFilters(p);
 
-    if (this.chart) {
-      this.chart.showLoading('default', {color: '#c23531', text: ''});
+    if (setGraph && this.chart) {
+      this.chart.showLoading('default', { color: '#c23531', text: '' });
     }
 
     this.service.getTimeline(p as HttpParams).subscribe((resp: any) => {
@@ -273,13 +273,16 @@ export class TimelineComponent {
       if (setGraph) {
         this.processResponse();
       }
+      if (this.chart) {
+        this.chart.hideLoading();
+      }
       this.loading = false;
     });
   }
 
   setOptions(data: any, date: any) {
     const dataZoomStart = data.length > 0 ? data[0][0] : 0;
-    const dataZoomEnd = data.length > 0 ? data[data.length-1][0] : 100;
+    const dataZoomEnd = data.length > 0 ? data[data.length - 1][0] : 100;
 
     this.chartOptions = {
 
@@ -303,13 +306,13 @@ export class TimelineComponent {
         {
           left: 60,
           rigth: '50px',
-          height: this.gridInverse ? '20%' : 'auto', 
+          height: this.gridInverse ? '20%' : 'auto',
         },
         {
           left: 60,
           rigth: this.gridInverse ? '50px' : '-50px',
           top: this.gridInverse ? '40%' : '60',
-          height: this.gridInverse ? '35%' : 'auto', 
+          height: this.gridInverse ? '35%' : 'auto',
         }
       ],
 
@@ -358,7 +361,7 @@ export class TimelineComponent {
           axisLabel: {
             showMinLabel: false
           },
-           splitLine:{show: false}
+          splitLine: { show: false }
         },
         {
           name: 'Počet dopisů za den',
@@ -370,20 +373,19 @@ export class TimelineComponent {
           axisLabel: {
             showMinLabel: false
           },
-           splitLine:{show: false}
+          splitLine: { show: false }
         }
       ],
       dataZoom: [
         {
-          type: 'inside',
+          type: 'slider',
           start: dataZoomStart,
-          end: dataZoomEnd,
-          //xAxisIndex: [0,1]
+          end: dataZoomEnd
         },
         {
           start: dataZoomStart,
           end: dataZoomEnd,
-          xAxisIndex: [0,1]
+          xAxisIndex: [0, 1]
         }
       ],
       series: [
@@ -408,7 +410,7 @@ export class TimelineComponent {
         {
           name: 'Počet dopisů za den',
           type: this.chartType + '',
-          
+
           itemStyle: this.state.getBarItemStyle('#83bff6', '#188df0'),
           barWidth: '3px',
           xAxisIndex: 1,
