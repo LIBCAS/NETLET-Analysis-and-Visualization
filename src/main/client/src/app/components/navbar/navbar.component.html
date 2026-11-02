@@ -62,6 +62,7 @@
       </mat-menu>
     }
 
+    @if(state.isHome()) {
     <a
       mat-button
       class="app-navbar-link app-navbar-external"
@@ -81,7 +82,7 @@
       <span>{{ 'navbar.project' | translate }}</span>
       <mat-icon aria-hidden="true">open_in_new</mat-icon>
     </a>
-
+    }
     <div class="app-navbar-language" role="group" [attr.aria-label]="'navbar.language' | translate">
       <button
         type="button"

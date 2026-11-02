@@ -1,5 +1,5 @@
 import { afterRenderEffect, Component, ElementRef, inject, Inject, DOCUMENT, viewChild } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule  } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { FooterComponent } from "./components/footer/footer.component";
 import { AppState } from './app-state';
@@ -18,7 +18,7 @@ export class AppComponent {
   private router = inject(Router);
   private host = inject<ElementRef<HTMLElement>>(ElementRef);
   private navbar = viewChild(NavbarComponent, { read: ElementRef });
-  
+
   title = 'netlet-analysis';
 
   constructor(
@@ -46,11 +46,13 @@ export class AppComponent {
   ngOnInit() {
     const s = this.route.queryParams.pipe(
       switchMap(p => {
-        this.state.isHome.set(false);
         this.processParams(p);
         return of(true);
       })
     );
+    this.router.events.subscribe(() => {
+      this.state.isHome.set(false);
+    });
     s.subscribe();
   }
 
