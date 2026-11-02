@@ -350,6 +350,7 @@ export class HomeComponent {
   }
 
   search() {
+    window.scroll(0, 0);
     this.setFilters();
     if (this.state.hasStateInUrl()) {
       this.router.navigate(['timeline'], { queryParams: { s: this.state.encodeState() } });
@@ -358,6 +359,7 @@ export class HomeComponent {
   }
 
   gotoView(view: string) {
+    window.scroll(0, 0);
     this.setFilters();
     if (this.state.hasStateInUrl()) {
       this.router.navigate([view], { queryParams: { s: this.state.encodeState() } });

@@ -136,7 +136,7 @@
           [attr.href]="card.route && searchModel().tenants.length ? '/' + card.route : null"
           [attr.aria-disabled]="!card.route || !searchModel().tenants.length"
           [attr.tabindex]="card.route && searchModel().tenants.length ? 0 : -1"
-          (click)="$event.preventDefault(); card.route && searchModel().tenants.length && gotoView(card.route)">
+          (click)="$event.preventDefault(); searchModel().tenants.length && gotoView(card.route)">
           <span class="app-home-view-icon">
             <mat-icon [svgIcon]="'app-home:' + viewAppearance[card.header].icon" aria-hidden="true"></mat-icon>
           </span>
