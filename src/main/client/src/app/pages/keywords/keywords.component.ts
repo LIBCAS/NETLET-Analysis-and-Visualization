@@ -116,15 +116,15 @@ export class KeywordsComponent {
         this.facets.set({});
       }
     });
-  }
-
-  ngOnInit(): void {
 
     this.translation.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
       if (this.limits && this.state.selectedTenants().length) {
         this.getData(true);
       }
     });
+  }
+
+  ngOnInit(): void {
 
     this.state.tenants().forEach(t => { t.available = true });
     this.state.currentView = this.state.views.find(v => v.route === 'keywords');

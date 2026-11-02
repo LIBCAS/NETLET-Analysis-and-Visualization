@@ -140,16 +140,16 @@ export class MapComponent {
         this.facets.set({});
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.state.tenants().forEach(t => { t.available = true });
-    this.state.currentView = this.state.views.find(v => v.route === 'map');
     this.translation.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.graphChart && !this.graphChart.isDisposed()) {
         this.addControl(this.map);
       }
     });
+  }
+
+  ngOnInit(): void {
+    this.state.tenants().forEach(t => { t.available = true });
+    this.state.currentView = this.state.views.find(v => v.route === 'map');
   }
 
   ngOnDestroy(): void {
