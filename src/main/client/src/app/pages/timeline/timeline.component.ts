@@ -201,7 +201,6 @@ export class TimelineComponent {
   onFiltersChanged(usedFacets: { field: string, value: string }[]) {
     //this.usedFacets = usedFacets;
     this.limits = this.state.getTenantsRange();
-    console.log(this.limits)
     this.getData(true);
   }
 

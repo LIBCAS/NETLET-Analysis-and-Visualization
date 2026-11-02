@@ -68,13 +68,7 @@ public class HikoIndexer {
       NamedList<Object> resp = solr.request(jrequest, "identities");
       InputStream is = (InputStream) resp.get("stream");
       JSONObject ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
-
-//            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-//            rawJsonResponseParser.setWriterType("json");
-//            jrequest.setResponseParser(rawJsonResponseParser);
-//            NamedList<Object> resp = solr.request(jrequest, "identities");
-//            String jsonResponse = (String) resp.get("response");
-//            JSONObject ret = new JSONObject(jsonResponse);
+      
       JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
       if (docs.length() > 0) {
         identityProfessions.put(identityId, docs.getJSONObject(0).optJSONArray("professions", new JSONArray()));
@@ -198,7 +192,7 @@ public class HikoIndexer {
         indexLetters(client, ret, tenant, from);
       }
       client.commit("hiko");
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
       ret.put("error", ex);
     }
@@ -220,7 +214,7 @@ public class HikoIndexer {
 
   private void clear(SolrClient client, String collection, LocalDateTime start) {
     try {
-      String to = dtformatter.format(start.atZone(ZoneOffset.UTC));
+      String to = dtformatter.format(start.atZone(ZoneOffset.UTC).minusDays(1));
       client.deleteByQuery(collection, "indextime:[* TO " + to + "]");
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, "Error clearing index", ex);
@@ -261,7 +255,7 @@ public class HikoIndexer {
       }
 
       client.commit("hiko");
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
       ret.put("error", ex);
     }
@@ -288,7 +282,7 @@ public class HikoIndexer {
       }
 
       client.commit("hiko");
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
       ret.put("error", ex);
     }
@@ -315,7 +309,7 @@ public class HikoIndexer {
       }
 
       client.commit("hiko");
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error indexing tenant", ex);
       ret.put("error", ex);
     }
@@ -336,7 +330,7 @@ public class HikoIndexer {
       initProfessions();
       indexLetter(client, ret, tenant, id);
       client.commit("hiko");
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error indexing tenant", ex);
       ret.put("error", ex);
     }
@@ -775,7 +769,7 @@ public class HikoIndexer {
         }
       }
       client.commit("identities");
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error indexing identities", ex);
       ret.put("error", ex);
     }
@@ -825,7 +819,7 @@ public class HikoIndexer {
         client.commit("places");
       }
 
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error indexing tenant", ex);
       ret.put("error", ex);
     }
@@ -990,7 +984,7 @@ public class HikoIndexer {
       }
       clear(client, "places", start);
       client.commit("places");
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error indexing places", ex);
       ret.put("error", ex);
     }
@@ -1046,6 +1040,7 @@ public class HikoIndexer {
       ret.put(tenant, ex.toString());
       LOGGER.log(Level.SEVERE, "Error in tenant {0}", tenant);
       LOGGER.log(Level.SEVERE, "Error is {0}", ex);
+      ret.put("error", "Error in tenant " + tenant);
     }
   }
 
@@ -1056,7 +1051,7 @@ public class HikoIndexer {
     try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       indexGlobalPlaces(client, ret);
       client.commit("places");
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error indexing global places", ex);
       ret.put("error", ex);
     }
@@ -1104,7 +1099,7 @@ public class HikoIndexer {
 
       LOGGER.log(Level.INFO, "Global places FINISHED {0}", tindexed);
     } catch (Exception ex) {
-      ret.put("global", ex.toString());
+      ret.put("error", ex.toString());
       LOGGER.log(Level.SEVERE, "Error in tenant {0} -> {1}", new Object[]{t, ex.toString()});
     }
   }
@@ -1149,7 +1144,7 @@ public class HikoIndexer {
       }
 
       client.commit("locations");
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error indexing locations", ex);
       ret.put("error", ex);
     }
@@ -1227,7 +1222,7 @@ public class HikoIndexer {
     try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       JSONArray tenants = Options.getInstance().getJSONObject("test_mappings").names();
       indexGlobalKeywords(client, ret, tenants.getString(0));
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error indexing global keywords", ex);
       ret.put("error", ex);
     }
@@ -1280,13 +1275,14 @@ public class HikoIndexer {
       for (String tenant : tenants) {
         try {
           indexTenantKeywords(client, ret, tenant);
-        } catch (URISyntaxException | IOException | InterruptedException ex) {
+        } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, "Error indexing keywords", ex);
+          ret.put("error", ex);
         }
       }
 
       client.commit("keywords");
-    } catch (SolrServerException | IOException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error indexing keywords", ex);
       ret.put("error", ex);
     }
@@ -1374,7 +1370,7 @@ public class HikoIndexer {
     try (SolrClient client = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       JSONArray tenants = Options.getInstance().getJSONObject("test_mappings").names();
       indexGlobalProfessions(client, ret, tenants.getString(0));
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error indexing global Professions", ex);
       ret.put("error", ex);
     }
@@ -1430,7 +1426,7 @@ public class HikoIndexer {
       }
 
       client.commit("professions");
-    } catch (URISyntaxException | InterruptedException | IOException | SolrServerException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error indexing Professions", ex);
       ret.put("error", ex);
     }

@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { MapViewComponent } from './pages/map-view/map-view.component';
 import { HomeComponent } from './pages/home/home.component';
 import { KeywordsComponent } from './pages/keywords/keywords.component';
 import { IdentitiesComponent } from './pages/identities/identities.component';
@@ -22,7 +21,6 @@ export const routes: Routes = [
     {path: 'relation', component: RelationComponent},
     {path: 'identities', component: IdentitiesComponent},
     {path: 'map', component: MapComponent},
-    {path: 'map-view', component: MapViewComponent},
     {path: 'periods', component: PeriodsComponent},
     {path: 'professions', component: ProfessionsComponent},
     {path: 'keywords', component: KeywordsComponent},

@@ -196,22 +196,27 @@
     },
     "centrality": {
       "header": "Centralita",
+      "text_long": "Blíže středu a většími body zobrazuje nejfrekventovanější osoby korespondence (autory, adresáty a sdílené osoby či každou z těchto kategorií zvlášť). Kliknutí na konkrétní bod osoby rozbalí seznam dopisů, v němž lze rozkliknout konkrétní dopis s dalšími údaji a vizualizacemi",
       "text": "Centralita aktérů korespondence v dané korespondenční síti"
     },
     "relation": {
       "header": "Vztah mezi dvěma sítěmi",
+      "text_long": "Zobrazuje osoby, které se vyskytují současně ve dvou sítích a které nikoliv",
       "text": "Míra jejich zprostředkovatelské pozice mezi dvěma sítěmi"
     },
     "keywords": {
       "header": "Klíčová slova",
+      "text_long": "Zobrazuje podíl kategorií klíčových slov i počet dopisů s konkrétním klíčovým slovem.",
       "text": "Kocitační sítě mapující v dopisech zmiňované osoby ve vztahu ke specifickým tématům či debatám."
     },
     "map": {
       "header": "Mapa",
+      "text_long": "Zobrazuje místa odeslání a přijetí dopisů. Velikost i odstín bodu na mapě se mění podle počtu dopisů (viz legendu pod časovou osou). Šipka indikuje směr korespondence.",
       "text": "Digitální vizualizace zaměřené na geografický horizont jednotlivých osobních korespondenčních souborů."
     },
     "periods": {
       "header": "Období",
+      "text_long": "Umožňuje porovnat podíl kategorií klíčových slov nebo podíl profesí adresátů a autorů ve třech obdobích českých dějin (1580–1670, 1870–1939 a 1939–1989).",
       "text": "Komparativně pojatá zobrazení v rámci tří hlavních období"
     },
     "catalogs_in_time": {
@@ -220,10 +225,12 @@
     },
     "identities": {
       "header": "Vztahy mezi osobami",
+      "text_long": "Zobrazuje autory a adresáty dopisů a poměr těchto dvou rolí.",
       "text": "Schémata zobrazující vztahy mezi jednotlivými pisateli a příjemci dopisů"
     },
     "professions": {
       "header": "Profese",
+      "text_long": "Zobrazuje poměr profesí autorů a/nebo adresátů podle počtu dopisů nebo podle počtu osob.",
       "text": "Schémata zobrazující korespondenční vztahy mezi různými profesními skupinami"
     },
     "themes": {
@@ -232,6 +239,7 @@
     },
     "timeline": {
       "header": "Časová osa",
+      "text_long": "Udává počet dopisů za den a rok ve vybraném časovém intervalu, tabulka s podrobnějšími údaji umožňuje rozkliknout konkrétní dopis s dalšími údaji a vizualizacemi",
       "text": "Zobrazení dopisů v chronologickém pořadí na časové ose"
     }
   },
