@@ -877,6 +877,7 @@ public class HikoIndexer {
           url = null;
           continue;
         }
+        List<SolrInputDocument> idocs = new ArrayList();
         for (int i = 0; i < docs.length(); i++) {
           JSONObject rs = docs.getJSONObject(i);
 
@@ -957,14 +958,16 @@ public class HikoIndexer {
           }
 
           doc.addField("type", rs.getString("type"));
-
-          client.add("identities", doc);
+          idocs.add(doc);
           ret.put(tenant, tindexed++);
 
-          client.commit("identities");
-          LOGGER.log(Level.INFO, "Tenant {0} -> {1} docs", new Object[]{tenant, tindexed});
-
         }
+        if (!idocs.isEmpty()) {
+          client.add("identities", idocs);
+        }
+        
+        client.commit("identities");
+        LOGGER.log(Level.INFO, "Tenant {0} -> {1} docs", new Object[]{tenant, tindexed});
         url = resp.getJSONObject("links").optString("next", null);
         Thread.sleep(1000);
       }
