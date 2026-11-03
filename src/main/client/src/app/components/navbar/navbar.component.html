@@ -38,15 +38,13 @@
             <a
               mat-menu-item
               class="app-navbar-view-item"
-              [routerLink]="[t.route]"
               queryParamsHandling="preserve"
               routerLinkActive="app-active"
-              [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' }"
               #viewLink="routerLinkActive"
               [attr.aria-current]="viewLink.isActive ? 'page' : null"
               [style.--app-view-accent]="viewAppearance[t.header].color"
               [title]="'home.' + t.header + '.text' | translate"
-              (click)="state.currentView = t">
+              (click)="gotoView(t)">
               <span class="app-navbar-view-content">
                 <span class="app-navbar-view-icon">
                   <mat-icon [svgIcon]="'app-navbar:' + viewAppearance[t.header].icon" aria-hidden="true"></mat-icon>
@@ -63,7 +61,7 @@
     }
 
     @if(state.isHome()) {
-    <a
+    <!-- <a
       mat-button
       class="app-navbar-link app-navbar-external"
       href="https://netlet-conversion-editor.inovatika.dev/"
@@ -71,7 +69,7 @@
       rel="noreferrer">
       <span>{{ 'navbar.conversion_editor' | translate }}</span>
       <mat-icon aria-hidden="true">open_in_new</mat-icon>
-    </a>
+    </a> -->
 
     <a
       mat-button

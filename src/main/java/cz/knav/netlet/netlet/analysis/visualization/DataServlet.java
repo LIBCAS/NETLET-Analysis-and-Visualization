@@ -43,7 +43,7 @@ public class DataServlet extends HttpServlet {
                 Actions actionToDo = Actions.valueOf(actionNameParam.toUpperCase());
                 JSONObject json = actionToDo.doPerform(request, response);
                 if (json != null) {
-                    response.getWriter().println(json.toString(2));
+                    response.getWriter().println(json.toString()); 
                 }
 
             } else {

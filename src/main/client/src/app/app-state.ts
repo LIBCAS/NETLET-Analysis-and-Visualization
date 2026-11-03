@@ -77,11 +77,11 @@ export interface Tenant {
       text: 'Statisticky pojaté grafy a časové osy porovnávající dynamiku vývoje jednotlivých korespondenčních celků v časové dimenzi',
       route: 'catalogs'
     },
-    {
-      header: 'themes',
-      text: 'Schémata zobrazující tematická propojení dopisů a korespondenčních celků',
-      route: ''
-    },
+    // {
+    //   header: 'themes',
+    //   text: 'Schémata zobrazující tematická propojení dopisů a korespondenčních celků',
+    //   route: ''
+    // },
   ];
   currentView: { header: string, text: string, route: string };
 

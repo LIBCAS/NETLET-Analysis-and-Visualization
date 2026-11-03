@@ -292,12 +292,13 @@ export class CentralityComponent {
     p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
     p.recipient = this.selectedRecipients;
     this.state.addFilters(p);
-    this.facets.set({})
-    if (!setResponse) {
-      p.rows = 0;
-    } else {
-      p.rows = 10000;
-    }
+    this.facets.set({});
+    p.rows = 0;
+    // if (!setResponse) {
+    //   p.rows = 0;
+    // } else {
+    //   p.rows = 10000;
+    // }
     this.service.getIdentities(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
@@ -342,36 +343,6 @@ export class CentralityComponent {
     return { x, y, radius, angle }
   }
 
-  authorLabel(identity: string) {
-    this._ngZone.run(() => {
-      // const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
-
-      // let popup = '';
-      // letters.forEach((letter: Letter) => {
-      //   popup += `<div>- ${letter.identity_recipient}. ${letter.date_year}`;
-      //   if (letter.keyword_categories_cs?.length > 0) {
-      //     popup += ` (${letter.keyword_categories_cs.join(', ')})`;
-      //   } else if (letter.keywords_cs?.length > 0) {
-      //     popup += ` (${letter.keywords_cs.join(', ')})`;
-      //   } else {
-
-      //   }
-
-      //   const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
-      //   const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
-      //   popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
-      //   this.infoContent = popup;
-
-      // });
-
-      this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
-      this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
-
-      this.setInfoHeader('identities.author_letters', identity);
-      this.openInfoDialog();
-    });
-  }
-
   openInfoDialog() {
     this.service.openInfoDialog({
       header: this.infoHeader,
@@ -381,62 +352,60 @@ export class CentralityComponent {
     });
   }
 
+  authorLabel(identity: string) {
+    this._ngZone.run(() => {
+      this.setInfoHeader('identities.recipient_letters', identity);
+      this.getLetters('author', identity);
 
+      // this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
+      // this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
+
+      // this.setInfoHeader('identities.author_letters', identity);
+      // this.openInfoDialog();
+    });
+  }
 
   recipientLabel(identity: string) {
     this._ngZone.run(() => {
-      // const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
-
-      // let popup = '';
-      // letters.forEach((letter: Letter) => {
-      //   popup += `<div>- ${letter.identity_author}. ${letter.date_year}`;
-      //   if (letter.keyword_categories_cs?.length > 0) {
-      //     popup += ` (${letter.keyword_categories_cs.join(', ')})`;
-      //   } else if (letter.keywords_cs?.length > 0) {
-      //     popup += ` (${letter.keywords_cs.join(', ')})`;
-      //   } else {
-
-      //   }
-
-      //   const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
-      //   const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
-      //   popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
-
-      //   this.infoContent = popup;
-      // });
-
-      this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
-      this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       this.setInfoHeader('identities.recipient_letters', identity);
-      this.openInfoDialog();
+      this.getLetters('recipient', identity);
+
+      // this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
+      // this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
+      // this.openInfoDialog();
     });
   }
 
   mentionedLabel(identity: string) {
     this._ngZone.run(() => {
-      // const letters = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
-
-      // let popup = '';
-      // letters.forEach((letter: Letter) => {
-      //   popup += `<div>${letter.identity_author} -> ${letter.identity_recipient}. ${letter.date_year}`;
-      //   if (letter.keyword_categories_cs?.length > 0) {
-      //     popup += ` (${letter.keyword_categories_cs.join(', ')})`;
-      //   } else if (letter.keywords_cs?.length > 0) {
-      //     popup += ` (${letter.keywords_cs.join(', ')})`;
-      //   } else {
-      //     //popup += `</div>`;
-      //   }
-
-      //   const tenant = this.config.isTest ? this.config.test_mappings[letter.tenant] : letter.tenant;
-      //   const link = this.config.hikoUrl.replace('{tenant}', tenant).replace('{id}', letter.letter_id + '');
-      //   popup += ` <a class="app-hiko" target="_hiko" href="${link}">view in hiko</a></div>`;
-
-      //   this.infoContent = popup;
-      // });
 
       this.setInfoHeader('identities.mentioned_letters', identity);
-      this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
+      this.getLetters('mentioned', identity);
+      // this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
+      // this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
+      // this.openInfoDialog();
+    });
+  }
+
+  getLetters(identityField: string, identity: string) {
+
+    const p: any = {};
+    p.tenant = this.state.selectedTenants().map(t => t.val);
+    p.tenant_year_range = this.state.getTenantsRange().toString();
+    p.date_range = this.limits[0].toISOString() + ',' + this.limits[1].toISOString();
+
+    this.state.addFilters(p);
+    p.rows = 20000;
+    p[identityField] = '"' + identity + '"';
+
+    this.service.getIdentitiyLetters(p as HttpParams).subscribe((resp: any) => {
+      if (!resp) {
+        return;
+      }
+      this.infoData = resp.response.docs;
       this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
+      
+      this.infoHeader = `Letters from/to ${identity}`;
       this.openInfoDialog();
     });
   }

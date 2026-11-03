@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule, MatIconButton } from '@angular/material/button';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -127,9 +127,10 @@ export class NavbarComponent {
   };
 
   showViews = computed<boolean>(() => !this.state.isHome());
+  window = window;
 
   constructor(
-    router: Router,
+    private router: Router,
     breakpoints: BreakpointObserver,
     public translator: TranslateService,
     public state: AppState,
@@ -163,5 +164,18 @@ export class NavbarComponent {
 
   ngOnInit(): void {
     this.onLanguageChanged('cs');
+  }
+
+  gotoView(view: {
+      header: string,
+      text: string,
+      route: string
+    }) {
+    window.scroll(0, 0);
+    this.state.currentView = view;
+    //this.setFilters();
+    if (this.state.hasStateInUrl()) {
+      this.router.navigate([view.route], { queryParams: { s: this.state.encodeState() } });
+    }
   }
 }
