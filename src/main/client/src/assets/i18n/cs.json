@@ -61,6 +61,16 @@
       "mode_printed": "Tisk",
       "printed": "Tisk"
     },
+    "copy_type_values": {
+      "letter": "Dopis",
+      "postcard": "Dopisnice",
+      "picture postcard": "Pohlednice",
+      "vccard": "Navštívenka/Vizitka",
+      "greeting card": "Přání",
+      "invitation card": "Pozvánka",
+      "telegram": "Telegram",
+      "type_other": "Jiné"
+    },
     "preservation_values": {
       "original": "Originál",
       "copy": "Opis",
@@ -287,7 +297,8 @@
     "Copy": "Repozitáře",
     "type": "Typ dokumentu",
     "preservation": "Dochování",
-    "copy": "Typ kopie",
+    "copy_copy": "Technika záznamu",
+    "copy_type": "Typ dokumentu",
     "repository": "Repozitář",
     "archive": "Archiv",
     "collection": "Sbírka",

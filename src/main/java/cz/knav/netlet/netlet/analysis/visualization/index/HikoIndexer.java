@@ -880,10 +880,27 @@ public class HikoIndexer {
         List<SolrInputDocument> idocs = new ArrayList();
         for (int i = 0; i < docs.length(); i++) {
           JSONObject rs = docs.getJSONObject(i);
+          SolrInputDocument doc = processIdentity(rs, tenant);
+          idocs.add(doc);
+          ret.put(tenant, tindexed++);
 
-          SolrInputDocument doc = new SolrInputDocument();
+        }
+        if (!idocs.isEmpty()) {
+          client.add("identities", idocs);
+        }
+        
+        client.commit("identities");
+        LOGGER.log(Level.INFO, "Tenant {0} -> {1} docs", new Object[]{tenant, tindexed});
+        url = resp.getJSONObject("links").optString("next", null);
+        Thread.sleep(1000);
+      }
+    }
+  }
+  
+  private SolrInputDocument processIdentity(JSONObject rs, String tenant) {
+    SolrInputDocument doc = new SolrInputDocument();
 
-          String id = tenant + "_" + rs.getInt("id");
+    String id = tenant + "_" + rs.getInt("id");
 
           doc.addField("id", id);
           doc.addField("table_id", rs.getInt("id"));
@@ -895,6 +912,9 @@ public class HikoIndexer {
           doc.addField("gender", rs.optString("gender"));
           doc.addField("birth_year", rs.optString("birth_year"));
           doc.addField("death_year", rs.optString("death_year"));
+          if (rs.has("related_identity_resources")) {
+            doc.addField("related_identity_resources", rs.optJSONArray("related_identity_resources").toString());
+          }
 
           String normalized = normalize(rs.optString("name", "") + rs.optString("birth_year", "") + rs.optString("death_year", ""));
           doc.addField("name_normalized", normalized);
@@ -958,21 +978,12 @@ public class HikoIndexer {
           }
 
           doc.addField("type", rs.getString("type"));
-          idocs.add(doc);
-          ret.put(tenant, tindexed++);
 
-        }
-        if (!idocs.isEmpty()) {
-          client.add("identities", idocs);
-        }
-        
-        client.commit("identities");
-        LOGGER.log(Level.INFO, "Tenant {0} -> {1} docs", new Object[]{tenant, tindexed});
-        url = resp.getJSONObject("links").optString("next", null);
-        Thread.sleep(1000);
-      }
-    }
+    
+
+    return doc;
   }
+
 
   public JSONObject indexPlaces() throws URISyntaxException, IOException, InterruptedException {
     //  LocalDateTime start = LocalDateTime.now(ZoneOffset.UTC);

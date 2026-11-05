@@ -41,9 +41,9 @@ public class DataServlet extends HttpServlet {
             String actionNameParam = request.getPathInfo().substring(1);
             if (actionNameParam != null) {
                 Actions actionToDo = Actions.valueOf(actionNameParam.toUpperCase());
-                JSONObject json = actionToDo.doPerform(request, response);
+                String json = actionToDo.doPerform(request, response);
                 if (json != null) {
-                    response.getWriter().println(json.toString()); 
+                    response.getWriter().println(json); 
                 }
 
             } else {
@@ -68,23 +68,23 @@ public class DataServlet extends HttpServlet {
     enum Actions {
         GET_DICTS {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
               JSONObject ret = new JSONObject();
               ret.put("tenants", IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant"));
               ret.put("places", IndexSearcher.getAllPlaces());
               //ret.put("identities", IndexSearcher.getAllIdentities());
-                return ret;
+                return ret.toString();
             }
         },
         GET_TENANTS {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant");
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant").toString();
             }
         },
         INDEX_HIKO {
             @Override
-            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
                 JSONObject json = new JSONObject();
                 try {
@@ -94,12 +94,12 @@ public class DataServlet extends HttpServlet {
                     LOGGER.log(Level.SEVERE, "Error {0}", ex);
                     json.put("error", ex.toString());
                 }
-                return json;
+                return json.toString();
             }
         },
         INDEX_IDENTITIES {
             @Override
-            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
                 JSONObject json = new JSONObject();
                 try {
@@ -109,12 +109,12 @@ public class DataServlet extends HttpServlet {
                     LOGGER.log(Level.SEVERE, "Error {0}", ex);
                     json.put("error", ex.toString());
                 }
-                return json;
+                return json.toString();
             }
         },
         INDEX_PROFESSIONS {
             @Override
-            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
                 JSONObject json = new JSONObject();
                 try {
@@ -124,12 +124,12 @@ public class DataServlet extends HttpServlet {
                     LOGGER.log(Level.SEVERE, "Error {0}", ex);
                     json.put("error", ex.toString());
                 }
-                return json;
+                return json.toString();
             }
         },
         INDEX_PLACES {
             @Override
-            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
                 JSONObject json = new JSONObject();
                 try {
@@ -139,12 +139,12 @@ public class DataServlet extends HttpServlet {
                     LOGGER.log(Level.SEVERE, "Error {0}", ex);
                     json.put("error", ex.toString());
                 }
-                return json;
+                return json.toString();
             }
         },
         UPDATE_HIKO {
             @Override
-            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
                 JSONObject json = new JSONObject();
                 try {
@@ -154,12 +154,12 @@ public class DataServlet extends HttpServlet {
                     LOGGER.log(Level.SEVERE, "Error", ex);
                     json.put("error", ex.toString());
                 }
-                return json;
+                return json.toString();
             }
         },
         INDEX_HIKO_TENANTS {
             @Override
-            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
                 JSONObject json = new JSONObject();
                 try {
@@ -169,12 +169,12 @@ public class DataServlet extends HttpServlet {
                     LOGGER.log(Level.SEVERE, "Error", ex);
                     json.put("error", ex.toString());
                 }
-                return json;
+                return json.toString();
             }
         },
         INDEX_HIKO_TENANT {
             @Override
-            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
                 JSONObject json = new JSONObject();
                 try {
@@ -184,12 +184,12 @@ public class DataServlet extends HttpServlet {
                     LOGGER.log(Level.SEVERE, "Error", ex);
                     json.put("error", ex.toString());
                 }
-                return json;
+                return json.toString();
             }
         },
         INDEX_HIKO_LETTER {
             @Override
-            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 JSONObject json = new JSONObject();
                 try {
                     HikoIndexer hi = new HikoIndexer();
@@ -198,12 +198,12 @@ public class DataServlet extends HttpServlet {
                     LOGGER.log(Level.SEVERE, "Error", ex);
                     json.put("error", ex.toString());
                 }
-                return json;
+                return json.toString();
             }
         },
         INDEX_HIKO_DB {
             @Override
-            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
                 JSONObject json = new JSONObject();
                 try {
@@ -213,90 +213,90 @@ public class DataServlet extends HttpServlet {
                     LOGGER.log(Level.SEVERE, "Error", ex);
                     json.put("error", ex.toString());
                 }
-                return json;
+                return json.toString();
             }
         },
         MAP{
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.getMapLetters(request);
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.getMapLetters(request).toString();
             }
         },
         MAP_IN_TIME{
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.mapInTime(request); 
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.mapInTime(request).toString(); 
             }
         },
         IDENTITIES{
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 return IndexSearcher.identityFacets(request);  
             }
         },
         RELATION{
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.relation(request);
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.relation(request).toString();
             }
         },
         IDENTITY_LETTERS{
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 return IndexSearcher.identityLetters(request);
             }
         },
         KEYWORDS {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.keywords(request);
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.keywords(request).toString();
             }
         },
         GET_LETTER {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.getLetter(request.getParameter("id"));
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.getLetter(request.getParameter("id")).toString();
             }
         },
         GET_CATALOG {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.getCatalog(request.getParameter("id"));
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.getCatalog(request.getParameter("id")).toString();
             }
         },
         GET_PLACE {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.getPlace(request.getParameter("id"));
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.getPlace(request.getParameter("id")).toString();
             }
         },
         GET_IDENTITY {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.getIdentity(request.getParameter("id"));
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.getIdentity(request.getParameter("id")).toString();
             }
         },
         IDENTITY_IN_TIME {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.twoIdentitiesInTime(request.getParameter("id"), request.getParameter("id2")); 
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.twoIdentitiesInTime(request.getParameter("id"), request.getParameter("id2")).toString(); 
             }
         },
         CATALOGS_IN_TIME {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.catalogsInTime(); 
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.catalogsInTime().toString(); 
             }
         },
         IDENTITY_IN_CATALOG {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.getIdentityInCatalog(request.getParameter("id"), request.getParameter("catalog"));
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.getIdentityInCatalog(request.getParameter("id"), request.getParameter("catalog")).toString();
             }
         },
         SEARCH_KEYWORDS {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
 
                 String lang = request.getParameter("lang");
@@ -311,12 +311,12 @@ public class DataServlet extends HttpServlet {
                         request.getParameter("tenant"),
                         lang, "category_lower_"+lang,  "type:[value v=category],value:category_"+lang, 
                         true).getJSONObject("response").getJSONArray("docs"));
-                return ret;
+                return ret.toString();
             }
         },
         SEARCH_LANGUAGES {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
 
                 String lang = request.getParameter("lang");
@@ -325,12 +325,12 @@ public class DataServlet extends HttpServlet {
                 }
                 ret.put("languages", IndexSearcher.searchLanguages()
                         .getJSONObject("facets").getJSONObject("languages").getJSONArray("buckets"));
-                return ret;
+                return ret.toString();
             }
         },
         SEARCH_PLACES {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
 
                 String lang = request.getParameter("lang");
@@ -340,12 +340,12 @@ public class DataServlet extends HttpServlet {
                 ret.put("places", IndexSearcher.searchPlaces(request.getParameter("prefix"), 
                         request.getParameter("tenant"),
                         lang).getJSONObject("response").getJSONArray("docs"));
-                return ret;
+                return ret.toString();
             }
         },
         SEARCH_IDENTITIES {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 JSONObject ret = new JSONObject();
 
                 String lang = request.getParameter("lang");
@@ -355,29 +355,29 @@ public class DataServlet extends HttpServlet {
                 ret.put("identities", IndexSearcher.searchIdentities(request.getParameter("prefix"), 
                         request.getParameter("tenant"),
                         lang).getJSONObject("response").getJSONArray("docs"));
-                return ret;
+                return ret.toString();
             }
         },
         PERIODS {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.periods(request);
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.periods(request).toString();
             }
         },
         PROFESSIONS {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 return IndexSearcher.professions(request);
             }
         },
         TIMELINE {
             @Override
-            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.timeline(request);
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.timeline(request).toString();
             }
         }; 
 
-        abstract JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception;
+        abstract String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception;
     }
 
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -197,7 +197,7 @@
           @for (copy of data.hiko?.copies; track copy.id) {
             <dl class="app-letter-metadata app-letter-copy">
               <div>
-                <dt>{{ 'field.copy' | translate }}</dt>
+                <dt>{{ 'field.copy_copy' | translate }}</dt>
                 <dd>{{ copy.copy ? translatedValue('copy_values', copy.copy) : ('letter.not_provided' | translate) }}</dd>
               </div>
               <div>
@@ -220,6 +220,12 @@
                 <div>
                   <dt>{{ 'field.manifestation_notes' | translate }}</dt>
                   <dd>{{ copy.manifestation_notes }}</dd>
+                </div>
+              }
+              @if (copy.type) {
+                <div>
+                  <dt>{{ 'field.copy_type' | translate }}</dt>
+                <dd>{{ copy.copy ? translatedValue('copy_type_values', copy.type) : ('letter.not_provided' | translate) }}</dd>
                 </div>
               }
             </dl>

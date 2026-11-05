@@ -458,6 +458,30 @@ main > :has(> .app-analysis-layout .app-view-content) {
     }
   }
 
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--app-color-line);
+    border-radius: 8px;
+    background: var(--app-color-paper);
+    color: var(--app-color-map-link);
+    box-shadow: var(--app-shadow-soft);
+
+    &:hover:not(:disabled) {
+      border-color: var(--app-color-map-link);
+      background: var(--app-color-gray-1);
+    }
+
+    &:disabled {
+      color: var(--app-color-gray-4);
+      box-shadow: none;
+    }
+  }
+
   mat-icon {
     width: 16px;
     height: 16px;

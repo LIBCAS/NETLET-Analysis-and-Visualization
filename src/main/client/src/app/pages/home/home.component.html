@@ -15,7 +15,8 @@
           <mat-datepicker-toggle matIconSuffix [for]="datum_od"></mat-datepicker-toggle>
           <mat-datepicker #datum_od startView="multi-year" [startAt]="year_min" (yearSelected)="doDateFromByYear($event)">
             <mat-datepicker-actions>
-              <button matButton matDatepickerCancel>OK</button>
+              <button matButton matDatepickerApply>OK</button>
+              <button matButton matDatepickerCancel>Close</button>
             </mat-datepicker-actions>
           </mat-datepicker>
         </mat-form-field>
@@ -26,7 +27,8 @@
           <mat-datepicker-toggle matIconSuffix [for]="datum_do"></mat-datepicker-toggle>
           <mat-datepicker #datum_do startView="multi-year" [startAt]="year_max" (yearSelected)="doDateToByYear($event)">
             <mat-datepicker-actions>
-              <button matButton matDatepickerCancel>OK</button>
+              <button matButton matDatepickerApply>OK</button>
+              <button matButton matDatepickerCancel>Close</button>
             </mat-datepicker-actions>
           </mat-datepicker>
         </mat-form-field>

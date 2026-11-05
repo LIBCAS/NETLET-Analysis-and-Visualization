@@ -49,14 +49,14 @@
             {{ 'home.periods.header' | translate }}
           </li>
         </ol>
+        <button 
+        mat-icon-button
+        type="button" style="position: absolute; right: 30px; top: 15px;" (click)="state.showYears.set(!state.showYears())">
+          <mat-icon aria-hidden="true">bar_chart</mat-icon>
+        </button>
       </nav>
 
-      <header class="app-view-header app-view-card">
-        <p>{{ 'home.periods.header' | translate }}</p>
-        <h1>{{ 'periods.title' | translate }}</h1>
-        <div>{{ 'home.periods.text_long' | translate }}</div>
-      </header>
-
+      @if (state.showYears()) {
       <section class="app-view-card app-view-chart" [attr.aria-label]="'map.year_chart' | translate">
         <div class="app-years">
           @if (solrResponse?.facets.years) {
@@ -68,6 +68,13 @@
           }
         </div>
       </section>
+      }
+
+      <header class="app-view-header app-view-card">
+        <p>{{ 'home.periods.header' | translate }}</p>
+        <h1>{{ 'periods.title' | translate }}</h1>
+        <div>{{ 'home.periods.text_long' | translate }}</div>
+      </header>
 
       @if (invalidTenant) {
         <mat-card class="app-view-card" appearance="outlined">

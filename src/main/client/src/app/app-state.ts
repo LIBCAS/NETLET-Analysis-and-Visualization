@@ -22,6 +22,8 @@ export interface Tenant {
   public isHome = signal<boolean>(false);
   public tenants = signal<Tenant[]>([]);
   public places = signal<any>({});
+  public showYears = signal<boolean>(true);
+  
 
   // public selectedTenants = signal<Tenant[]>([]);
 

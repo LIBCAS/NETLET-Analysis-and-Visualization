@@ -25,6 +25,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FacetsComponent } from "../../components/facets/facets.component";
 import { AngularSplitModule } from "angular-split";
+import { MatButtonModule } from '@angular/material/button';
 
 echarts.use([PieChart, BarChart, CanvasRenderer, TreemapChart, TreeChart, LegendComponent, TooltipComponent, GridComponent, TitleComponent]);
 
@@ -39,6 +40,7 @@ echarts.use([PieChart, BarChart, CanvasRenderer, TreemapChart, TreeChart, Legend
     MatCardModule,
     MatListModule,
     MatExpansionModule,
+    MatButtonModule,
     MatIconModule,
     MatCheckboxModule,
     YearsChartComponent,

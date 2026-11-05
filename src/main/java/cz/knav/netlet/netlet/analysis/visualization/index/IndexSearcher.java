@@ -751,7 +751,7 @@ public class IndexSearcher {
     return ret;
   }
 
-  public static JSONObject identityFacets(HttpServletRequest request) {
+  public static String identityFacets(HttpServletRequest request) {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
@@ -806,16 +806,16 @@ public class IndexSearcher {
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
       NamedList<Object> resp = solr.request(jrequest, "hiko");
       InputStream is = (InputStream) resp.get("stream");
-      ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
-      solr.close();
+      String r = IOUtils.toString(is, "UTF-8");
+      return r;
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
       ret.put("error", ex);
+      return ret.toString();
     }
-    return ret;
   }
 
-  public static JSONObject identityLetters(HttpServletRequest request) {
+  public static String identityLetters(HttpServletRequest request) {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
@@ -842,16 +842,16 @@ public class IndexSearcher {
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
       NamedList<Object> resp = solr.request(jrequest, "hiko");
       InputStream is = (InputStream) resp.get("stream");
-      ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
       solr.close();
+      return IOUtils.toString(is, "UTF-8");
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
       ret.put("error", ex);
+    return ret.toString();
     }
-    return ret;
   }
 
-  public static JSONObject professions(HttpServletRequest request) {
+  public static String professions(HttpServletRequest request) {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       String lang = request.getParameter("lang");
@@ -905,13 +905,13 @@ public class IndexSearcher {
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
       NamedList<Object> resp = solr.request(jrequest, "hiko");
       InputStream is = (InputStream) resp.get("stream");
-      ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+      return IOUtils.toString(is, "UTF-8");
 
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
       ret.put("error", ex);
+      return ret.toString();
     }
-    return ret;
   }
 
   public static JSONObject periods(HttpServletRequest request) {

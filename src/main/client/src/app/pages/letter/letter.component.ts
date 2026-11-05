@@ -73,11 +73,13 @@ export class LetterComponent {
   readonly searchUrl = this.router.createUrlTree(['/'], {
     queryParams: this.source?.url.queryParams ?? this.route.snapshot.queryParams,
   });
+
   readonly letterRes = httpResource<any>(() => this.letterId() ? {
     url: '/api/data/get_letter',
     params: { id: this.letterId() },
   } : undefined);
   readonly letter = computed(() => this.letterRes.hasValue() ? this.letterRes.value() : undefined);
+  
   readonly personGroups = computed(() => ['authors', 'recipients', 'mentioned'].map((label, index) => ({
     label,
     people: (this.letter()?.identities ?? []).filter((person: any) => person.role === ['author', 'recipient', 'mentioned'][index]),
