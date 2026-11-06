@@ -75,6 +75,7 @@ import { Configuration } from './shared/config';
                         t.available = true
                     });
                     this.state.places.set(res.places);
+                    this.state.identities.set(res.identities);
                 }));
             }),
             catchError((err) => {

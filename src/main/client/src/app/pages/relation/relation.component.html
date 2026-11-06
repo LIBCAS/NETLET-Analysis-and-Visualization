@@ -62,6 +62,9 @@
             {{ 'home.relation.header' | translate }}
           </li>
         </ol>
+        <button mat-icon-button type="button" class="app-years-button" [title]="'action.toggle_years_chart' | translate" (click)="state.showYears.set(!state.showYears())">
+          <mat-icon aria-hidden="true">bar_chart</mat-icon>
+        </button>
       </nav>
 
       <header class="app-view-header app-view-card">

@@ -72,7 +72,7 @@ public class DataServlet extends HttpServlet {
               JSONObject ret = new JSONObject();
               ret.put("tenants", IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant"));
               ret.put("places", IndexSearcher.getAllPlaces());
-              //ret.put("identities", IndexSearcher.getAllIdentities());
+              ret.put("identities", IndexSearcher.getAllIdentities());
                 return ret.toString();
             }
         },

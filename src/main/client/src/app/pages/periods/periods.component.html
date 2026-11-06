@@ -49,9 +49,7 @@
             {{ 'home.periods.header' | translate }}
           </li>
         </ol>
-        <button 
-        mat-icon-button
-        type="button" style="position: absolute; right: 30px; top: 15px;" (click)="state.showYears.set(!state.showYears())">
+        <button mat-icon-button type="button" class="app-years-button" [title]="'action.toggle_years_chart' | translate" (click)="state.showYears.set(!state.showYears())">
           <mat-icon aria-hidden="true">bar_chart</mat-icon>
         </button>
       </nav>

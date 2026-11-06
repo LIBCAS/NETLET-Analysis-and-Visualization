@@ -41,7 +41,7 @@
     "description": "Přehled dopisů, osob a časového vývoje korespondence v katalogu.",
     "search_letters": "Prohlédnout dopisy",
     "correspondence": "Korespondence hlavních osob",
-    "main_people": "Hlavní osoby"
+    "main_identities": "Hlavní osoby/instituce"
   },
   "letter": {
     "detail": "Dopis",
@@ -134,6 +134,7 @@
   },
   "identities": {
     "title": "Korespondenční síť osob",
+    "identity_letters": "{{identity}} — odeslané a přijaté dopisy",
     "author_letters": "{{identity}} — odeslané dopisy",
     "recipient_letters": "{{identity}} — přijaté dopisy",
     "mentioned_letters": "{{identity}} — zmínky v dopisech"
@@ -324,7 +325,8 @@
     "letter_details": "Zobrazit dopis",
     "selectAll": "Vybrat všechny",
     "showLinks": "Zobrazit spojnice",
-    "Close": "Zavřít"
+    "Close": "Zavřít",
+    "toggle_years_chart": "Zobrazit/skrýt časový graf"
   },
   "invalidTenant": "Nejsou k dispozice data pro tento Katalog",
   "catalog": {

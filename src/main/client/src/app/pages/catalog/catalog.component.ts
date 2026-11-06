@@ -241,20 +241,7 @@ export class CatalogComponent {
     let maxCount = 0;
 
 
-    if (this.identityInTime().recipient?.years) {
-      const d = this.identityInTime().recipient.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
-      d.forEach((c: JSONFacet) => {
-        maxCount = Math.max(maxCount, c.count)
-      });
-      series.push({
-        name: 'jako adresat',
-        color: this.config.colors['recipient'],
-        type: 'line',
-        smooth: true,
-        symbol: 'none',
-        data: d.map((c: JSONFacet) => [c.val, c.count])
-      });
-    }
+    
     if (this.identityInTime().author?.years) {
       const d = this.identityInTime().author.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       d.forEach((c: JSONFacet) => {
@@ -269,13 +256,27 @@ export class CatalogComponent {
         data: d.map((c: JSONFacet) => [c.val, c.count])
       });
     }
+    if (this.identityInTime().recipient?.years) {
+      const d = this.identityInTime().recipient.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
+      d.forEach((c: JSONFacet) => {
+        maxCount = Math.max(maxCount, c.count)
+      });
+      series.push({
+        name: 'jako adresát',
+        color: this.config.colors['recipient'],
+        type: 'line',
+        smooth: true,
+        symbol: 'none',
+        data: d.map((c: JSONFacet) => [c.val, c.count])
+      });
+    }
     if (this.identityInTime().mentioned?.years) {
       const d = this.identityInTime().mentioned.years.buckets.filter((c: JSONFacet) => this.inLimits(c, limits));
       d.forEach((c: JSONFacet) => {
         maxCount = Math.max(maxCount, c.count)
       });
       series.push({
-        name: 'mentioned',
+        name: 'jako zmíněná osoba',
         color: this.config.colors['mentioned'],
         type: 'line',
         smooth: true,

@@ -41,7 +41,7 @@
     "description": "An overview of letters, people and the development of correspondence over time within the catalog.",
     "search_letters": "Browse letters",
     "correspondence": "Correspondence of key people",
-    "main_people": "Key people"
+    "main_identities": "Key people/institutions"
   },
   "letter": {
     "detail": "Letter",
@@ -134,6 +134,7 @@
   },
   "identities": {
     "title": "Network of correspondents",
+    "identity_letters": "{{identity}} — sent and received letters",
     "author_letters": "{{identity}} — sent letters",
     "recipient_letters": "{{identity}} — received letters",
     "mentioned_letters": "{{identity}} — mentions in letters"
@@ -316,7 +317,8 @@
     "letter_details": "View letter",
     "selectAll": "Select all",
     "showLinks": "Show links",
-    "Close": "Close"
+    "Close": "Close",
+    "toggle_years_chart": "Zobrazit/skrýt časový graf"
   },
   "invalidTenant": "No data is available for this catalog",
   "catalog": {

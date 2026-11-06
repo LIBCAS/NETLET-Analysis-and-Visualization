@@ -500,6 +500,7 @@ public class HikoIndexer {
     addIdentities(rs.getJSONArray("authors"), "author", doc, tenant);
     addIdentities(rs.getJSONArray("recipients"), "recipient", doc, tenant);
     addIdentities(rs.getJSONArray("mentioned"), "mentioned", doc, tenant);
+    addIdentitiesLinks(rs.getJSONArray("authors"),rs.getJSONArray("recipients"), doc, tenant);
     addKeywords(rs.optJSONArray("keywords"), doc, tenant);
     return doc;
   }
@@ -655,6 +656,37 @@ public class HikoIndexer {
       identity.put("professions", addProfessions(id, role, doc, tenant));
       //JSONArray ps = addProfessions(id, role, doc, tenant);
       doc.addField("identities", identity.toString());
+
+    }
+  }
+  
+  
+
+  private void addIdentitiesLinks(JSONArray authors, JSONArray recipients, SolrInputDocument doc, String tenant) {
+      
+
+    for (int i = 0; i < authors.length(); i++) {
+      JSONObject author = authors.getJSONObject(i);
+      String scope = author.optString("scope");
+      JSONObject gi = author.optJSONObject("global_identity");
+      String author_id = ("local".equals(scope) ? tenant : "global") + "_" + author.getInt("id");
+      if (gi != null) {
+        author_id = "global_" + gi.getInt("id");
+      }
+      
+      //String author_id = ("local".equals(author.optString("scope")) ? tenant : "global") + "_" + author.optString("id");
+      for (int j = 0; j < recipients.length(); j++) {
+        JSONObject recipient = recipients.getJSONObject(j);
+        String rscope = recipient.optString("scope");
+        JSONObject rgi = recipient.optJSONObject("global_identity");
+        String recipient_id = ("local".equals(rscope) ? tenant : "global") + "_" + recipient.getInt("id");
+        if (rgi != null) {
+          recipient_id = "global_" + rgi.getInt("id");
+        }
+        
+        //String recipient_id = ("local".equals(recipient.optString("scope")) ? tenant : "global") + "_" + recipient.optString("id");
+        doc.addField("identities_link_id", author_id + "-" + recipient_id);
+      }
 
     }
   }

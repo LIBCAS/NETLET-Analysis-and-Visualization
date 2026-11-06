@@ -50,8 +50,12 @@ export class DialogLettersInfoComponent {
       return this.data.data.filter(letter =>
         (this.showFrom() && this.matchesPlace(letter.origin_id, place)) ||
         (this.showTo() && this.matchesPlace(letter.destination_id, place)));
+    } else if(this.data.type === 'identities_link'){
+      return this.linkSwapped() ? this.reversedLink()?.docs ?? [] : this.data.data;
+    } else {
+      return this.linkSwapped() ? this.reversedLink()?.docs ?? [] : this.data.data;
     }
-    return this.linkSwapped() ? this.reversedLink()?.docs ?? [] : this.data.data;
+    
   });
   readonly computedHeader = computed(() => {
     this.language();
@@ -70,6 +74,14 @@ export class DialogLettersInfoComponent {
         count: this.filteredData().length,
       });
     }
+    if (this.data.type === 'identities_link') {
+      return this.translation.instant('letters_info.link_title', {
+        route: header.replace(/^Letters from\s+/, '').replace(/\s+\(\d+\)$/, '').replace(/ > /g, ' → '),
+        count: this.filteredData().length,
+      });
+    }
+
+    
     return header;
   });
 

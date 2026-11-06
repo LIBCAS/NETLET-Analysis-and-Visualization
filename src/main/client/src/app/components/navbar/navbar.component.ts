@@ -166,16 +166,12 @@ export class NavbarComponent {
     this.onLanguageChanged('cs');
   }
 
-  gotoView(view: {
-      header: string,
-      text: string,
-      route: string
-    }) {
+  gotoView(view: {header: string, text: string, route: string}) {
     window.scroll(0, 0);
     this.state.currentView = view;
     //this.setFilters();
-    if (this.state.hasStateInUrl()) {
+    //if (this.state.hasStateInUrl()) {
       this.router.navigate([view.route], { queryParams: { s: this.state.encodeState() } });
-    }
+    //}
   }
 }

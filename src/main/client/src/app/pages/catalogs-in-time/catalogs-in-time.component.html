@@ -34,6 +34,9 @@
             {{ 'home.catalogs_in_time.header' | translate }}
           </li>
         </ol>
+        <button mat-icon-button type="button" class="app-years-button" [title]="'action.toggle_years_chart' | translate" (click)="state.showYears.set(!state.showYears())">
+          <mat-icon aria-hidden="true">bar_chart</mat-icon>
+        </button>
       </nav>
 
       <header class="app-view-header app-view-card">
@@ -41,7 +44,7 @@
         <h1>{{ 'catalogs_in_time.title' | translate }}</h1>
         <div>{{ 'home.catalogs_in_time.text' | translate }}</div>
       </header>
-
+      @if (state.showYears()) {
       <section
         class="app-analysis-workspace app-analysis-graph app-view-card app-view-chart"
         [attr.aria-label]="'home.catalogs_in_time.header' | translate">
@@ -54,6 +57,7 @@
           (chartInit)="onYearsChartInit($event)">
         </div>
       </section>
+    }
     </div>
   </as-split-area>
 </as-split>

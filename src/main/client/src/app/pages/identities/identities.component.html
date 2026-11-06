@@ -34,6 +34,9 @@
             {{ 'home.identities.header' | translate }}
           </li>
         </ol>
+        <button mat-icon-button type="button" class="app-years-button" [title]="'action.toggle_years_chart' | translate" (click)="state.showYears.set(!state.showYears())">
+          <mat-icon aria-hidden="true">bar_chart</mat-icon>
+        </button>
       </nav>
 
       <header class="app-view-header app-view-card">
@@ -43,6 +46,7 @@
       </header>
 
       <div class="app-view-network-workspace app-analysis-workspace app-analysis-graph">
+      @if (state.showYears()) {
         <section class="app-view-card app-view-chart" [attr.aria-label]="'map.year_chart' | translate">
           <div class="app-years">
             @if (solrResponse?.facets.years) {
@@ -56,6 +60,7 @@
             }
           </div>
         </section>
+      }
 
         <section
           class="app-view-network app-view-card app-view-card-clip app-analysis-graph-body"

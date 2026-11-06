@@ -457,6 +457,9 @@ main > :has(> .app-analysis-layout .app-view-content) {
       text-decoration: underline;
     }
   }
+  .app-years-button {
+    position: absolute; right: 30px; top: 15px;
+  }
 
   button {
     display: inline-flex;

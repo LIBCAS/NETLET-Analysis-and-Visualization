@@ -8,6 +8,7 @@ export interface Letter {
     origin_name: string,
     destination_name: string,
     link_id: string[],
+    identities_link_id: string[],
     date_year: number,
     places: Place[],
     identities: Identity[],

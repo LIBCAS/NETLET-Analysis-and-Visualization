@@ -125,7 +125,7 @@ public class IndexSearcher {
               .withFacet("tenant", tenantFacet)
               .withFacet("identity", new TermsFacetMap("identity_id")
                       .includeTotalNumBuckets(true)
-                      .setLimit(10)
+                      .setLimit(30)
                       .setMinCount(1))
               .withFacet("mentioned", new TermsFacetMap("identity_mentioned_id")
                       .includeTotalNumBuckets(true)
@@ -337,7 +337,7 @@ public class IndexSearcher {
 
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
-              .returnFields("id,name,name_normalized")
+              .returnFields("id,name")
               .setLimit(100000);
 
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
@@ -786,15 +786,18 @@ public class IndexSearcher {
               //.returnFields("id,letter_id,tenant,date_year,date_computed,identity_name,identity_recipient,identity_author,identity_mentioned,origin,destination,identities:[json],keywords_category_cs,keywords_cs")
               .withFacet("date_year", rangeFacet)
               //              .withFacet("keywords", categoriesFacet)
-              .withFacet("chart_mentioned", new TermsFacetMap("identity_mentioned")
+              .withFacet("links", new TermsFacetMap("identities_link_id") 
+                        .setLimit(-1)
+                        .setMinCount(1))
+              .withFacet("chart_mentioned", new TermsFacetMap("identity_mentioned_id")
                       .setLimit(1000)
                       .setSort("index")
                       .setMinCount(1))
-              .withFacet("chart_recipients", new TermsFacetMap("identity_recipient")
+              .withFacet("chart_recipients", new TermsFacetMap("identity_recipient_id")
                       .setLimit(1000)
                       .setSort("index")
                       .setMinCount(1))
-              .withFacet("chart_authors", new TermsFacetMap("identity_author")
+              .withFacet("chart_authors", new TermsFacetMap("identity_author_id")
                       .setLimit(1000)
                       .setSort("index")
                       .setMinCount(1))
@@ -833,17 +836,24 @@ public class IndexSearcher {
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
               //.withFilter("identity_mentioned:\"" + request.getParameter("mentioned") +"\"")
-              .returnFields("id,letter_id,tenant,date_computed,date_year,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
+              .returnFields("id,letter_id,tenant,date_computed,date_year,identities_link_id,identity_name,identity_recipient,identity_author,origin,destination,places:[json],identities:[json],keywords_category_cs,keywords_cs")
               //.returnFields("id,letter_id,identity_author,identity_recipient,date_year,origin_name,destination_name")
               .setLimit(rows);
 
       jrequest = addFilters(request, jrequest, lang);
+      
+      if (request.getParameter("identities_link_id") != null) {
+        String f = request.getParameter("identities_link_id");
+        String rf = f.split("-")[1] + '-' + f.split("-")[0];
+        jrequest = jrequest.withFilter("identities_link_id:\"" + f + "\" OR identities_link_id:\"" + rf + "\"");
+        jrequest = jrequest.withParam("stats", "false").withParam("facet", "false");
+      }
 
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
       NamedList<Object> resp = solr.request(jrequest, "hiko");
       InputStream is = (InputStream) resp.get("stream");
-      solr.close();
-      return IOUtils.toString(is, "UTF-8");
+      String r = IOUtils.toString(is, "UTF-8");
+      return r;
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
       ret.put("error", ex);
