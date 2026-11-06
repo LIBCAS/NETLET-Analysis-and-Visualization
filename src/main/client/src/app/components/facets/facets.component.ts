@@ -98,7 +98,7 @@ export class FacetsComponent {
 
   ngOnInit() {
     this.tenantClickSubject$.pipe(
-      debounceTime(500),
+      debounceTime(700),
       // complete with component destroy *
       takeUntil(this.destroy$)
     )

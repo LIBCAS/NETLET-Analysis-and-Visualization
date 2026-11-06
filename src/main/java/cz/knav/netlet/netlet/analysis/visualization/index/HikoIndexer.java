@@ -487,13 +487,6 @@ public class HikoIndexer {
     doc.addField("date_year", date_year);
     setPeriod(doc, date_year);
 
-//      <field name="date_marked" type="string" indexed="true" stored="true" />
-//  <field name="date_uncertain" type="boolean" indexed="true" stored="true" />
-//  <field name="date_approximate" type="boolean" indexed="true" stored="true" />
-//  <field name="date_inferred" type="boolean" indexed="true" stored="true" />
-//  <field name="date_is_range" type="boolean" indexed="true" stored="true" />
-//  <field name="date_note" type="string" indexed="true" stored="true" />
-//          
     addPlaces(rs.getJSONArray("origins"), "origin", doc, tenant);
     addPlaces(rs.getJSONArray("destinations"), "destination", doc, tenant);
     addLinks(rs.getJSONArray("origins"),rs.getJSONArray("destinations"), doc, tenant);
@@ -665,8 +658,6 @@ public class HikoIndexer {
   
 
   private void addIdentitiesLinks(JSONArray authors, JSONArray recipients, SolrInputDocument doc, String tenant) {
-      
-
     for (int i = 0; i < authors.length(); i++) {
       JSONObject author = authors.getJSONObject(i);
       String scope = author.optString("scope");
@@ -676,7 +667,6 @@ public class HikoIndexer {
         author_id = "global_" + gi.getInt("id");
       }
       
-      //String author_id = ("local".equals(author.optString("scope")) ? tenant : "global") + "_" + author.optString("id");
       for (int j = 0; j < recipients.length(); j++) {
         JSONObject recipient = recipients.getJSONObject(j);
         String rscope = recipient.optString("scope");
@@ -686,12 +676,31 @@ public class HikoIndexer {
           recipient_id = "global_" + rgi.getInt("id");
         }
         
-        //String recipient_id = ("local".equals(recipient.optString("scope")) ? tenant : "global") + "_" + recipient.optString("id");
         doc.addField("identities_link_id", author_id + "-" + recipient_id);
+        addProfessionsLinks(author_id, recipient_id, doc, tenant);
       }
 
     }
   }
+  
+  private void addProfessionsLinks(String author_id, String recipient_id, SolrInputDocument doc, String tenant) {
+    JSONArray author_prof = getIdentityProfessions(author_id);
+    JSONArray recipient_prof = getIdentityProfessions(recipient_id);
+    for (int i = 0; i < author_prof.length(); i++) {
+      JSONObject ap = author_prof.getJSONObject(i);
+      String ascope = ap.optString("scope");
+      String pr_author_id = ("local".equals(ascope) ? tenant : "global") + "_" + ap.getInt("id");
+      for (int j = 0; j < recipient_prof.length(); j++) {
+        JSONObject rs = recipient_prof.getJSONObject(j);
+        String rscope = rs.optString("scope");
+        String pr_recipient_id = ("local".equals(rscope) ? tenant : "global") + "_" + rs.getInt("id");
+
+        doc.addField("professions_link_id", pr_author_id + "-" + pr_recipient_id);
+      }
+    }
+  }
+  
+  
 
   private JSONArray addProfessions(String identityId, String role, SolrInputDocument doc, String tenant) {
     JSONArray lprofessions = getIdentityProfessions(identityId);
@@ -707,6 +716,7 @@ public class HikoIndexer {
       doc.addField("professions_id", rs.getInt("id"));
       doc.addField("professions_cs", k.optString("cs", null));
       doc.addField("professions_en", k.optString("en", null));
+      doc.addField("professions_" + role + "_id", id);
       doc.addField("professions_" + role + "_cs", k.optString("cs", null));
       doc.addField("professions_" + role + "_en", k.optString("en", null));
       if (professions.has(id)) {

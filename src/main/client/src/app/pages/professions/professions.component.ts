@@ -75,9 +75,12 @@ export class ProfessionsComponent {
     }[]
   }
 
+  links: JSONFacet[];
   professions_author: JSONFacet[];
   professions_recipient: JSONFacet[];
   professions_mentioned: JSONFacet[];
+
+  nameField = 'name_cs';
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -97,12 +100,6 @@ export class ProfessionsComponent {
         this.facets.set({});
       }
     });
-
-    this.translation.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
-      if (this.limits && this.state.selectedTenants().length) {
-        this.getData(true);
-      }
-    });
   }
 
   ngOnInit(): void {
@@ -111,6 +108,10 @@ export class ProfessionsComponent {
       this.limits = this.state.getTenantsRange();
       this.getData(true);
     }
+
+    this.translation.onLangChange.subscribe(() => {
+        this.nameField = 'name_' + this.translation.currentLang;
+    });
   }
 
   onGraphChartInit(e: any) {
@@ -197,11 +198,12 @@ export class ProfessionsComponent {
     p.lang = this.translation.currentLang;
     p.includeAuthors = this.includeAuthors;
     p.includeRecipients = this.includeRecipients;
-    if (!setResponse) {
-      p.rows = 0;
-    } else {
-      p.rows = 10000;
-    }
+    p.rows = 0;
+    // if (!setResponse) {
+    //   p.rows = 0;
+    // } else {
+    //   p.rows = 10000;
+    // }
     this.state.addFilters(p);
     this.service.getProfessions(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
@@ -218,6 +220,7 @@ export class ProfessionsComponent {
         this.state.tenants().forEach(t => { t.available = !!ts.find(ta => ta.val === t.val) });
         this.solrResponse = resp;
       }
+      this.links = resp.facets.links?.buckets ?? [];
       this.professions_author = resp.facets.chart_authors?.buckets ?? [];
       this.professions_recipient = resp.facets.chart_recipients?.buckets ?? [];
       // this.professions_mentioned = resp.facets.professions_mentioned.buckets;
@@ -236,8 +239,12 @@ export class ProfessionsComponent {
       this.professions_author.forEach((p: JSONFacet) => {
         data.push({
           id: p.val,
-          name: p.val,
-          value: p.count
+          name: this.state.professions()[p.val][this.nameField],
+          value: p.count,
+          label: {
+            width: 100,
+            overflow: 'truncate'
+          }
         })
       });
     }
@@ -245,8 +252,12 @@ export class ProfessionsComponent {
       this.professions_recipient.forEach((p: JSONFacet) => {
         data.push({
           id: p.val,
-          name: p.val,
-          value: p.count
+          name: this.state.professions()[p.val][this.nameField],
+          value: p.count,
+          label: {
+            width: 100,
+            overflow: 'truncate'
+          }
         })
       });
     }
@@ -259,6 +270,11 @@ export class ProfessionsComponent {
       legend: {
         type: data.length > 45 ? 'scroll' : 'plain',
         orient: 'vertical',
+        padding: 0,
+        textStyle: {
+          width: 120, //set to grid right - item width (default 25) - 5 set tooltip right to grid right
+          overflow: 'truncate',
+        },
         right: 10,
         data: data.map(a => a.name),
         formatter: name => {
@@ -292,8 +308,12 @@ export class ProfessionsComponent {
       this.professions_author.forEach((p: JSONFacet) => {
         data.push({
           id: p.val,
-          name: p.val,
-          value: p['authors'].buckets.length
+          name: this.state.professions()[p.val][this.nameField],
+          value: p['authors'].buckets.length,
+          label: {
+            width: 100,
+            overflow: 'truncate'
+          }
         })
       });
     }
@@ -305,8 +325,12 @@ export class ProfessionsComponent {
         } else {
           data.push({
             id: p.val,
-            name: p.val,
-            value: p['recipients'].buckets.length
+            name: this.state.professions()[p.val][this.nameField],
+            value: p['recipients'].buckets.length,
+            label: {
+              width: 100,
+              overflow: 'truncate'
+            }
           });
         }
       });
@@ -321,6 +345,11 @@ export class ProfessionsComponent {
         type: data.length > 20 ? 'scroll' : 'plain',
         orient: 'vertical',
         right: 10,
+        padding: 0,
+        textStyle: {
+          width: 120, //set to grid right - item width (default 25) - 5 set tooltip right to grid right
+          overflow: 'truncate',
+        },
         data: data.map(a => a.name),
         formatter: name => {
           const value = data.find(row => row.name === name)?.value ?? 0;
@@ -368,9 +397,8 @@ export class ProfessionsComponent {
     //if (this.includeAuthors){
       this.professions_author.forEach((identity: JSONFacet) => {
         nodes.push({
-          // id: identity.id + '',
           id: identity.val + '_authors',
-          name: identity.val,
+          name: this.state.professions()[identity.val][this.nameField],
           value: identity.count,
           category: 'authors',
           draggable: true,
@@ -385,7 +413,7 @@ export class ProfessionsComponent {
         nodes.push({
           // id: identity.id + '',
           id: identity.val + '_recipients',
-          name: identity.val,
+          name: this.state.professions()[identity.val][this.nameField],
           value: identity.count,
           category: 'recipients',
           draggable: true,
@@ -397,35 +425,29 @@ export class ProfessionsComponent {
     //}
 
       const links: any[] = [];
-      this.solrResponse.response.docs.forEach((letter: Letter) => {
-        if (letter.identities) {
-          const a = letter.identities.find(i => i.role === 'author')?.professions;
-          const r = letter.identities.find(i => i.role === 'recipient')?.professions;
-          if (a && r) {
-            a.forEach(pa => {
-              r.forEach(pr => {
-                //const id = pa.id + '_' + pr.id;
-                const author = this.translation.currentLang === 'en' ? pa.name.en || pa.name.cs : pa.name.cs;
-                const recipient = this.translation.currentLang === 'en' ? pr.name.en || pr.name.cs : pr.name.cs;
-                const id = author + '_' + recipient;
-                const link = links.find(l => l.id === id);
-                if (!link) {
-                  links.push({
-                    id: id,
-                    source: author + '_authors',
-                    target: recipient + '_recipients',
-                    label: author + ' > ' + recipient,
-                    count: 1
-                  });
-                } else {
-                  link.count++
-                }
-              });
-            });
-          }
 
-        }
-      });
+      this.links.forEach((f: JSONFacet) => {
+        const parts = f.val.split('-');
+        const linkId = f.val;
+        const author = this.state.professions()[parts[0]][this.nameField];
+        const recipient = this.state.professions()[parts[1]][this.nameField];
+      
+        links.push({
+          id: linkId,
+          source: parts[0] + '_authors',
+          target: parts[1] + '_recipients',
+          authors: [],
+          recipients: [],
+          label: author + ' > ' + recipient,
+          labelReversed: recipient + ' > ' + author,
+          count: f.count,
+          lineStyle: {
+            width: 1,
+            opacity: 1
+          }
+        });
+        
+    });
     
       this.graphData = {
         categories,
