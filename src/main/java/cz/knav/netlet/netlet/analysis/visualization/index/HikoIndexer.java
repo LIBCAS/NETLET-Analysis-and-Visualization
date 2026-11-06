@@ -636,7 +636,6 @@ public class HikoIndexer {
       }
       doc.addField("identity_id", id);
       //doc.addField("identity_role", role);
-      doc.addField("identity_name", rs.getString("name"));
 
       doc.addField("identity_" + role, rs.getString("name"));
       doc.addField("identity_" + role + "_id", id); 
@@ -650,8 +649,11 @@ public class HikoIndexer {
         doc.addField("global_identity_id", gi.getInt("id"));
         doc.addField("identity_name", gi.getString("name"));
       } else {
-        
+        doc.addField("identity_name", rs.getString("name"));
       }
+      
+//      String normalized = rs.optString("name", "") + " (" + rs.optString("birth_year", "") + " - " + rs.optString("death_year", "") + ")";
+//      doc.addField("identity_name_normalized", normalized);
 
       identity.put("professions", addProfessions(id, role, doc, tenant));
       //JSONArray ps = addProfessions(id, role, doc, tenant);

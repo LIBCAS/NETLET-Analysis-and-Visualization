@@ -154,11 +154,11 @@ export class CentralityComponent {
     this.graphChart.on('click', (params: any) => {
       if (params.dataType === 'node') {
         if (params.data.category === 'mentioned') {
-          this.mentionedLabel(params.data.name);
+          this.mentionedLabel(params.data.val, params.data.name);
         } else if (params.data.category === 'authors') {
-          this.authorLabel(params.data.name);
+          this.authorLabel(params.data.val, params.data.name);
         } else if (params.data.category === 'recipients') {
-          this.recipientLabel(params.data.name);
+          this.recipientLabel(params.data.val, params.data.name);
         }
       }
     });
@@ -352,38 +352,25 @@ export class CentralityComponent {
     });
   }
 
-  authorLabel(identity: string) {
+  authorLabel(id: string, name: string) {
     this._ngZone.run(() => {
-      this.setInfoHeader('identities.recipient_letters', identity);
-      this.getLetters('author', identity);
-
-      // this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_author?.includes(identity));
-      // this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
-
-      // this.setInfoHeader('identities.author_letters', identity);
-      // this.openInfoDialog();
+      this.setInfoHeader('identities.author_letters', name);
+      this.getLetters('author_id', id);
     });
   }
 
-  recipientLabel(identity: string) {
+  recipientLabel(id: string, name: string) {
     this._ngZone.run(() => {
-      this.setInfoHeader('identities.recipient_letters', identity);
-      this.getLetters('recipient', identity);
-
-      // this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_recipient?.includes(identity));
-      // this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
-      // this.openInfoDialog();
+      this.setInfoHeader('identities.recipient_letters', name);
+      this.getLetters('recipient_id', id);
     });
   }
 
-  mentionedLabel(identity: string) {
+  mentionedLabel(id: string, name: string) {
     this._ngZone.run(() => {
 
-      this.setInfoHeader('identities.mentioned_letters', identity);
-      this.getLetters('mentioned', identity);
-      // this.infoData = this.solrResponse.response.docs.filter((doc: any) => doc.identity_mentioned?.includes(identity));
-      // this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
-      // this.openInfoDialog();
+      this.setInfoHeader('identities.mentioned_letters', name);
+      this.getLetters('mentioned_id', id);
     });
   }
 
@@ -405,7 +392,7 @@ export class CentralityComponent {
       this.infoData = resp.response.docs;
       this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       
-      this.infoHeader = `Letters from/to ${identity}`;
+      //this.infoHeader = `Letters from/to ${identity}`;
       this.openInfoDialog();
     });
   }
@@ -445,11 +432,13 @@ export class CentralityComponent {
       );
     this.mentioned.forEach((identity: JSONFacet, index: number) => {
       const pos = this.setPosition(h, w, identity.count, maxCount);
+      const id = this.state.identities()[identity.val];
       nodes.push({
+        val: identity.val + '',
         id: identity.val + '_mentioned',
-        name: identity.val,
+        name: `${id.name} (${id.birth_year} - ${id.death_year})`,
         value: identity.count,
-        //label: this.mentionedLabel(identity.val);
+        label: id.name + '<br/>' + this.translation.instant('field.mentioned') + ': ' + identity.count,
         category: 'mentioned',
         symbolSize: maxSize * identity.count / maxCount + minSize,
         x: pos.x,
@@ -466,11 +455,13 @@ export class CentralityComponent {
     this.recipients.forEach((identity: JSONFacet, index: number) => {
       if (this.allIncluded || !this.config.excluded_identities().includes(identity.val)) {
         const pos = this.setPosition(h, w, identity.count, maxCount);
+        const id = this.state.identities()[identity.val];
         nodes.push({
-          // id: identity.id + '',
+          val: identity.val + '',
           id: identity.val + '_recipients',
-          name: identity.val,
+          name: `${id.name} (${id.birth_year} - ${id.death_year})`,
           value: identity.count,
+          label: id.name + '<br/>' + this.translation.instant('field.recipient') + ': ' + identity.count,
           category: 'recipients',
           symbolSize: maxSize * identity.count / maxCount + minSize,
           x: pos.x,
@@ -488,11 +479,13 @@ export class CentralityComponent {
     this.authors.forEach((identity: JSONFacet, index: number) => {
       if (this.allIncluded || !this.config.excluded_identities().includes(identity.val)) {
         const pos = this.setPosition(h, w, identity.count, maxCount);
+        const id = this.state.identities()[identity.val];
         nodes.push({
-          // id: identity.id + '',
+          val: identity.val + '',
           id: identity.val + '_authors',
-          name: identity.val,
+          name: `${id.name} (${id.birth_year} - ${id.death_year})`,
           value: identity.count,
+          label: id.name + '<br/>' + this.translation.instant('field.author') + ': ' + identity.count,
           category: 'authors',
           symbolSize: maxSize * identity.count / maxCount + minSize,
           x: pos.x,
@@ -522,7 +515,7 @@ export class CentralityComponent {
         formatter: (params: any) => {
           return params.dataType === 'edge' ?
             `${params.data.label} (${params.data.count})` :
-            params.name
+            params.data.label
         }
       },
       legend: [

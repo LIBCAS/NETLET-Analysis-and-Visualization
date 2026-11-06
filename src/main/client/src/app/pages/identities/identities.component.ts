@@ -125,7 +125,8 @@ export class IdentitiesComponent {
       this.loading = true;
       if (params.dataType === 'node'){
         this._ngZone.run(() => {
-          this.getLetters(params.data.name);
+          this.infoHeader = this.translation.instant('identities.identity_letters', {identity: params.data.name});
+          this.getLetters(params.data.id);
         });
       } else if (params.dataType === 'edge') {
         this._ngZone.run(() => {
@@ -201,13 +202,13 @@ export class IdentitiesComponent {
 
     this.state.addFilters(p);
     p.rows = 20000;
-    p.identity_main = '"' + identity + '"';
+    p.identity_main_id = '"' + identity + '"';
 
     this.service.getIdentitiyLetters(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
       }
-      this.infoHeader = this.translation.instant('identities.identity_letters', {identity});
+      
       this.infoData = resp.response.docs;
       this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
       
@@ -353,16 +354,16 @@ export class IdentitiesComponent {
     const minSize = 10;
     let maxCount = Math.max(...this.authors.map(r => r.count), ...this.recipients.map(r => r.count));
 
-
     this.authors.forEach((identity: JSONFacet) => {
       const pos = this.setPosition(identity.val);
+      const id = this.state.identities()[identity.val];
       nodes.push({
         id: identity.val + '',
         // id: identity.val + '_author',
-        name: this.state.identities()[identity.val].name,
+        name: `${id.name} (${id.birth_year} - ${id.death_year})`,
         value: identity.count,
         authorCount: identity.count,
-        label: this.state.identities()[identity.val].name + '<br/>' + this.translation.instant('field.author') + ': ' + identity.count,
+        label: id.name + '<br/>' + this.translation.instant('field.author') + ': ' + identity.count,
         category: 'authors',
         symbolSize: maxSize * identity.count / maxCount + minSize,
         x: pos.x,
@@ -388,13 +389,14 @@ export class IdentitiesComponent {
         node.recipientCount = identity.count;
         node.label = node.label + '<br/>' + this.translation.instant('field.recipient') + ': ' + identity.count;
       } else {
+        const id = this.state.identities()[identity.val];
         nodes.push({
           id: identity.val + '',
           // id: identity.val + '_recipient',
-          name: this.state.identities()[identity.val].name,
+          name: `${id.name} (${id.birth_year} - ${id.death_year})`,
           value: identity.count,
           recipientCount: identity.count,
-          label: this.state.identities()[identity.val].name + '<br/>' + this.translation.instant('field.recipient') + ': ' + identity.count,
+          label: id.name + '<br/>' + this.translation.instant('field.recipient') + ': ' + identity.count,
           category: 'recipients',
           symbolSize: maxSize * identity.count / maxCount + minSize,
           x: pos.x,
@@ -430,28 +432,6 @@ export class IdentitiesComponent {
         });
         
     });
-
-    // this.solrResponse.response.docs.forEach((letter: Letter) => {
-    //   if (this.inLimits(letter.date_year) && letter.identities) {
-    //     const a = letter.identities.find(i => i.role === 'author');
-    //     const r = letter.identities.find(i => i.role === 'recipient');
-    //     const id = a.id + '_' + r.id;
-    //     const link = links.find(l => l.id === id);
-    //     if (!link) {
-    //       links.push({
-    //         id: id,
-    //         // source: a.name + '_author',
-    //         // target: r.name + '_recipient',
-    //         source: a.name,
-    //         target: r.name,
-    //         label: a.name + ' > ' + r.name,
-    //         count: 1
-    //       });
-    //     } else {
-    //       link.count++
-    //     }
-    //   }
-    // });
 
     this.graphData = {
       categories,

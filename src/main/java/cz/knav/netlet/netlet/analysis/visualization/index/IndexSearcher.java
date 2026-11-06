@@ -337,7 +337,7 @@ public class IndexSearcher {
 
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
-              .returnFields("id,name")
+              .returnFields("id,name,birth_year,death_year") 
               .setLimit(100000);
 
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
@@ -1181,6 +1181,13 @@ public class IndexSearcher {
       jrequest = jrequest.withFilter("date_year:[" + year_from + " TO " + year_to + "]");
     }
 
+    if (request.getParameter("identity_main_id") != null) {
+      jrequest = jrequest.withFilter(
+              "{!tag=ffidentity_main}identity_author_id:(" + String.join(" OR ", request.getParameterValues("identity_main_id")) + ") OR "
+              + "identity_recipient_id:(" + String.join(" OR ", request.getParameterValues("identity_main_id")) + ")"
+      );
+    }
+
     if (request.getParameter("identity_main") != null) {
       jrequest = jrequest.withFilter(
               "{!tag=ffidentity_main}identity_author:(" + String.join(" OR ", request.getParameterValues("identity_main")) + ") OR "
@@ -1196,12 +1203,24 @@ public class IndexSearcher {
       jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author:(" + String.join(" OR ", request.getParameterValues("author")) + ")");
     }
 
+    if (request.getParameter("author_id") != null) {
+      jrequest = jrequest.withFilter("{!tag=ffauthors}identity_author_id:(" + String.join(" OR ", request.getParameterValues("author_id")) + ")");
+    }
+
     if (request.getParameter("recipient") != null) {
       jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient:(" + String.join(" OR ", request.getParameterValues("recipient")) + ")");
     }
 
+    if (request.getParameter("recipient_id") != null) {
+      jrequest = jrequest.withFilter("{!tag=ffrecipients}identity_recipient_id:(" + String.join(" OR ", request.getParameterValues("recipient_id")) + ")");
+    }
+
     if (request.getParameter("mentioned") != null) {
       jrequest = jrequest.withFilter("{!tag=ffmentioned}identity_mentioned:(" + String.join("\" OR \"", request.getParameterValues("mentioned")) + ")");
+    }
+
+    if (request.getParameter("mentioned_id") != null) {
+      jrequest = jrequest.withFilter("{!tag=ffmentioned}identity_mentioned_id:(" + String.join("\" OR \"", request.getParameterValues("mentioned_id")) + ")");
     }
 
     if (request.getParameter("keyword") != null) {
