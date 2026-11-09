@@ -60,16 +60,35 @@
             <div>– {{ data.hiko.dates.date_range }}</div>
           }
 
-          <mat-expansion-panel class="app-details-subgroup" [expanded]="false">
-              <mat-expansion-panel-header>
-                <mat-panel-title>{{ 'detaily' | translate }}</mat-panel-title>
+          <mat-expansion-panel class="app-details-subgroup" [expanded]="false" [hideToggle]="true">
+              <mat-expansion-panel-header class="right-aligned-header">
+                <mat-panel-title>{{ 'action.more' | translate }}</mat-panel-title>
               </mat-expansion-panel-header>         
               @if (data.hiko?.date_marked) {
                 <div class="app-letter-summary-row">
                     <span>{{ 'field.date_marked' | translate }}</span>
                     <div>{{ data.hiko.date_marked }}</div>
                 </div>
-              }
+              }       
+              @if (data.hiko) {
+                <div class="app-letter-summary-row">
+                  @if(data.hiko.date_approximate) {
+                    <span><mat-icon>check</mat-icon>{{ 'field.date_approximate' | translate }}</span>
+                  }
+                  @if(data.hiko.date_uncertain) {
+                    <span><mat-icon>check</mat-icon>{{ 'field.date_uncertain' | translate }}</span>
+                  }
+                  @if(data.hiko.date_inferred) {
+                    <span><mat-icon>check</mat-icon>{{ 'field.date_inferred' | translate }}</span>
+                  }
+                </div>
+              }      
+              @if (data.hiko?.date_note) {
+                <div class="app-letter-summary-row">
+                    <span>{{ 'field.date_note' | translate }}</span>
+                    <div>{{ data.hiko.date_note }}</div>
+                </div>
+              }       
           </mat-expansion-panel>
 
         </section>

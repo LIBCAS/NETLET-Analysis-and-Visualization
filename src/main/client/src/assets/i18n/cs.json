@@ -317,7 +317,11 @@
     "date_to": "Do",
     "has_content_count": "Počet dopisů s fulltextem",
     "has_media_count": "Počet dopisů s přílohou",
-    "date_marked": "Datum označené v dopise"
+    "date_marked": "Datum označené v dopise",
+    "date_approximate": "Datum je přibližné",
+    "date_uncertain": "Datum je nejisté",
+    "date_inferred": "Datum je odvozené",
+    "date_note": "Poznámka k datu"
   },
   "action": {
     "exclude_filter": "Vyloučit z filtru",
@@ -329,7 +333,8 @@
     "selectAll": "Vybrat všechny",
     "showLinks": "Zobrazit spojnice",
     "Close": "Zavřít",
-    "toggle_years_chart": "Zobrazit/skrýt časový graf"
+    "toggle_years_chart": "Zobrazit/skrýt časový graf",
+    "more": "více"
   },
   "invalidTenant": "Nejsou k dispozice data pro tento Katalog",
   "catalog": {

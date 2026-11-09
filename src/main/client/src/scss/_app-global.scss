@@ -619,3 +619,11 @@ main:is(.app-scroll-page, .app-scroll-panels) .app-view-content.app-view-long-co
   z-index: 21;
   pointer-events: none;
 }
+
+.right-aligned-header > .mat-content {
+    justify-content: space-between;
+}
+
+.mat-content > mat-panel-title, .mat-content > mat-panel-description {
+  flex: 0 0 auto;
+}

@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import org.json.JSONObject;
 
 /**
  *
@@ -29,6 +30,9 @@ public class InitServlet extends HttpServlet {
 
   //Default config directory in webapp
   public static String DEFAULT_I18N_DIR = "/assets/i18n";
+
+  //Dicts
+  public static JSONObject DICTS = null;
   
   
   public static ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);

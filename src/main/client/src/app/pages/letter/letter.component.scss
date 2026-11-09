@@ -30,12 +30,12 @@
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: 20px;
 
-  > p,
-  > h1 {
+  >p,
+  >h1 {
     grid-column: 1;
   }
 
-  > a {
+  >a {
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: center;
@@ -96,11 +96,11 @@
   display: grid;
   gap: 4px;
 
-  + .app-letter-summary-row {
+  +.app-letter-summary-row {
     margin-top: 14px;
   }
 
-  > span {
+  >span {
     color: var(--app-color-muted);
     font-size: 12px;
   }
@@ -144,7 +144,7 @@
 .app-letter-metadata {
   margin: 0 0 20px;
 
-  > div {
+  >div {
     display: grid;
     grid-template-columns: 140px minmax(0, 1fr);
     gap: 14px;
@@ -166,7 +166,7 @@
 .app-letter-copy {
   margin: 14px 0 0;
 
-  > div:last-child {
+  >div:last-child {
     border-bottom: 0;
   }
 }
@@ -184,7 +184,7 @@
   flex-wrap: wrap;
   gap: 8px;
 
-  > span {
+  >span {
     padding: 6px 12px;
     border: 1px solid var(--app-color-line);
     border-radius: 20px;
@@ -197,7 +197,7 @@
 }
 
 :host ::ng-deep #letterMap {
-  
+
   .lmap-ec-layer {
     z-index: 300 !important;
   }
@@ -220,7 +220,7 @@
       }
     }
   }
-  
+
   .app-map-boundaries {
     width: 280px;
     max-width: calc(100vw - 70px);
@@ -293,27 +293,33 @@
 }
 
 .app-details-subgroup {
-  @include mat.expansion-overrides((
-    container-background-color: transparent,
-    container-elevation-shadow: none,
-    container-shape: 0,
-    container-text-size: 13px,
-    header-collapsed-state-height: 42px,
-    header-expanded-state-height: 42px,
-    header-text-color: var(--app-color-ink),
-    header-text-size: 13px,
-    header-text-weight: 500,
-    header-indicator-color: var(--app-color-muted),
-    header-hover-state-layer-color: transparent
-  ));
-  margin: 0;
+  @include mat.expansion-overrides((container-background-color: transparent,
+      container-elevation-shadow: none,
+      container-shape: 0,
+      container-text-size: 13px,
+      header-collapsed-state-height: 42px,
+      header-expanded-state-height: 42px,
+      header-text-color: var(--app-color-ink),
+      header-text-size: 13px,
+      header-text-weight: 500,
+      header-indicator-color: var(--app-color-muted),
+      header-hover-state-layer-color: transparent));
 
-  mat-panel-title {
-    gap: 10px;
+
+  .right-aligned-header>.mat-content {
+    justify-content: space-between;
+    
   }
 
-  .app-facet-label {
-    flex: 1;
+  span {
+    font-size: 13px;
+  }
+
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 13px;
+    color: darkgreen;
   }
 }
 
@@ -331,7 +337,7 @@
     grid-template-columns: minmax(0, 1fr);
     row-gap: 10px;
 
-    > a {
+    >a {
       grid-column: 1;
       grid-row: auto;
       justify-self: start;
@@ -340,13 +346,14 @@
 }
 
 @media (max-width: 620px) {
+
   .app-letter-summary,
   .app-letter-persons,
   .app-letter-places {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .app-letter-metadata > div {
+  .app-letter-metadata>div {
     grid-template-columns: minmax(0, 1fr);
     gap: 4px;
   }

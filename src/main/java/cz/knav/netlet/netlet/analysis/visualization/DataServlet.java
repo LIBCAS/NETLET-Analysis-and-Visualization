@@ -69,12 +69,15 @@ public class DataServlet extends HttpServlet {
         GET_DICTS {
             @Override
             String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-              JSONObject ret = new JSONObject();
-              ret.put("tenants", IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant"));
-              ret.put("places", IndexSearcher.getAllPlaces());
-              ret.put("identities", IndexSearcher.getAllIdentities());
-              ret.put("professions", IndexSearcher.getAllProfessions());
-                return ret.toString();
+              if (InitServlet.DICTS == null) {
+                JSONObject ret = new JSONObject();
+                ret.put("tenants", IndexSearcher.getTenants().getJSONObject("facets").getJSONObject("tenant"));
+                ret.put("places", IndexSearcher.getAllPlaces());
+                ret.put("identities", IndexSearcher.getAllIdentities());
+                ret.put("professions", IndexSearcher.getAllProfessions());
+                InitServlet.DICTS = ret;
+              }
+                return InitServlet.DICTS.toString();
             }
         },
         GET_TENANTS {

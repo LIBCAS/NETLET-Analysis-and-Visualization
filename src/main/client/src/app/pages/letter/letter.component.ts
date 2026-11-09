@@ -215,6 +215,10 @@ export class LetterComponent {
         //this.geoJsonControl.removeFrom(lmap);
         lmap.removeControl(this.geoJsonControl);
       }
+
+      if (!this.letter().date_year) {
+        return;
+      }
       
       this.geoJsonControl = new L.Control({ position: 'topright' });
   
@@ -229,8 +233,6 @@ export class LetterComponent {
   
         const years = L.DomUtil.create('div', 'app-map-boundaries-years');
         div.appendChild(years);
-
-
         
         const first = this.config.geojsons.findIndex(g => g > this.letter().date_year) - 1;
         const rok = this.config.geojsons[first] + '';
