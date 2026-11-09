@@ -53,9 +53,9 @@
     "deml": "#c23511",
     "blekastad": "#b2b201",
     "kalivoda": "rgb(204, 104, 134)",
-    "komensky": "#314636",
+    "komensky": "#914636",
     "marci": "#61a008",
-    "musil": "rgb(154, 96, 140)",
+    "musil": "rgb(154, 126, 140)",
     "neumann": "#dd8648",
     "pamatky": "#71c75e",
     "patocka": "#6e7054",
@@ -63,7 +63,7 @@
     "sachs": "#bd491a",
     "studenti": "#44d23d",
     "tgm": "#242c13",
-    "ucenci": "#246c13"
+    "ucenci": "#246d13"
   },
 
   "hikoUrl": "https://{tenant}.historicka-korespondence.cz/letters/{id}/edit",

@@ -67,6 +67,20 @@
         </dt>
         <dd>{{ data.facets.mentioned.numBuckets }}</dd>
       </div>
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">article</mat-icon>
+          {{ 'field.has_content_count' | translate }}
+        </dt>
+        <dd>{{ data.facets.has_content.count }}</dd>
+      </div>
+      <div class="app-view-card">
+        <dt>
+          <mat-icon aria-hidden="true">attach_file</mat-icon>
+          {{ 'field.has_media_count' | translate }}
+        </dt>
+        <dd>{{ data.facets.has_media.count }}</dd>
+      </div>
     </dl>
 
     <section class="app-view-card app-view-chart" [attr.aria-label]="'letters_count_by_year' | translate">

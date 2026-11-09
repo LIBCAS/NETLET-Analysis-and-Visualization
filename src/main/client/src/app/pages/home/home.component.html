@@ -8,8 +8,45 @@
     </div>
 
     <mat-card appearance="outlined" class="app-search-panel">
+
+      <!-- redesign -->
+      <div class="app-catalog-strip" role="group" [attr.aria-label]="'tenants' | translate">
+        <p>{{ 'tenants' | translate }}</p>
+        @for (t of state.tenants(); track t.val) {
+          <div class="app-catalog-chip" [class.app-selected]="isTenantSelected(t)">
+            <mat-checkbox [checked]="isTenantSelected(t)" (change)="toggleTenant(t, $event.checked)">
+              {{ 'catalog.' + t.val + '0' | translate }} <strong>{{ 'catalog.' + t.val | translate }}</strong>
+            </mat-checkbox>
+            <a class="app-catalog-info" [routerLink]="'/catalog/' + t.val" [title]="('field.detail' | translate) + ': ' + ('catalog.' + t.val | translate)" [attr.aria-label]="('field.detail' | translate) + ': ' + ('catalog.' + t.val | translate)">
+              <mat-icon aria-hidden="true" [style.color]="config.tenant_colors[t.val]">info</mat-icon>
+            </a>
+          </div>
+        }
+      </div>
+
       <div class="app-search-fields">
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+
+        <ngxsmk-datepicker 
+          locale="cs"
+          [dateFormatPattern]="'DD.MM.YYYY'"
+          [showCalendarButton]="true"
+          [allowTyping]="true"
+          [showTime]="false"
+          [(ngModel)]="date_from"
+          [placeholder]="'field.date_from' | translate"
+        ></ngxsmk-datepicker>
+
+        <ngxsmk-datepicker 
+          locale="cs"
+          [dateFormatPattern]="'DD.MM.YYYY'"
+          [showCalendarButton]="true"
+          [allowTyping]="true"
+          [showTime]="false"
+          [(ngModel)]="date_to"
+          [placeholder]="'field.date_to' | translate"
+        ></ngxsmk-datepicker>
+
+        <!-- <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <span matTextPrefix class="app-search-label">{{ 'field.date_from' | translate }}</span>
           <input matInput [matDatepicker]="datum_od" [(ngModel)]="date_from" [attr.aria-label]="'field.date_from' | translate" (ngModelChange)="searchForm().markAsDirty()" (click)="datum_od.open()">
           <mat-datepicker-toggle matIconSuffix [for]="datum_od"></mat-datepicker-toggle>
@@ -31,7 +68,7 @@
               <button matButton matDatepickerCancel>Close</button>
             </mat-datepicker-actions>
           </mat-datepicker>
-        </mat-form-field>
+        </mat-form-field> -->
 
         <mat-form-field appearance="outline" subscriptSizing="dynamic" class="app-search-wide">
           <span matTextPrefix class="app-search-label">{{ 'field.identities' | translate }}</span>
@@ -82,21 +119,6 @@
       </div>
 
       <!-- redesign -->
-      <div class="app-catalog-strip" role="group" [attr.aria-label]="'tenants' | translate">
-        <p>{{ 'tenants' | translate }}</p>
-        @for (t of state.tenants(); track t.val) {
-          <div class="app-catalog-chip" [class.app-selected]="isTenantSelected(t)">
-            <mat-checkbox [checked]="isTenantSelected(t)" (change)="toggleTenant(t, $event.checked)">
-              {{ 'catalog.' + t.val | translate }}
-            </mat-checkbox>
-            <a class="app-catalog-info" [routerLink]="'/catalog/' + t.val" [title]="('field.detail' | translate) + ': ' + ('catalog.' + t.val | translate)" [attr.aria-label]="('field.detail' | translate) + ': ' + ('catalog.' + t.val | translate)">
-              <mat-icon aria-hidden="true">info_outline</mat-icon>
-            </a>
-          </div>
-        }
-      </div>
-
-      <!-- redesign -->
       <button matIconButton class="app-search-submit" [title]="'action.search' | translate" [attr.aria-label]="'action.search' | translate" [disabled]="!searchForm().dirty()" (click)="search()">
         <mat-icon aria-hidden="true">search</mat-icon>
       </button>
@@ -131,14 +153,12 @@
   <div class="app-home-view-grid">
     @for (card of state.views; track card.header) {
       <mat-card appearance="outlined" class="app-home-view-card" [class.app-disabled]="!card.route" [style.--app-view-accent]="viewAppearance[card.header].color">
-        <!-- redesign: Karty jsou dostupné pouze s vybraným katalogem. -->
         <a
           class="app-home-view-link"
           role="link"
-          [attr.href]="card.route && searchModel().tenants.length ? '/' + card.route : null"
-          [attr.aria-disabled]="!card.route || !searchModel().tenants.length"
-          [attr.tabindex]="card.route && searchModel().tenants.length ? 0 : -1"
-          (click)="$event.preventDefault(); searchModel().tenants.length && gotoView(card.route)">
+          [attr.href]="card.route ? '/' + card.route : null"
+          [attr.aria-disabled]="!card.route"
+          (click)="$event.preventDefault(); gotoView(card.route)">
           <span class="app-home-view-icon">
             <mat-icon [svgIcon]="'app-home:' + viewAppearance[card.header].icon" aria-hidden="true"></mat-icon>
           </span>

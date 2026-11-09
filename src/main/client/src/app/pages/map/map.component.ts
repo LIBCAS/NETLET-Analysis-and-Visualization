@@ -142,7 +142,7 @@ export class MapComponent {
     });
     this.translation.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.graphChart && !this.graphChart.isDisposed()) {
-        this.addControl(this.map);
+        this.addControlGeoJsonControl(this.map);
       }
     });
   }
@@ -277,8 +277,9 @@ export class MapComponent {
           ]),
         }
 
-        nodes.push({ id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: f.count, color: '#00f', 
-          symbolSize: symbolSize, 
+        nodes.push({
+          id: place.id, name: place.name, value: [place.longitude, place.latitude, 1], count: f.count, color: '#00f',
+          symbolSize: symbolSize,
           itemStyle
         });
       } else {
@@ -302,7 +303,7 @@ export class MapComponent {
     });
   }
 
-  fillLinks(facet: any, links: any[] ) {
+  fillLinks(facet: any, links: any[]) {
     facet.forEach((f: { val: string, count: number, tenant: any }) => {
       const parts = f.val.split('-');
       const linkId = f.val;
@@ -361,8 +362,8 @@ export class MapComponent {
       if (y.links) {
         this.fillLinks(y.links.buckets, links);
       }
-      
-    }); 
+
+    });
     this.graphRendering = true;
     this.graphChart.setOption({
       series: {
@@ -387,12 +388,12 @@ export class MapComponent {
 
   changeLimits(limits: [Date, Date]) {
     this.limits = limits;
-      this.graphInTime();
+    this.graphInTime();
     // if (this.running) {
     // } else {
     //   this.getData(true, false);
     // }
-    
+
   }
 
   activeIdentity: JSONFacet = null;
@@ -492,7 +493,7 @@ export class MapComponent {
   }
 
   setGraphData() {
-    
+
     this.nodes = {};
     this.links = {};
     const nodes: any = [];
@@ -509,8 +510,8 @@ export class MapComponent {
       if (y.links) {
         this.fillLinks(y.links.buckets, links);
       }
-      
-    }); 
+
+    });
 
     // this.solrResponse.facets.places.buckets.forEach((f: { val: string, count: number }) => {
     //   const place = this.state.places()[f.val];
@@ -631,7 +632,7 @@ export class MapComponent {
             min: 0.4,
             max: 2
           },
-          
+
           lineStyle: {
             color: 'source',
             curveness: 0.3
@@ -781,7 +782,7 @@ export class MapComponent {
       this.infoData = resp.response.docs;
       //this.infoFields = ['letter_id', 'identity_author', 'identity_recipient', 'date_year', 'origin_name', 'destination_name', 'action'];
       this.infoFields = ['id', 'tenant', 'author', 'recipient', 'origin', 'destination', 'date', 'action'];
-      
+
       this.infoHeader = `Letters from/to ${params.data.name}`;
       this.infoType = 'place';
       this.infoTypeData = place;
@@ -826,13 +827,13 @@ export class MapComponent {
 
   openInfoDialog() {
     this.service.openInfoDialog({
-        type: this.infoType,
-        typeData: this.infoTypeData,
-        header: this.infoHeader,
-        content: null,
-        fields: this.infoFields,
-        data: this.infoData
-      });
+      type: this.infoType,
+      typeData: this.infoTypeData,
+      header: this.infoHeader,
+      content: null,
+      fields: this.infoFields,
+      data: this.infoData
+    });
   }
 
   onSelectionChange(event: any) {
@@ -855,18 +856,48 @@ export class MapComponent {
       const lmap = lmapComponent.getLeaflet();
       this.clearGeos(lmap);
       // Výběr hranic nesmí být závislostí efektu, který načítá data mapy.
-      untracked(() => this.addControl(lmap));
+      untracked(() => this.addControlGeoJsonControl(lmap));
     }
   }
 
+
   geoJsonControl: any;
-  addControl(lmap: any) {
+  showGeoJsonControl = true;
+  toggleGeoJsonControl() {
+
+    if (this.graphChart) {
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const lmapComponent = this.graphChart.getModel().getComponent("lmap");
+      // Get the instance of Leaflet
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const lmap = lmapComponent.getLeaflet();
+      this.clearGeos(lmap);
+      if (this.showGeoJsonControl) {
+        // Výběr hranic nesmí být závislostí efektu, který načítá data mapy.
+        untracked(() => this.addControlGeoJsonControl(lmap));
+      } else {(lmap)
+        this.removeGeoJsonControl(lmap)
+      }
+    }
+
+    
+    
+  }
+
+  removeGeoJsonControl(lmap: any) {
     if (this.geoJsonControl) {
       //this.geoJsonControl.removeFrom(lmap);
       lmap.removeControl(this.geoJsonControl);
     }
-    
-    this.geoJsonControl = new L.Control({ position: 'bottomright' });
+  }
+
+  addControlGeoJsonControl(lmap: any) {
+    this.removeGeoJsonControl(lmap);
+
+    this.geoJsonControl = new L.Control({ position: 'topright' });
 
     this.geoJsonControl.onAdd = (map: any) => {
 

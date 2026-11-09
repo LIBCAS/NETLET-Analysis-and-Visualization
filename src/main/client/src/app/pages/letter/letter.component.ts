@@ -28,6 +28,7 @@ import {
   LeafletComponentOption,
   LeafletHeatmapSeriesOption,
 } from "@joakimono/echarts-extension-leaflet/src/export";
+import { MatExpansionModule } from '@angular/material/expansion';
 
 type ECOption = ComposeOption<
   | TitleComponentOption
@@ -40,7 +41,8 @@ type ECOption = ComposeOption<
 
 @Component({
   selector: 'app-letter',
-  imports: [DatePipe, TranslateModule, RouterModule, MatIconModule, MatButtonModule, MatProgressBarModule],
+  imports: [DatePipe, TranslateModule, RouterModule, MatIconModule, 
+    MatButtonModule, MatProgressBarModule, MatExpansionModule],
   templateUrl: './letter.component.html',
   styleUrl: './letter.component.scss',
 })

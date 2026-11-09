@@ -140,6 +140,8 @@ public class IndexSearcher {
                       .includeTotalNumBuckets(true)
                       .setLimit(1)
                       .setMinCount(1))
+              .withFacet("has_media", new QueryFacetMap("has_media:true"))
+              .withFacet("has_content", new QueryFacetMap("has_content:true"))
               .setLimit(0);
 
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
@@ -285,6 +287,7 @@ public class IndexSearcher {
       }
       if (!Options.getInstance().getBoolean("includePamatky", false)) {
         jrequest = jrequest.withFilter("-tenant:pamatky");
+        jrequest = jrequest.withFilter("-tenant:studenti");
       }
 
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
@@ -409,6 +412,7 @@ public class IndexSearcher {
 
       if (!Options.getInstance().getBoolean("includePamatky", false)) {
         jrequest = jrequest.withFilter("-tenant:pamatky");
+        jrequest = jrequest.withFilter("-tenant:studenti");
       }
 
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
@@ -1165,6 +1169,7 @@ public class IndexSearcher {
 
     if (!Options.getInstance().getBoolean("includePamatky", false)) {
       jrequest = jrequest.withFilter("-tenant:pamatky");
+      jrequest = jrequest.withFilter("-tenant:studenti");
     }
     if (other_tenant != null && other_tenant.length > 1) {
       jrequest = jrequest.withFilter("tenant:(" + String.join(" ", other_tenant) + ")");
@@ -1597,6 +1602,7 @@ public class IndexSearcher {
       JsonQueryRequest srequest = new JsonQueryRequest()
               .setQuery("*:*")
               .withFilter("-tenant:pamatky")
+              .withFilter("-tenant:studenti")
 //              .withFacet("years", rangeFacet
 //                      .withSubFacet("tenant", new TermsFacetMap("tenant"))
 //              )

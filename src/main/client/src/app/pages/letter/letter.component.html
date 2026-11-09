@@ -59,6 +59,19 @@
           @if (data.hiko?.dates?.date_range) {
             <div>– {{ data.hiko.dates.date_range }}</div>
           }
+
+          <mat-expansion-panel class="app-details-subgroup" [expanded]="false">
+              <mat-expansion-panel-header>
+                <mat-panel-title>{{ 'detaily' | translate }}</mat-panel-title>
+              </mat-expansion-panel-header>         
+              @if (data.hiko?.date_marked) {
+                <div class="app-letter-summary-row">
+                    <span>{{ 'field.date_marked' | translate }}</span>
+                    <div>{{ data.hiko.date_marked }}</div>
+                </div>
+              }
+          </mat-expansion-panel>
+
         </section>
         <section class="app-view-card app-letter-card">
           <h2>

@@ -14,12 +14,13 @@ import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import {form, FormField} from '@angular/forms/signals';
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
-import { map, Observable, tap } from 'rxjs';
-import {AsyncPipe} from '@angular/common';
 import { AppService } from '../../app.service';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { httpResource } from '@angular/common/http';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+
+import { NgxsmkDatepickerComponent } from 'ngxsmk-datepicker';
+import { NgxsmkDatepickerMatFormFieldControlDirective } from 'ngxsmk-datepicker/material';
+import { AppConfiguration } from '../../app-configuration';
 
 /*
 Ikony ze statického redesignu: Lucide (https://lucide.dev).
@@ -134,11 +135,14 @@ const HOME_VIEW_ICONS: Record<string, string> = {
   selector: 'app-home',
   imports: [RouterModule, TranslateModule, FormsModule, FormField, MatDatepickerModule,
     MatCardModule, MatButtonModule, MatFormFieldModule, MatInputModule,
-    MatCheckboxModule, MatIconModule, MatAutocompleteModule],
+    MatCheckboxModule, MatIconModule, MatAutocompleteModule,
+    NgxsmkDatepickerComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
+
+  public config = inject(AppConfiguration);
 
   readonly router = inject(Router);
 
@@ -340,10 +344,12 @@ export class HomeComponent {
     }
     
     if(this.date_from) {
-      usedFacets.push({field: 'date_from', value: this.dateAdapter.toIso8601(this.date_from).substring(0, 10), op: ''});
+      const d = this.dateAdapter.parse(this.date_from, 'DD.MM.YYYY')
+      usedFacets.push({field: 'date_from', value: this.dateAdapter.toIso8601(d).substring(0, 10), op: ''});
     }
     if(this.date_to) {
-      usedFacets.push({field: 'date_to', value: this.dateAdapter.toIso8601(this.date_to).substring(0, 10), op: ''});
+      const d = this.dateAdapter.parse(this.date_to, 'DD.MM.YYYY')
+      usedFacets.push({field: 'date_to', value: this.dateAdapter.toIso8601(d).substring(0, 10), op: ''});
     }
 
     this.state.usedFacets.set([...usedFacets]);
@@ -361,9 +367,9 @@ export class HomeComponent {
   gotoView(view: string) {
     window.scroll(0, 0);
     this.setFilters();
-    if (this.state.hasStateInUrl()) {
+    //if (this.state.hasStateInUrl()) {
       this.router.navigate([view], { queryParams: { s: this.state.encodeState() } });
-    }
+    //}
     
   }
 

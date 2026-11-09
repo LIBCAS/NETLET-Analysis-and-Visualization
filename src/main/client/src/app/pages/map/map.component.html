@@ -61,6 +61,9 @@
             <mat-checkbox [(ngModel)]="showLinks" (change)="toggleLinks()" [disabled]="!graphChart">
               {{ 'action.showLinks' | translate }}
             </mat-checkbox>
+            <mat-checkbox [(ngModel)]="showGeoJsonControl" (change)="toggleGeoJsonControl()" [disabled]="!graphChart">
+              {{ 'map.boundaries' | translate }}
+            </mat-checkbox>
 
             @if (!loading) {
               <div class="app-map-size-legend" [attr.aria-label]="'map.size_legend' | translate">

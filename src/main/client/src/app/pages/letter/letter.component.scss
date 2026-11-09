@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 // redesign
 :host {
   display: block;
@@ -290,6 +292,30 @@
   }
 }
 
+.app-details-subgroup {
+  @include mat.expansion-overrides((
+    container-background-color: transparent,
+    container-elevation-shadow: none,
+    container-shape: 0,
+    container-text-size: 13px,
+    header-collapsed-state-height: 42px,
+    header-expanded-state-height: 42px,
+    header-text-color: var(--app-color-ink),
+    header-text-size: 13px,
+    header-text-weight: 500,
+    header-indicator-color: var(--app-color-muted),
+    header-hover-state-layer-color: transparent
+  ));
+  margin: 0;
+
+  mat-panel-title {
+    gap: 10px;
+  }
+
+  .app-facet-label {
+    flex: 1;
+  }
+}
 
 
 @media (max-width: 980px) {
