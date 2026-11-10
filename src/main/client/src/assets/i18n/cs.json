@@ -41,7 +41,7 @@
     "description": "Přehled dopisů, osob a časového vývoje korespondence v katalogu.",
     "search_letters": "Prohlédnout dopisy",
     "correspondence": "Korespondence hlavních osob",
-    "main_identities": "Hlavní osoby/instituce"
+    "main_identities": "Hlavní osoby a instituce"
   },
   "letter": {
     "detail": "Dopis",
@@ -180,7 +180,8 @@
     "czech": "Čeština",
     "english": "English",
     "open_menu": "Otevřít navigaci",
-    "close_menu": "Zavřít navigaci"
+    "close_menu": "Zavřít navigaci",
+    "help": "Nápověda"
   },
   "footer": {
     "license": "Vývoj probíhá pod licencí"
@@ -189,7 +190,7 @@
     "intro": {
       "eyebrow": "Network of Letters",
       "text": "Zobrazení a analýza korespondenčních sítí",
-      "title": "Korespondence intelektuálních elit v přelomových dobách českých dějin z digitální perspektivy."
+      "title": "Korespondence intelektuálních elit v přelomových dobách českých dějin z digitální perspektivy"
     },
     "overview": {
       "label": "Přehled aplikace",
@@ -218,17 +219,17 @@
     "keywords": {
       "header": "Témata a klíčová slova",
       "text_long": "Kruhový graf zobrazuje podíl kategorií klíčových slov podle jejich zastoupení ve vybraném souboru dopisů; grafy ve spodní části stránky zobrazují jednotlivá klíčová slova a v detailu i jejich souvislost s konkrétními autory či adresáty.",
-      "text": "Tematická charakteristika korespondenčních souboru a vztahy klíčových slov k jednotlivým aktérům."
+      "text": "Tematická charakteristika korespondenčních souborů a vztahy klíčových slov k jednotlivým aktérům"
     },
     "map": {
       "header": "Mapa",
       "text_long": "Zobrazuje místa odeslání a přijetí dopisů. Velikost i odstín bodu na mapě se mění podle počtu dopisů (viz legendu pod časovou osou). Šipka indikuje směr korespondence.",
-      "text": "Vizualizace geografického horizontu korespondenčních souborů."
+      "text": "Vizualizace geografického horizontu korespondenčních souborů"
     },
     "periods": {
       "header": "Porovnání období",
       "text_long": "Umožňuje porovnat podíl kategorií klíčových slov nebo podíl profesí adresátů a autorů ve třech obdobích českých dějin (1580–1670, 1870–1939 a 1939–1989).",
-      "text": "Komparativně pojatá zobrazení klíčových slov a profesí v rámci tří hlavních období"
+      "text": "Komparativně pojatá zobrazení v rámci tří hlavních období"
     },
     "catalogs_in_time": {
       "header": "Dynamika korespondenčních souborů",
@@ -243,7 +244,7 @@
     "professions": {
       "header": "Profese a sociální role",
       "text_long": "Kruhové grafy zobrazují zastoupení jednotlivých profesí autorů, adresátů nebo obou typů aktérů v korespondenční síti; graf vpravo zobrazuje prostý podíl jednotlivých profesí na celkovém počtu aktérů; graf vlevo navíc zohledňuje množství jejich dopisů v celku korespondence.",
-      "text": "Profesní složení aktérů korespondence a vztahy mezi různými profesními skupinami"
+      "text": "Profesní skladba aktérů korespondence a vztahy mezi profesními skupinami"
     },
     "themes": {
       "header": "Témata",
@@ -252,8 +253,7 @@
     "timeline": {
       "header": "Časová osa",
       "text_long": "Časová osa udává počet dopisů v databázi za jednotlivé dny a roky ve vybraném časovém intervalu (výběr dopisů lze omezit pomocí filtrů v levém sloupci); tabulka s podrobnějšími údaji umožňuje zobrazit detaily konkrétního dopisu.",
-      
-      "text": "Zobrazení dopisů v chronologickém pořadí na časové ose"
+      "text": "Zobrazení dopisů na časové ose"
     }
   },
   "field": {

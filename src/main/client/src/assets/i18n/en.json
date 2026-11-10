@@ -180,7 +180,8 @@
     "czech": "Čeština",
     "english": "English",
     "open_menu": "Open navigation",
-    "close_menu": "Close navigation"
+    "close_menu": "Close navigation",
+    "help": "Help"
   },
   "footer": {
     "license": "Developed under the license"

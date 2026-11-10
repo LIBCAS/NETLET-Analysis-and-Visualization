@@ -86,7 +86,7 @@ export class LetterComponent {
     label,
     people: (this.letter()?.identities ?? []).filter((person: any) => person.role === ['author', 'recipient', 'mentioned'][index]),
   })));
-  readonly placeGroups = computed(() => ['origins', 'destinations'].map((label, index) => ({
+  readonly placeGroups = computed(() => ['origin', 'destination'].map((label, index) => ({
     label,
     places: (this.letter()?.places ?? []).filter((place: any) => place.role === ['origin', 'destination'][index]),
   })));

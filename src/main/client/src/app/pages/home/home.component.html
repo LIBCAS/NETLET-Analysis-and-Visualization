@@ -1,26 +1,28 @@
 <!-- redesign -->
 <div class="app-home-intro">
 
-  <section class="app-home-overview" [attr.aria-label]="'home.overview.label' | translate">
-    <div class="app-home-stat">
-      <strong>{{ state.tenants().length }}</strong>
-      <span>{{ 'home.overview.catalogs' | translate }}</span>
-    </div>
-    <div class="app-home-stat">
-      <strong>{{ timeRange() }}</strong>
-      <span>{{ 'home.overview.time_range' | translate }}</span>
-    </div>
-    <div class="app-home-stat">
-      <strong>{{ lettersCount() }}</strong>
-      <span>{{ 'letters_count' | translate }}</span>
-    </div>
-  </section>
+  
 
   <section class="app-home-hero" aria-labelledby="app-home-heading">
     <div class="app-home-copy">
       <h1 id="app-home-heading">{{ 'home.intro.eyebrow' | translate }}</h1>
       <p class="app-home-eyebrow">{{ 'home.intro.title' | translate }}</p>
       <p class="app-home-lede">{{ 'home.intro.text' | translate }}</p>
+      
+      <section class="app-home-overview" [attr.aria-label]="'home.overview.label' | translate">
+        <div class="app-home-stat">
+          <strong>{{ state.tenants().length }}</strong>
+          <span>{{ 'home.overview.catalogs' | translate }}</span>
+        </div>
+        <div class="app-home-stat">
+          <strong>{{ timeRange() }}</strong>
+          <span>{{ 'home.overview.time_range' | translate }}</span>
+        </div>
+        <div class="app-home-stat">
+          <strong>{{ lettersCount() }}</strong>
+          <span>{{ 'letters_count' | translate }}</span>
+        </div>
+      </section>
     </div>
 
     <mat-card appearance="outlined" class="app-search-panel">
@@ -49,7 +51,7 @@
           [allowTyping]="true"
           [showTime]="false"
           [(ngModel)]="date_from"
-          [placeholder]="'field.date_from' | translate"
+          [placeholder]="('field.date_from' | translate) + ' (dd.mm.yyyy)'"
         ></ngxsmk-datepicker>
 
         <ngxsmk-datepicker 
@@ -59,7 +61,7 @@
           [allowTyping]="true"
           [showTime]="false"
           [(ngModel)]="date_to"
-          [placeholder]="'field.date_to' | translate"
+          [placeholder]="('field.date_to' | translate) + ' (dd.mm.yyyy)'"
         ></ngxsmk-datepicker>
 
         <mat-form-field appearance="outline" subscriptSizing="dynamic" >
@@ -108,12 +110,12 @@
             }
           </mat-autocomplete>
         </mat-form-field>
+        <button matIconButton class="app-search-submit" [title]="'action.search' | translate" [attr.aria-label]="'action.search' | translate" [disabled]="!searchForm().dirty()" (click)="search()">
+          <mat-icon aria-hidden="true">search</mat-icon>
+        </button>
       </div>
 
       <!-- redesign -->
-      <button matIconButton class="app-search-submit" [title]="'action.search' | translate" [attr.aria-label]="'action.search' | translate" [disabled]="!searchForm().dirty()" (click)="search()">
-        <mat-icon aria-hidden="true">search</mat-icon>
-      </button>
     </mat-card>
   </section>
 </div>

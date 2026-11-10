@@ -13,24 +13,26 @@
     outlined-container-shape: 8px
   ));
   @include mat.form-field-overrides((
-    container-height: 48px,
-    container-vertical-padding: 12px,
+    container-height: 32px,
+    container-vertical-padding: 7px,
     container-text-size: 15px,
     container-text-weight: 400,
     outlined-outline-color: #cfc9c3,
     trailing-icon-color: #5e534e
   ));
 
+  margin-top: 10px;
   position: relative;
   min-width: 0; // redesign
   width: 100%; // redesign
-  padding: 16px 16px 58px;
+  padding: 16px 16px 16px;
   box-shadow: var(--app-shadow-soft);
 }
 
 .app-search-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  //grid-template-columns: 2fr 2fr 1fr ;
   gap: 12px;
 
   mat-form-field {
@@ -150,8 +152,8 @@
   ));
 
   position: absolute;
-  right: 19px;
-  bottom: 18px;
+  right: 5px;
+  top: 5px;
 
   &:hover:not(:disabled) {
     background: rgba(122, 86, 73, .08);
@@ -182,11 +184,14 @@
 
 // redesign
 .app-home-intro {
+  // background-image: url(/assets/img/professions.png) ;
+  // background-color: rgba(255,255,255,0.8);
   background: linear-gradient(
     to bottom,
     var(--app-color-soft) calc(100% - var(--app-home-overview-overlap)),
     var(--app-color-paper) 0
   );
+  background-blend-mode: lighten;
 }
 
 .app-home-hero {
@@ -230,11 +235,12 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
-  margin: 15px var(--app-home-inline-padding);
+  margin: 1px;
   border: 1px solid var(--app-color-line);
   border-radius: 8px;
   overflow: hidden;
   background: var(--app-color-line);
+    text-transform: lowercase;
 }
 
 .app-home-stat {

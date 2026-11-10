@@ -20,7 +20,7 @@
       }
       <li aria-current="page">
         <mat-icon aria-hidden="true">chevron_right</mat-icon>
-        {{ 'field.tenant' | translate }} {{ 'catalog.' + catalogId() | translate }}
+        {{ 'field.tenant' | translate }} {{ 'catalog.' + catalogId() + '0' | translate }} <strong>{{ 'catalog.' + catalogId() | translate }}</strong>
       </li>
     </ol>
   </nav>
@@ -28,7 +28,7 @@
   @if (catalog(); as data) {
     <header class="app-view-header app-view-card">
       <p>{{ 'field.tenant' | translate }}</p>
-      <h1>{{ 'catalog.' + catalogId() | translate }}</h1>
+      <h1>{{ 'catalog.' + catalogId() + '0' | translate }} <strong>{{ 'catalog.' + catalogId() | translate }}</strong></h1>
       <div>{{ 'catalog_detail.description' | translate }}</div>
       <div class="app-catalog-actions">
         <button mat-stroked-button (click)="search()">

@@ -19,7 +19,6 @@ import { httpResource } from '@angular/common/http';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 import { NgxsmkDatepickerComponent } from 'ngxsmk-datepicker';
-import { NgxsmkDatepickerMatFormFieldControlDirective } from 'ngxsmk-datepicker/material';
 import { AppConfiguration } from '../../app-configuration';
 
 @Component({

@@ -21,10 +21,10 @@
           <mat-checkbox [(ngModel)]="k.selected" (change)="clickTenantThrottled()">
             @if (colored()) {
               <span [style.color]="'color-mix(in srgb, ' + config.tenant_colors[k.val] + ' 70%, #2f3136)'">
-                {{ 'catalog.' + k.val | translate }} ({{ k.count }})
+                {{ 'catalog.' + k.val + '0' | translate }} <strong>{{ 'catalog.' + k.val | translate }}</strong> ({{ k.count }})
               </span>
             } @else {
-              {{ 'catalog.' + k.val | translate }} ({{ k.count }})
+              {{ 'catalog.' + k.val + '0' | translate }} <strong>{{ 'catalog.' + k.val | translate }}</strong> ({{ k.count }})
             }
           </mat-checkbox>
           @if (colored()) {
