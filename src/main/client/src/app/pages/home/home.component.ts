@@ -161,7 +161,7 @@ export class HomeComponent {
 
   readonly dateAdapter = inject(DateAdapter);
 
-  readonly activeViewsCount = computed(() => this.state.views.filter(view => view.route).length);
+  readonly lettersCount = computed(() => this.state.lettersCount());
   readonly timeRange = computed(() => {
     const tenants = this.state.tenants();
     const firstYears = tenants.map(tenant => tenant.date_year_min).filter(Number.isFinite);

@@ -44,6 +44,32 @@ public class IndexSearcher {
   public static final Logger LOGGER = Logger.getLogger(IndexSearcher.class.getName());
   final static SimpleDateFormat dtformatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
   final static SimpleDateFormat yearformatter = new SimpleDateFormat("yyyy");
+  
+  public static JSONObject getTotalLetters() throws URISyntaxException, IOException, InterruptedException {
+
+      JSONObject ret = new JSONObject();
+    try (SolrClient solr = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
+      
+      JsonQueryRequest jrequest = new JsonQueryRequest()
+              .setQuery("*:*")
+              .setLimit(0);
+      
+      if (!Options.getInstance().getBoolean("includePamatky", false)) {
+        jrequest = jrequest.withFilter("-tenant:pamatky");
+        jrequest = jrequest.withFilter("-tenant:studenti");
+      }
+      jrequest.setResponseParser(new InputStreamResponseParser("json"));
+
+      NamedList<Object> resp = solr.request(jrequest, "hiko");
+      InputStream is = (InputStream) resp.get("stream");
+      ret = new JSONObject(IOUtils.toString(is, "UTF-8"));
+
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, "Error {0}", ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
 
   public static JSONObject getLetterFromHIKO(String id, String tenant) {
     JSONObject ret = new JSONObject();

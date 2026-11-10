@@ -60,9 +60,9 @@
             <div>– {{ data.hiko.dates.date_range }}</div>
           }
 
-          <mat-expansion-panel class="app-details-subgroup" [expanded]="false" [hideToggle]="true">
+          <mat-expansion-panel class="app-details-subgroup" [expanded]="false" [hideToggle]="false">
               <mat-expansion-panel-header class="right-aligned-header">
-                <mat-panel-title>{{ 'action.more' | translate }}</mat-panel-title>
+                <!-- <mat-panel-title>{{ 'action.more' | translate }}</mat-panel-title> -->
               </mat-expansion-panel-header>         
               @if (data.hiko?.date_marked) {
                 <div class="app-letter-summary-row">

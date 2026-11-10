@@ -77,6 +77,7 @@ import { Configuration } from './shared/config';
                     this.state.places.set(res.places);
                     this.state.identities.set(res.identities);
                     this.state.professions.set(res.professions);
+                    this.state.lettersCount.set(res.lettersCount);
                 }));
             }),
             catchError((err) => {

@@ -75,9 +75,16 @@ public class DataServlet extends HttpServlet {
                 ret.put("places", IndexSearcher.getAllPlaces());
                 ret.put("identities", IndexSearcher.getAllIdentities());
                 ret.put("professions", IndexSearcher.getAllProfessions());
+                ret.put("lettersCount", IndexSearcher.getTotalLetters().getJSONObject("response").getInt("numFound"));
                 InitServlet.DICTS = ret;
               }
                 return InitServlet.DICTS.toString();
+            }
+        },
+        GET_TOTAL {
+            @Override
+            String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                return IndexSearcher.getTotalLetters().toString();
             }
         },
         GET_TENANTS {

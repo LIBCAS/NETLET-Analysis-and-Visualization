@@ -191,10 +191,10 @@
 
 .app-home-hero {
   display: grid;
-  grid-template-columns: minmax(280px, .85fr) minmax(360px, 1.15fr);
+  grid-template-columns: minmax(280px, .65fr) minmax(360px, 1.15fr);
   gap: clamp(24px, 4vw, 56px);
   align-items: center;
-  padding: 42px var(--app-home-inline-padding) 32px;
+  padding: 2px var(--app-home-inline-padding) 2px;
 }
 
 .app-home-copy {
@@ -203,7 +203,7 @@
 
   h1 {
     margin: 10px 0 16px;
-    font-size: clamp(38px, 5.2vw, 62px);
+    font-size: clamp(32px, 5.2vw, 48px);
     line-height: .98;
     overflow-wrap: break-word;
   }
@@ -212,7 +212,7 @@
 .app-home-eyebrow {
   margin: 0;
   color: var(--app-color-primary-strong);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -220,7 +220,7 @@
 
 .app-home-lede {
   max-width: 600px;
-  margin: 0;
+  margin-top: 30px;
   color: var(--app-color-muted);
   font-size: clamp(17px, 2vw, 21px);
   line-height: 1.55;
@@ -231,7 +231,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
-  margin: 0 var(--app-home-inline-padding);
+  margin: 15px var(--app-home-inline-padding);
   border: 1px solid var(--app-color-line);
   border-radius: 8px;
   overflow: hidden;
@@ -243,12 +243,12 @@
   align-content: center;
   gap: 5px;
   min-width: 0;
-  min-height: 112px;
-  padding: 20px;
+  min-height: 60px;
+  padding: 15px;
   background: var(--app-color-paper);
 
   strong {
-    font-size: 30px;
+    font-size: 20px;
   }
 
   span {
@@ -274,7 +274,7 @@
 // redesign
 @media (max-width: 760px) {
   .app-home-hero {
-    padding-top: 34px;
+    padding-top: 12px;
   }
 
   .app-home-overview {
@@ -288,7 +288,7 @@
 
 // redesign
 .app-home-views {
-  padding: 72px var(--app-home-inline-padding) 54px;
+  padding: 24px var(--app-home-inline-padding) 24px;
   background: var(--app-color-paper);
 }
 

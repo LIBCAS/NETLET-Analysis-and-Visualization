@@ -1,5 +1,21 @@
 <!-- redesign -->
 <div class="app-home-intro">
+
+  <section class="app-home-overview" [attr.aria-label]="'home.overview.label' | translate">
+    <div class="app-home-stat">
+      <strong>{{ state.tenants().length }}</strong>
+      <span>{{ 'home.overview.catalogs' | translate }}</span>
+    </div>
+    <div class="app-home-stat">
+      <strong>{{ timeRange() }}</strong>
+      <span>{{ 'home.overview.time_range' | translate }}</span>
+    </div>
+    <div class="app-home-stat">
+      <strong>{{ lettersCount() }}</strong>
+      <span>{{ 'letters_count' | translate }}</span>
+    </div>
+  </section>
+
   <section class="app-home-hero" aria-labelledby="app-home-heading">
     <div class="app-home-copy">
       <p class="app-home-eyebrow">{{ 'home.intro.eyebrow' | translate }}</p>
@@ -23,7 +39,7 @@
           </div>
         }
       </div>
-
+      
       <div class="app-search-fields">
 
         <ngxsmk-datepicker 
@@ -46,31 +62,7 @@
           [placeholder]="'field.date_to' | translate"
         ></ngxsmk-datepicker>
 
-        <!-- <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <span matTextPrefix class="app-search-label">{{ 'field.date_from' | translate }}</span>
-          <input matInput [matDatepicker]="datum_od" [(ngModel)]="date_from" [attr.aria-label]="'field.date_from' | translate" (ngModelChange)="searchForm().markAsDirty()" (click)="datum_od.open()">
-          <mat-datepicker-toggle matIconSuffix [for]="datum_od"></mat-datepicker-toggle>
-          <mat-datepicker #datum_od startView="multi-year" [startAt]="year_min" (yearSelected)="doDateFromByYear($event)">
-            <mat-datepicker-actions>
-              <button matButton matDatepickerApply>OK</button>
-              <button matButton matDatepickerCancel>Close</button>
-            </mat-datepicker-actions>
-          </mat-datepicker>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <span matTextPrefix class="app-search-label">{{ 'field.date_to' | translate }}</span>
-          <input matInput [matDatepicker]="datum_do" [(ngModel)]="date_to" [attr.aria-label]="'field.date_to' | translate" (ngModelChange)="searchForm().markAsDirty()" (click)="datum_do.open()">
-          <mat-datepicker-toggle matIconSuffix [for]="datum_do"></mat-datepicker-toggle>
-          <mat-datepicker #datum_do startView="multi-year" [startAt]="year_max" (yearSelected)="doDateToByYear($event)">
-            <mat-datepicker-actions>
-              <button matButton matDatepickerApply>OK</button>
-              <button matButton matDatepickerCancel>Close</button>
-            </mat-datepicker-actions>
-          </mat-datepicker>
-        </mat-form-field> -->
-
-        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="app-search-wide">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" >
           <span matTextPrefix class="app-search-label">{{ 'field.identities' | translate }}</span>
           <input type="text" matInput [attr.aria-label]="'field.identities' | translate" [formField]="searchForm.identities" [matAutocomplete]="autoIdentities">
           <mat-autocomplete #autoIdentities="matAutocomplete">
@@ -80,7 +72,7 @@
           </mat-autocomplete>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="app-search-wide">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" >
           <span matTextPrefix class="app-search-label">{{ 'field.places' | translate }}</span>
           <input type="text" matInput [attr.aria-label]="'field.places' | translate" [formField]="searchForm.places" [matAutocomplete]="autoPlaces">
           <mat-autocomplete #autoPlaces="matAutocomplete">
@@ -124,22 +116,6 @@
       </button>
     </mat-card>
   </section>
-
-  <!-- redesign -->
-  <section class="app-home-overview" [attr.aria-label]="'home.overview.label' | translate">
-    <div class="app-home-stat">
-      <strong>{{ state.tenants().length }}</strong>
-      <span>{{ 'home.overview.catalogs' | translate }}</span>
-    </div>
-    <div class="app-home-stat">
-      <strong>{{ timeRange() }}</strong>
-      <span>{{ 'home.overview.time_range' | translate }}</span>
-    </div>
-    <div class="app-home-stat">
-      <strong>{{ activeViewsCount() }}</strong>
-      <span>{{ 'home.overview.active_views' | translate }}</span>
-    </div>
-  </section>
 </div>
 
 
@@ -147,7 +123,7 @@
 <section class="app-home-views" aria-labelledby="app-home-views-heading">
   <div class="app-home-section-heading">
     <p class="app-home-eyebrow">{{ 'views' | translate }}</p>
-    <h2 id="app-home-views-heading">{{ 'home.views.title' | translate }}</h2>
+    <!-- <h2 id="app-home-views-heading">{{ 'home.views.title' | translate }}</h2> -->
   </div>
 
   <div class="app-home-view-grid">

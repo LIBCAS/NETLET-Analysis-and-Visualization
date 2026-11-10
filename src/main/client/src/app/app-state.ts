@@ -24,6 +24,7 @@ export interface Tenant {
   public places = signal<any>({});
   public identities = signal<any>({});
   public professions = signal<any>({});
+  public lettersCount = signal<any>({});
   public showYears = signal<boolean>(true);
   
 
