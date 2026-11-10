@@ -296,7 +296,7 @@ public class DataServlet extends HttpServlet {
         CATALOGS_IN_TIME {
             @Override
             String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-                return IndexSearcher.catalogsInTime().toString(); 
+                return IndexSearcher.catalogsInTime(request).toString(); 
             }
         },
         IDENTITY_IN_CATALOG {

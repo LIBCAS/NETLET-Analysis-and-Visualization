@@ -67,7 +67,7 @@ export class CatalogsInTimeComponent {
 
   ngOnInit(): void {
     this.state.currentView = this.state.views.find(view => view.route === 'catalogs');
-    this.getData();
+    //this.getData();
   }
 
   onYearsChartInit(e: any) {
@@ -82,7 +82,7 @@ export class CatalogsInTimeComponent {
     this.loading.set(true);
     this.facets.set(null);
     const p: any = {};
-    p.tenant = this.state.selectedTenants().map(t => t.val);
+    //p.tenant = this.state.selectedTenants().map(t => t.val);
     p.rows = 0;
     this.state.addFilters(p);
 
@@ -92,16 +92,10 @@ export class CatalogsInTimeComponent {
         return;
       }
 
-      //this.facets.set(resp.years);
+      this.facets.set(resp);
       this.count = resp.count;
-
-      // if (resp.facets['tenants']?.buckets.length > 0 && this.state.selectedTenants().length === 0) {
-      //   this.state.tenants.update(ts => {
-      //     ts.forEach(t => { t.selected = this.facets()['tenants']?.buckets.findIndex(b => b.val === t.val) > -1 });
-      //     return [...ts]
-      //   });
-      // }
-      this.setYearsChart(resp.tenant);
+      
+      this.setYearsChart(resp.tenant_graph);
       this.loading.set(false);
     });
   }
@@ -197,7 +191,7 @@ export class CatalogsInTimeComponent {
         top: 30,
         left: 30,
         formatter: (name: string) => {
-          return this.translation.instant('catalog.' + name);
+          return this.translation.instant('catalog.' + name + '0') + ' ' + this.translation.instant('catalog.' + name);
         }
       },
       dataZoom: [

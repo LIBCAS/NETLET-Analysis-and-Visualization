@@ -13,6 +13,7 @@
     <div class="app-filters">
       @if (facets()) {
         <app-facets
+        [showTenants]="false"
           [fields]="['authors', 'recipients', 'mentioned', 'identities', 'keyword_categories', 'keywords', 'professions', 'origins', 'destinations', 'languages']"
           [renderLists]="true"
           [facets]="facets()"
@@ -34,15 +35,12 @@
             {{ 'home.catalogs_in_time.header' | translate }}
           </li>
         </ol>
-        <button mat-icon-button type="button" class="app-years-button" [title]="'action.toggle_years_chart' | translate" (click)="state.showYears.set(!state.showYears())">
-          <mat-icon aria-hidden="true">bar_chart</mat-icon>
-        </button>
       </nav>
 
       <header class="app-view-header app-view-card">
         <p>{{ 'home.catalogs_in_time.header' | translate }}</p>
         <h1>{{ 'catalogs_in_time.title' | translate }}</h1>
-        <div>{{ 'home.catalogs_in_time.text' | translate }}</div>
+        <div>{{ 'home.catalogs_in_time.text_long' | translate }}</div>
       </header>
       @if (state.showYears()) {
       <section

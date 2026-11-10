@@ -1096,18 +1096,13 @@ public class IndexSearcher {
 
     String date_range = request.getParameter("date_range");
     if (date_range == null || date_range.isBlank()) {
-      date_range = "1000,2026";
+      date_range = "1500-01-01,2026-12-31"; 
     }
     String[] years = date_range.split(",");
     String gap = "+1MONTH";
-
-//    Date from = dtformatter.parse(years[0]);
-//    Date until = dtformatter.parse(years[1]);
-//    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
-//    LocalDateTime date1 = LocalDate.parse(years[0], dtf).atStartOfDay();
-//    LocalDateTime date2 = LocalDate.parse(years[1], dtf).atStartOfDay();
+    
     LocalDate date1 = LocalDate.parse(years[0].substring(0, 10));
     LocalDate date2 = LocalDate.parse(years[1].substring(0, 10));
     long daysBetween = Duration.between(date1.atStartOfDay(), date2.atStartOfDay()).toDays();
@@ -1619,7 +1614,7 @@ public class IndexSearcher {
     return identities;
   }
   
-  public static JSONObject catalogsInTime() {
+  public static JSONObject catalogsInTime(HttpServletRequest request) {
     JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpJdkSolrClient.Builder(Options.getInstance().getString("solr")).build()) {
       
@@ -1629,14 +1624,18 @@ public class IndexSearcher {
               .setQuery("*:*")
               .withFilter("-tenant:pamatky")
               .withFilter("-tenant:studenti")
-//              .withFacet("years", rangeFacet
-//                      .withSubFacet("tenant", new TermsFacetMap("tenant"))
-//              )
-              .withFacet("tenant", new TermsFacetMap("tenant")
+              .withFacet("tenant_graph", new TermsFacetMap("tenant")
                       .withSubFacet("years",rangeFacet )
                       .setLimit(100)
               )
               .setLimit(0);
+      
+      String lang = request.getParameter("lang");
+      if (lang == null) {
+        lang = "cs";
+      }
+      srequest = addFilters(request, srequest, lang);
+      srequest = addFacets(request, srequest, lang);
 
       srequest.setResponseParser(new InputStreamResponseParser("json"));
 

@@ -61,8 +61,8 @@ export class KeywordsComponent {
   keyword_categories: JSONFacet[];
   selectedKeywords: string[] = [];
 
-  
-  keyword_categories_tree: {[category: string]: string[]};
+
+  keyword_categories_tree: { [category: string]: string[] };
 
   pieOptions: EChartsOption = {};
   pieChart: ECharts;
@@ -104,7 +104,7 @@ export class KeywordsComponent {
     public state: AppState,
     private service: AppService
   ) {
-    
+
     effect(() => {
       const sc = this.state.stateChanged();
       if (sc > 0) {
@@ -194,7 +194,7 @@ export class KeywordsComponent {
     if (this.treeMapChartRecipients && !this.treeMapChartRecipients.isDisposed()) {
       this.treeMapChartRecipients.clear();
     }
-    
+
     this.service.getKeywords(p as HttpParams).subscribe((resp: any) => {
       if (!resp) {
         return;
@@ -277,7 +277,11 @@ export class KeywordsComponent {
         left: 'center'
       },
       legend: {
+        show: true,
         type: data.length > 15 ? 'scroll' : 'plain',
+        backgroundColor: '#fff',
+        borderColor: '#ccc',
+        borderWidth: 1,
         orient: 'vertical',
         right: 10,
         data: data.map(a => a.name),
@@ -318,18 +322,20 @@ export class KeywordsComponent {
           const ids: any = [];
           this.totalBuckets += k.identities.buckets.length;
           k.identities.buckets.forEach((i: any) => {
-            if (i.val){
-            ids.push({
-              value: i.count,
-              name: i.val
-            })}
+            if (i.val) {
+              ids.push({
+                value: i.count,
+                name: i.val
+              })
+            }
           });
-          if (k.val){
-          ks.push({
-            value: k.count,
-            children: ids,
-            name: k.val
-          })}
+          if (k.val) {
+            ks.push({
+              value: k.count,
+              children: ids,
+              name: k.val
+            })
+          }
         }
       });
       data.push({
@@ -365,7 +371,7 @@ export class KeywordsComponent {
       series: [
         {
           roam: 'move',
-          name:  this.translation.instant('keywords_by_category'),
+          name: this.translation.instant('keywords_by_category'),
           type: 'treemap',
           colorMappingBy: 'id',
           leafDepth: 2,

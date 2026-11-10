@@ -133,14 +133,14 @@
     "boundaries": "Zobrazení státních hranic podle roku"
   },
   "identities": {
-    "title": "Korespondenční síť osob",
+    "title": "Korespondenční síť osob a institucí",
     "identity_letters": "{{identity}} — odeslané a přijaté dopisy",
     "author_letters": "{{identity}} — odeslané dopisy",
     "recipient_letters": "{{identity}} — přijaté dopisy",
     "mentioned_letters": "{{identity}} — zmínky v dopisech"
   },
   "centrality": {
-    "title": "Postavení osob v korespondenční síti",
+    "title": "Četnost výskytu osob a institucí v korespondenci",
     "controls": "Nastavení centrality"
   },
   "network": {
@@ -156,11 +156,11 @@
     "recipient_letters": "Dopisy pro příjemce {{identity}} ({{count}})"
   },
   "professions": {
-    "title": "Profesní skupiny v korespondenci",
+    "title": "Profese a sociální role aktérů korespondence",
     "network": "Korespondenční vztahy mezi profesními skupinami"
   },
   "keywords": {
-    "title": "Témata a osoby v korespondenci",
+    "title": "Tematické okruhy a osoby v korespondenci",
     "authors": "Autoři ve vztahu k tématům",
     "recipients": "Adresáti ve vztahu k tématům"
   },
@@ -168,7 +168,7 @@
     "title": "Srovnání témat a profesí napříč obdobími"
   },
   "catalogs_in_time": {
-    "title": "Vývoj korespondence v jednotlivých katalozích"
+    "title": "Dynamika vývoje jednotlivých korespondenčních souborů v čase"
   },
   "navbar": {
     "search": "Vyhledávání",
@@ -207,17 +207,17 @@
     },
     "centrality": {
       "header": "Centralita",
-      "text_long": "Blíže středu a většími body zobrazuje nejfrekventovanější osoby korespondence (autory, adresáty a sdílené osoby či každou z těchto kategorií zvlášť). Kliknutí na konkrétní bod osoby rozbalí seznam dopisů, v němž lze rozkliknout konkrétní dopis s dalšími údaji a vizualizacemi",
+      "text_long": "Blíže středu a většími body zobrazuje nejfrekventovanější osoby a instituce korespondenčního souboru (jako autory, adresáty a zmíněné či každou z těchto kategorií zvlášť). Kliknutí na konkrétní bod osoby rozbalí seznam dopisů, v němž lze rozkliknout konkrétní dopis s dalšími údaji a vizualizacemi.",
       "text": "Centralita aktérů korespondence v dané korespondenční síti"
     },
     "relation": {
       "header": "Vztah mezi dvěma sítěmi",
-      "text_long": "Zobrazuje osoby, které se vyskytují současně ve dvou sítích a které nikoliv",
+      "text_long": "Zobrazuje, kteří adresáti se vyskytují v obou vybraných sítích, a kteří nikoliv.",
       "text": "Sdílení aktérů korespondence mezi dvěma sítěmi"
     },
     "keywords": {
       "header": "Témata a klíčová slova",
-      "text_long": "Zobrazuje podíl kategorií klíčových slov i počet dopisů s konkrétním klíčovým slovem.",
+      "text_long": "Kruhový graf zobrazuje podíl kategorií klíčových slov podle jejich zastoupení ve vybraném souboru dopisů; grafy ve spodní části stránky zobrazují jednotlivá klíčová slova a v detailu i jejich souvislost s konkrétními autory či adresáty.",
       "text": "Tematická charakteristika korespondenčních souboru a vztahy klíčových slov k jednotlivým aktérům."
     },
     "map": {
@@ -232,16 +232,17 @@
     },
     "catalogs_in_time": {
       "header": "Dynamika korespondenčních souborů",
+      "text_long": "Statisticky pojaté grafy a časové osy porovnávají dynamiku vývoje jednotlivých korespondenčních souborů ve vymezeném období",
       "text": "Dynamika vývoje jednotlivých korespondenčních celků v časové dimenzi"
     },
     "identities": {
       "header": "Vztahy mezi aktéry",
-      "text_long": "Zobrazuje autory a adresáty dopisů a poměr těchto dvou rolí.",
+      "text_long": "Zobrazuje autory a adresáty dopisů a poměr těchto dvou rolí u jednotlivých aktérů.",
       "text": "Schémata zobrazující vztahy mezi jednotlivými pisateli a příjemci dopisů"
     },
     "professions": {
       "header": "Profese a sociální role",
-      "text_long": "Zobrazuje poměr profesí autorů a/nebo adresátů podle počtu dopisů nebo podle počtu osob.",
+      "text_long": "Kruhové grafy zobrazují zastoupení jednotlivých profesí autorů, adresátů nebo obou typů aktérů v korespondenční síti; graf vpravo zobrazuje prostý podíl jednotlivých profesí na celkovém počtu aktérů; graf vlevo navíc zohledňuje množství jejich dopisů v celku korespondence.",
       "text": "Profesní složení aktérů korespondence a vztahy mezi různými profesními skupinami"
     },
     "themes": {
@@ -250,7 +251,8 @@
     },
     "timeline": {
       "header": "Časová osa",
-      "text_long": "Udává počet dopisů za den a rok ve vybraném časovém intervalu, tabulka s podrobnějšími údaji umožňuje rozkliknout konkrétní dopis s dalšími údaji a vizualizacemi",
+      "text_long": "Časová osa udává počet dopisů v databázi za jednotlivé dny a roky ve vybraném časovém intervalu (výběr dopisů lze omezit pomocí filtrů v levém sloupci); tabulka s podrobnějšími údaji umožňuje zobrazit detaily konkrétního dopisu.",
+      
       "text": "Zobrazení dopisů v chronologickém pořadí na časové ose"
     }
   },
