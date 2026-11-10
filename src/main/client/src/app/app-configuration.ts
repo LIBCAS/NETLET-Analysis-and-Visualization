@@ -51,48 +51,51 @@ SOFTWARE.
 */
 public HOME_VIEW_ICONS: Record<string, string> = {
   timeline: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M4 12h.01" />
-    <path d="M4 16h.01" />
-    <path d="M4 20h.01" />
-    <path d="M4 4h.01" />
-    <path d="M4 8h.01" />
-    <path d="M9.414 13.414a2 2 0 0 0 1.414.586H19a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-8.172a2 2 0 0 0-1.414.586L8 12z" />
-    <path d="M9.414 21.414a2 2 0 0 0 1.414.586H19a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-8.172a2 2 0 0 0-1.414.586L8 20z" />
-    <path d="M9.414 5.414A2 2 0 0 0 10.828 6H19a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1h-8.172a2 2 0 0 0-1.414.586L8 4z" />
+    <path d="M2 19h20" />
+    <path d="M4 19v2m5-2v2m5-2v2m5-2v2" />
+    <path d="m4 14 5-5 5 3 5-7" />
+    <circle cx="4" cy="14" r="1" fill="currentColor" stroke="none" />
+    <circle cx="9" cy="9" r="1" fill="currentColor" stroke="none" />
+    <circle cx="14" cy="12" r="1" fill="currentColor" stroke="none" />
+    <circle cx="19" cy="5" r="1" fill="currentColor" stroke="none" />
   </svg>`,
   map: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z" />
     <path d="M15 5.764v15" />
     <path d="M9 3.236v15" />
   </svg>`,
-  network: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="16" y="16" width="6" height="6" rx="1" />
-    <rect x="2" y="16" width="6" height="6" rx="1" />
-    <rect x="9" y="2" width="6" height="6" rx="1" />
+  identities: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="19" cy="19" r="3" />
+    <circle cx="5" cy="19" r="3" />
+    <circle cx="12" cy="5" r="3" />
     <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
     <path d="M12 12V8" />
   </svg>`,
-  activity: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
+  centrality: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="12" cy="12" rx="10" ry="9" />
+    <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="5" r="1.25" fill="currentColor" stroke="none" />
+    <circle cx="19" cy="12" r="1.25" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="19" r="1.25" fill="currentColor" stroke="none" />
+    <circle cx="5" cy="12" r="1.25" fill="currentColor" stroke="none" />
   </svg>`,
-  split: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M16 3h5v5" />
-    <path d="M8 3H3v5" />
-    <path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3" />
-    <path d="m15 9 6-6" />
+  relation: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 5.68a7 7 0 0 1 0 12.64 7 7 0 0 1 0-12.64Z" fill="currentColor" fill-opacity=".18" stroke="none" />
+    <circle cx="9" cy="12" r="7" />
+    <circle cx="15" cy="12" r="7" />
   </svg>`,
-  briefcase: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  professions: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 12h.01" />
     <path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
     <path d="M22 13a18.15 18.15 0 0 1-20 0" />
     <rect width="20" height="14" x="2" y="6" rx="2" />
   </svg>`,
-  tags: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  keywords: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M13.172 2a2 2 0 0 1 1.414.586l6.71 6.71a2.4 2.4 0 0 1 0 3.408l-4.592 4.592a2.4 2.4 0 0 1-3.408 0l-6.71-6.71A2 2 0 0 1 6 9.172V3a1 1 0 0 1 1-1z" />
     <path d="M2 7v6.172a2 2 0 0 0 .586 1.414l6.71 6.71a2.4 2.4 0 0 0 3.191.193" />
     <circle cx="10.5" cy="6.5" r=".5" fill="currentColor" />
   </svg>`,
-  layers: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  periods: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
     <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
     <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
@@ -117,6 +120,20 @@ public HOME_VIEW_ICONS: Record<string, string> = {
     <line x1="12" x2="12.01" y1="8" y2="8" />
   </svg>`
 };
+
+
+
+  readonly viewAppearance: Record<string, { icon: string; color: string }> = {
+    timeline: { icon: 'timeline', color: '#b6463f' },
+    map: { icon: 'map', color: '#2f6f73' },
+    identities: { icon: 'identities', color: '#4457a6' },
+    centrality: { icon: 'centrality', color: '#8b4a88' },
+    relation: { icon: 'relation', color: '#a05c2f' },
+    professions: { icon: 'professions', color: '#55713b' },
+    keywords: { icon: 'keywords', color: '#967029' },
+    periods: { icon: 'periods', color: '#385f8b' },
+    catalogs_in_time: { icon: 'chart', color: '#6d6d76' }
+  };
 
 
     public config: Configuration;

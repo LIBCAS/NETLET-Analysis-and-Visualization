@@ -42,12 +42,12 @@
               routerLinkActive="app-active"
               #viewLink="routerLinkActive"
               [attr.aria-current]="viewLink.isActive ? 'page' : null"
-              [style.--app-view-accent]="viewAppearance[t.header].color"
+              [style.--app-view-accent]="config.viewAppearance[t.header].color"
               [title]="'home.' + t.header + '.text' | translate"
               (click)="gotoView(t)">
               <span class="app-navbar-view-content">
                 <span class="app-navbar-view-icon">
-                  <mat-icon [svgIcon]="'app-navbar:' + viewAppearance[t.header].icon" aria-hidden="true"></mat-icon>
+                  <mat-icon [svgIcon]="'app-navbar:' + config.viewAppearance[t.header].icon" aria-hidden="true"></mat-icon>
                 </span>
                 <span class="app-navbar-view-label">{{ 'home.' + t.header + '.header' | translate }}</span>
                 @if (viewLink.isActive) {

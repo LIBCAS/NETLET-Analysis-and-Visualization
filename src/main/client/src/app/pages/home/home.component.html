@@ -122,21 +122,22 @@
 <!-- redesign -->
 <section class="app-home-views" aria-labelledby="app-home-views-heading">
   <div class="app-home-section-heading">
-    <p class="app-home-eyebrow">{{ 'views' | translate }}</p>
+    <!-- <p class="app-home-eyebrow">{{ 'views' | translate }}</p> -->
+    <p class="app-home-eyebrow">{{ 'home.views.title' | translate }}</p>
     <!-- <h2 id="app-home-views-heading">{{ 'home.views.title' | translate }}</h2> -->
   </div>
 
   <div class="app-home-view-grid">
     @for (card of state.views; track card.header) {
-      <mat-card appearance="outlined" class="app-home-view-card" [class.app-disabled]="!card.route" [style.--app-view-accent]="viewAppearance[card.header].color">
+      <mat-card appearance="outlined" class="app-home-view-card"  [style.--app-view-accent]="config.viewAppearance[card.header].color">
         <a
           class="app-home-view-link"
           role="link"
           [attr.href]="card.route ? '/' + card.route : null"
-          [attr.aria-disabled]="!card.route"
+          [attr.aria-disabled]="state.hasStateInUrl()"
           (click)="$event.preventDefault(); gotoView(card.route)">
           <span class="app-home-view-icon">
-            <mat-icon [svgIcon]="'app-home:' + viewAppearance[card.header].icon" aria-hidden="true"></mat-icon>
+            <mat-icon [svgIcon]="'app-home:' + config.viewAppearance[card.header].icon" aria-hidden="true"></mat-icon>
           </span>
           <div class="app-home-view-copy">
             <mat-card-title>{{ 'home.' + card.header + '.header' | translate }}</mat-card-title>

@@ -36,20 +36,6 @@ export class HomeComponent {
   public config = inject(AppConfiguration);
 
   readonly router = inject(Router);
-
-  readonly viewAppearance: Record<string, { icon: string; color: string }> = {
-    timeline: { icon: 'timeline', color: '#b6463f' },
-    map: { icon: 'map', color: '#2f6f73' },
-    identities: { icon: 'network', color: '#4457a6' },
-    centrality: { icon: 'activity', color: '#8b4a88' },
-    relation: { icon: 'split', color: '#a05c2f' },
-    professions: { icon: 'briefcase', color: '#55713b' },
-    keywords: { icon: 'tags', color: '#967029' },
-    periods: { icon: 'layers', color: '#385f8b' },
-    catalogs_in_time: { icon: 'chart', color: '#6d6d76' },
-    themes: { icon: 'sparkles', color: '#6d6d76' }
-  };
-
   readonly dateAdapter = inject(DateAdapter);
 
   readonly lettersCount = computed(() => this.state.lettersCount());
@@ -258,9 +244,11 @@ export class HomeComponent {
   gotoView(view: string) {
     window.scroll(0, 0);
     this.setFilters();
-    //if (this.state.hasStateInUrl()) {
+    if (this.state.hasStateInUrl()) {
       this.router.navigate([view], { queryParams: { s: this.state.encodeState() } });
-    //}
+    } else {
+      alert('Nejprve vyberte jeden či více katalogů.')
+    }
     
   }
 

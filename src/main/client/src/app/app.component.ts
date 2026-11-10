@@ -1,5 +1,5 @@
 import { afterRenderEffect, Component, ElementRef, inject, Inject, DOCUMENT, viewChild } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Event, NavigationEnd, NavigationStart, Router, RouterModule } from '@angular/router';
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { FooterComponent } from "./components/footer/footer.component";
 import { AppState } from './app-state';
@@ -50,8 +50,11 @@ export class AppComponent {
         return of(true);
       })
     );
-    this.router.events.subscribe(() => {
-      this.state.isHome.set(false);
+    this.router.events.subscribe((event: Event) => {
+      if (event instanceof NavigationEnd) {
+        this.state.isHome.set(event.url === '/' || event.url.includes('home'))
+      }
+      
     });
     s.subscribe();
   }
