@@ -203,26 +203,25 @@
 
   h1 {
     margin: 10px 0 16px;
-    font-size: clamp(32px, 5.2vw, 48px);
+    font-size: clamp(28px, 5.2vw, 28px);
+    color: var(--app-color-primary-strong);
     line-height: .98;
     overflow-wrap: break-word;
+    text-transform: uppercase;
   }
 }
 
 .app-home-eyebrow {
   margin: 0;
-  color: var(--app-color-primary-strong);
-  font-size: 14px;
+  font-size: 24px;
   font-weight: 800;
-  letter-spacing: .12em;
-  text-transform: uppercase;
 }
 
 .app-home-lede {
   max-width: 600px;
   margin-top: 30px;
   color: var(--app-color-muted);
-  font-size: clamp(17px, 2vw, 21px);
+  font-size: clamp(20px, 2vw, 20px);
   line-height: 1.55;
 }
 
