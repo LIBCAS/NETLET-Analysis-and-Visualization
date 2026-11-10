@@ -40,6 +40,7 @@
               class="app-navbar-view-item"
               queryParamsHandling="preserve"
               routerLinkActive="app-active"
+              [routerLink]="t.route"
               #viewLink="routerLinkActive"
               [attr.aria-current]="viewLink.isActive ? 'page' : null"
               [style.--app-view-accent]="config.viewAppearance[t.header].color"
@@ -61,15 +62,6 @@
     }
 
     @if(state.isHome()) {
-    <!-- <a
-      mat-button
-      class="app-navbar-link app-navbar-external"
-      href="https://netlet-conversion-editor.inovatika.dev/"
-      target="_blank"
-      rel="noreferrer">
-      <span>{{ 'navbar.conversion_editor' | translate }}</span>
-      <mat-icon aria-hidden="true">open_in_new</mat-icon>
-    </a> -->
 
     <a
       mat-button

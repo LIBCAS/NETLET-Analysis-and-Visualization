@@ -122,7 +122,7 @@ export class TimelineComponent {
     private translation: TranslateService,
     public state: AppState,
     private service: AppService,
-    private config: AppConfiguration,
+    public config: AppConfiguration,
     private datePipe: DatePipe
   ) {
     effect(() => {

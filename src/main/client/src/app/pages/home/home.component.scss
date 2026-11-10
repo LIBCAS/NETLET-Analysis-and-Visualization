@@ -184,14 +184,15 @@
 
 // redesign
 .app-home-intro {
-  // background-image: url(/assets/img/professions.png) ;
-  // background-color: rgba(255,255,255,0.8);
-  background: linear-gradient(
-    to bottom,
-    var(--app-color-soft) calc(100% - var(--app-home-overview-overlap)),
-    var(--app-color-paper) 0
-  );
+  background-image: url(/assets/img/professions.png) ;
+  background-color: rgba(255,255,255,0.8);
   background-blend-mode: lighten;
+  
+  // background: linear-gradient(
+  //   to bottom,
+  //   var(--app-color-soft) calc(100% - var(--app-home-overview-overlap)),
+  //   var(--app-color-paper) 0
+  // );
 }
 
 .app-home-hero {

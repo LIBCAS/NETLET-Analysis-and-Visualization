@@ -204,6 +204,7 @@ public class IndexSearcher {
       final JsonQueryRequest srequest = new JsonQueryRequest()
               .setQuery("*:*")
               //.withFilter("place_id:" + id)
+              .withFacet("total", new QueryFacetMap("place_id:" + id))
               .withFacet("orig", new QueryFacetMap("origin_id:" + id))
               .withFacet("dest", new QueryFacetMap("destination_id:" + id))
               .withFacet("mentioned", new QueryFacetMap("full_text_cs:\"" + ret.optString("name") + "\""))

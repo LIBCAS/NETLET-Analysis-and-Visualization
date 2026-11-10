@@ -20,6 +20,7 @@ interface PlaceDetail {
   geoname_id?: number | string;
   stats?: {
     count?: number;
+    total?: { count?: number };
     orig?: { count?: number };
     dest?: { count?: number };
     mentioned?: { count?: number };
