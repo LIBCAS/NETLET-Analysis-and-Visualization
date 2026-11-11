@@ -102,7 +102,9 @@ export class RelationComponent {
     this.translation.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
       if (this.graphChart && this.graphData) {
         this.graphChart.setOption({
-          legend: [{ formatter: (name: string) => this.translation.instant('catalog.' + name) }]
+          legend: [{ formatter: (name: string) => this.translation.instant('catalog.' + name + '0') + ' ' +
+            this.translation.instant('catalog.' + name)
+           }]
         });
       }
       if (this.infoIdentity) {
@@ -400,7 +402,7 @@ export class RelationComponent {
             return a.name;
           }),
           formatter: (name: string) => {
-            return this.translation.instant('catalog.' + name);
+            return this.translation.instant('catalog.' + name + '0') + ' ' + this.translation.instant('catalog.' + name) ;
           }
         }
       ],

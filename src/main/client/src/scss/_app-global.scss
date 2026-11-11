@@ -432,7 +432,6 @@ main > :has(> .app-analysis-layout .app-view-content) {
 }
 
 .app-view-breadcrumbs {
-  display: none;
   font-size: 13px;
   color: var(--app-color-muted);
 
@@ -460,6 +459,7 @@ main > :has(> .app-analysis-layout .app-view-content) {
   }
   .app-years-button {
     position: absolute; right: 30px; top: 15px;
+    cursor: pointer;
   }
 
   button {
@@ -530,6 +530,43 @@ main > :has(> .app-analysis-layout .app-view-content) {
     font-size: 14px;
     line-height: 1.6;
   }
+
+  
+  .app-years-button {
+    position: absolute; right: 35px; top: 35px;
+    cursor: pointer;
+  }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--app-color-line);
+    border-radius: 8px;
+    background: var(--app-color-paper);
+    color: var(--app-color-map-link);
+    box-shadow: var(--app-shadow-soft);
+
+    &:hover:not(:disabled) {
+      border-color: var(--app-color-map-link);
+      background: var(--app-color-gray-1);
+    }
+
+    &:disabled {
+      color: var(--app-color-gray-4);
+      box-shadow: none;
+    }
+  }
+
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+
 }
 
 .app-view-chart {
@@ -628,19 +665,3 @@ main:is(.app-scroll-page, .app-scroll-panels) .app-view-content.app-view-long-co
 .mat-content > mat-panel-title, .mat-content > mat-panel-description {
   flex: 0 0 auto;
 }
-
-
-  .app-navbar-view-icon {
-    place-items: center;
-    height: 34px;
-    border-radius: 8px;
-    color: var(--app-view-accent);
-    background: color-mix(in srgb, var(--app-view-accent), #ffffff 86%);
-
-    mat-icon {
-      width: 20px;
-      height: 20px;
-      margin: 0;
-      color: inherit;
-    }
-  }

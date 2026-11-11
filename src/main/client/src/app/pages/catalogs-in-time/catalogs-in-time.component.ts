@@ -158,7 +158,9 @@ export class CatalogsInTimeComponent {
           params.forEach((serie: any) => {
             if (serie.value[1] > 0) {
               ret += `${serie.marker}<span style="font-size:14px;color:#6d6e73;font-weight:400;margin-left:2px">
-              ${this.translation.instant('catalog.' + serie.seriesName)}</span><span style="float:right;margin-left:20px;font-size:14px;color:#6d6e73;font-weight:900">${serie.value[1]}</span><br/>`;
+              ${this.translation.instant('catalog.' + serie.seriesName + '0')} ${this.translation.instant('catalog.' + serie.seriesName)}
+              </span>
+              <span style="float:right;margin-left:20px;font-size:14px;color:#6d6e73;font-weight:900">${serie.value[1]}</span><br/>`;
             }
           });
           return ret;
