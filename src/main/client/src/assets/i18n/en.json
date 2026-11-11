@@ -208,34 +208,42 @@
     },
     "centrality": {
       "header": "Centrality",
+      "text_long": "The most frequent people and institutions in a correspondence collection appear as larger points closer to the center. You can view authors, recipients and mentioned people together or separately. Click a person's point to open a list of their letters, then select a letter to see its details and visualizations.",
       "text": "Centrality of correspondence participants in a given correspondence network"
     },
     "relation": {
       "header": "Relationship between two networks",
+      "text_long": "Shows which recipients appear in both selected networks and which appear in only one.",
       "text": "The extent of their intermediary role between two networks"
     },
     "keywords": {
       "header": "Keywords",
+      "text_long": "The pie chart shows the proportion of keyword categories in the selected letters. The charts below show individual keywords and, in their details, how they relate to particular authors or recipients.",
       "text": "Co-citation networks mapping people mentioned in letters in relation to specific topics or debates."
     },
     "map": {
       "header": "Map",
+      "text_long": "Shows where letters were sent from and received. The size and shade of each point vary with the number of letters (see the legend below the timeline). Arrows indicate the direction of correspondence.",
       "text": "Digital visualizations focused on the geographical scope of individual personal correspondence collections."
     },
     "periods": {
       "header": "Periods",
+      "text_long": "Compare the proportions of keyword categories or of recipients' and authors' professions across three periods of Czech history (1580–1670, 1870–1939 and 1939–1989).",
       "text": "Comparative visualizations across three main periods"
     },
     "catalogs_in_time": {
       "header": "Catalog dynamics",
+      "text_long": "Statistical charts and timelines compare how individual correspondence collections developed over the selected period.",
       "text": "Statistical charts and timelines comparing the evolution of individual correspondence collections over time"
     },
     "identities": {
       "header": "Relationships between people",
+      "text_long": "Shows the authors and recipients of letters and the balance between these two roles for each person.",
       "text": "Diagrams showing relationships between individual letter writers and recipients"
     },
     "professions": {
       "header": "Professions",
+      "text_long": "The pie charts show the distribution of professions among authors, recipients or both groups in the correspondence network. The chart on the right shows each profession's share of all people; the chart on the left also takes into account how many letters they wrote or received.",
       "text": "Diagrams showing correspondence relationships between different professional groups"
     },
     "themes": {
@@ -244,6 +252,7 @@
     },
     "timeline": {
       "header": "Timeline",
+      "text_long": "The timeline shows the number of letters in the database by day and year within the selected time range. Use the filters in the left panel to narrow the selection; the table provides more information and lets you open individual letter details.",
       "text": "Letters displayed in chronological order on a timeline"
     }
   },
@@ -307,7 +316,14 @@
     "year_from": "From year",
     "year_to": "To year",
     "date_from": "From",
-    "date_to": "To"
+    "date_to": "To",
+    "has_content_count": "Number of letters with full text",
+    "has_media_count": "Number of letters with an attachment",
+    "date_marked": "Date marked in the letter",
+    "date_approximate": "Date is approximate",
+    "date_uncertain": "Date is uncertain",
+    "date_inferred": "Date is inferred",
+    "date_note": "Note on the date"
   },
   "action": {
     "exclude_filter": "Exclude from filter",
