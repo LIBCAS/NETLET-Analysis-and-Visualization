@@ -269,6 +269,9 @@ export class ProfessionsComponent {
       },
       legend: {
         type: data.length > 45 ? 'scroll' : 'plain',
+        backgroundColor: '#fff',
+        borderColor: '#ccc',
+        borderWidth: 1,
         orient: 'vertical',
         padding: 0,
         textStyle: {
@@ -344,6 +347,9 @@ export class ProfessionsComponent {
       legend: {
         type: data.length > 20 ? 'scroll' : 'plain',
         orient: 'vertical',
+        backgroundColor: '#fff',
+        borderColor: '#ccc',
+        borderWidth: 1,
         right: 10,
         padding: 0,
         textStyle: {
