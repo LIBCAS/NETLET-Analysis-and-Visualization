@@ -130,7 +130,7 @@ public class DataServlet extends HttpServlet {
                 JSONObject json = new JSONObject();
                 try {
                     HikoIndexer hi = new HikoIndexer();
-                    json = hi.indexGlobalProfessions();
+                    json = hi.indexProfessions(); 
                 } catch (Exception ex) {
                     LOGGER.log(Level.SEVERE, "Error {0}", ex);
                     json.put("error", ex.toString());

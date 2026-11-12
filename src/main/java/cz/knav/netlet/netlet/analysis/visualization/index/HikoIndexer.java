@@ -129,7 +129,7 @@ public class HikoIndexer {
       JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
       for (int i = 0; i < docs.length(); i++) {
         JSONObject d = docs.getJSONObject(i);
-        professions.put(d.getString("id") + "", d);
+        professions.put(d.getString("id"), d);
       }
 
     } catch (Exception ex) {
@@ -693,12 +693,15 @@ public class HikoIndexer {
       JSONObject ap = author_prof.getJSONObject(i);
       String ascope = ap.optString("scope");
       String pr_author_id = ("local".equals(ascope) ? tenant : "global") + "_" + ap.getInt("id");
+      String prcat_author_id = ap.getInt("category_id") + "";
       for (int j = 0; j < recipient_prof.length(); j++) {
         JSONObject rs = recipient_prof.getJSONObject(j);
         String rscope = rs.optString("scope");
         String pr_recipient_id = ("local".equals(rscope) ? tenant : "global") + "_" + rs.getInt("id");
+        String prcat_recipient_id = rs.getInt("category_id") + "";
 
         doc.addField("professions_link_id", pr_author_id + "-" + pr_recipient_id);
+        doc.addField("professions_category_link_id", prcat_author_id + "-" + prcat_recipient_id); 
       }
     }
   }
@@ -711,12 +714,13 @@ public class HikoIndexer {
       JSONObject rs = lprofessions.getJSONObject(i);
 
       String scope = rs.optString("scope");
-      String id = ("local".equals(scope) ? tenant : "global") + "_" + rs.getInt("id");
+      String id_prefix = ("local".equals(scope) ? tenant : "global") + "_";
+      String id = id_prefix + rs.getInt("id");
 
       JSONObject k = rs.optJSONObject("name")
               .put("id", id);
 
-      doc.addField("professions_id", rs.getInt("id"));
+      //doc.addField("professions_id", id);
       doc.addField("professions_cs", k.optString("cs", null));
       doc.addField("professions_en", k.optString("en", null));
       doc.addField("professions_" + role + "_id", id);
@@ -726,9 +730,10 @@ public class HikoIndexer {
         JSONObject pc = professions.getJSONObject(id);
 
         k.put("category", pc);
-        doc.addField("professions_category_id", pc.optInt("category_id"));
+        doc.addField("professions_cat_id", pc.optString("category_id"));
         doc.addField("professions_category_cs", pc.optString("category_cs", null));
         doc.addField("professions_category_en", pc.optString("category_en", null));
+        doc.addField("professions_category_" + role + "_id", pc.optString("category_id")+"");
         doc.addField("professions_category_" + role + "_cs", pc.optString("category_cs", null));
         doc.addField("professions_category_" + role + "_en", pc.optString("category_en", null));
       }
@@ -796,7 +801,7 @@ public class HikoIndexer {
       JSONArray docs = new JSONObject(response.body()).getJSONArray("data");
       for (int i = 0; i < docs.length(); i++) {
         JSONObject d = docs.getJSONObject(i);
-        globalProfessionCategories.put((isGlobal ? "global" : tenant) + "-" + d.getInt("id"), d);
+        globalProfessionCategories.put((isGlobal ? "global" : tenant) + "_" + d.getInt("id"), d);
       }
     }
   }
@@ -984,7 +989,9 @@ public class HikoIndexer {
               doc.addField("professions", p.toString());
               doc.addField("professions_cs", p.getJSONObject("name").optString("cs"));
               doc.addField("professions_en", p.getJSONObject("name").optString("en"));
-              doc.addField("professions_category", p.optInt("category_id"));
+              if (p.has("category_id")) {
+                doc.addField("professions_category", p.getString("scope") + "_" + p.optInt("category_id"));
+              }
             }
           }
 
@@ -1503,7 +1510,7 @@ public class HikoIndexer {
     if (Options.getInstance().getBoolean("isVaTest", true)) {
       t = Options.getInstance().getJSONObject("test_mappings").getString(tenant);
     }
-    initKeywordCategories(tenant, false);
+    initProfessionCategories(tenant, false);
     String url = Options.getInstance().getJSONObject("hiko").getString("api")
             .replace("{tenant}", t)
             + "/professions?per_page=100";
@@ -1551,10 +1558,10 @@ public class HikoIndexer {
       doc.addField("type", rs.optString("type"));
       if (rs.has("category_id")) {
         int category_id = rs.optInt("category_id");
-        doc.addField("category_id", category_id);
-        if (globalProfessionCategories.has(tenant + "-" + category_id)) {
-          doc.addField("category_cs", globalProfessionCategories.getJSONObject(tenant + "-" + category_id).getJSONObject("name").getString("cs"));
-          doc.addField("category_en", globalProfessionCategories.getJSONObject(tenant + "-" + category_id).getJSONObject("name").getString("en"));
+        doc.addField("category_id", tenant + "_" + category_id);
+        if (globalProfessionCategories.has(tenant + "_" + category_id)) {
+          doc.addField("category_cs", globalProfessionCategories.getJSONObject(tenant + "_" + category_id).getJSONObject("name").getString("cs")); 
+          doc.addField("category_en", globalProfessionCategories.getJSONObject(tenant + "_" + category_id).getJSONObject("name").getString("en"));
         }
       }
 

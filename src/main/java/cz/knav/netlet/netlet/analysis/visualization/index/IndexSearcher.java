@@ -362,12 +362,13 @@ public class IndexSearcher {
 
   public static JSONObject getAllProfessions() throws URISyntaxException, IOException, InterruptedException {
 
-    JSONObject places = new JSONObject();
+    JSONObject pr = new JSONObject();
+    JSONObject prcat = new JSONObject();
     try (SolrClient solr = new HttpJettySolrClient.Builder(Options.getInstance().getString("solr")).build()) {
 
       JsonQueryRequest jrequest = new JsonQueryRequest()
               .setQuery("*:*")
-              .returnFields("id,name_cs,name_en")
+              .returnFields("id,name_cs,name_en,category_id,category_cs,category_en")
               .setLimit(10000);
 
       jrequest.setResponseParser(new InputStreamResponseParser("json"));
@@ -379,14 +380,22 @@ public class IndexSearcher {
       JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
       for (int i = 0; i < docs.length(); i++) {
         JSONObject d = docs.getJSONObject(i);
-        places.put(d.getString("id") + "", d);
-      }
+        pr.put(d.getString("id") + "", d);
+        if (d.has("category_cs")) {
+          prcat.put(d.optInt("category_id") + "", 
+                  new JSONObject()
+                           .put("name_cs", d.optString("category_cs"))
+                           .put("name_en", d.optString("category_en"))
+                           );
+        }
+      } 
 
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, "Error {0}", ex);
       // ret.put("error", ex);
     }
-    return places;
+    pr.put("categories", prcat);
+    return pr;
   }
 
   public static JSONObject getAllIdentities() throws URISyntaxException, IOException, InterruptedException {
@@ -963,6 +972,9 @@ public class IndexSearcher {
                       .setMinCount(1))
               
               .withFacet("links", new TermsFacetMap("professions_link_id") 
+                        .setLimit(-1)
+                        .setMinCount(1))
+              .withFacet("category_links", new TermsFacetMap("professions_category_link_id") 
                         .setLimit(-1)
                         .setMinCount(1))
               .withFacet("chart_authors", new TermsFacetMap("professions_author_id")
